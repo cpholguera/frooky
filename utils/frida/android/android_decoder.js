@@ -186,7 +186,7 @@ function decodeCursor(value){
       out = out + "\n";
     } while (cursor.moveToNext());
 
-    cursor.move(originalCursorPosition);
+    cursor.moveToPosition(originalCursorPosition);
   }
   return out;
 }
