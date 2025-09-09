@@ -125,7 +125,7 @@ function registerAllHooks(hook, categoryName, callback) {
         }
       } catch (err) {
         console.error(err)
-        console.error("Problem when overloading " + hook.class + ":" + hook.methods[m]);
+        console.error(`Problem when overloading ${hook.class}:${hook.methods[m]}`);
       }
     }
 }
