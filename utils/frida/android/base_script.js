@@ -200,11 +200,15 @@ function findOverloadIndex(methodHandle, argTypes) {
  */
 function buildHookOperations(hook) {
   var operations = [];
+  var errors = [];
 
   try {
     // Invalid configuration: methods + overloads (logged elsewhere)
     if (hook.methods && hook.overloads && hook.overloads.length > 0) {
-      return { operations: operations, count: 0 };
+      var errInvalid = "Invalid hook configuration for " + hook.class + ": 'overloads' is only supported with a singular 'method', not with 'methods'.";
+      console.error(errInvalid);
+      errors.push(errInvalid);
+      return { operations: operations, count: 0, errors: errors, errorCount: errors.length };
     }
 
     // Explicit overload list for single method
@@ -228,12 +232,15 @@ function buildHookOperations(hook) {
               argsExplicit.join(", ") +
               "]. This hook will be skipped."
             );
+            errors.push("Overload not found for " + hook.class + ":" + hook.method + " with args [" + argsExplicit.join(", ") + "]");
           }
         }
       } catch (e) {
-        console.warn("Warning: Failed to process method '" + hook.method + "' in class '" + hook.class + "': " + e);
+        var errMsg = "Failed to process method '" + hook.method + "' in class '" + hook.class + "': " + e;
+        console.warn("Warning: " + errMsg);
+        errors.push(errMsg);
       }
-      return { operations: operations, count: operations.length };
+      return { operations: operations, count: operations.length, errors: errors, errorCount: errors.length };
     }
 
     // Single method without explicit overloads: all overloads
@@ -245,9 +252,11 @@ function buildHookOperations(hook) {
           operations.push({ clazz: hook.class, method: hook.method, overloadIndex: i, args: paramsAll });
         }
       } catch (e) {
-        console.warn("Warning: Failed to process method '" + hook.method + "' in class '" + hook.class + "': " + e);
+        var errMsg2 = "Failed to process method '" + hook.method + "' in class '" + hook.class + "': " + e;
+        console.warn("Warning: " + errMsg2);
+        errors.push(errMsg2);
       }
-      return { operations: operations, count: operations.length };
+      return { operations: operations, count: operations.length, errors: errors, errorCount: errors.length };
     }
 
     // Multiple methods: all overloads for each
@@ -261,17 +270,21 @@ function buildHookOperations(hook) {
             operations.push({ clazz: hook.class, method: mName, overloadIndex: j, args: paramsEach });
           }
         } catch (e) {
-          console.warn("Warning: Failed to process method '" + mName + "' in class '" + hook.class + "': " + e);
+          var errMsg3 = "Failed to process method '" + mName + "' in class '" + hook.class + "': " + e;
+          console.warn("Warning: " + errMsg3);
+          errors.push(errMsg3);
         }
       }
-      return { operations: operations, count: operations.length };
+      return { operations: operations, count: operations.length, errors: errors, errorCount: errors.length };
     }
   } catch (e) {
     // Log the error to aid debugging; returning partial results
-    console.error("Error in buildHookOperations for hook:", hook, "\n", e);
+    var errMsg4 = "Error in buildHookOperations for hook: " + (hook && hook.class ? hook.class : "<unknown>") + ": " + e;
+    console.error(errMsg4);
+    errors.push(errMsg4);
   }
 
-  return { operations: operations, count: operations.length };
+  return { operations: operations, count: operations.length, errors: errors, errorCount: errors.length };
 }
 
 /**
@@ -319,8 +332,14 @@ Java.perform(function () {
     // Aggregate map nested by class then method
     var aggregate = {};
     var total = 0;
+    var errors = [];
+    var totalErrors = 0;
     hookOperationsCache.forEach(function (cached) {
       total += cached.built.count;
+      if (cached.built.errors && cached.built.errors.length) {
+        Array.prototype.push.apply(errors, cached.built.errors);
+        totalErrors += cached.built.errors.length;
+      }
       cached.built.operations.forEach(function (op) {
         if (!aggregate[op.clazz]) {
           aggregate[op.clazz] = {};
@@ -345,7 +364,7 @@ Java.perform(function () {
       }
     }
 
-    var summary = { type: "summary", hooks: overloadList, totalHooks: total };
+    var summary = { type: "summary", hooks: overloadList, totalHooks: total, errors: errors, totalErrors: totalErrors };
     console.log(JSON.stringify(summary, null, 2));
   } catch (e) {
     // If summary fails, don't block hooking
