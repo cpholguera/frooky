@@ -95,7 +95,7 @@ function registerHook(
 
     const event = {
       id: generateUUID(),
-        type: "hook",
+      type: "hook",
       category: categoryName,
       time: new Date().toISOString(),
       class: clazz,
@@ -152,8 +152,51 @@ function findOverloadIndex(methodHandle, argTypes) {
  * Builds a normalized list of hook operations for a single hook definition.
  * Each operation contains clazz, method, overloadIndex, and args array (decoded parameter types).
  * This centralizes selection logic used for both summary emission and hook registration.
- * @param {object} hook
+ *
+ * The function supports several hook configuration scenarios:
+ * - If both `methods` and `overloads` are specified, the configuration is considered invalid and no operations are returned.
+ * - If a single `method` and an explicit list of `overloads` are provided, only those overloads are considered.
+ * - If only `methods` is provided, all overloads for each method are included.
+ * - If only `method` is provided, all overloads for that method are included.
+ * - If neither is provided, or if the configuration is invalid, no operations are returned.
+ *
+ * Error handling:
+ * - If an explicit overload is not found, it is skipped and not included in the operations.
+ * - If an exception occurs during processing, it is logged and the function returns the operations collected so far.
+ *
+ * @param {object} hook - Hook definition object. Supported formats:
+ *   - { class: string, method: string }
+ *   - { class: string, methods: string[] }
+ *   - { class: string, method: string, overloads: Array<{ args: string[] }> }
  * @returns {{operations: Array<{clazz:string, method:string, overloadIndex:number, args:string[]}>, count:number}}
+ *
+ * @example
+ * // Hook all overloads of a single method
+ * buildHookOperations({ class: "android.net.Uri", method: "parse" });
+ *
+ * @example
+ * // Hook all overloads of multiple methods
+ * buildHookOperations({ class: "android.net.Uri", methods: ["parse", "toString"] });
+ *
+ * @example
+ * // Hook specific overloads of a method
+ * buildHookOperations({
+ *   class: "android.net.Uri",
+ *   method: "parse",
+ *   overloads: [
+ *     { args: ["java.lang.String"] },
+ *     { args: ["android.net.Uri"] }
+ *   ]
+ * });
+ *
+ * @example
+ * // Invalid configuration: both methods and overloads
+ * buildHookOperations({
+ *   class: "android.net.Uri",
+ *   methods: ["parse"],
+ *   overloads: [{ args: ["java.lang.String"] }]
+ * });
+ * // Returns { operations: [], count: 0 }
  */
 function buildHookOperations(hook) {
   var operations = [];
@@ -166,25 +209,43 @@ function buildHookOperations(hook) {
 
     // Explicit overload list for single method
     if (hook.method && hook.overloads && hook.overloads.length > 0) {
-      var handle = Java.use(hook.class)[hook.method];
-      for (var o = 0; o < hook.overloads.length; o++) {
-        var def = hook.overloads[o];
-        var argsExplicit = Array.isArray(def.args) ? def.args : [];
-        var idx = findOverloadIndex(handle, argsExplicit);
-        if (idx !== -1) {
-          var params = parseParameterTypes(handle.overloads[idx].toString());
-          operations.push({ clazz: hook.class, method: hook.method, overloadIndex: idx, args: params });
+      try {
+        var handle = Java.use(hook.class)[hook.method];
+        for (var o = 0; o < hook.overloads.length; o++) {
+          var def = hook.overloads[o];
+          var argsExplicit = Array.isArray(def.args) ? def.args : [];
+          var idx = findOverloadIndex(handle, argsExplicit);
+          if (idx !== -1) {
+            var params = parseParameterTypes(handle.overloads[idx].toString());
+            operations.push({ clazz: hook.class, method: hook.method, overloadIndex: idx, args: params });
+          } else {
+            console.warn(
+              "[frida-android] Warning: Overload not found for class '" +
+              hook.class +
+              "', method '" +
+              hook.method +
+              "', args [" +
+              argsExplicit.join(", ") +
+              "]. This hook will be skipped."
+            );
+          }
         }
+      } catch (e) {
+        console.warn("Warning: Failed to process method '" + hook.method + "' in class '" + hook.class + "': " + e);
       }
       return { operations: operations, count: operations.length };
     }
 
     // Single method without explicit overloads: all overloads
     if (hook.method && (!hook.overloads || hook.overloads.length === 0)) {
-      var handleAll = Java.use(hook.class)[hook.method];
-      for (var i = 0; i < handleAll.overloads.length; i++) {
-        var paramsAll = parseParameterTypes(handleAll.overloads[i].toString());
-        operations.push({ clazz: hook.class, method: hook.method, overloadIndex: i, args: paramsAll });
+      try {
+        var handleAll = Java.use(hook.class)[hook.method];
+        for (var i = 0; i < handleAll.overloads.length; i++) {
+          var paramsAll = parseParameterTypes(handleAll.overloads[i].toString());
+          operations.push({ clazz: hook.class, method: hook.method, overloadIndex: i, args: paramsAll });
+        }
+      } catch (e) {
+        console.warn("Warning: Failed to process method '" + hook.method + "' in class '" + hook.class + "': " + e);
       }
       return { operations: operations, count: operations.length };
     }
@@ -200,13 +261,14 @@ function buildHookOperations(hook) {
             operations.push({ clazz: hook.class, method: mName, overloadIndex: j, args: paramsEach });
           }
         } catch (e) {
-          // skip missing methods
+          console.warn("Warning: Failed to process method '" + mName + "' in class '" + hook.class + "': " + e);
         }
       }
       return { operations: operations, count: operations.length };
     }
   } catch (e) {
-    // swallow; return what we have
+    // Log the error to aid debugging; returning partial results
+    console.error("Error in buildHookOperations for hook:", hook, "\n", e);
   }
 
   return { operations: operations, count: operations.length };
@@ -219,13 +281,14 @@ function buildHookOperations(hook) {
  *   With overloads: {class: "android.content.ContentResolver", method: "insert", overloads: [{args: ["android.net.Uri", "android.content.ContentValues"]}]}
  * @param {string} categoryName - OWASP MAS category for easier identification (e.g., "CRYPTO")
  * @param {function} callback - Callback function. The function takes the information gathered as JSON string.
+ * @param {{operations: Array<{clazz:string, method:string, overloadIndex:number, args:string[]}>, count:number}} [cachedOperations] - Optional pre-computed hook operations to avoid redundant processing.
  */
-function registerAllHooks(hook, categoryName, callback) {
+function registerAllHooks(hook, categoryName, callback, cachedOperations) {
   if (hook.methods && hook.overloads && hook.overloads.length > 0) {
     console.error(`Invalid hook configuration for ${hook.class}: 'overloads' is only supported with a singular 'method', not with 'methods'.`);
     return;
   }
-  var built = buildHookOperations(hook);
+  var built = cachedOperations || buildHookOperations(hook);
   built.operations.forEach(function (op) {
     try {
       registerHook(op.clazz, op.method, op.overloadIndex, categoryName, callback, hook.maxFrames);
@@ -242,15 +305,23 @@ Java.perform(function () {
     console.log(JSON.stringify(event, null, 2))
   }
 
+  // Pre-compute hook operations once to avoid redundant processing
+  var hookOperationsCache = [];
+  target.hooks.forEach(function (hook, _) {
+    hookOperationsCache.push({
+      hook: hook,
+      built: buildHookOperations(hook)
+    });
+  });
+
   // Emit an initial summary of all overloads that will be hooked
   try {
     // Aggregate map nested by class then method
     var aggregate = {};
     var total = 0;
-    target.hooks.forEach(function (hook, _) {
-      var built = buildHookOperations(hook);
-      total += built.count;
-      built.operations.forEach(function (op) {
+    hookOperationsCache.forEach(function (cached) {
+      total += cached.built.count;
+      cached.built.operations.forEach(function (op) {
         if (!aggregate[op.clazz]) {
           aggregate[op.clazz] = {};
         }
@@ -274,14 +345,16 @@ Java.perform(function () {
       }
     }
 
-    var summary = { type: "summary", hooks: overloadList, totalhooks: total };
+    var summary = { type: "summary", hooks: overloadList, totalHooks: total };
     console.log(JSON.stringify(summary, null, 2));
   } catch (e) {
     // If summary fails, don't block hooking
+    console.error("Summary generation failed, but hooking will continue. Error:", e);
   }
 
-  target.hooks.forEach(function (hook, _) {
-    registerAllHooks(hook, target.category, callback);
+  // Register hooks using cached operations
+  hookOperationsCache.forEach(function (cached) {
+    registerAllHooks(cached.hook, target.category, callback, cached.built);
   });
 
 });
