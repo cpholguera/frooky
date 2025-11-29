@@ -118,24 +118,80 @@ function registerHook(
 }
 
 /**
+ * Finds the overload index that matches the given argument types.
+ * @param {Object} methodHandle - Frida method handle with overloads.
+ * @param {[string]} argTypes - Array of argument type strings (e.g., ["android.net.Uri", "android.content.ContentValues"]).
+ * @returns {number} The index of the matching overload, or -1 if not found.
+ */
+function findOverloadIndex(methodHandle, argTypes) {
+  for (var i = 0; i < methodHandle.overloads.length; i++) {
+    var overload = methodHandle.overloads[i];
+    var parameterTypes = parseParameterTypes(overload.toString());
+    
+    if (parameterTypes.length !== argTypes.length) {
+      continue;
+    }
+    
+    var match = true;
+    for (var j = 0; j < argTypes.length; j++) {
+      if (parameterTypes[j] !== argTypes[j]) {
+        match = false;
+        break;
+      }
+    }
+    
+    if (match) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+/**
  * Takes an array of objects usually defined in the `hooks.js` file of a DEMO and loads all classes and functions stated in there.
- * @param {[object]} hook - Contains a list of objects which contains all methods which will be overloaded. (e.g., [{class: "android.security.keystore.KeyGenParameterSpec$Builder", methods: [ "setBlockModes"]}])
+ * @param {[object]} hook - Contains a list of objects which contains all methods which will be overloaded.
+ *   Basic format: {class: "android.security.keystore.KeyGenParameterSpec$Builder", methods: ["setBlockModes"]}
+ *   With overloads: {class: "android.content.ContentResolver", method: "insert", overloads: [{args: ["android.net.Uri", "android.content.ContentValues"]}]}
  * @param {string} categoryName - OWASP MAS category for easier identification (e.g., "CRYPTO")
  * @param {function} callback - Callback function. The function takes the information gathered as JSON string.
  */
 function registerAllHooks(hook, categoryName, callback) {
-    for(const m in hook.methods){
+    // Check if specific overloads are defined with `method` (singular) and `overloads`
+    if (hook.method && hook.overloads && hook.overloads.length > 0) {
       try {
-        var toHook = Java.use(hook.class)[hook.methods[m]];
-
-        var overloadCount = toHook.overloads.length;
-
-        for (var i = 0; i < overloadCount; i++) {
-          registerHook(hook.class, hook.methods[m], i, categoryName, callback, hook.maxFrames);
+        var toHook = Java.use(hook.class)[hook.method];
+        
+        for (var o = 0; o < hook.overloads.length; o++) {
+          var overloadDef = hook.overloads[o];
+          var argTypes = overloadDef.args || [];
+          var overloadIndex = findOverloadIndex(toHook, argTypes);
+          
+          if (overloadIndex !== -1) {
+            registerHook(hook.class, hook.method, overloadIndex, categoryName, callback, hook.maxFrames);
+          } else {
+            console.error(`Overload not found for ${hook.class}:${hook.method} with args [${argTypes.join(", ")}]`);
+          }
         }
       } catch (err) {
-        console.error(err)
-        console.error(`Problem when overloading ${hook.class}:${hook.methods[m]}`);
+        console.error(err);
+        console.error(`Problem when overloading ${hook.class}:${hook.method}`);
+      }
+    }
+    // Default behavior: hook all overloads for each method in `methods` array
+    else if (hook.methods) {
+      for (var m in hook.methods) {
+        try {
+          var toHook = Java.use(hook.class)[hook.methods[m]];
+
+          var overloadCount = toHook.overloads.length;
+
+          for (var i = 0; i < overloadCount; i++) {
+            registerHook(hook.class, hook.methods[m], i, categoryName, callback, hook.maxFrames);
+          }
+        } catch (err) {
+          console.error(err);
+          console.error(`Problem when overloading ${hook.class}:${hook.methods[m]}`);
+        }
       }
     }
 }
