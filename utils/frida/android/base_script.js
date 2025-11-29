@@ -156,6 +156,11 @@ function findOverloadIndex(methodHandle, argTypes) {
  * @param {function} callback - Callback function. The function takes the information gathered as JSON string.
  */
 function registerAllHooks(hook, categoryName, callback) {
+    // Invalid configuration: `methods` must not be combined with `overloads`
+    if (hook.methods && hook.overloads && hook.overloads.length > 0) {
+      console.error(`Invalid hook configuration for ${hook.class}: 'overloads' is only supported with a singular 'method', not with 'methods'.`);
+      return;
+    }
     // Check if specific overloads are defined with `method` (singular) and `overloads`
     if (hook.method && hook.overloads && hook.overloads.length > 0) {
       try {
@@ -171,6 +176,20 @@ function registerAllHooks(hook, categoryName, callback) {
           } else {
             console.error(`Overload not found for ${hook.class}:${hook.method} with args [${argTypes.join(", ")}]`);
           }
+        }
+      } catch (err) {
+        console.error(err);
+        console.error(`Problem when overloading ${hook.class}:${hook.method}`);
+      }
+    }
+    // If a single `method` is provided without `overloads`, hook all overloads of that method
+    else if (hook.method && (!hook.overloads || hook.overloads.length === 0)) {
+      try {
+        var toHookSingle = Java.use(hook.class)[hook.method];
+        var overloadCountSingle = toHookSingle.overloads.length;
+
+        for (var iSingle = 0; iSingle < overloadCountSingle; iSingle++) {
+          registerHook(hook.class, hook.method, iSingle, categoryName, callback, hook.maxFrames);
         }
       } catch (err) {
         console.error(err);
