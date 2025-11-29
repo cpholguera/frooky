@@ -65,6 +65,7 @@ function registerHook(
 ) {
 
   var Exception = Java.use("java.lang.Exception");
+  const System = Java.use('java.lang.System');
 
   const toHook = Java.use(clazz)[method];
 
@@ -84,12 +85,21 @@ function registerHook(
     var parameterTypes = parseParameterTypes(methodHeader);
     var returnType = parseReturnValue(methodHeader);
 
+    let instanceId;
+    if (this && this.$className && typeof this.$h === 'undefined') {
+      instanceId = 'static';
+    } else {
+      // call Java’s identityHashCode on the real object
+      instanceId = System.identityHashCode(this);
+    }
+
     const event = {
       id: generateUUID(),
       category: categoryName,
       time: new Date().toISOString(),
       class: clazz,
       method: method,
+      instanceId: instanceId,
       stackTrace: stackTrace,
       inputParameters: decodeArguments(parameterTypes, arguments),
     };
