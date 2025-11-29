@@ -120,7 +120,7 @@ function registerHook(
 /**
  * Finds the overload index that matches the given argument types.
  * @param {Object} methodHandle - Frida method handle with overloads.
- * @param {[string]} argTypes - Array of argument type strings (e.g., ["android.net.Uri", "android.content.ContentValues"]).
+ * @param {string[]} argTypes - Array of argument type strings (e.g., ["android.net.Uri", "android.content.ContentValues"]).
  * @returns {number} The index of the matching overload, or -1 if not found.
  */
 function findOverloadIndex(methodHandle, argTypes) {
@@ -163,7 +163,7 @@ function registerAllHooks(hook, categoryName, callback) {
         
         for (var o = 0; o < hook.overloads.length; o++) {
           var overloadDef = hook.overloads[o];
-          var argTypes = overloadDef.args || [];
+          var argTypes = Array.isArray(overloadDef.args) ? overloadDef.args : [];
           var overloadIndex = findOverloadIndex(toHook, argTypes);
           
           if (overloadIndex !== -1) {
