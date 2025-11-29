@@ -95,6 +95,7 @@ function registerHook(
 
     const event = {
       id: generateUUID(),
+        type: "hook",
       category: categoryName,
       time: new Date().toISOString(),
       class: clazz,
@@ -148,6 +149,70 @@ function findOverloadIndex(methodHandle, argTypes) {
 }
 
 /**
+ * Builds a normalized list of hook operations for a single hook definition.
+ * Each operation contains clazz, method, overloadIndex, and args array (decoded parameter types).
+ * This centralizes selection logic used for both summary emission and hook registration.
+ * @param {object} hook
+ * @returns {{operations: Array<{clazz:string, method:string, overloadIndex:number, args:string[]}>, count:number}}
+ */
+function buildHookOperations(hook) {
+  var operations = [];
+
+  try {
+    // Invalid configuration: methods + overloads (logged elsewhere)
+    if (hook.methods && hook.overloads && hook.overloads.length > 0) {
+      return { operations: operations, count: 0 };
+    }
+
+    // Explicit overload list for single method
+    if (hook.method && hook.overloads && hook.overloads.length > 0) {
+      var handle = Java.use(hook.class)[hook.method];
+      for (var o = 0; o < hook.overloads.length; o++) {
+        var def = hook.overloads[o];
+        var argsExplicit = Array.isArray(def.args) ? def.args : [];
+        var idx = findOverloadIndex(handle, argsExplicit);
+        if (idx !== -1) {
+          var params = parseParameterTypes(handle.overloads[idx].toString());
+          operations.push({ clazz: hook.class, method: hook.method, overloadIndex: idx, args: params });
+        }
+      }
+      return { operations: operations, count: operations.length };
+    }
+
+    // Single method without explicit overloads: all overloads
+    if (hook.method && (!hook.overloads || hook.overloads.length === 0)) {
+      var handleAll = Java.use(hook.class)[hook.method];
+      for (var i = 0; i < handleAll.overloads.length; i++) {
+        var paramsAll = parseParameterTypes(handleAll.overloads[i].toString());
+        operations.push({ clazz: hook.class, method: hook.method, overloadIndex: i, args: paramsAll });
+      }
+      return { operations: operations, count: operations.length };
+    }
+
+    // Multiple methods: all overloads for each
+    if (hook.methods) {
+      for (var m = 0; m < hook.methods.length; m++) {
+        var mName = hook.methods[m];
+        try {
+          var handleEach = Java.use(hook.class)[mName];
+          for (var j = 0; j < handleEach.overloads.length; j++) {
+            var paramsEach = parseParameterTypes(handleEach.overloads[j].toString());
+            operations.push({ clazz: hook.class, method: mName, overloadIndex: j, args: paramsEach });
+          }
+        } catch (e) {
+          // skip missing methods
+        }
+      }
+      return { operations: operations, count: operations.length };
+    }
+  } catch (e) {
+    // swallow; return what we have
+  }
+
+  return { operations: operations, count: operations.length };
+}
+
+/**
  * Takes an array of objects usually defined in the `hooks.js` file of a DEMO and loads all classes and functions stated in there.
  * @param {[object]} hook - Contains a list of objects which contains all methods which will be overloaded.
  *   Basic format: {class: "android.security.keystore.KeyGenParameterSpec$Builder", methods: ["setBlockModes"]}
@@ -156,69 +221,63 @@ function findOverloadIndex(methodHandle, argTypes) {
  * @param {function} callback - Callback function. The function takes the information gathered as JSON string.
  */
 function registerAllHooks(hook, categoryName, callback) {
-    // Invalid configuration: `methods` must not be combined with `overloads`
-    if (hook.methods && hook.overloads && hook.overloads.length > 0) {
-      console.error(`Invalid hook configuration for ${hook.class}: 'overloads' is only supported with a singular 'method', not with 'methods'.`);
-      return;
+  if (hook.methods && hook.overloads && hook.overloads.length > 0) {
+    console.error(`Invalid hook configuration for ${hook.class}: 'overloads' is only supported with a singular 'method', not with 'methods'.`);
+    return;
+  }
+  var built = buildHookOperations(hook);
+  built.operations.forEach(function (op) {
+    try {
+      registerHook(op.clazz, op.method, op.overloadIndex, categoryName, callback, hook.maxFrames);
+    } catch (err) {
+      console.error(err);
+      console.error(`Problem when overloading ${op.clazz}:${op.method}#${op.overloadIndex}`);
     }
-    // Check if specific overloads are defined with `method` (singular) and `overloads`
-    if (hook.method && hook.overloads && hook.overloads.length > 0) {
-      try {
-        var toHook = Java.use(hook.class)[hook.method];
-        
-        for (var o = 0; o < hook.overloads.length; o++) {
-          var overloadDef = hook.overloads[o];
-          var argTypes = Array.isArray(overloadDef.args) ? overloadDef.args : [];
-          var overloadIndex = findOverloadIndex(toHook, argTypes);
-          
-          if (overloadIndex !== -1) {
-            registerHook(hook.class, hook.method, overloadIndex, categoryName, callback, hook.maxFrames);
-          } else {
-            console.error(`Overload not found for ${hook.class}:${hook.method} with args [${argTypes.join(", ")}]`);
-          }
-        }
-      } catch (err) {
-        console.error(err);
-        console.error(`Problem when overloading ${hook.class}:${hook.method}`);
-      }
-    }
-    // If a single `method` is provided without `overloads`, hook all overloads of that method
-    else if (hook.method && (!hook.overloads || hook.overloads.length === 0)) {
-      try {
-        var toHookSingle = Java.use(hook.class)[hook.method];
-        var overloadCountSingle = toHookSingle.overloads.length;
-
-        for (var iSingle = 0; iSingle < overloadCountSingle; iSingle++) {
-          registerHook(hook.class, hook.method, iSingle, categoryName, callback, hook.maxFrames);
-        }
-      } catch (err) {
-        console.error(err);
-        console.error(`Problem when overloading ${hook.class}:${hook.method}`);
-      }
-    }
-    // Default behavior: hook all overloads for each method in `methods` array
-    else if (hook.methods) {
-      for (var m in hook.methods) {
-        try {
-          var toHook = Java.use(hook.class)[hook.methods[m]];
-
-          var overloadCount = toHook.overloads.length;
-
-          for (var i = 0; i < overloadCount; i++) {
-            registerHook(hook.class, hook.methods[m], i, categoryName, callback, hook.maxFrames);
-          }
-        } catch (err) {
-          console.error(err);
-          console.error(`Problem when overloading ${hook.class}:${hook.methods[m]}`);
-        }
-      }
-    }
+  });
 }
 
 Java.perform(function () {
 
   function callback(event){
     console.log(JSON.stringify(event, null, 2))
+  }
+
+  // Emit an initial summary of all overloads that will be hooked
+  try {
+    // Aggregate map nested by class then method
+    var aggregate = {};
+    var total = 0;
+    target.hooks.forEach(function (hook, _) {
+      var built = buildHookOperations(hook);
+      total += built.count;
+      built.operations.forEach(function (op) {
+        if (!aggregate[op.clazz]) {
+          aggregate[op.clazz] = {};
+        }
+        if (!aggregate[op.clazz][op.method]) {
+          aggregate[op.clazz][op.method] = [];
+        }
+        aggregate[op.clazz][op.method].push(op.args);
+      });
+    });
+
+    var overloadList = [];
+    for (var clazz in aggregate) {
+      if (!aggregate.hasOwnProperty(clazz)) continue;
+      var methodsMap = aggregate[clazz];
+      for (var methodName in methodsMap) {
+        if (!methodsMap.hasOwnProperty(methodName)) continue;
+        var entries = methodsMap[methodName].map(function (argsArr) {
+          return { args: argsArr };
+        });
+        overloadList.push({ class: clazz, method: methodName, overloads: entries });
+      }
+    }
+
+    var summary = { type: "summary", hooks: overloadList, totalhooks: total };
+    console.log(JSON.stringify(summary, null, 2));
+  } catch (e) {
+    // If summary fails, don't block hooking
   }
 
   target.hooks.forEach(function (hook, _) {
