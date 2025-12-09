@@ -88,7 +88,12 @@ function registerHook(
       instanceId = 'static';
     } else {
       // call Java’s identityHashCode on the real object
-      instanceId = System.identityHashCode(this);
+      try {
+        instanceId = System.identityHashCode(this);
+      } catch (e) {
+        console.error("Error in identityHashCode", e)
+        instanceId = "error"
+      }
     }
 
     const event = {
