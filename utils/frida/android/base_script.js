@@ -52,16 +52,14 @@ function generateUUID() {
  * @param {string} method - Name of the method which should be overloaded (e.g., "setBlockModes").
  * @param {number} overloadIndex - If there are overloaded methods available, this number represents them (e.g., 0 for the first one)
  * @param {string} categoryName - OWASP MAS category for easier identification (e.g., "CRYPTO")
- * @param {function} callback - Callback function. The function takes the information gathered as JSON string.
- * @param {number} maxFrames - Maximum number of stack frames to capture (default is 8,  set to -1 for unlimited frames).
+ * @param {number} maxFrames - Maximum number of stack frames to capture (default is 8, set to -1 for unlimited frames).
  */
 function registerHook(
-  clazz,
-  method,
-  overloadIndex,
-  categoryName,
-  callback,
-  maxFrames = 8
+    clazz,
+    method,
+    overloadIndex,
+    categoryName,
+    maxFrames = 8
 ) {
 
   let Exception = Java.use("java.lang.Exception");
@@ -106,13 +104,13 @@ function registerHook(
     };
 
     try {
-      var returnValue = this[method].apply(this, arguments);
+      let returnValue = this[method].apply(this, arguments);
       event.returnValue = decodeArguments([returnType], [returnValue]);
-      callback(event);
+      console.log(JSON.stringify(event, null, 2))
       return returnValue;
     } catch (e) {
       event.exception = e.toString();
-      callback(event);
+      console.log(JSON.stringify(event, null, 2))
       throw e;
     }
   };
@@ -293,10 +291,9 @@ function buildHookOperations(hook) {
  *   Basic format: {class: "android.security.keystore.KeyGenParameterSpec$Builder", methods: ["setBlockModes"]}
  *   With overloads: {class: "android.content.ContentResolver", method: "insert", overloads: [{args: ["android.net.Uri", "android.content.ContentValues"]}]}
  * @param {string} categoryName - OWASP MAS category for easier identification (e.g., "CRYPTO")
- * @param {function} callback - Callback function. The function takes the information gathered as JSON string.
  * @param {{operations: Array<{clazz:string, method:string, overloadIndex:number, args:string[]}>, count:number}} [cachedOperations] - Optional pre-computed hook operations to avoid redundant processing.
  */
-function registerAllHooks(hook, categoryName, callback, cachedOperations) {
+function registerAllHooks(hook, categoryName, cachedOperations) {
   if (hook.methods && hook.overloads && hook.overloads.length > 0) {
     console.error(`Invalid hook configuration for ${hook.class}: 'overloads' is only supported with a singular 'method', not with 'methods'.`);
     return;
@@ -304,7 +301,7 @@ function registerAllHooks(hook, categoryName, callback, cachedOperations) {
   let built = cachedOperations || buildHookOperations(hook);
   built.operations.forEach(function (op) {
     try {
-      registerHook(op.clazz, op.method, op.overloadIndex, categoryName, callback, hook.maxFrames);
+      registerHook(op.clazz, op.method, op.overloadIndex, categoryName, hook.maxFrames);
     } catch (err) {
       console.error(err);
       console.error(`Problem when overloading ${op.clazz}:${op.method}#${op.overloadIndex}`);
@@ -313,10 +310,6 @@ function registerAllHooks(hook, categoryName, callback, cachedOperations) {
 }
 
 Java.perform(function () {
-
-  function callback(event){
-    console.log(JSON.stringify(event, null, 2))
-  }
 
   // Pre-compute hook operations once to avoid redundant processing
   let hookOperationsCache = [];
@@ -373,7 +366,7 @@ Java.perform(function () {
 
   // Register hooks using cached operations
   hookOperationsCache.forEach(function (cached) {
-    registerAllHooks(cached.hook, target.category, callback, cached.built);
+    registerAllHooks(cached.hook, target.category, cached.built);
   });
 
 });
