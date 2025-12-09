@@ -4,8 +4,8 @@
  * @returns {[string]} The decoded parameter types (e.g., "['[Ljava.lang.String;']")
  */
 function parseParameterTypes(methodHeader) {
-  var regex = /\((.*?)\)/;
-  var parameterString = regex.exec(methodHeader)[1];
+  let regex = /\((.*?)\)/;
+  let parameterString = regex.exec(methodHeader)[1];
   if (parameterString === "") {
     return [];
   }
@@ -26,14 +26,14 @@ function parseReturnValue(methodHeader) {
  * @returns {string} v4 UUID (e.g. "bf01006f-1d6c-4faa-8680-36818b4681bc")
  */
 function generateUUID() {
-  var d = new Date().getTime();
-  var d2 =
-    (typeof performance !== "undefined" &&
-      performance.now &&
-      performance.now() * 1000) ||
-    0;
+  let d = new Date().getTime();
+  let d2 =
+      (typeof performance !== "undefined" &&
+          performance.now &&
+          performance.now() * 1000) ||
+      0;
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16;
+    let r = Math.random() * 16;
     if (d > 0) {
       r = (d + r) % 16 | 0;
       d = Math.floor(d / 16);
@@ -64,26 +64,26 @@ function registerHook(
   maxFrames = 8
 ) {
 
-  var Exception = Java.use("java.lang.Exception");
-  const System = Java.use('java.lang.System');
+  let Exception = Java.use("java.lang.Exception");
+  let System = Java.use('java.lang.System');
 
-  const toHook = Java.use(clazz)[method];
+  let toHook = Java.use(clazz)[method];
 
-  const methodHeader = toHook.overloads[overloadIndex].toString();
+  let methodHeader = toHook.overloads[overloadIndex].toString();
 
   toHook.overloads[overloadIndex].implementation = function () {
 
-    var st = Exception.$new().getStackTrace();
-    var stackTrace = [];
+    let st = Exception.$new().getStackTrace();
+    let stackTrace = [];
     st.forEach(function (stElement, index) {
       if (maxFrames === -1 || index < maxFrames) {
-        var stLine = stElement.toString();
+        let stLine = stElement.toString();
         stackTrace.push(stLine);
       }
     });
 
-    var parameterTypes = parseParameterTypes(methodHeader);
-    var returnType = parseReturnValue(methodHeader);
+    let parameterTypes = parseParameterTypes(methodHeader);
+    let returnType = parseReturnValue(methodHeader);
 
     let instanceId;
     if (this && this.$className && typeof this.$h === 'undefined') {
@@ -125,22 +125,22 @@ function registerHook(
  * @returns {number} The index of the matching overload, or -1 if not found.
  */
 function findOverloadIndex(methodHandle, argTypes) {
-  for (var i = 0; i < methodHandle.overloads.length; i++) {
-    var overload = methodHandle.overloads[i];
-    var parameterTypes = parseParameterTypes(overload.toString());
-    
+  for (let i = 0; i < methodHandle.overloads.length; i++) {
+    let overload = methodHandle.overloads[i];
+    let parameterTypes = parseParameterTypes(overload.toString());
+
     if (parameterTypes.length !== argTypes.length) {
       continue;
     }
-    
-    var match = true;
-    for (var j = 0; j < argTypes.length; j++) {
+
+    let match = true;
+    for (let j = 0; j < argTypes.length; j++) {
       if (parameterTypes[j] !== argTypes[j]) {
         match = false;
         break;
       }
     }
-    
+
     if (match) {
       return i;
     }
@@ -199,92 +199,92 @@ function findOverloadIndex(methodHandle, argTypes) {
  * // Returns { operations: [], count: 0 }
  */
 function buildHookOperations(hook) {
-  var operations = [];
-  var errors = [];
+  let operations = [];
+  let errors = [];
 
   try {
     // Invalid configuration: methods + overloads (logged elsewhere)
     if (hook.methods && hook.overloads && hook.overloads.length > 0) {
-      var errInvalid = "Invalid hook configuration for " + hook.class + ": 'overloads' is only supported with a singular 'method', not with 'methods'.";
+      let errInvalid = "Invalid hook configuration for " + hook.class + ": 'overloads' is only supported with a singular 'method', not with 'methods'.";
       console.error(errInvalid);
       errors.push(errInvalid);
-      return { operations: operations, count: 0, errors: errors, errorCount: errors.length };
+      return {operations: operations, count: 0, errors: errors, errorCount: errors.length};
     }
 
     // Explicit overload list for single method
     if (hook.method && hook.overloads && hook.overloads.length > 0) {
       try {
-        var handle = Java.use(hook.class)[hook.method];
-        for (var o = 0; o < hook.overloads.length; o++) {
-          var def = hook.overloads[o];
-          var argsExplicit = Array.isArray(def.args) ? def.args : [];
-          var idx = findOverloadIndex(handle, argsExplicit);
+        let handle = Java.use(hook.class)[hook.method];
+        for (let o = 0; o < hook.overloads.length; o++) {
+          let def = hook.overloads[o];
+          let argsExplicit = Array.isArray(def.args) ? def.args : [];
+          let idx = findOverloadIndex(handle, argsExplicit);
           if (idx !== -1) {
-            var params = parseParameterTypes(handle.overloads[idx].toString());
-            operations.push({ clazz: hook.class, method: hook.method, overloadIndex: idx, args: params });
+            let params = parseParameterTypes(handle.overloads[idx].toString());
+            operations.push({clazz: hook.class, method: hook.method, overloadIndex: idx, args: params});
           } else {
             console.warn(
-              "[frida-android] Warning: Overload not found for class '" +
-              hook.class +
-              "', method '" +
-              hook.method +
-              "', args [" +
-              argsExplicit.join(", ") +
-              "]. This hook will be skipped."
+                "[frida-android] Warning: Overload not found for class '" +
+                hook.class +
+                "', method '" +
+                hook.method +
+                "', args [" +
+                argsExplicit.join(", ") +
+                "]. This hook will be skipped."
             );
             errors.push("Overload not found for " + hook.class + ":" + hook.method + " with args [" + argsExplicit.join(", ") + "]");
           }
         }
       } catch (e) {
-        var errMsg = "Failed to process method '" + hook.method + "' in class '" + hook.class + "': " + e;
+        let errMsg = "Failed to process method '" + hook.method + "' in class '" + hook.class + "': " + e;
         console.warn("Warning: " + errMsg);
         errors.push(errMsg);
       }
-      return { operations: operations, count: operations.length, errors: errors, errorCount: errors.length };
+      return {operations: operations, count: operations.length, errors: errors, errorCount: errors.length};
     }
 
     // Single method without explicit overloads: all overloads
     if (hook.method && (!hook.overloads || hook.overloads.length === 0)) {
       try {
-        var handleAll = Java.use(hook.class)[hook.method];
-        for (var i = 0; i < handleAll.overloads.length; i++) {
-          var paramsAll = parseParameterTypes(handleAll.overloads[i].toString());
-          operations.push({ clazz: hook.class, method: hook.method, overloadIndex: i, args: paramsAll });
+        let handleAll = Java.use(hook.class)[hook.method];
+        for (let i = 0; i < handleAll.overloads.length; i++) {
+          let paramsAll = parseParameterTypes(handleAll.overloads[i].toString());
+          operations.push({clazz: hook.class, method: hook.method, overloadIndex: i, args: paramsAll});
         }
       } catch (e) {
-        var errMsg2 = "Failed to process method '" + hook.method + "' in class '" + hook.class + "': " + e;
+        let errMsg2 = "Failed to process method '" + hook.method + "' in class '" + hook.class + "': " + e;
         console.warn("Warning: " + errMsg2);
         errors.push(errMsg2);
       }
-      return { operations: operations, count: operations.length, errors: errors, errorCount: errors.length };
+      return {operations: operations, count: operations.length, errors: errors, errorCount: errors.length};
     }
 
     // Multiple methods: all overloads for each
     if (hook.methods) {
-      for (var m = 0; m < hook.methods.length; m++) {
-        var mName = hook.methods[m];
+      for (let m = 0; m < hook.methods.length; m++) {
+        let mName = hook.methods[m];
         try {
-          var handleEach = Java.use(hook.class)[mName];
-          for (var j = 0; j < handleEach.overloads.length; j++) {
-            var paramsEach = parseParameterTypes(handleEach.overloads[j].toString());
-            operations.push({ clazz: hook.class, method: mName, overloadIndex: j, args: paramsEach });
+          let handleEach = Java.use(hook.class)[mName];
+          for (let j = 0; j < handleEach.overloads.length; j++) {
+            let paramsEach = parseParameterTypes(handleEach.overloads[j].toString());
+            operations.push({clazz: hook.class, method: mName, overloadIndex: j, args: paramsEach});
           }
         } catch (e) {
-          var errMsg3 = "Failed to process method '" + mName + "' in class '" + hook.class + "': " + e;
+          let errMsg3 = "Failed to process method '" + mName + "' in class '" + hook.class + "': " + e;
           console.warn("Warning: " + errMsg3);
           errors.push(errMsg3);
         }
       }
-      return { operations: operations, count: operations.length, errors: errors, errorCount: errors.length };
+      return {operations: operations, count: operations.length, errors: errors, errorCount: errors.length};
     }
   } catch (e) {
     // Log the error to aid debugging; returning partial results
-    var errMsg4 = "Error in buildHookOperations for hook: " + (hook && hook.class ? hook.class : "<unknown>") + ": " + e;
+    let errMsg4 = "Error in buildHookOperations for hook: " + (hook && hook.class ? hook.class : "<unknown>") + ": " + e;
     console.error(errMsg4);
     errors.push(errMsg4);
   }
 
-  return { operations: operations, count: operations.length, errors: errors, errorCount: errors.length };
+  return {operations: operations, count: operations.length, errors: errors, errorCount: errors.length};
 }
 
 /**
@@ -301,7 +301,7 @@ function registerAllHooks(hook, categoryName, callback, cachedOperations) {
     console.error(`Invalid hook configuration for ${hook.class}: 'overloads' is only supported with a singular 'method', not with 'methods'.`);
     return;
   }
-  var built = cachedOperations || buildHookOperations(hook);
+  let built = cachedOperations || buildHookOperations(hook);
   built.operations.forEach(function (op) {
     try {
       registerHook(op.clazz, op.method, op.overloadIndex, categoryName, callback, hook.maxFrames);
@@ -319,7 +319,7 @@ Java.perform(function () {
   }
 
   // Pre-compute hook operations once to avoid redundant processing
-  var hookOperationsCache = [];
+  let hookOperationsCache = [];
   target.hooks.forEach(function (hook, _) {
     hookOperationsCache.push({
       hook: hook,
@@ -330,12 +330,12 @@ Java.perform(function () {
   // Emit an initial summary of all overloads that will be hooked
   try {
     // Aggregate map nested by class then method
-    var aggregate = {};
-    var total = 0;
-    var errors = [];
-    var totalErrors = 0;
+    let aggregate = {};
+    let totalHooks = 0;
+    let errors = [];
+    let totalErrors = 0;
     hookOperationsCache.forEach(function (cached) {
-      total += cached.built.count;
+      totalHooks += cached.built.count;
       if (cached.built.errors && cached.built.errors.length) {
         Array.prototype.push.apply(errors, cached.built.errors);
         totalErrors += cached.built.errors.length;
@@ -351,20 +351,20 @@ Java.perform(function () {
       });
     });
 
-    var overloadList = [];
-    for (var clazz in aggregate) {
+    let hooks = [];
+    for (let clazz in aggregate) {
       if (!aggregate.hasOwnProperty(clazz)) continue;
-      var methodsMap = aggregate[clazz];
-      for (var methodName in methodsMap) {
+      let methodsMap = aggregate[clazz];
+      for (let methodName in methodsMap) {
         if (!methodsMap.hasOwnProperty(methodName)) continue;
-        var entries = methodsMap[methodName].map(function (argsArr) {
-          return { args: argsArr };
+        let entries = methodsMap[methodName].map(function (argsArr) {
+          return {args: argsArr};
         });
-        overloadList.push({ class: clazz, method: methodName, overloads: entries });
+        hooks.push({class: clazz, method: methodName, overloads: entries});
       }
     }
 
-    var summary = { type: "summary", hooks: overloadList, totalHooks: total, errors: errors, totalErrors: totalErrors };
+    let summary = {type: "summary", hooks: hooks, totalHooks: totalHooks, errors: errors, totalErrors: totalErrors};
     console.log(JSON.stringify(summary, null, 2));
   } catch (e) {
     // If summary fails, don't block hooking
