@@ -1,0 +1,41 @@
+# Frooky local debug artifacts
+tmp/
+output.json
+*.jsonl
+
+# node
+node_modules/
+package.json
+package-lock.json
+
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env/
+
+# Packaging/build outputs
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Test / type-check / lint caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# IDE / OS
+.DS_Store
+.vscode/
+.idea/
