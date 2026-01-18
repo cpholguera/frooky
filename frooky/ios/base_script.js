@@ -465,7 +465,7 @@ function registerNativeHook(hook, categoryName, callback) {
         }
       } catch (eFilt) {}
 
-      this._mastgEvent = {
+      this.event = {
         id: generateUUID(),
         type: "native-hook",
         category: categoryName,
@@ -478,14 +478,14 @@ function registerNativeHook(hook, categoryName, callback) {
       };
       // Defer emission if we have out descriptors to enrich after execution
       if (!hasOutDescriptors) {
-        callback(this._mastgEvent);
+        callback(this.event);
       } else {
         this._deferEmit = true;
       }
     },
     onLeave: function(retval) {
       try {
-        if (this._mastgEvent && this._deferEmit && Array.isArray(hook.args)) {
+        if (this.event && this._deferEmit && Array.isArray(hook.args)) {
           var descriptors = hook.args;
           var rawArgs = hook.__lastEnterArgs || [];
           for (var di = 0; di < descriptors.length; di++) {
@@ -527,41 +527,41 @@ function registerNativeHook(hook, categoryName, callback) {
               if (len === undefined) len = (typeof desc.length === 'number') ? desc.length : 0;
               if (len > 0 && _isReadable(ptr, len)) {
                 var outBytesObj = _readBytes(ptr, len);
-                this._mastgEvent.inputParameters[di].value = (outBytesObj.base64 !== null) ? outBytesObj.base64 : '<bytes-read-error>';
-                this._mastgEvent.inputParameters[di].format = 'base64';
+                this.event.inputParameters[di].value = (outBytesObj.base64 !== null) ? outBytesObj.base64 : '<bytes-read-error>';
+                this.event.inputParameters[di].format = 'base64';
               } else {
-                this._mastgEvent.inputParameters[di].value = '<unreadable-output>';
-                this._mastgEvent.inputParameters[di].format = 'base64';
+                this.event.inputParameters[di].value = '<unreadable-output>';
+                this.event.inputParameters[di].format = 'base64';
               }
             } else if (desc.type === 'CFData') {
               if (ptr && !(ptr.isNull && ptr.isNull()) && ObjC && ObjC.available) {
                 try {
                   var outCFData = new ObjC.Object(ptr);
                   var b64 = outCFData.base64EncodedStringWithOptions_(0).toString();
-                  this._mastgEvent.inputParameters[di].value = b64;
-                  this._mastgEvent.inputParameters[di].format = 'base64';
+                  this.event.inputParameters[di].value = b64;
+                  this.event.inputParameters[di].format = 'base64';
                 } catch (eCFDO) {
-                  this._mastgEvent.inputParameters[di].value = '<bytes-read-error>';
-                  this._mastgEvent.inputParameters[di].format = 'base64';
+                  this.event.inputParameters[di].value = '<bytes-read-error>';
+                  this.event.inputParameters[di].format = 'base64';
                 }
               } else {
-                this._mastgEvent.inputParameters[di].value = '<unreadable-output>';
-                this._mastgEvent.inputParameters[di].format = 'base64';
+                this.event.inputParameters[di].value = '<unreadable-output>';
+                this.event.inputParameters[di].format = 'base64';
               }
             } else {
               // Non-bytes output: attempt basic pointer/string/int decoding
               var outVal;
               try { outVal = ptr.readCString(); }
               catch(eStr) { try { outVal = ptr.toInt32(); } catch(eInt) { outVal = ptr.toString(); } }
-              this._mastgEvent.inputParameters[di].value = outVal;
+              this.event.inputParameters[di].value = outVal;
             }
           }
-          this._mastgEvent.retval = retval ? retval.toString() : '<no-retval>';
-          callback(this._mastgEvent);
+          this.event.retval = retval ? retval.toString() : '<no-retval>';
+          callback(this.event);
           hook.__lastEnterArgs = undefined;
         }
       } catch(eOut) {
-        if (this._mastgEvent && this._deferEmit) { callback(this._mastgEvent); }
+        if (this.event && this._deferEmit) { callback(this.event); }
       }
     }
   });
@@ -595,7 +595,7 @@ function registerObjCHook(hook, categoryName, callback) {
         stackTrace.push("<backtrace unavailable: " + e + ">");
       }
 
-      this._mastgEvent = {
+      this.event = {
         id: generateUUID(),
         type: "objc-hook",
         category: categoryName,
@@ -606,7 +606,7 @@ function registerObjCHook(hook, categoryName, callback) {
         stackTrace: stackTrace
       };
 
-      callback(this._mastgEvent);
+      callback(this.event);
     },
     onLeave: function(retval) {
       // Optionally emit a separate event or extend the onEnter event
