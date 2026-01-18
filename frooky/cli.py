@@ -31,7 +31,7 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="Select which built-in script set to use",
     )
-    parser.add_argument("hooks", help="Path to your hooks.js file")
+    parser.add_argument("hooks", nargs="+", help="Path(s) to your input hook JSON file(s)")
     parser.add_argument("-o", "--output", default="output.json", help="Output JSON file")
 
     return parser
@@ -46,13 +46,16 @@ def main() -> int:
     if device_count > 1:
         parser.error("Use only one of -D/--device or -U/--usb.")
 
-    hook_path = Path(args.hooks)
-    if not hook_path.exists():
-        parser.error(f"Hooks file not found: {hook_path}")
+    hook_paths = []
+    for hook in args.hooks:
+        hook_path = Path(hook)
+        if not hook_path.exists():
+            parser.error(f"Hooks file not found: {hook_path}")
+        hook_paths.append(hook_path)
 
     options = RunnerOptions(
         platform=args.platform,
-        hook_path=hook_path,
+        hook_paths=hook_paths,
         output_path=Path(args.output),
         device_id=args.device,
         use_usb=args.usb,

@@ -20,12 +20,21 @@ BRIDGES = [
     "frida-swift-bridge",
 ]
 
+BANNER = r"""
+   ___    ____           
+  / __\  / _  |    _     _    _  _   _   _
+ / _\   | (_) |  / _ \ / _ \ | / /  | | | |
+/ /     / / | | | (_) | (_) ||  <   | |_| |
+\/     /_/  |_|  \___/ \___/ |_|\_\  \__, |
+                                     |___/
+"""
+
 
 @dataclass
 class RunnerOptions:
     """Options for the FrookyRunner."""
     platform: str
-    hook_path: Path
+    hook_paths: list[Path]
     output_path: Path
     device_id: Optional[str] = None
     use_usb: bool = False
@@ -83,9 +92,30 @@ class FrookyRunner:
 
     def _prepare_script(self, tmp_dir: Path) -> Path:
         """Combine user hooks with platform scripts."""
-        # Read user hooks
-        with open(self.options.hook_path, "r", encoding="utf-8") as f:
-            user_hooks = f.read()
+        # Read all hook files as JSON and merge hooks arrays
+        merged_hooks = []
+        category = None
+        
+        for hook_path in self.options.hook_paths:
+            with open(hook_path, "r", encoding="utf-8") as f:
+                hook_data = json.load(f)
+            
+            # Take category from first file that has one
+            if category is None and "category" in hook_data:
+                category = hook_data["category"]
+            
+            # Merge hooks
+            if "hooks" in hook_data:
+                merged_hooks.extend(hook_data["hooks"])
+        
+        # Build the target object
+        target = {
+            "category": category or "FROOKY",
+            "hooks": merged_hooks
+        }
+        
+        # Generate JavaScript declaration
+        user_hooks = f"var target = {json.dumps(target, indent=2)};"
 
         # Get all platform scripts dynamically
         platform = self.options.platform
@@ -185,6 +215,7 @@ class FrookyRunner:
 
     def run(self) -> int:
         """Run the Frooky hooks."""
+        print(BANNER)
         try:
             self._ensure_bridges()
 
