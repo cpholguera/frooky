@@ -189,7 +189,7 @@ function registerNativeHook(hook, categoryName) {
         // If filtering fails, default to emitting
       }
 
-      let _mastgEvent = {
+      let event = {
         id: generateUUID(),
         type: "native-hook",
         category: categoryName,
@@ -201,7 +201,7 @@ function registerNativeHook(hook, categoryName) {
         inputParameters: decodedArgs
       };
 
-      send(_mastgEvent);
+      send(event);
     },
     onLeave: function(retval) {
       // Optionally emit a separate event or extend the onEnter event
