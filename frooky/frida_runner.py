@@ -374,7 +374,9 @@ class FrookyRunner:
                 time.sleep(0.2)
 
         except KeyboardInterrupt:
-            print("\nStopping...")
+            # Overwrite the ^C characters
+            print("\b\b  ", end="", flush=True)
+            print("\n\n  Stopping ...\n")
 
         except Exception as e:
             print(f"Error: {e}", file=sys.stderr)
