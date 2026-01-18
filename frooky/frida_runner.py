@@ -181,26 +181,37 @@ class FrookyRunner:
         # Get Frida version
         frida_version = frida.__version__
         
-        # Build the header
-        lines = []
-        lines.append("")
-        lines.append("   ___    ____           ")
-        lines.append("  / __\\  / _  |    _     _    _  _   _   _")
-        lines.append(" / _\\   | (_) |  / _ \\ / _ \\ | / /  | | | |")
-        lines.append("/ /     / / | | | (_) | (_) ||  <   | |_| |")
-        lines.append("\\/     /_/  |_|  \\___/ \\___/ |_|\\_\\  \\__, |")
-        lines.append("                                     |___/")
-        lines.append("")
-        lines.append(f"  Powered by Frida {frida_version} - Target: {self._get_target_description()}")
-        lines.append("")
-        lines.append(f"  Device: {self.device.name}")
+        # Logo lines
+        logo = [
+            "   ___    ____           ",
+            "  / __\\  / _  |    _     _    _  _   _   _",
+            " / _\\   | (_) |  / _ \\ / _ \\ | / /  | | | |",
+            "/ /     / / | | | (_) | (_) ||  <   | |_| |",
+            "\\/     /_/  |_|  \\___/ \\___/ |_|\\_\\  \\__, |",
+            "                                     |___/",
+        ]
         
-        if self.device.id:
-            lines.append(f"  Device ID: {self.device.id}")
+        # Info lines to display on the right
+        info = [
+            f"Powered by Frida {frida_version}",
+            f"Target: {self._get_target_description()}",
+            "",
+            f"Device: {self.device.name}" + (f" ({self.device.id})" if self.device.id else ""),
+            f"Platform: {self.options.platform}",
+            f"Output: {self.options.output_path}",
+            f"Hooks: {len(self.options.hook_paths)} file(s)",
+        ]
         
-        lines.append(f"  Platform: {self.options.platform}")
-        lines.append(f"  Output: {self.options.output_path}")
-        lines.append(f"  Hooks: {len(self.options.hook_paths)} file(s)")
+        # Find the width of the widest logo line
+        logo_width = max(len(line) for line in logo)
+        
+        # Combine logo and info side by side
+        lines = [""]
+        for i in range(max(len(logo), len(info))):
+            logo_part = logo[i].ljust(logo_width) if i < len(logo) else " " * logo_width
+            info_part = info[i] if i < len(info) else ""
+            lines.append(f"{logo_part}   {info_part}")
+        
         lines.append("")
         lines.append("  Press Ctrl+C to stop...")
         lines.append("")
