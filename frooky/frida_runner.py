@@ -205,7 +205,7 @@ class FrookyRunner:
 
     def _print_hooks_line(self) -> None:
         """Print the hooks summary line once when summary event arrives."""
-        hook_line = f"\n  Hooks: {self.total_hooks}"
+        hook_line = f"\n  Resolved Hooks: {self.total_hooks}"
         if self.total_errors > 0:
             hook_line += f" | Errors: {self.total_errors}"
         print(hook_line)
@@ -220,7 +220,7 @@ class FrookyRunner:
         if len(self.last_event) > max_event_len:
             event_display += "..."
         
-        status = f"\r  Events: {self.event_count:,} | Last: {event_display}"
+        status = f"\r  Events: {self.event_count:,} \t\t| Last: {event_display}"
         # Pad with spaces to clear previous content
         status = status.ljust(100)
         print(status, end="", flush=True)
@@ -266,8 +266,8 @@ class FrookyRunner:
             "",
             f"Device: {self.device.name}" + (f" ({self.device.id})" if self.device.id else ""),
             f"Platform: {self.options.platform}",
+            f"Hook files: {len(self.options.hook_paths)}",
             f"Output: {self.options.output_path}",
-            f"Hooks: {len(self.options.hook_paths)} file(s)",
         ]
         
         # Find the width of the widest logo line
