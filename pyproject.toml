@@ -1,26 +1,45 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=70"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "frooky"
 version = "0.1.0"
-description = "Frida-powered hook runner with bundled scripts"
+description = "Frida-powered hook runner based on JSON hook files."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [
-  { name = "cpholguera" }
+  { name = "Carlos Holguera", email = "holguera.cybersec@gmail.com" },
+  { name = "Stefan Bernhardsgrütter", email = "stefan.bernhardsgruetter@redguard.ch" },
 ]
+keywords = ["mobile", "instrumentation", "pentest", "frida", "hook"]
+classifiers = [
+  "License :: OSI Approved",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: JavaScript",
+  "Topic :: Security",
+  "Topic :: Software Development :: Debuggers",
+]
+
 dependencies = [
-  "frida>=16.0.0"
+  "frida>=17.5.2",
+  "frida-tools>=14.5.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/cpholguera/frooky"
+Repository = "https://github.com/cpholguera/frooky"
+"Bug Tracker" = "https://github.com/cpholguera/frooky/issues"
 
 [project.scripts]
 frooky = "frooky.cli:main"
-
-[tool.setuptools]
-include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
