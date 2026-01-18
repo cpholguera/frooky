@@ -44,6 +44,10 @@ class FrookyRunner:
         self.session: Optional[frida.core.Session] = None
         self.script: Optional[frida.core.Script] = None
         self.device: Optional[frida.core.Device] = None
+        self.event_count: int = 0
+        self.last_event: str = "Waiting for events..."
+        self.total_hooks: Optional[int] = None
+        self.total_errors: int = 0
 
     def _ensure_bridges(self) -> None:
         """Ensure Frida bridges are installed."""
@@ -146,16 +150,80 @@ class FrookyRunner:
                 with open(output_path, "a", encoding="utf-8") as f:
                     json.dump(payload, f)
                     f.write("\n")
+                
+                # Check if this is a summary event
+                if isinstance(payload, dict):
+                    event_type = payload.get("type")
+                    
+                    if event_type == "summary":
+                        # Store summary info and print once
+                        self.total_hooks = payload.get("totalHooks", 0)
+                        self.total_errors = payload.get("totalErrors", 0)
+                        self._print_hooks_line()
+                    elif event_type == "hook":
+                        # Only count hook events
+                        self.event_count += 1
+                        # Extract event info for status line
+                        method = payload.get("method", payload.get("symbol", "unknown"))
+                        class_name = payload.get("class", "")
+                        if class_name:
+                            self.last_event = f"{class_name}.{method}"
+                        else:
+                            self.last_event = method
+                        self._update_status_line()
             else:
                 try:
                     parsed = json.loads(payload)
                     with open(output_path, "a", encoding="utf-8") as f:
                         json.dump(parsed, f)
                         f.write("\n")
+                    
+                    # Check if this is a summary event
+                    if isinstance(parsed, dict):
+                        event_type = parsed.get("type")
+                        
+                        if event_type == "summary":
+                            # Store summary info and print once
+                            self.total_hooks = parsed.get("totalHooks", 0)
+                            self.total_errors = parsed.get("totalErrors", 0)
+                            self._print_hooks_line()
+                        elif event_type == "hook":
+                            # Only count hook events
+                            self.event_count += 1
+                            # Extract event info for status line
+                            method = parsed.get("method", parsed.get("symbol", "unknown"))
+                            class_name = parsed.get("class", "")
+                            if class_name:
+                                self.last_event = f"{class_name}.{method}"
+                            else:
+                                self.last_event = method
+                            self._update_status_line()
                 except Exception:
                     print("MSG", payload)
 
         return on_message
+
+    def _print_hooks_line(self) -> None:
+        """Print the hooks summary line once when summary event arrives."""
+        hook_line = f"\n  Hooks: {self.total_hooks}"
+        if self.total_errors > 0:
+            hook_line += f" | Errors: {self.total_errors}"
+        print(hook_line)
+        # Print initial events line
+        self._update_status_line()
+
+    def _update_status_line(self) -> None:
+        """Update the live status line with event count and last event."""
+        # Truncate last_event if too long
+        max_event_len = 60
+        event_display = self.last_event[:max_event_len]
+        if len(self.last_event) > max_event_len:
+            event_display += "..."
+        
+        status = f"\r  Events: {self.event_count:,} | Last: {event_display}"
+        # Pad with spaces to clear previous content
+        status = status.ljust(100)
+        print(status, end="", flush=True)
 
     def _get_target_description(self) -> str:
         """Get a description of the target for the header."""
