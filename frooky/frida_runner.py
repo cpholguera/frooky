@@ -7,8 +7,11 @@ import os
 import sys
 import json
 from dataclasses import dataclass
+from importlib import resources
 from pathlib import Path
 from typing import Optional
+
+from .resources import read_text
 
 
 BRIDGES = [
@@ -64,6 +67,48 @@ class FrookyRunner:
                 stdout=sys.stdout,
                 stderr=sys.stderr,
             )
+
+    def _get_platform_scripts(self) -> list[str]:
+        """Get all .js files from the platform folder, with base_script.js last."""
+        platform = self.options.platform
+        platform_dir = resources.files("frooky").joinpath(platform)
+        
+        script_files = [
+            item.name for item in platform_dir.iterdir()
+            if item.name.endswith(".js") and item.name != "base_script.js"
+        ]
+        script_files.append("base_script.js")
+        
+        return script_files
+
+    def _prepare_script(self, tmp_dir: Path) -> Path:
+        """Combine user hooks with platform scripts."""
+        # Read user hooks
+        with open(self.options.hook_path, "r", encoding="utf-8") as f:
+            user_hooks = f.read()
+
+        # Get all platform scripts dynamically
+        platform = self.options.platform
+        script_files = self._get_platform_scripts()
+        
+        platform_scripts = []
+        for script_file in script_files:
+            script_path = f"{platform}/{script_file}"
+            try:
+                script_content = read_text(script_path)
+                platform_scripts.append(script_content)
+            except FileNotFoundError:
+                pass  # Skip if file doesn't exist
+
+        # Combine: user hooks define 'target', platform scripts use it
+        combined = f"{user_hooks}\n\n" + "\n\n".join(platform_scripts)
+
+        # Write merged agent to tmp/agent.js
+        combined_path = tmp_dir / "agent.js"
+        with open(combined_path, "w", encoding="utf-8") as f:
+            f.write(combined)
+
+        return combined_path
 
     def _create_message_handler(self):
         """Create a message handler closure with access to output path."""
@@ -146,14 +191,16 @@ class FrookyRunner:
             # Set up paths
             tmp_dir = Path("tmp")
             tmp_dir.mkdir(exist_ok=True)
-            src_agent = tmp_dir / "frooky_last.js"
-            built_agent = Path("agent.js")
+            built_agent = tmp_dir / "_agent.js"
 
-            # Copy hooks to temp location (resources.py handles this typically)
-            # For now, we'll use the hook_path directly
-            src_agent = self.options.hook_path
+            # Combine user hooks with platform base script
+            src_agent = self._prepare_script(tmp_dir)
 
             self._build_agent(src_agent, built_agent)
+
+            # Clear/overwrite the output file at start
+            with open(self.options.output_path, "w", encoding="utf-8") as f:
+                pass  # Truncate file
 
             # Get device
             self.device = self._get_device()
