@@ -20,15 +20,6 @@ BRIDGES = [
     "frida-swift-bridge",
 ]
 
-BANNER = r"""
-   ___    ____           
-  / __\  / _  |    _     _    _  _   _   _
- / _\   | (_) |  / _ \ / _ \ | / /  | | | |
-/ /     / / | | | (_) | (_) ||  <   | |_| |
-\/     /_/  |_|  \___/ \___/ |_|\_\  \__, |
-                                     |___/
-"""
-
 
 @dataclass
 class RunnerOptions:
@@ -166,6 +157,56 @@ class FrookyRunner:
 
         return on_message
 
+    def _get_target_description(self) -> str:
+        """Get a description of the target for the header."""
+        opts = self.options
+        
+        if opts.attach_frontmost:
+            app = self.device.get_frontmost_application()
+            if app:
+                return f"frontmost application: {app.name} (PID: {app.pid})"
+            return "frontmost application"
+        elif opts.attach_name:
+            return opts.attach_name
+        elif opts.attach_identifier:
+            return opts.attach_identifier
+        elif opts.attach_pid:
+            return str(opts.attach_pid)
+        elif opts.spawn:
+            return f"{opts.spawn} (spawned)"
+        return "unknown target"
+
+    def _print_header(self) -> None:
+        """Print the Frooky header with session information."""
+        # Get Frida version
+        frida_version = frida.__version__
+        
+        # Build the header
+        lines = []
+        lines.append("")
+        lines.append("   ___    ____           ")
+        lines.append("  / __\\  / _  |    _     _    _  _   _   _")
+        lines.append(" / _\\   | (_) |  / _ \\ / _ \\ | / /  | | | |")
+        lines.append("/ /     / / | | | (_) | (_) ||  <   | |_| |")
+        lines.append("\\/     /_/  |_|  \\___/ \\___/ |_|\\_\\  \\__, |")
+        lines.append("                                     |___/")
+        lines.append("")
+        lines.append(f"  Powered by Frida {frida_version} - Target: {self._get_target_description()}")
+        lines.append("")
+        lines.append(f"  Device: {self.device.name}")
+        
+        if self.device.id:
+            lines.append(f"  Device ID: {self.device.id}")
+        
+        lines.append(f"  Platform: {self.options.platform}")
+        lines.append(f"  Output: {self.options.output_path}")
+        lines.append(f"  Hooks: {len(self.options.hook_paths)} file(s)")
+        lines.append("")
+        lines.append("  Press Ctrl+C to stop...")
+        lines.append("")
+        
+        print("\n".join(lines))
+
     def _get_device(self) -> frida.core.Device:
         """Get the Frida device based on options."""
         if self.options.device_id:
@@ -184,15 +225,12 @@ class FrookyRunner:
             app = self.device.get_frontmost_application()
             if app is None:
                 raise RuntimeError("No frontmost application found")
-            print(f"Attaching to frontmost application: {app.name} (PID: {app.pid})")
             return self.device.attach(app.pid)
 
         elif opts.attach_name:
-            print(f"Attaching to process by name: {opts.attach_name}")
             return self.device.attach(opts.attach_name)
 
         elif opts.attach_identifier:
-            print(f"Attaching to process by identifier: {opts.attach_identifier}")
             # Find process by identifier
             for proc in self.device.enumerate_processes():
                 if proc.identifier == opts.attach_identifier:
@@ -201,11 +239,9 @@ class FrookyRunner:
             return self.device.attach(opts.attach_identifier)
 
         elif opts.attach_pid:
-            print(f"Attaching to PID: {opts.attach_pid}")
             return self.device.attach(opts.attach_pid)
 
         elif opts.spawn:
-            print(f"Spawning: {opts.spawn}")
             pid = self.device.spawn(opts.spawn)
             session = self.device.attach(pid)
             return session
@@ -215,7 +251,6 @@ class FrookyRunner:
 
     def run(self) -> int:
         """Run the Frooky hooks."""
-        print(BANNER)
         try:
             self._ensure_bridges()
 
@@ -235,10 +270,12 @@ class FrookyRunner:
 
             # Get device
             self.device = self._get_device()
-            print(f"Using device: {self.device.name}")
 
             # Attach or spawn
             self.session = self._attach_or_spawn()
+
+            # Print header with all session info
+            self._print_header()
 
             # Load script
             with open(built_agent, "r", encoding="utf-8") as f:
@@ -251,11 +288,7 @@ class FrookyRunner:
             # Resume if spawned
             if self.options.spawn:
                 pid = self.session.pid
-                print(f"Resuming PID: {pid}")
                 self.device.resume(pid)
-
-            print(f"Script loaded. Writing output to: {self.options.output_path}")
-            print("Press Ctrl+C to stop...")
 
             # Main loop
             while True:
