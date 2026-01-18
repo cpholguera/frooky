@@ -617,7 +617,7 @@ function registerObjCHook(hook, categoryName, callback) {
 // Main execution
 (function() {
   function callback(event) {
-    console.log(JSON.stringify(event, null, 2));
+    send(event);
   }
 
   var hooksSummary = [];
@@ -661,5 +661,5 @@ function registerObjCHook(hook, categoryName, callback) {
     errors: errors,
     totalErrors: errors.length
   };
-  console.log(JSON.stringify(summary, null, 2));
+  send(summary);
 })();

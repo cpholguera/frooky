@@ -181,7 +181,7 @@ function registerNativeHook(hook, categoryName) {
         let descriptors2 = Array.isArray(hook.args) ? hook.args : [];
         if (!filtersPass(decodedArgs, descriptors2)) {
           if (hook.debug === true) {
-            console.log(JSON.stringify({ type: 'native-filter-suppressed', symbol: hook.symbol, args: decodedArgs }));
+            send({ type: 'native-filter-suppressed', symbol: hook.symbol, args: decodedArgs });
           }
           return; // suppress event when filters don't match
         }
@@ -201,7 +201,7 @@ function registerNativeHook(hook, categoryName) {
         inputParameters: decodedArgs
       };
 
-      console.log(JSON.stringify(_mastgEvent, null, 2));
+      send(_mastgEvent);
     },
     onLeave: function(retval) {
       // Optionally emit a separate event or extend the onEnter event
@@ -276,11 +276,11 @@ function registerHook(
     try {
       let returnValue = this[method].apply(this, arguments);
       event.returnValue = decodeArguments([returnType], [returnValue]);
-      console.log(JSON.stringify(event, null, 2))
+      send(event)
       return returnValue;
     } catch (e) {
       event.exception = e.toString();
-      console.log(JSON.stringify(event, null, 2))
+      send(event)
       throw e;
     }
   };
@@ -534,7 +534,7 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
           errors: nativeErrors,
           totalErrors: nativeErrors.length
         };
-        console.log(JSON.stringify(nativeSummary, null, 2));
+        send(nativeSummary);
       }
 
       // 2) Emit an initial summary of all overloads that will be hooked
@@ -575,7 +575,7 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
         }
 
         let summary = {type: "summary", hooks: hooks, totalHooks: totalHooks, errors: errors, totalErrors: totalErrors};
-        console.log(JSON.stringify(summary, null, 2));
+        send(summary);
       } catch (e) {
         // If summary fails, don't block hooking
         console.error("Summary generation failed, but hooking will continue. Error:", e);
