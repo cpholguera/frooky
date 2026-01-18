@@ -1,3 +1,5 @@
+import Java from "frida-java-bridge"
+
 /**
  * Decodes the parameter types of a Java method.
  * @param {string} methodHeader - Java method (e.g., `function setBlockModes([Ljava.lang.String;): android.security.keystore.KeyGenParameterSpec$Builder`)

@@ -1,3 +1,6 @@
+import ObjC from "frida-objc-bridge";
+// import Swift from "frida-swift-bridge";
+
 /**
  * Generates a v4 UUID
  * @returns {string} v4 UUID (e.g. "bf01006f-1d6c-4faa-8680-36818b4681bc")
