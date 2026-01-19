@@ -111,3 +111,5 @@ Output (pretty-printed for readability):
   ]
 }
 ```
+
+See more in [docs/usage.md](docs/usage.md) and see a full example in [docs/examples/example.md](docs/examples/example.md).

@@ -223,7 +223,17 @@ Hook Objective-C methods using `objClass` and `symbol`:
 
 Events are written to the output file in JSON Lines format (one JSON object per line, known as NDJSON). You can easily pretty-print it e.g. using `jq . output.json`.
 
-Example event (pretty-printed for clarity):
+First of all, a summary event is written when hooking is initialized, listing all resolved hooks. It includes:
+
+- `type`: Indicates this is a summary event
+- `hooks`: An array of all hooked methods with their classes and overloads
+- `totalHooks`: Total number of hooks that were set up
+- `errors`: Any errors encountered while setting up hooks
+- `totalErrors`: Total number of errors encountered
+
+After that, individual hook events are written each time a hooked method/function is called.
+
+Example hook event (pretty-printed for clarity):
 
 ```json
 {
