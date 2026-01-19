@@ -1,7 +1,6 @@
 # Example: Hooking EncryptedSharedPreferences Methods
 
-In this example we download and install the OWASP MAS [MASTG-DEMO-0060](https://mas.owasp.org/MASTG/demos/android/MASVS-STORAGE/MASTG-DEMO-0060/MASTG-DEMO-0060/) app (App Writing Sensitive Data to Sandbox using EncryptedSharedPreferences
-), create two hook files to hook methods related to encrypted shared preferences, and run `frooky` with both hook files against the app. We then analyze the output JSON Lines file to see the captured hook events.
+In this example we download and install the OWASP MAS [MASTG-DEMO-0060](https://mas.owasp.org/MASTG/demos/android/MASVS-STORAGE/MASTG-DEMO-0060/MASTG-DEMO-0060/) app (App Writing Sensitive Data to Sandbox using EncryptedSharedPreferences), create two hook files to hook methods related to encrypted shared preferences, and run `frooky` with both hook files against the app. We then analyze the output JSON Lines file to see the captured hook events.
 
 ## Creating Hook Files
 
