@@ -9,283 +9,105 @@
                                      |___/
 ```
 
-A Frida-based dynamic analysis tool for Android and iOS applications.
+`frooky` is a [Frida](https://www.frida.re/)-based dynamic analysis tool for Android and iOS apps based on JSON hook files.
+
+[![PyPi](https://badge.fury.io/py/frooky.svg)](https://pypi.python.org/pypi/frooky)
+
+- Hook Java/Kotlin methods and native C/C++ functions
+- Simple JSON hook file format
+- Support for method overloads and stack trace capturing
+- Argument capturing with various data types
+- Filtering hooks by argument values or stack trace patterns
+- Output events in JSON Lines format for easy processing
+
+See more in [docs/usage.md](docs/usage.md).
 
 ## Installation
 
+Simply install via pip and you'll get the `frooky` CLI tool:
+
 ```bash
-pip install frooky
+pip3 install frooky
 ```
 
 ## Usage
 
+Create a hook file (e.g., `hooks.json`) as described in [docs/usage.md](docs/usage.md), then run `frooky` with the desired options:
+
 ```bash
 # Attach by app name
-frooky -U -n "My App" hooks.json
+frooky -U -n "My App" --platform android hooks.json
 
 # Spawn and add multiple hook files (hooks are merged)
-frooky -U -f com.example.app hooks.json hooks2.json more_hooks.json
+frooky -U -f com.example.app --platform android storage.json crypto.json
 ```
 
 See `frooky -h` for more options.
 
-## Hook Files
+## Example
 
-Hook files use JSON format. When multiple hook files are provided, their `hooks` arrays are merged together.
+We'll use the OWASP MAS [MASTG-DEMO-0072](https://mas.owasp.org/MASTG/demos/android/MASVS-CRYPTO/MASTG-DEMO-0072/MASTG-DEMO-0072/) app to demonstrate hooking a cryptographic key generation method.
 
-### Basic Structure
+First you need to create a hook file, e.g., `crypto.json`:
 
 ```json
 {
-  "category": "STORAGE",
+  "category": "CRYPTO",
   "hooks": [
     {
-      "class": "com.example.MyClass",
-      "methods": ["method1", "method2"]
+      "class": "android.security.keystore.KeyGenParameterSpec$Builder",
+      "method": "$init",
+      "maxFrames": 10
     }
   ]
 }
 ```
 
-### Java/Kotlin Hooks
+Then run `frooky` with the hook file against your target app:
 
-#### Simple Method Hook
-
-```json
-{
-  "class": "java.io.File",
-  "method": "exists"
-}
+```bash
+frooky -U -n "MASTestApp" --platform android crypto.json
 ```
 
-#### Multiple Methods
+Output (pretty-printed for readability):
+
+> Events are written to the output file in JSON Lines format (one JSON object per line, known as NDJSON). You can easily pretty-print it e.g. using `jq . output.json`.
 
 ```json
 {
-  "class": "java.io.FileOutputStream",
-  "methods": ["write", "close", "flush"]
-}
-```
-
-#### Method Overloads
-
-Specify exact method signatures using `overloads`:
-
-```json
-{
-  "class": "java.io.FileOutputStream",
-  "method": "write",
-  "overloads": [
-    { "args": ["[B"] },
-    { "args": ["[B", "int", "int"] },
-    { "args": ["int"] }
+  "id": "14535033-08ea-4063-897c-eacd4a885d8b",
+  "type": "hook",
+  "category": "CRYPTO",
+  "time": "2026-01-14T16:02:21.782Z",
+  "class": "android.security.keystore.KeyGenParameterSpec$Builder",
+  "method": "$init",
+  "instanceId": 35486102,
+  "stackTrace": [
+    "android.security.keystore.KeyGenParameterSpec$Builder.<init>(Native Method)",
+    "org.owasp.mastestapp.MastgTest.generateKey(MastgTest.kt:97)",
+    "org.owasp.mastestapp.MastgTest.mastgTest(MastgTest.kt:41)",
+    "org.owasp.mastestapp.MainActivityKt.MainScreen$lambda$12$lambda$11(MainActivity.kt:101)",
+    "org.owasp.mastestapp.MainActivityKt.$r8$lambda$Pm6AsbKBmypP53K-UABM21E_Xxk(Unknown Source:0)",
+    "org.owasp.mastestapp.MainActivityKt$$ExternalSyntheticLambda3.run(D8$$SyntheticClass:0)",
+    "java.lang.Thread.run(Thread.java:1012)"
+  ],
+  "inputParameters": [
+    {
+      "declaredType": "java.lang.String",
+      "value": "MultiPurposeKey"
+    },
+    {
+      "declaredType": "int",
+      "value": 15
+    }
+  ],
+  "returnValue": [
+    {
+      "declaredType": "void",
+      "value": "void"
+    }
   ]
 }
 ```
 
-#### Stack Traces
-
-Control stack trace depth with `maxFrames`:
-
-```json
-{
-  "class": "javax.crypto.Cipher",
-  "method": "doFinal",
-  "maxFrames": 10
-}
-```
-
-### Native Hooks
-
-Native hooks intercept C/C++ functions. Set `native: true` and specify the symbol.
-
-#### Basic Native Hook
-
-```json
-{
-  "native": true,
-  "symbol": "open",
-  "module": "libc.so"
-}
-```
-
-#### Argument Descriptors
-
-Define how arguments should be captured:
-
-```json
-{
-  "native": true,
-  "symbol": "write",
-  "module": "libc.so",
-  "args": [
-    { "name": "fd", "type": "int32" },
-    { "name": "buf", "type": "bytes", "length": 256 },
-    { "name": "count", "type": "int32" }
-  ]
-}
-```
-
-#### Dynamic Length from Another Argument
-
-Use `lengthInArg` to read length from another argument:
-
-```json
-{
-  "native": true,
-  "symbol": "send",
-  "module": "libc.so",
-  "args": [
-    { "name": "sockfd", "type": "int32" },
-    { "name": "buf", "type": "bytes", "lengthInArg": 2 },
-    { "name": "len", "type": "int32" },
-    { "name": "flags", "type": "int32" }
-  ]
-}
-```
-
-#### Capture Return Values
-
-Set `returnValue: true` on the last argument:
-
-```json
-{
-  "native": true,
-  "symbol": "read",
-  "module": "libc.so",
-  "args": [
-    { "name": "fd", "type": "int32" },
-    { "name": "buf", "type": "bytes", "lengthInArg": 2 },
-    { "name": "count", "type": "int32" },
-    { "name": "result", "type": "int32", "returnValue": true }
-  ]
-}
-```
-
-#### Outbound Parameters
-
-Use `direction: "out"` for output parameters that should be read after the function returns:
-
-```json
-{
-  "native": true,
-  "symbol": "CCCrypt",
-  "module": "libcommonCrypto.dylib",
-  "args": [
-    { "name": "op", "type": "int32" },
-    { "name": "alg", "type": "int32" },
-    { "name": "dataOut", "type": "bytes", "length": 256, "direction": "out" },
-    { "name": "dataOutMoved", "type": "pointer", "direction": "out" }
-  ]
-}
-```
-
-#### Filter by Value
-
-Only capture events when arguments match specific values:
-
-```json
-{
-  "native": true,
-  "symbol": "open",
-  "module": "libc.so",
-  "args": [
-    { "name": "pathname", "type": "string", "filter": ["/data/", "/sdcard/"] }
-  ]
-}
-```
-
-#### Filter by Stack Trace
-
-Only capture events when the call stack contains specific patterns:
-
-```json
-{
-  "native": true,
-  "symbol": "SSL_write",
-  "module": "libssl.so",
-  "filterEventsByStacktrace": ["com.example.network", "okhttp3"]
-}
-```
-
-#### Debug Mode
-
-Enable verbose logging for troubleshooting:
-
-```json
-{
-  "native": true,
-  "symbol": "problematic_function",
-  "module": "libfoo.so",
-  "debug": true
-}
-```
-
-### Argument Types
-
-| Type | Description |
-|------|-------------|
-| `string` | Null-terminated C string |
-| `int32` | 32-bit signed integer |
-| `uint32` | 32-bit unsigned integer |
-| `int64` | 64-bit signed integer |
-| `pointer` | Memory address |
-| `bytes` | Raw bytes (requires `length` or `lengthInArg`) |
-| `bool` | Boolean value |
-| `double` | 64-bit floating point |
-| `CFData` | iOS CFData object |
-| `CFDictionary` | iOS CFDictionary object |
-
-### iOS Objective-C Hooks
-
-Hook Objective-C methods using `objClass` and `symbol`:
-
-```json
-{
-  "native": true,
-  "objClass": "NSURLSession",
-  "symbol": "dataTaskWithRequest:completionHandler:"
-}
-```
-
-## Output Format
-
-Events are written to the output file in JSON Lines format (one JSON object per line, know as NDJSON). You can easily pretty-print it e.g. using `jq . output.json`.
-
-Example event (pretty-printed for clarity):
-
-```json
-{
-    "id": "0117229c-b034-4676-ba33-075fc27922ba",
-    "type": "hook",
-    "category": "STORAGE",
-    "time": "2026-01-18T16:17:25.470Z",
-    "class": "android.app.SharedPreferencesImpl$EditorImpl",
-    "method": "putString",
-    "instanceId": 268282727,
-    "stackTrace": [
-        "android.app.SharedPreferencesImpl$EditorImpl.putString(Native Method)",
-        "androidx.security.crypto.EncryptedSharedPreferences$Editor.putEncryptedObject(EncryptedSharedPreferences.java:389)",
-        ...
-    ],
-    "inputParameters": [
-        {
-            "declaredType": "java.lang.String",
-            "value": "AQMRC7OWD6/h1iJseuzJVrClpwKE8swB8gOrGnsdaN4="
-        },
-        {
-            "declaredType": "java.lang.String",
-            "value": "AX4R5MZu+J1p0U3hvKyuEnJDQopI+wupiSi8CAG8dzq0PU76NbbebjhqMtqCD7fFUy2SmmQuQVDlDrrj30d3GQes+PlD8HmRFszVTge039GQ"
-        }
-    ],
-    "returnValue": [
-        {
-            "declaredType": "android.content.SharedPreferences$Editor",
-            "value": "<instance: android.content.SharedPreferences$Editor, $className: android.app.SharedPreferencesImpl$EditorImpl>",
-            "runtimeType": "android.app.SharedPreferencesImpl$EditorImpl",
-            "instanceId": "268282727",
-            "instanceToString": "android.app.SharedPreferencesImpl$EditorImpl@ffdab67"
-        }
-    ]
-}
-```
+See more in [docs/usage.md](docs/usage.md) and see a full example in [docs/examples/example.md](docs/examples/example.md).
