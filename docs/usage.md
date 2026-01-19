@@ -221,7 +221,7 @@ Hook Objective-C methods using `objClass` and `symbol`:
 
 ## Output Format
 
-Events are written to the output file in JSON Lines format (one JSON object per line, know as NDJSON). You can easily pretty-print it e.g. using `jq . output.json`.
+Events are written to the output file in JSON Lines format (one JSON object per line, known as NDJSON). You can easily pretty-print it e.g. using `jq . output.json`.
 
 Example event (pretty-printed for clarity):
 

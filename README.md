@@ -16,7 +16,7 @@
 [![PyPi](https://badge.fury.io/py/frooky.svg)](https://pypi.python.org/pypi/frooky)
 
 - Hook Java/Kotlin methods and native C/C++ functions
-- Simply JSON hook file format
+- Simple JSON hook file format
 - Support for method overloads and stack trace capturing
 - Argument capturing with various data types
 - Filtering hooks by argument values or stack trace patterns
@@ -73,7 +73,7 @@ frooky -U -n "MASTestApp" --platform android crypto.json
 
 Output (pretty-printed for readability):
 
-> Events are written to the output file in JSON Lines format (one JSON object per line, know as NDJSON). You can easily pretty-print it e.g. using `jq . output.json`.
+> Events are written to the output file in JSON Lines format (one JSON object per line, known as NDJSON). You can easily pretty-print it e.g. using `jq . output.json`.
 
 ```json
 {
