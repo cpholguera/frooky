@@ -204,7 +204,7 @@ function registerNativeHook(hook, categoryName) {
         let descriptors2 = Array.isArray(hook.args) ? hook.args : [];
         if (!filtersPass(decodedArgs, descriptors2)) {
           if (hook.debug === true) {
-            console.log(JSON.stringify({type: 'native-filter-suppressed', symbol: hook.symbol, args: decodedArgs}));
+            send(JSON.stringify({type: 'native-filter-suppressed', symbol: hook.symbol, args: decodedArgs}));
           }
           return; // suppress event when filters don't match
         }
@@ -224,7 +224,7 @@ function registerNativeHook(hook, categoryName) {
         inputParameters: decodedArgs
       };
 
-      console.log(JSON.stringify(_mastgEvent, null, 2));
+      send(JSON.stringify(_mastgEvent, null, 2));
     }, onLeave: function (retval) {
       // Optionally emit a separate event or extend the onEnter event
       // For now, we just log the return if needed
@@ -288,11 +288,11 @@ function registerHook(clazz, method, overloadIndex, categoryName, maxFrames = 8)
     try {
       const returnValue = this[method].apply(this, arguments);
       event.returnValue = decodeArguments([returnType], [returnValue]);
-      console.log(JSON.stringify(event, null, 2))
+      send(JSON.stringify(event, null, 2))
       return returnValue;
     } catch (e) {
       event.exception = e.toString();
-      console.log(JSON.stringify(event, null, 2))
+      send(JSON.stringify(event, null, 2))
       throw e;
     }
   };
@@ -514,9 +514,9 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
 // Main execution: separate native hooks from Java hooks
 (() => {
   // Separate hooks into native and Java categories
-  let nativeHooks = [];
-  let javaHooks = [];
-  target.hooks.forEach(function (hook) {
+  const nativeHooks = [];
+  const javaHooks = [];
+  javaHooks.forEach(hook => {
     if (isNativeHook(hook)) {
       nativeHooks.push(hook);
     } else {
@@ -525,12 +525,12 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
   });
 
   // Prepare native summary upfront without attaching hooks yet
-  let nativeHooksSummary = [];
-  let nativeErrors = [];
+  const nativeHooksSummary = [];
+  const nativeErrors = [];
   nativeHooks.forEach(function (hook) {
     try {
       // Attempt to resolve symbol to surface errors early, but do not attach
-      let addr = resolveNativeSymbol(hook);
+      const addr = resolveNativeSymbol(hook);
       if (!addr) {
         nativeErrors.push("Failed to resolve native symbol '" + hook.symbol + "'" + (hook.module ? " in module '" + hook.module + "'" : ""));
       }
@@ -538,7 +538,7 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
         module: hook.module || "<global>", symbol: hook.symbol
       });
     } catch (e) {
-      let errMsg = "Failed to resolve native hook for symbol '" + hook.symbol + "': " + e;
+      const errMsg = "Failed to resolve native hook for symbol '" + hook.symbol + "': " + e;
       console.error(errMsg);
       nativeErrors.push(errMsg);
     }
@@ -551,7 +551,7 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
 
     setTimeout(() => {
       // Pre-compute hook operations once to avoid redundant processing
-      let hookOperationsCache = [];
+      const hookOperationsCache = [];
       target.hooks.forEach(hook => {
         hookOperationsCache.push({
           hook, built: buildHookOperations(hook)
@@ -560,17 +560,17 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
 
       // 1) Emit native summary
       if (nativeHooks.length > 0) {
-        let nativeSummary = {
+        const nativeSummary = {
           type: "native-summary",
           hooks: nativeHooksSummary,
           totalHooks: nativeHooksSummary.length,
           errors: nativeErrors,
           totalErrors: nativeErrors.length
         };
-        console.log(JSON.stringify(nativeSummary, null, 2));
+        send(JSON.stringify(nativeSummary, null, 2));
       }
 
-      // 2)Emit an initial summary of all overloads that will be hooked
+      // 2) Emit an initial summary of all overloads that will be hooked
       try {
         // Aggregate map nested by class then method
         const aggregate = {};
@@ -594,7 +594,7 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
           });
         });
 
-        let hooks = [];
+        const hooks = [];
         for (const clazz in aggregate) {
           if (!aggregate.hasOwnProperty(clazz)) continue;
           const methodsMap = aggregate[clazz];
@@ -608,7 +608,7 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
         }
 
         const summary = {type: "summary", hooks, totalHooks, errors, totalErrors};
-        console.log(JSON.stringify(summary, null, 2));
+        send(JSON.stringify(summary, null, 2));
       } catch (e) {
         // If summary fails, don't block hooking
         console.error("Summary generation failed, but hooking will continue. Error:", e);
@@ -625,7 +625,7 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
         });
       }
 
-      // 4) Register Javahooks using cached operations
+      // 4) Register Java hooks using cached operations
       hookOperationsCache.forEach(cached => {
         registerAllHooks(cached.hook, target.category, cached.built);
       });
