@@ -27,7 +27,7 @@ jobs:
             simpleMatches.forEach(match => issueNumbers.add(parseInt(match[1])));
             
             // Pattern 2: Owner/repo format - fixes owner/repo#123
-            const ownerRepoRegex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+([a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+)#(\d+)/gi;
+            const ownerRepoRegex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+([a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+)#(\d+)/gi;
             const ownerRepoMatches = [...prBody.matchAll(ownerRepoRegex)];
             ownerRepoMatches.forEach(match => {
               const repoPath = match[1];
@@ -41,7 +41,7 @@ jobs:
             });
             
             // Pattern 3: Full URL format - fixes https://github.com/owner/repo#123 or /issues/123
-            const urlRegex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+https?:\/\/github\.com\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)(?:\/issues\/|#)(\d+)/gi;
+            const urlRegex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+https?:\/\/github\.com\/([a-zA-Z0-9._-]+)\/([a-zA-Z0-9._-]+)(?:\/issues\/|#)(\d+)/gi;
             const urlMatches = [...prBody.matchAll(urlRegex)];
             urlMatches.forEach(match => {
               const owner = match[1];
