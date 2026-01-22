@@ -6,6 +6,7 @@ import subprocess
 import os
 import sys
 import json
+import shutil
 from dataclasses import dataclass
 from importlib import resources
 from pathlib import Path
@@ -34,6 +35,7 @@ class RunnerOptions:
     attach_identifier: Optional[str] = None
     attach_pid: Optional[int] = None
     spawn: Optional[str] = None
+    keep_artifacts: bool = False
 
 
 class FrookyRunner:
@@ -328,6 +330,25 @@ class FrookyRunner:
         else:
             raise RuntimeError("No target specified")
 
+    def _cleanup_artifacts(self) -> None:
+        """Remove temporary artifacts created during execution."""
+        artifacts = [
+            Path("tmp"),
+            Path("node_modules"),
+            Path("package.json"),
+            Path("package-lock.json"),
+        ]
+        
+        for artifact in artifacts:
+            try:
+                if artifact.is_dir():
+                    shutil.rmtree(artifact)
+                elif artifact.is_file():
+                    artifact.unlink()
+            except Exception:
+                # Silently ignore cleanup errors
+                pass
+
     def run(self) -> int:
         """Run the Frooky hooks."""
         try:
@@ -393,5 +414,9 @@ class FrookyRunner:
                     self.session.detach()
                 except Exception:
                     pass
+            
+            # Clean up artifacts unless --keep-artifacts was specified
+            if not self.options.keep_artifacts:
+                self._cleanup_artifacts()
 
         return 0
