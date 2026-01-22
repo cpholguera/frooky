@@ -33,6 +33,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("hooks", nargs="+", help="Path(s) to your input hook JSON file(s)")
     parser.add_argument("-o", "--output", default="output.json", help="Output JSON file")
+    parser.add_argument(
+        "--keep-artifacts",
+        action="store_true",
+        help="Keep temporary artifacts (tmp/, node_modules/, package.json, package-lock.json)",
+    )
 
     return parser
 
@@ -64,6 +69,7 @@ def main() -> int:
         attach_identifier=args.attach_identifier,
         attach_pid=args.attach_pid,
         spawn=args.spawn,
+        keep_artifacts=args.keep_artifacts,
     )
 
     runner = FrookyRunner(options)
