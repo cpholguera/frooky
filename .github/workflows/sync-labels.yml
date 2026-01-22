@@ -19,25 +19,55 @@ jobs:
             const prNumber = context.payload.pull_request.number;
             const prBody = context.payload.pull_request.body || '';
             
-            // Regular expressions to find linked issues
-            // Matches: fixes #123, closes#456, resolves #789, etc.
-            const linkedIssueRegex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s*#(\d+)/gi;
+            const issueNumbers = new Set();
             
-            // Extract issue numbers from PR body
-            const matches = [...prBody.matchAll(linkedIssueRegex)];
-            const issueNumbers = matches.map(match => parseInt(match[1]));
+            // Pattern 1: Simple format - fixes #123, closes#456
+            const simpleRegex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s*#(\d+)/gi;
+            const simpleMatches = [...prBody.matchAll(simpleRegex)];
+            simpleMatches.forEach(match => issueNumbers.add(parseInt(match[1])));
             
-            if (issueNumbers.length === 0) {
+            // Pattern 2: Owner/repo format - fixes owner/repo#123
+            const ownerRepoRegex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+([a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+)#(\d+)/gi;
+            const ownerRepoMatches = [...prBody.matchAll(ownerRepoRegex)];
+            ownerRepoMatches.forEach(match => {
+              const repoPath = match[1];
+              const issueNum = parseInt(match[2]);
+              // Only add if it's the same repository
+              if (repoPath === `${context.repo.owner}/${context.repo.repo}`) {
+                issueNumbers.add(issueNum);
+              } else {
+                console.log(`Skipping cross-repository issue: ${repoPath}#${issueNum}`);
+              }
+            });
+            
+            // Pattern 3: Full URL format - fixes https://github.com/owner/repo#123 or /issues/123
+            const urlRegex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+https?:\/\/github\.com\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)(?:\/issues\/|#)(\d+)/gi;
+            const urlMatches = [...prBody.matchAll(urlRegex)];
+            urlMatches.forEach(match => {
+              const owner = match[1];
+              const repo = match[2];
+              const issueNum = parseInt(match[3]);
+              // Only add if it's the same repository
+              if (owner === context.repo.owner && repo === context.repo.repo) {
+                issueNumbers.add(issueNum);
+              } else {
+                console.log(`Skipping cross-repository issue: ${owner}/${repo}#${issueNum}`);
+              }
+            });
+            
+            const issueNumbersArray = Array.from(issueNumbers);
+            
+            if (issueNumbersArray.length === 0) {
               console.log('No linked issues found in PR description');
               return;
             }
             
-            console.log(`Found linked issues: ${issueNumbers.join(', ')}`);
+            console.log(`Found linked issues: ${issueNumbersArray.join(', ')}`);
             
             // Collect all labels from linked issues
             const allLabels = new Set();
             
-            for (const issueNumber of issueNumbers) {
+            for (const issueNumber of issueNumbersArray) {
               try {
                 const { data: issue } = await github.rest.issues.get({
                   owner: context.repo.owner,
