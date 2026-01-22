@@ -20,8 +20,8 @@ jobs:
             const prBody = context.payload.pull_request.body || '';
             
             // Regular expressions to find linked issues
-            // Matches: fixes #123, closes #456, resolves #789, etc.
-            const linkedIssueRegex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+#(\d+)/gi;
+            // Matches: fixes #123, closes#456, resolves #789, etc.
+            const linkedIssueRegex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s*#(\d+)/gi;
             
             // Extract issue numbers from PR body
             const matches = [...prBody.matchAll(linkedIssueRegex)];
