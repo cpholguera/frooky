@@ -4,18 +4,10 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
-    paths:
-      - 'docs/examples/android-app/**'
-      - 'frooky/**'
+      - main
   pull_request:
     branches:
-      - master
-    paths:
-      - 'docs/examples/android-app/**'
-      - 'frooky/**'
-      - '.github/workflows/test-android-runtime.yml'
-
+      - main
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
