@@ -110,4 +110,6 @@ Output (pretty-printed for readability):
 }
 ```
 
-See more in [docs/usage.md](docs/usage.md) and a full example in [docs/examples/example.md](docs/examples/example.md). For development and local testing instructions of this repo, see [docs/develop.md](docs/develop.md).
+See more in [docs/usage.md](docs/usage.md) and a full example in [docs/examples/example.md](docs/examples/example.md). 
+
+For development and local testing instructions of this repo, see [docs/develop.md](docs/develop.md).
