@@ -2,7 +2,7 @@
 
 ## Hook Files
 
-Hook files use JSON format. When multiple hook files are provided, their `hooks` arrays are merged together.
+Hook files use the JSON format. When multiple hook files are provided, their `hooks` arrays are merged.
 
 ### Basic Structure
 
@@ -194,18 +194,18 @@ Enable verbose logging for troubleshooting:
 
 ### Argument Types
 
-| Type | Description |
-|------|-------------|
-| `string` | Null-terminated C string |
-| `int32` | 32-bit signed integer |
-| `uint32` | 32-bit unsigned integer |
-| `int64` | 64-bit signed integer |
-| `pointer` | Memory address |
-| `bytes` | Raw bytes (requires `length` or `lengthInArg`) |
-| `bool` | Boolean value |
-| `double` | 64-bit floating point |
-| `CFData` | iOS CFData object |
-| `CFDictionary` | iOS CFDictionary object |
+| Type           | Description                                    |
+|----------------|------------------------------------------------|
+| `string`       | Null-terminated C string                       |
+| `int32`        | 32-bit signed integer                          |
+| `uint32`       | 32-bit unsigned integer                        |
+| `int64`        | 64-bit signed integer                          |
+| `pointer`      | Memory address                                 |
+| `bytes`        | Raw bytes (requires `length` or `lengthInArg`) |
+| `bool`         | Boolean value                                  |
+| `double`       | 64-bit floating point                          |
+| `CFData`       | iOS CFData object                              |
+| `CFDictionary` | iOS CFDictionary object                        |
 
 ### iOS Objective-C Hooks
 
@@ -221,17 +221,17 @@ Hook Objective-C methods using `objClass` and `symbol`:
 
 ## Output Format
 
-Events are written to the output file in JSON Lines format (one JSON object per line, known as NDJSON). You can easily pretty-print it e.g. using `jq . output.json`.
+Events are written to the output file in JSON Lines format (one JSON object per line, known as NDJSON). You can pretty-print it easily, for example, using `jq . output.json`.
 
-First of all, a summary event is written when hooking is initialized, listing all resolved hooks. It includes:
+First, a summary event is written when hooking is initialized, listing all resolved hooks. It includes:
 
 - `type`: Indicates this is a summary event
-- `hooks`: An array of all hooked methods with their classes and overloads
-- `totalHooks`: Total number of hooks that were set up
+- `hooks`: An array of all hooked methods, including their classes and overloads
+- `totalHooks`: The total number of hooks set up
 - `errors`: Any errors encountered while setting up hooks
-- `totalErrors`: Total number of errors encountered
+- `totalErrors`: The total number of errors encountered
 
-After that, individual hook events are written each time a hooked method/function is called.
+After that, an individual hook event is written each time a hooked method or function is called.
 
 Example hook event (pretty-printed for clarity):
 
@@ -274,17 +274,17 @@ Example hook event (pretty-printed for clarity):
 Explanation of fields:
 
 - `id`: Unique identifier for the event (UUID)
-- `type`: Type of event (e.g., "hook", "summary")
+- `type`: Event type (e.g., "hook", "summary")
 - `category`: Category specified in the hook file (e.g., "STORAGE", "CRYPTO")
-- `time`: Timestamp of the event in ISO 8601 format
+- `time`: Event timestamp in ISO 8601 format
 - `class`: Hooked class name
 - `method`: Hooked method name
 - `instanceId`: Unique identifier for the instance on which the method was called
 - `stackTrace`: Captured stack trace leading to the method call
-- `inputParameters`: Array of input parameters with their declared types and values
+- `inputParameters`: Array of input parameters, each with its declared type and value
   - `declaredType`: The declared type of the parameter
   - `value`: The captured value of the parameter
-- `returnValue`: Array of return values with their declared types and values
+- `returnValue`: Array of return values, each with its declared type, captured value, runtime type, instance ID, and string representation
   - `declaredType`: The declared type of the return value
   - `value`: The captured value of the return value
   - `runtimeType`: The actual runtime type of the return value
