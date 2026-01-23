@@ -114,6 +114,21 @@ jobs:
             sleep 2
             adb shell "ps | grep frida-server"
 
+            # Download and setup frida-server
+            FRIDA_VERSION=$(pip show frida | grep Version | awk '{print $2}')
+            echo "Frida version: $FRIDA_VERSION"
+            wget "https://github.com/frida/frida/releases/download/${FRIDA_VERSION}/frida-server-${FRIDA_VERSION}-android-x86_64.xz"
+            unxz "frida-server-${FRIDA_VERSION}-android-x86_64.xz"
+            
+            # Push frida-server to device
+            adb push "frida-server-${FRIDA_VERSION}-android-x86_64" /data/local/tmp/frida-server
+            adb shell "chmod 755 /data/local/tmp/frida-server"
+            
+            # Start frida-server in background
+            adb shell "/data/local/tmp/frida-server &"
+            sleep 2
+            echo "Frida server started"
+
             # Run the auto.sh script from the example directory
             cd docs/examples/android-app && chmod +x auto.sh && ./auto.sh
 
