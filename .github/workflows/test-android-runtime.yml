@@ -1,0 +1,119 @@
+name: Test Android Runtime
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - 'docs/examples/android-app/**'
+      - 'frooky/**'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'docs/examples/android-app/**'
+      - 'frooky/**'
+      - '.github/workflows/test-android-runtime.yml'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install frooky
+        run: pip install -e .
+
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Clone mas-app-android repository
+        uses: actions/checkout@v4
+        with:
+          repository: cpholguera/mas-app-android
+          path: mas-app-android
+
+      - name: Copy example files and build APK
+        run: |
+          EXAMPLE_DIR="docs/examples/android-app"
+
+          # Copy MastgTest.kt if it exists
+          if [ -f "$EXAMPLE_DIR/MastgTest.kt" ]; then
+            cp -f "$EXAMPLE_DIR/MastgTest.kt" mas-app-android/app/src/main/java/org/owasp/mastestapp/MastgTest.kt
+            echo "Copied MastgTest.kt"
+          fi
+
+          # Copy build.gradle.kts.libs if it exists
+          if [ -f "$EXAMPLE_DIR/build.gradle.kts.libs" ]; then
+            sed -i '/\/\/ ADD_LIBS_HERE/{
+              r '"$EXAMPLE_DIR/build.gradle.kts.libs"'
+              d
+            }' mas-app-android/app/build.gradle.kts
+            echo "Replaced libs in build.gradle.kts"
+          fi
+
+          # Build the APK
+          cd mas-app-android
+          ./gradlew assembleDebug --stacktrace
+          echo "Build succeeded"
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Start Android Emulator and Run Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 31
+          arch: x86_64
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            # Install the APK
+            adb install mas-app-android/app/build/outputs/apk/debug/app-debug.apk
+            echo "App installed successfully"
+
+            # Run the auto.sh script from the example directory
+            cd docs/examples/android-app
+            chmod +x auto.sh
+            ./auto.sh
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MASTestApp.apk
+          path: mas-app-android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Upload Dynamic Test Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dynamic-test-results
+          path: |
+            ~/.maestro/tests/**/*
+            docs/examples/android-app/auto.log
+            docs/examples/android-app/output.json
+            **/before.png
+            **/after.png
