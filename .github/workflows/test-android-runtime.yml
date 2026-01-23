@@ -88,9 +88,7 @@ jobs:
             echo "App installed successfully"
 
             # Run the auto.sh script from the example directory
-            cd docs/examples/android-app
-            chmod +x auto.sh
-            ./auto.sh
+            cd docs/examples/android-app && chmod +x auto.sh && ./auto.sh
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
