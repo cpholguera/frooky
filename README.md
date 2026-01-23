@@ -15,16 +15,16 @@
 
 - Hook Java/Kotlin methods and native C/C++ functions
 - Simple JSON hook file format
-- Support for method overloads and stack trace capturing
-- Argument capturing with various data types
-- Filtering hooks by argument values or stack trace patterns
+- Support for method overloads and stack trace capture
+- Argument capture with various data types
+- Filter hooks by argument values or stack trace patterns
 - Output events in JSON Lines format for easy processing
 
 See more in [docs/usage.md](docs/usage.md).
 
 ## Installation
 
-Simply install via pip and you'll get the `frooky` CLI tool:
+Simply install via pip to get the `frooky` CLI tool:
 
 ```bash
 pip3 install frooky
@@ -110,4 +110,6 @@ Output (pretty-printed for readability):
 }
 ```
 
-See more in [docs/usage.md](docs/usage.md) and see a full example in [docs/examples/example.md](docs/examples/example.md).
+See more in [docs/usage.md](docs/usage.md) and a full example in [docs/examples/example.md](docs/examples/example.md). 
+
+For development and local testing instructions of this repo, see [docs/develop.md](docs/develop.md).
