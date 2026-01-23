@@ -22,6 +22,14 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frida-compile
+        run: npm install -g frida-compile@19.0.4
+
       - name: Install frooky
         run: pip install -e .
 
@@ -104,9 +112,6 @@ jobs:
             # Run the auto.sh script from the example directory
             cd docs/examples/android-app && chmod +x auto.sh && ./auto.sh
 
-            adb shell "tail -n 200 /data/local/tmp/frida.log || true"
-            adb pull /data/local/tmp/frida.log frida.log || true
-
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
@@ -123,6 +128,5 @@ jobs:
             docs/examples/android-app/auto.log
             docs/examples/android-app/frooky.log
             docs/examples/android-app/output.json
-            frida.log
             **/before.png
             **/after.png
