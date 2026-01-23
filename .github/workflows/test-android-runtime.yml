@@ -37,6 +37,7 @@ jobs:
         run: |
           FRIDA_VERSION=$(frida --version)
           echo "Frida version: $FRIDA_VERSION"
+          echo "FRIDA_VERSION=$FRIDA_VERSION" >> $GITHUB_ENV
 
       - name: Install Maestro
         run: |
@@ -120,13 +121,7 @@ jobs:
             adb shell "ps | grep frida-server"
 
             # Download and setup frida-server
-            FRIDA_VERSION=$(frida --version)
-            echo "Frida version: $FRIDA_VERSION"
-            wget "https://github.com/frida/frida/releases/download/${FRIDA_VERSION}/frida-server-${FRIDA_VERSION}-android-x86_64.xz"
-            unxz "frida-server-${FRIDA_VERSION}-android-x86_64.xz"
-            
-            # Push frida-server to device
-            adb push "frida-server-${FRIDA_VERSION}-android-x86_64" /data/local/tmp/frida-server
+            FRIDA_VERSION=$(frida --version) && echo "Frida version: $FRIDA_VERSION" && wget "https://github.com/frida/frida/releases/download/${FRIDA_VERSION}/frida-server-${FRIDA_VERSION}-android-x86_64.xz" && unxz "frida-server-${FRIDA_VERSION}-android-x86_64.xz" && adb push "frida-server-${FRIDA_VERSION}-android-x86_64" /data/local/tmp/frida-server
             adb shell "chmod 755 /data/local/tmp/frida-server"
             
             # Start frida-server in background
