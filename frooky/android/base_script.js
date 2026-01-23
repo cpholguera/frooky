@@ -406,11 +406,12 @@ function buildHookOperations(hook) {
       }
     }
 
-    const firstFinding = enumerateFirstMethod(hook.class, method);
-    const foundClass = firstFinding.classes[0].name
+
+    const foundMethod = enumerateFirstMethod(hook.class, method)
+    const foundClass = foundMethod.classes[0].name
 
     if (hook.changeClassLoader) {
-      Java.classFactory.loader = firstFinding.loader;
+      Java.classFactory.loader = foundMethod.loader;
     }
     return foundClass;
   }
