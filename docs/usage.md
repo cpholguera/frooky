@@ -38,6 +38,18 @@ Hook files use JSON format. When multiple hook files are provided, their `hooks`
 }
 ```
 
+#### Hook All Methods of a Class
+
+To hook all methods of a class, specify only the `class` field:
+
+```json
+{
+  "class": "android.app.SharedPreferencesImpl$EditorImpl"
+}
+```
+
+This will automatically hook all overloads of all methods in the class, which is useful for comprehensive monitoring without needing to enumerate each method.
+
 #### Method Overloads
 
 Specify exact method signatures using `overloads`:
