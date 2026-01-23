@@ -121,6 +121,7 @@ jobs:
           path: |
             ~/.maestro/tests/**/*
             docs/examples/android-app/auto.log
+            docs/examples/android-app/frooky.log
             docs/examples/android-app/output.json
             frida.log
             **/before.png
