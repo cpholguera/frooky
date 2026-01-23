@@ -6,7 +6,6 @@ This document describes how to set up a local development environment and run te
 
 - Python 3+ (use `python3`)
 - Node.js (LTS) and `npm` or `pnpm` for JS tooling (optional)
-- Frida tools for runtime testing: `frida-tools` (`pip install frida-tools`)
 - A physical device or emulator with `frida-server` running (for dynamic tests)
 
 ## Running the CLI locally
