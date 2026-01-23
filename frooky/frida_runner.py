@@ -46,6 +46,7 @@ class FrookyRunner:
         self.session: Optional[frida.core.Session] = None
         self.script: Optional[frida.core.Script] = None
         self.device: Optional[frida.core.Device] = None
+        self.spawned_pid: Optional[int] = None
         self.event_count: int = 0
         self.last_event: str = "Waiting for events..."
         self.total_hooks: Optional[int] = None
@@ -325,6 +326,7 @@ class FrookyRunner:
         elif opts.spawn:
             pid = self.device.spawn(opts.spawn)
             session = self.device.attach(pid)
+            self.spawned_pid = pid
             return session
 
         else:
@@ -387,8 +389,7 @@ class FrookyRunner:
 
             # Resume if spawned
             if self.options.spawn:
-                pid = self.session.pid
-                self.device.resume(pid)
+                self.device.resume(self.spawned_pid)
 
             # Main loop
             while True:
