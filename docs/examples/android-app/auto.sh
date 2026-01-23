@@ -4,7 +4,7 @@ set -euo pipefail
 FLOW="flow.yaml"
 
 # Start Frida and redirect stdout and stderr to file
-frooky -U -n MASTestApp --platform android hooks.json hooks2.json 2>&1 &
+frooky -U -f org.owasp.mastestapp --platform android hooks.json hooks2.json 2>&1 &
 
 FRIDA_PID=$!
 

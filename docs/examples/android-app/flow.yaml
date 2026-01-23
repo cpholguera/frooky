@@ -1,6 +1,5 @@
 appId: org.owasp.mastestapp
 ---
-- launchApp
 - assertVisible: "OWASP MAS"
 - takeScreenshot: before
 - tapOn: "Start"
