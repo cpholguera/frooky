@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from . import __version__
 from .frida_runner import FrookyRunner, RunnerOptions
 
 
@@ -10,6 +11,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="frooky",
         description="Run Frooky hooks using Frida's Python bindings.",
+    )
+
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"frooky {__version__}",
     )
 
     # Device selection group
