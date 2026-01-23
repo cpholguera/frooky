@@ -33,12 +33,6 @@ jobs:
       - name: Install frooky
         run: pip install -e .
 
-      - name: Verify frida installation
-        run: |
-          FRIDA_VERSION=$(frida --version)
-          echo "Frida version: $FRIDA_VERSION"
-          echo "FRIDA_VERSION=$FRIDA_VERSION" >> $GITHUB_ENV
-
       - name: Install Maestro
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
@@ -126,8 +120,9 @@ jobs:
             
             # Start frida-server in background
             adb shell "nohup /data/local/tmp/frida-server >/data/local/tmp/frida.log 2>&1 </dev/null &"
+
             sleep 2
-            echo "Frida server started"
+            adb shell "ps | grep frida-server"
 
             # Run the auto.sh script from the example directory
             cd docs/examples/android-app && chmod +x auto.sh && ./auto.sh
