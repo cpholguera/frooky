@@ -27,6 +27,9 @@ dist/
 .eggs/
 pip-wheel-metadata/
 
+# Generated version file (created by setuptools-scm during build)
+frooky/_version.py
+
 # Test / type-check / lint caches
 .pytest_cache/
 .mypy_cache/
