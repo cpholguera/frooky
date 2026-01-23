@@ -410,7 +410,7 @@ function buildHookOperations(hook) {
               }
             }
           } catch (e) {
-            // Skip methods that can't be hooked (e.g., constructors, synthetic methods)
+            // Skip methods that can't be hooked (e.g., synthetic or unsupported methods)
             if (hook.debug === true) {
               console.warn("Could not hook method '" + methodName + "' in class '" + hook.class + "': " + e);
             }

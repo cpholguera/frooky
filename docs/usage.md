@@ -48,7 +48,7 @@ To hook all methods of a class, specify only the `class` field:
 }
 ```
 
-This will automatically hook all overloads of all methods in the class, which is useful for comprehensive monitoring without needing to enumerate each method.
+This will automatically hook all overloads of all methods declared directly in the specified class (methods from superclasses or interfaces are not included). To hook inherited methods, add separate hooks for the corresponding parent classes or interfaces. This is useful for comprehensive monitoring of a given class without needing to enumerate each of its declared methods.
 
 #### Method Overloads
 
