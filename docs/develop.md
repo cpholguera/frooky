@@ -27,7 +27,7 @@ This document describes how to set up a local development environment and run te
 3. Ensure which CLI version you're running:
 
     ```bash
-    pwd frooky
+    which frooky
     ```
    
-   The output must be within the VENV directory ending at `[..]/venv/bin/frooky`. If not, a different version might be used instead, such as a global installation.
+   The output must be a path within the VENV directory, typically ending with `venv/bin/frooky`. If not, a different version might be used instead, such as a global installation.
