@@ -125,7 +125,7 @@ jobs:
             adb shell "chmod 755 /data/local/tmp/frida-server"
             
             # Start frida-server in background
-            adb shell "/data/local/tmp/frida-server &"
+            adb shell "nohup /data/local/tmp/frida-server >/data/local/tmp/frida.log 2>&1 </dev/null &"
             sleep 2
             echo "Frida server started"
 
