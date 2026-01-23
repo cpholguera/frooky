@@ -25,6 +25,11 @@ jobs:
       - name: Install frooky
         run: pip install -e .
 
+      - name: Verify frida installation
+        run: |
+          FRIDA_VERSION=$(frida --version)
+          echo "Frida version: $FRIDA_VERSION"
+
       - name: Install Maestro
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
@@ -88,7 +93,7 @@ jobs:
             echo "App installed successfully"
 
             # Download and setup frida-server
-            FRIDA_VERSION=$(pip show frida | grep Version | awk '{print $2}')
+            FRIDA_VERSION=$(frida --version)
             echo "Frida version: $FRIDA_VERSION"
             wget "https://github.com/frida/frida/releases/download/${FRIDA_VERSION}/frida-server-${FRIDA_VERSION}-android-x86_64.xz"
             unxz "frida-server-${FRIDA_VERSION}-android-x86_64.xz"
