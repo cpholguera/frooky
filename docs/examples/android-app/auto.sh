@@ -16,7 +16,7 @@ else
 fi
 
 # Start frooky and redirect stdout/stderr to file
-frooky "${DEVICE_ARGS[@]}" -f org.owasp.mastestapp --platform android hooks.json hooks2.json -o "$OUTPUT_JSON" >"$FROOKY_LOG" 2>&1 &
+frooky "${DEVICE_ARGS[@]}" -f org.owasp.mastestapp --platform android hooks.json hooks2.json --keep-artifacts -o "$OUTPUT_JSON" >"$FROOKY_LOG" 2>&1 &
 
 FROOKY_PID=$!
 
