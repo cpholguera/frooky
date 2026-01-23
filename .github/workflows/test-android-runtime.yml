@@ -79,7 +79,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 31
-          target: googleapis
+          target: google_apis
           arch: x86_64
           emulator-options: -wipe-data -no-snapshot-save -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
@@ -104,6 +104,9 @@ jobs:
             # Run the auto.sh script from the example directory
             cd docs/examples/android-app && chmod +x auto.sh && ./auto.sh
 
+            adb shell "tail -n 200 /data/local/tmp/frida.log || true"
+            adb pull /data/local/tmp/frida.log frida.log || true
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
@@ -119,5 +122,6 @@ jobs:
             ~/.maestro/tests/**/*
             docs/examples/android-app/auto.log
             docs/examples/android-app/output.json
+            frida.log
             **/before.png
             **/after.png
