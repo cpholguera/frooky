@@ -48,6 +48,14 @@ sleep 1
 ps -p "$FROOKY_PID" >/dev/null 2>&1 || true
 tail -n 20 "$FROOKY_LOG" || true
 
+# Give frooky a moment to connect/attach/spawn. If it dies early, surface the error.
+sleep 5
+if ! kill -0 "$FRIDA_PID" 2>/dev/null; then
+	echo "frooky exited early; dumping frooky.log"
+	tail -n 200 frooky.log || true
+	exit 1
+fi
+
 # Run Maestro (https://docs.maestro.dev/getting-started/installing-maestro)
 maestro test "$FLOW" > auto.log 2>&1
 MAESTRO_EXIT=$?
@@ -65,5 +73,8 @@ tail -n 200 "$FROOKY_LOG" || true
 
 
 ls -laR .
+
+# Surface frooky log (useful in CI even on success)
+tail -n 200 frooky.log || true
 
 exit "$MAESTRO_EXIT"
