@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=70"]
+requires = ["setuptools>=70", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "frooky"
-version = "0.1.1"
+dynamic = ["version"]
 description = "Frida-powered hook runner based on JSON hook files."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -50,3 +50,6 @@ frooky = [
   "android/*.js",
   "ios/*.js",
 ]
+
+[tool.setuptools_scm]
+version_file = "frooky/_version.py"
