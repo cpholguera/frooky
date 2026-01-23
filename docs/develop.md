@@ -6,7 +6,7 @@ This document describes how to set up a local development environment for the re
 
 - Python 3+ (use `python3`)
 - Node.js (LTS) and `npm` or `pnpm` for JS tooling (optional)
-- A physical device or emulator with `frida-server` running (for dynamic tests)
+- A physical device or emulator with `frida-server` or an app with an embedded frida gadget running (for dynamic tests)
 
 ## Running the CLI locally
 
