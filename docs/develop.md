@@ -1,6 +1,6 @@
 # Development / Local Testing
 
-This document describes how to set up a local development environment and run tests for the repository on macOS.
+This document describes how to set up a local development environment for the repository on macOS.
 
 ## Prerequisites
 
