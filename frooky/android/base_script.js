@@ -325,10 +325,10 @@ function findOverloadIndex(methodHandle, argTypes) {
  *
  * The function supports several hook configuration scenarios:
  * - If both `methods` and `overloads` are specified, the configuration is considered invalid and no operations are returned.
+ * - If only `class` is specified (no method/methods), all methods of the class are hooked.
  * - If a single `method` and an explicit list of `overloads` are provided, only those overloads are considered.
  * - If only `methods` is provided, all overloads for each method are included.
  * - If only `method` is provided, all overloads for that method are included.
- * - If neither is provided, or if the configuration is invalid, no operations are returned.
  *
  * Error handling:
  * - If an explicit overload is not found, it is skipped and not included in the operations.
@@ -339,6 +339,10 @@ function findOverloadIndex(methodHandle, argTypes) {
  *   - { class: string, methods: string[] }
  *   - { class: string, method: string, overloads: Array<{ args: string[] }> }
  * @returns {{operations: Array<{clazz:string, method:string, overloadIndex:number, args:string[]}>, count:number}}
+ *
+ * @example
+ * // Hook all methods of a class
+ * buildHookOperations({ class: "android.net.Uri" });
  *
  * @example
  * // Hook all overloads of a single method
@@ -379,6 +383,45 @@ function buildHookOperations(hook) {
       console.error(errInvalid);
       errors.push(errInvalid);
       return {operations: operations, count: 0, errors: errors, errorCount: errors.length};
+    }
+
+    // If only class is specified (no method/methods), hook all methods
+    if (!hook.method && (!hook.methods || hook.methods.length === 0)) {
+      try {
+        let classHandle = Java.use(hook.class);
+        let allMethods = classHandle.class.getDeclaredMethods();
+        let processedMethods = {};
+        
+        for (let m = 0; m < allMethods.length; m++) {
+          let methodName = allMethods[m].getName();
+          
+          // Skip if already processed (avoid duplicate methods)
+          if (processedMethods[methodName]) {
+            continue;
+          }
+          processedMethods[methodName] = true;
+          
+          try {
+            let handleEach = classHandle[methodName];
+            if (handleEach && handleEach.overloads) {
+              for (let j = 0; j < handleEach.overloads.length; j++) {
+                let paramsEach = parseParameterTypes(handleEach.overloads[j].toString());
+                operations.push({clazz: hook.class, method: methodName, overloadIndex: j, args: paramsEach});
+              }
+            }
+          } catch (e) {
+            // Skip methods that can't be hooked (e.g., synthetic or unsupported methods)
+            if (hook.debug === true) {
+              console.warn("Could not hook method '" + methodName + "' in class '" + hook.class + "': " + e);
+            }
+          }
+        }
+      } catch (e) {
+        let errMsg = "Failed to enumerate methods for class '" + hook.class + "': " + e;
+        console.error(errMsg);
+        errors.push(errMsg);
+      }
+      return {operations: operations, count: operations.length, errors: errors, errorCount: errors.length};
     }
 
     // Explicit overload list for single method
