@@ -11,7 +11,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: macos-14
+    runs-on: macos-latest
     timeout-minutes: 30
 
     steps:
@@ -55,12 +55,12 @@ jobs:
             echo "Copied MastgTest.swift"
           fi
 
-      - name: Select Xcode version
-        run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
-
       - name: Build the app for simulator
         run: |
           cd mas-app-ios
+          
+          # Copy the CI config file
+          cp .github/Local.xcconfig.ci Local.xcconfig
           
           # Get the default scheme
           DEFAULT_SCHEME=$(xcodebuild -list -json | jq -r '.project.targets[0]')
@@ -70,8 +70,7 @@ jobs:
           xcodebuild build \
             -project "MASTestApp.xcodeproj" \
             -scheme "$DEFAULT_SCHEME" \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2' \
-            -configuration Debug \
+            -destination "platform=iOS Simulator,name=iPhone 16" \
             -derivedDataPath "$GITHUB_WORKSPACE/DerivedData" \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
@@ -85,11 +84,7 @@ jobs:
           xcrun simctl list devices available
           
           # Boot iPhone 16 simulator
-          SIMULATOR_UDID=$(xcrun simctl list devices available | grep "iPhone 16" | grep -v "Plus\|Pro" | head -1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
-          echo "SIMULATOR_UDID=$SIMULATOR_UDID" >> $GITHUB_ENV
-          echo "Using simulator: $SIMULATOR_UDID"
-          
-          xcrun simctl boot "$SIMULATOR_UDID" || echo "Simulator already booted"
+          xcrun simctl boot "iPhone 16" || echo "Simulator already booted"
           
           # Wait for simulator to be ready
           sleep 5
@@ -106,7 +101,7 @@ jobs:
           fi
           
           # Install the app
-          xcrun simctl install "$SIMULATOR_UDID" "$APP_PATH"
+          xcrun simctl install "iPhone 16" "$APP_PATH"
           echo "App installed successfully"
 
       - name: Run Tests

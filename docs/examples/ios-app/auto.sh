@@ -13,7 +13,7 @@ APP_NAME="MASTestApp"
 xcrun simctl launch booted "$APP_ID" || true
 sleep 2
 
-# List running processes
+# List running processes (local device, not USB)
 PS_OUT="$(frida-ps -ai || true)"
 printf '%s\n' "$PS_OUT"
 
@@ -31,8 +31,8 @@ fi
 
 FROOKY_PID=$!
 
-sleep 1
-ps -p "$FROOKY_PID" >/dev/null 2>&1 || true
+sleep 2
+ps -p "$FROOKY_PID" >/dev/null 2>&1 || { echo "frooky exited early"; tail -n 50 "$FROOKY_LOG" || true; exit 1; }
 tail -n 20 "$FROOKY_LOG" || true
 
 # Run Maestro (https://docs.maestro.dev/getting-started/installing-maestro)
