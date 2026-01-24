@@ -78,7 +78,7 @@ class FrookyRunner:
     def _get_platform_scripts(self) -> list[str]:
         """Get all .js files from the platform folder, with base_script.js last."""
         platform = self.options.platform
-        platform_dir = resources.files("frooky").joinpath("agent", platform)
+        platform_dir = resources.files("frooky").joinpath("frooky-agent", platform)
         
         script_files = [
             item.name for item in platform_dir.iterdir()
@@ -121,7 +121,7 @@ class FrookyRunner:
         
         platform_scripts = []
         for script_file in script_files:
-            script_path = resources.files("frooky").joinpath("agent", platform, script_file)
+            script_path = resources.files("frooky").joinpath("frooky-agent", platform, script_file)
             try:
                 script_content = read_text(script_path)
                 platform_scripts.append(script_content)
