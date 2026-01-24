@@ -1,4 +1,4 @@
-import { target } from '../_hooks.ts';
+import { target } from '../tmp/_hooks.ts';
+import { runFrookyAgent } from './base_script.ts'
 
-console.log("Android Stub");
-console.log(target.category);
+runFrookyAgent(target)

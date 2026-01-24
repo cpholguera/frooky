@@ -64,79 +64,23 @@ class FrookyRunner:
             except subprocess.CalledProcessError:
                 pass
 
-    def _build_agent(self, src_agent: Path, built_agent: Path) -> None:
-        """Build the agent script if needed."""
-        if not built_agent.exists() or (
-            built_agent.stat().st_mtime < src_agent.stat().st_mtime
-        ):
-            subprocess.check_call(
-                ["npx", "frida-compile", str(src_agent), "-o", str(built_agent)],
-                stdout=sys.stdout,
-                stderr=sys.stderr,
-            )
+    def _compile_agent(self, tmp_dir: Path):
+        """Combine user hooks.json and compile the agent using the node build script"""
 
-    def _get_platform_scripts(self) -> list[str]:
-        """Get all .js files from the platform folder, with base_script.js last."""
         platform = self.options.platform
-        platform_dir = resources.files("frooky").joinpath("frooky-agent", platform)
-        
-        script_files = [
-            item.name for item in platform_dir.iterdir()
-            if item.name.endswith(".js") and item.name != "base_script.js"
-        ]
-        script_files.append("base_script.js")
-        
-        return script_files
 
-    def _prepare_script(self, tmp_dir: Path) -> Path:
-        """Combine user hooks with platform scripts."""
-        # Read all hook files as JSON and merge hooks arrays
-        merged_hooks = []
-        category = None
-        
-        for hook_path in self.options.hook_paths:
-            with open(hook_path, "r", encoding="utf-8") as f:
-                hook_data = json.load(f)
-            
-            # Take category from first file that has one
-            if category is None and "category" in hook_data:
-                category = hook_data["category"]
-            
-            # Merge hooks
-            if "hooks" in hook_data:
-                merged_hooks.extend(hook_data["hooks"])
-        
-        # Build the target object
-        target = {
-            "category": category or "FROOKY",
-            "hooks": merged_hooks
-        }
-        
-        # Generate JavaScript declaration
-        user_hooks = f"var target = {json.dumps(target, indent=2)};"
+        frooky_agent_dir = Path(__file__).parent / "frooky-agent"
+        subprocess.run(
+            ["npm", "run", f"build-{platform}", "--"] + self.options.hook_paths,
+            cwd=frooky_agent_dir,
+            check=True
+        )
 
-        # Get all platform scripts dynamically
-        platform = self.options.platform
-        script_files = self._get_platform_scripts()
-        
-        platform_scripts = []
-        for script_file in script_files:
-            script_path = resources.files("frooky").joinpath("frooky-agent", platform, script_file)
-            try:
-                script_content = read_text(script_path)
-                platform_scripts.append(script_content)
-            except FileNotFoundError:
-                pass  # Skip if file doesn't exist
+        # copy the compiled _agent.ts from frooky-agent to the local tmp
+        source = Path(frooky_agent_dir, "tmp", "_agent.js")
+        destination = Path(tmp_dir, "_agent.js")
+        shutil.copy2(source, destination)
 
-        # Combine: user hooks define 'target', platform scripts use it
-        combined = f"{user_hooks}\n\n" + "\n\n".join(platform_scripts)
-
-        # Write merged agent to tmp/agent.js
-        combined_path = tmp_dir / "agent.js"
-        with open(combined_path, "w", encoding="utf-8") as f:
-            f.write(combined)
-
-        return combined_path
 
     def _create_message_handler(self):
         """Create a message handler closure with access to output path."""
@@ -362,9 +306,7 @@ class FrookyRunner:
             built_agent = tmp_dir / "_agent.js"
 
             # Combine user hooks with platform base script
-            src_agent = self._prepare_script(tmp_dir)
-
-            self._build_agent(src_agent, built_agent)
+            self._compile_agent(tmp_dir)
 
             # Clear/overwrite the output file at start
             with open(self.options.output_path, "w", encoding="utf-8") as f:

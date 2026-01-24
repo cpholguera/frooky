@@ -513,7 +513,7 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
 }
 
 // Main execution: separate native hooks from Java hooks
-(() => {
+export function runFrookyAgent(target) {
   // Separate hooks into native and Java categories
   const nativeHooks = [];
   const javaHooks = [];
@@ -632,4 +632,4 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
       });
     }, delay);
   });
-})();
+};

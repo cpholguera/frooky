@@ -8,8 +8,8 @@
     "allowImportingTsExtensions": true
   },
   "include": [
-    "ios/**/*.ts",
-    "andoid/**/*.ts",
-    "shared/**/*.ts",
+    "ios/**/*",
+    "andoid/**/*",
+    "shared/**/*"
   ]
 }

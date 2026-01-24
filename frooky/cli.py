@@ -63,7 +63,7 @@ def main() -> int:
         hook_path = Path(hook)
         if not hook_path.exists():
             parser.error(f"Hooks file not found: {hook_path}")
-        hook_paths.append(hook_path)
+        hook_paths.append(hook_path.resolve())
 
     options = RunnerOptions(
         platform=args.platform,

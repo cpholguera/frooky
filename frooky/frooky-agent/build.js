@@ -1,9 +1,9 @@
-// build.js
 const fs = require('fs');
 const { execSync, spawn } = require('child_process');
 const path = require('path');
 const chokidar = require('chokidar');
 
+// TODO: add verbose flags (see https://github.com/cpholguera/frooky/issues/27)
 const platform = process.argv[2]; // 'android' or 'ios'
 const hookFiles = process.argv.slice(3).filter(arg => !arg.startsWith('-'));
 const isWatchMode = process.env.npm_lifecycle_event?.startsWith('watch-');
@@ -21,16 +21,22 @@ hookFiles.forEach(file => {
     }
 });
 
-const hooksFilePath = path.join(__dirname, '_hooks.ts');
+const tmpDir = path.join(__dirname, 'tmp');
+if (!fs.existsSync(tmpDir)) {
+    fs.mkdirSync(tmpDir);
+}
+
+const hooksFilePath = path.join(tmpDir, '_hooks.ts');
 
 // TODO: Patch wen fixing https://github.com/cpholguera/frooky/issues/29
-
 // Function to merge and generate _hooks.ts
 function generateHooksFile() {
     const mergedHooks = {
         category: null,
         hooks: []
     };
+
+    console.log(`Comining hooks...`);
 
     hookFiles.forEach(file => {
         try {
@@ -52,7 +58,7 @@ function generateHooksFile() {
         }
     });
 
-    console.log(`Merged ${mergedHooks.hooks.length} hook(s)`);
+    console.log(`Combined ${mergedHooks.hooks.length} hook(s)`);
 
     // Generate TypeScript file
     const tsContent = `export const target = ${JSON.stringify(mergedHooks, null, 2)};\n`;
@@ -77,9 +83,9 @@ if (isWatchMode) {
     // Start frida-compile in watch mode
     const fridaProcess = spawn('frida-compile', [
         `${platform}/index.ts`,
-        '-o', '_agent.js',
-        '-c',
-        '-w'
+        '-o', 'tmp/_agent.js',
+        '-w',
+        '-T', 'none'                // TODO remove -T none after migration
     ], { stdio: 'inherit' });
 
     // Watch hook files for changes
@@ -104,7 +110,7 @@ if (isWatchMode) {
 
 } else {
     // Single build mode
-    const command = `frida-compile ${platform}/index.ts -o _agent.js -c`;
+    const command = `frida-compile ${platform}/index.ts -o tmp/_agent.js -T none`;      // TODO remove -T none after migration
 
     try {
         console.log(`Building ${platform} agent...`);
