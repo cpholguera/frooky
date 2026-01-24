@@ -24,7 +24,6 @@ hookFiles.forEach(file => {
 const hooksFilePath = path.join(__dirname, '_hooks.ts');
 
 
-
 // TODO: Patch wen fixing https://github.com/cpholguera/frooky/issues/29
 
 // Function to merge and generate _hooks.ts
@@ -91,7 +90,7 @@ if (isWatchMode) {
     });
 
     watcher.on('change', (filePath) => {
-        console.log(`\n🔄 Hook file changed: ${filePath}`);
+        console.log(`\n Hook file changed: ${filePath}`);
         generateHooksFile();
         // frida-compile will automatically detect _hooks.ts change and rebuild
     });
