@@ -16,19 +16,12 @@ sleep 2
 PID="$(frida-ps -Uai | awk '$3=="org.owasp.mastestapp"{print $1; exit}')"
 echo "Target pid, $PID"
 
-cat > /tmp/frida_sanity.js <<'JS'
-Java.perform(function () {
-  console.log("frida attached and Java is ready")
-  setTimeout(function () {
-    console.log("detaching frida")
-    Java.perform(function () {
-      Java.use("java.lang.System").exit(0)
-    })
-  }, 1500)
-})
-JS
+set +e
 
-frida -U -p "$PID" -l /tmp/frida_sanity.js -q
+frida -U -p "$PID" -q -l frida_sanity.js
+RC=$?
+set -e
+echo "frida exit code, $RC"
 
 # Start frooky and redirect stdout and stderr to file
 # frooky -U -f org.owasp.mastestapp --platform android hooks.json hooks2.json --keep-artifacts -o "$OUTPUT_JSON" >"$FROOKY_LOG" 2>&1 &
