@@ -63,22 +63,19 @@ class FrookyRunner:
             except subprocess.CalledProcessError:
                 pass
 
-    def _compile_agent(self, tmp_dir: Path):
+    def _compile_agent(self):
         """Combine user hooks.json and compile the agent using the node build script"""
 
         platform = self.options.platform
+        frooky_agent_folder =  Path("frooky", "frooky-agent")
+        frooky_agent_build_script = Path(frooky_agent_folder, "build.js")
 
-        frooky_agent_dir = Path(__file__).parent / "frooky-agent"
         subprocess.run(
-            ["npm", "run", f"build-{platform}", "--"] + self.options.hook_paths,
-            cwd=frooky_agent_dir,
+            ["node", frooky_agent_build_script, "-p", platform, "-T", "none"] + self.options.hook_paths,    # TODO: Remove "-T", "none" after TS migration
             check=True
         )
 
-        # copy the compiled _agent.ts from frooky-agent to the local tmp
-        source = Path(frooky_agent_dir, "tmp", "_agent.js")
-        destination = Path(tmp_dir, "_agent.js")
-        shutil.copy2(source, destination)
+        return Path(frooky_agent_folder, "tmp", "_agent.js")
 
 
     def _create_message_handler(self):
@@ -278,7 +275,7 @@ class FrookyRunner:
     def _cleanup_artifacts(self) -> None:
         """Remove temporary artifacts created during execution."""
         artifacts = [
-            Path("tmp"),
+            Path("frooky", "frooky-agent", "tmp"),
             Path("node_modules"),
             Path("package.json"),
             Path("package-lock.json"),
@@ -299,13 +296,8 @@ class FrookyRunner:
         try:
             self._ensure_bridges()
 
-            # Set up paths
-            tmp_dir = Path("tmp")
-            tmp_dir.mkdir(exist_ok=True)
-            built_agent = tmp_dir / "_agent.js"
-
             # Combine user hooks with platform base script
-            self._compile_agent(tmp_dir)
+            built_agent = self._compile_agent()
 
             # Clear/overwrite the output file at start
             with open(self.options.output_path, "w", encoding="utf-8") as f:

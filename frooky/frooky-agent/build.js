@@ -2,14 +2,56 @@ const fs = require('fs');
 const { execSync, spawn } = require('child_process');
 const path = require('path');
 const chokidar = require('chokidar');
+const minimist = require('minimist');
+const { glob } = require('glob');
 
-// TODO: add verbose flags (see https://github.com/cpholguera/frooky/issues/27)
-const platform = process.argv[2]; // 'android' or 'ios'
-const hookFiles = process.argv.slice(3).filter(arg => !arg.startsWith('-'));
-const isWatchMode = process.env.npm_lifecycle_event?.startsWith('watch-');
+// Parse arguments
+const argv = minimist(process.argv.slice(2), {
+    string: ['p', 'T'],
+    boolean: ['w'],
+    alias: {
+        p: 'platform',
+        w: 'watch',
+        T: 'type'
+    },
+    default: {
+        T: 'full'
+    }
+});
 
-if (!platform || hookFiles.length === 0) {
-    console.error('Usage: node build.js <platform> <hook-file-1> [hook-file-2] ...');
+const platform = argv.platform;
+const isWatchMode = argv.watch;
+const typeOption = argv.T;
+
+// Validate platform
+const validPlatforms = ['android', 'ios'];
+if (!platform || !validPlatforms.includes(platform)) {
+    console.error('Usage: node build.js -p <platform> [-w] [-T <type>] <hook-pattern> ');
+    console.error(`Platform must be one of: ${validPlatforms.join(', ')}`);
+    console.error('Example: node build.js -p android -w -T full hooks/*.js');
+    process.exit(1);
+}
+
+// Handle hook files
+const hookPatterns = argv._;
+if (argv.hooks) {
+    hookPatterns = Array.isArray(argv.hooks) ? argv.hooks : [argv.hooks];
+}
+
+
+// Expand glob patterns to actual files
+let hookFiles = [];
+for (const pattern of hookPatterns) {
+    const matches = glob.sync(pattern);
+    if (matches.length === 0) {
+        console.error(`No files matched pattern: ${pattern}`);
+        process.exit(1);
+    }
+    hookFiles.push(...matches);
+}
+
+if (hookFiles.length === 0) {
+    console.error('No hook files specified.');
     process.exit(1);
 }
 
@@ -82,11 +124,11 @@ if (isWatchMode) {
 
     // Start frida-compile in watch mode
     const fridaProcess = spawn('frida-compile', [
-        `${platform}/index.ts`,
-        '-o', 'tmp/_agent.js',
+        `${path.join(__dirname, platform, 'index.ts')}`,
+        '-o', path.join(tmpDir, '_agent.js'),
         '-w',
-        '-T', 'none'                // TODO remove -T none after migration
-    ], { stdio: 'inherit' });
+        '-T', typeOption
+    ], { stdio: 'inherit'});
 
     // Watch hook files for changes
     const watcher = chokidar.watch(hookFiles, {
@@ -110,8 +152,8 @@ if (isWatchMode) {
 
 } else {
     // Single build mode
-    const command = `frida-compile ${platform}/index.ts -o tmp/_agent.js -T none`;      // TODO remove -T none after migration
-
+    const command = `frida-compile ${path.join(__dirname, platform, 'index.ts')} -o ${path.join(tmpDir, '_agent.js')} -T ${typeOption}`;
+    
     try {
         console.log(`Building ${platform} agent...`);
         execSync(command, { stdio: 'inherit' });
