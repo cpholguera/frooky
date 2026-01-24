@@ -90,7 +90,7 @@ if (isWatchMode) {
     });
 
     watcher.on('change', (filePath) => {
-        console.log(`\n Hook file changed: ${filePath}`);
+        console.log(`\nHook file changed: ${filePath}`);
         generateHooksFile();
         // frida-compile will automatically detect _hooks.ts change and rebuild
     });
