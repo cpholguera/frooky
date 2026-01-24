@@ -9,7 +9,7 @@
   },
   "include": [
     "ios/**/*",
-    "andoid/**/*",
+    "android/**/*",
     "shared/**/*"
   ]
 }
