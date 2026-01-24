@@ -70,7 +70,7 @@ if (!fs.existsSync(tmpDir)) {
 
 const hooksFilePath = path.join(tmpDir, '_hooks.ts');
 
-// TODO: Patch wen fixing https://github.com/cpholguera/frooky/issues/29
+// TODO: Patch when fixing https://github.com/cpholguera/frooky/issues/29
 // Function to merge and generate _hooks.ts
 function generateHooksFile() {
     const mergedHooks = {
