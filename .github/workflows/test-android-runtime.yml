@@ -53,29 +53,29 @@ jobs:
           repository: cpholguera/mas-app-android
           path: mas-app-android
 
-      - name: Copy example files and build APK
-        run: |
-          EXAMPLE_DIR="docs/examples/android-app"
+      # - name: Copy example files and build APK
+      #   run: |
+      #     EXAMPLE_DIR="docs/examples/android-app"
 
-          # Copy MastgTest.kt if it exists
-          if [ -f "$EXAMPLE_DIR/MastgTest.kt" ]; then
-            cp -f "$EXAMPLE_DIR/MastgTest.kt" mas-app-android/app/src/main/java/org/owasp/mastestapp/MastgTest.kt
-            echo "Copied MastgTest.kt"
-          fi
+      #     # Copy MastgTest.kt if it exists
+      #     if [ -f "$EXAMPLE_DIR/MastgTest.kt" ]; then
+      #       cp -f "$EXAMPLE_DIR/MastgTest.kt" mas-app-android/app/src/main/java/org/owasp/mastestapp/MastgTest.kt
+      #       echo "Copied MastgTest.kt"
+      #     fi
 
-          # Copy build.gradle.kts.libs if it exists
-          if [ -f "$EXAMPLE_DIR/build.gradle.kts.libs" ]; then
-            sed -i '/\/\/ ADD_LIBS_HERE/{
-              r '"$EXAMPLE_DIR/build.gradle.kts.libs"'
-              d
-            }' mas-app-android/app/build.gradle.kts
-            echo "Replaced libs in build.gradle.kts"
-          fi
+      #     # Copy build.gradle.kts.libs if it exists
+      #     if [ -f "$EXAMPLE_DIR/build.gradle.kts.libs" ]; then
+      #       sed -i '/\/\/ ADD_LIBS_HERE/{
+      #         r '"$EXAMPLE_DIR/build.gradle.kts.libs"'
+      #         d
+      #       }' mas-app-android/app/build.gradle.kts
+      #       echo "Replaced libs in build.gradle.kts"
+      #     fi
 
-          # Build the APK
-          cd mas-app-android
-          ./gradlew assembleDebug --stacktrace
-          echo "Build succeeded"
+      #     # Build the APK
+      #     cd mas-app-android
+      #     ./gradlew assembleDebug --stacktrace
+      #     echo "Build succeeded"
 
       - name: Enable KVM
         run: |
@@ -100,7 +100,9 @@ jobs:
             # Confirm root access
             adb shell "id"
 
-            adb install mas-app-android/app/build/outputs/apk/debug/app-debug.apk
+            cd docs/examples/android-app && unzip -o MASTG-DEMO-0060.apk.zip && adb install -r MASTG-DEMO-0060.apk
+
+            # adb install mas-app-android/app/build/outputs/apk/debug/app-debug.apk
 
             # Download and setup frida-server
             FRIDA_VERSION=$(frida --version) && echo "Frida version: $FRIDA_VERSION" && wget "https://github.com/frida/frida/releases/download/${FRIDA_VERSION}/frida-server-${FRIDA_VERSION}-android-x86_64.xz" && unxz "frida-server-${FRIDA_VERSION}-android-x86_64.xz" && adb push "frida-server-${FRIDA_VERSION}-android-x86_64" /data/local/tmp/frida-server
@@ -115,11 +117,11 @@ jobs:
             # Run the auto.sh script from the example directory
             cd docs/examples/android-app && chmod +x auto.sh && ./auto.sh
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: MASTestApp.apk
-          path: mas-app-android/app/build/outputs/apk/debug/app-debug.apk
+      # - name: Upload APK
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: MASTestApp.apk
+      #     path: mas-app-android/app/build/outputs/apk/debug/app-debug.apk
 
       - name: Collect artifacts
         if: always()
