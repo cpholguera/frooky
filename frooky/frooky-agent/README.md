@@ -23,8 +23,8 @@ $ npm run build-android ../../docs/examples/hooks*.json
 
 This will create two files: 
 
-1. `_hooks.ts`: Merged hooks from the JSON files
-1. `_agent.ts`: frooky agent which can be run with frida
+1. `./tmp/_hooks.ts`: Merged hooks from the JSON files
+1. `./tmp/_agent.ts`: frooky agent which can be run with frida
 
 ## Development workflow 
 
@@ -38,7 +38,7 @@ $ npm run watch-android ../../docs/examples/hooks*.json
 Now you can use frida to run the compiled agent:
 
 ```sh
-$ frida -U -f org.owasp.mastestapp -l _agent.js
+$ frida -U -f org.owasp.mastestapp -l ./tmp/_agent.js
 ```
 
 The agent will update when you change the code, but also the JSON hook files.
