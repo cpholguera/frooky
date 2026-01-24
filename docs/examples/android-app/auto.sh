@@ -13,10 +13,16 @@ adb wait-for-device
 adb shell monkey -p "$APP_ID" -c android.intent.category.LAUNCHER 1
 sleep 2
 
-frida-ps -Uai | grep -i mas
+PS_OUT="$(frida-ps -Uai || true)"
+printf '%s\n' "$PS_OUT"
 
-PID="$(frida-ps -Uai | awk '$3=="org.owasp.mastestapp"{print $1; exit}')"
+PID="$(printf '%s\n' "$PS_OUT" | awk '$3=="org.owasp.mastestapp"{print $1; exit}')"
 echo "Target pid, $PID"
+
+if [ -z "${PID:-}" ]; then
+  echo "Could not find pid for $APP_ID"
+  exit 1
+fi
 
 # set +e
 # timeout 5s frida -U -p "$PID" -l frida_sanity.js
@@ -35,15 +41,10 @@ set -e
 echo "frooky exit code, $RC"
 tail -n 200 "$FROOKY_LOG" || true
 
-FROOKY_PID=$!
-
 # Run Maestro (https://docs.maestro.dev/getting-started/installing-maestro)
 maestro test "$FLOW" > auto.log 2>&1
 MAESTRO_EXIT=$?
 
-# Stop frooky when Maestro completes
-kill -INT "$FROOKY_PID" 2>/dev/null || true
-wait "$FROOKY_PID" 2>/dev/null || true
 ls -laR .
 
 exit "$MAESTRO_EXIT"
