@@ -1,9 +1,9 @@
 # Frooky Agent
 
-This is the agent used for frooky. 
+This is the agent used by frooky. 
 
 You can run it as standalone frida agent as long as you provide
-the `hook.ts` file with the instrumentation instructions.
+one or multiple `hook.json` file with the instrumentation instructions.
 
 ## How to compile the standalone frooky agent
 
