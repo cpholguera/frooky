@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+FLOW="flow.yaml"
+
+OUTPUT_JSON="output.json"
+FROOKY_LOG="frooky.log"
+
+APP_ID="org.owasp.mastestapp.MASTestApp-iOS"
+APP_NAME="MASTestApp"
+
+# Launch the app first
+xcrun simctl launch booted "$APP_ID" || true
+sleep 2
+
+# List running processes
+PS_OUT="$(frida-ps -ai || true)"
+printf '%s\n' "$PS_OUT"
+
+PID="$(printf '%s\n' "$PS_OUT" | awk -v name="$APP_NAME" '$2==name{print $1; exit}')"
+echo "Target pid: $PID"
+
+if [ -z "${PID:-}" ]; then
+  echo "Could not find pid for $APP_NAME, trying to attach by name"
+  # Start frooky attaching by name instead of PID
+  nohup frooky -n "$APP_NAME" --platform ios hooks.json --keep-artifacts -o "$OUTPUT_JSON" >>"$FROOKY_LOG" 2>&1 </dev/null &
+else
+  # Start frooky attaching by PID
+  nohup frooky -p "$PID" --platform ios hooks.json --keep-artifacts -o "$OUTPUT_JSON" >>"$FROOKY_LOG" 2>&1 </dev/null &
+fi
+
+FROOKY_PID=$!
+
+sleep 1
+ps -p "$FROOKY_PID" >/dev/null 2>&1 || true
+tail -n 20 "$FROOKY_LOG" || true
+
+# Run Maestro (https://docs.maestro.dev/getting-started/installing-maestro)
+maestro test "$FLOW" > auto.log 2>&1
+MAESTRO_EXIT=$?
+
+# Stop frooky when Maestro completes
+kill -INT "$FROOKY_PID" 2>/dev/null || true
+sleep 2
+kill -TERM "$FROOKY_PID" 2>/dev/null || true
+sleep 2
+kill -KILL "$FROOKY_PID" 2>/dev/null || true
+wait "$FROOKY_PID" 2>/dev/null || true
+
+tail -n 200 "$FROOKY_LOG" || true
+
+ls -laR .
+
+exit "$MAESTRO_EXIT"

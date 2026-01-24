@@ -1,0 +1,137 @@
+name: Test iOS Runtime
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: macos-14
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frida-compile
+        run: npm install -g frida-compile@19.0.4
+
+      - name: Install frooky
+        run: pip install -e .
+
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Clone mas-app-ios repository
+        uses: actions/checkout@v4
+        with:
+          repository: cpholguera/mas-app-ios
+          path: mas-app-ios
+
+      - name: Copy example files
+        run: |
+          EXAMPLE_DIR="docs/examples/ios-app"
+
+          # Copy MastgTest.swift if it exists
+          if [ -f "$EXAMPLE_DIR/MastgTest.swift" ]; then
+            cp -f "$EXAMPLE_DIR/MastgTest.swift" mas-app-ios/MASTestApp/MastgTest.swift
+            echo "Copied MastgTest.swift"
+          fi
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+
+      - name: Build the app for simulator
+        run: |
+          cd mas-app-ios
+          
+          # Get the default scheme
+          DEFAULT_SCHEME=$(xcodebuild -list -json | jq -r '.project.targets[0]')
+          echo "Using scheme: $DEFAULT_SCHEME"
+          
+          # Build for simulator
+          xcodebuild build \
+            -project "MASTestApp.xcodeproj" \
+            -scheme "$DEFAULT_SCHEME" \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2' \
+            -configuration Debug \
+            -derivedDataPath "$GITHUB_WORKSPACE/DerivedData" \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+          
+          echo "Build succeeded"
+
+      - name: Boot iOS Simulator
+        run: |
+          # List available simulators
+          xcrun simctl list devices available
+          
+          # Boot iPhone 16 simulator
+          SIMULATOR_UDID=$(xcrun simctl list devices available | grep "iPhone 16" | grep -v "Plus\|Pro" | head -1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
+          echo "SIMULATOR_UDID=$SIMULATOR_UDID" >> $GITHUB_ENV
+          echo "Using simulator: $SIMULATOR_UDID"
+          
+          xcrun simctl boot "$SIMULATOR_UDID" || echo "Simulator already booted"
+          
+          # Wait for simulator to be ready
+          sleep 5
+
+      - name: Install app on simulator
+        run: |
+          # Find the built .app
+          APP_PATH=$(find "$GITHUB_WORKSPACE/DerivedData" -name "*.app" -type d | head -1)
+          echo "Found app at: $APP_PATH"
+          
+          if [ -z "$APP_PATH" ]; then
+            echo "Error: Could not find the built .app file."
+            exit 1
+          fi
+          
+          # Install the app
+          xcrun simctl install "$SIMULATOR_UDID" "$APP_PATH"
+          echo "App installed successfully"
+
+      - name: Run Tests
+        run: |
+          set -eux
+          
+          # Verify Frida can see the simulator
+          echo "Frida devices:"
+          frida-ls-devices
+          
+          # Run the auto.sh script from the example directory
+          cd docs/examples/ios-app && chmod +x auto.sh && ./auto.sh
+
+      - name: Upload Dynamic Test Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dynamic-test-results
+          path: |
+            ~/.maestro/tests/**/*
+            docs/examples/ios-app/auto.log
+            docs/examples/ios-app/frooky.log
+            docs/examples/ios-app/output.json
+            docs/examples/ios-app/tmp/
+            **/before.png
+            **/after.png
+
+
