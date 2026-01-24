@@ -92,8 +92,7 @@ jobs:
           emulator-options: -wipe-data -no-snapshot-save -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: |
-            #!/usr/bin/env bash
-            set -euxo pipefail
+            set -eux
             adb wait-for-device
             adb root
             adb wait-for-device
