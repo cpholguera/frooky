@@ -42,7 +42,7 @@ fi
 # echo "frooky exit code, $RC"
 
 
-frooky -U -p "$PID" --platform android hooks.json hooks2.json --keep-artifacts -o "$OUTPUT_JSON" >>"$FROOKY_LOG" 2>&1 &
+nohup frooky -U -p "$PID" --platform android hooks.json hooks2.json --keep-artifacts -o "$OUTPUT_JSON" >>"$FROOKY_LOG" 2>&1 </dev/null &
 FROOKY_PID=$!
 
 # set +e
