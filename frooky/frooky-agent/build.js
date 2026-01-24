@@ -78,7 +78,7 @@ function generateHooksFile() {
         hooks: []
     };
 
-    console.log(`Comining hooks...`);
+    console.log(`Combining hooks...`);
 
     hookFiles.forEach(file => {
         try {
