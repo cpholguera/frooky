@@ -10,7 +10,7 @@ one or multiple `hook.json` file with the instrumentation instructions.
 ### Install packages
 
 ```sh
-$ cd frooky-agent/
+$ cd agent/
 $ npm install
 ```
 

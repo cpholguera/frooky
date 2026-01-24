@@ -43,7 +43,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--keep-artifacts",
         action="store_true",
-        help="Keep temporary artifacts (frooky-agent/tmp/, node_modules/, package.json, package-lock.json)",
+        help="Keep temporary artifacts (frooky/agent/tmp/, node_modules/, package.json, package-lock.json)",
     )
 
     return parser

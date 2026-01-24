@@ -67,7 +67,7 @@ class FrookyRunner:
         """Combine user hooks.json and compile the agent using the node build script"""
 
         platform = self.options.platform
-        frooky_agent_folder =  Path("frooky", "frooky-agent")
+        frooky_agent_folder =  Path("frooky", "agent")
         frooky_agent_build_script = Path(frooky_agent_folder, "build.js")
 
         subprocess.run(
@@ -275,7 +275,7 @@ class FrookyRunner:
     def _cleanup_artifacts(self) -> None:
         """Remove temporary artifacts created during execution."""
         artifacts = [
-            Path("frooky", "frooky-agent", "tmp"),
+            Path("frooky", "agent", "tmp"),
             Path("node_modules"),
             Path("package.json"),
             Path("package-lock.json"),

@@ -107,7 +107,7 @@ function generateHooksFile() {
 
     try {
         fs.writeFileSync(hooksFilePath, tsContent);
-        console.log(`Generated ${hooksFilePath}`);
+        console.log(`Hoooks location: ${hooksFilePath}`);
     } catch (error) {
         console.error('Error writing _hooks.ts:', error.message);
         process.exit(1);
@@ -152,12 +152,14 @@ if (isWatchMode) {
 
 } else {
     // Single build mode
-    const command = `frida-compile ${path.join(__dirname, platform, 'index.ts')} -o ${path.join(tmpDir, '_agent.js')} -T ${typeOption}`;
+    const agentPath = path.join(tmpDir, '_agent.js')
+    const command = `frida-compile ${path.join(__dirname, platform, 'index.ts')} -o ${agentPath} -T ${typeOption}`;
     
     try {
         console.log(`Building ${platform} agent...`);
         execSync(command, { stdio: 'inherit' });
-        console.log('Build complete');
+        console.log(`Build ${platform} agent complete.`);
+        console.log(`Agent location: ${agentPath}`);
     } catch (error) {
         console.error('Build failed:', error.message);
         process.exit(1);
