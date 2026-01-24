@@ -8,6 +8,8 @@ node_modules/
 package.json
 package-lock.json
 
+# Exception: include specific package.json
+!frooky/agent/package.json
 
 # Python bytecode
 __pycache__/
