@@ -41,16 +41,25 @@ fi
 # echo "frooky exit code, $RC"
 
 
-frooky -U -p "$PID" --platform android hooks.json hooks2.json --keep-artifacts -o "$OUTPUT_JSON" >>"$FROOKY_LOG" 2>&1 &
+nohup frooky -U -p "$PID" --platform android hooks.json hooks2.json --keep-artifacts -o "$OUTPUT_JSON" >>"$FROOKY_LOG" 2>&1 </dev/null &
 FROOKY_PID=$!
+
+sleep 1
+ps -p "$FROOKY_PID" >/dev/null 2>&1 || true
+tail -n 20 "$FROOKY_LOG" || true
 
 # Run Maestro (https://docs.maestro.dev/getting-started/installing-maestro)
 maestro test "$FLOW" > auto.log 2>&1
 MAESTRO_EXIT=$?
 
 # Stop frooky when Maestro completes
-kill -INT "$FROOKY_PID" 2>/dev/null || true 
+kill -INT "$FROOKY_PID" 2>/dev/null || true
+sleep 2
+kill -TERM "$FROOKY_PID" 2>/dev/null || true
+sleep 2
+kill -KILL "$FROOKY_PID" 2>/dev/null || true
 wait "$FROOKY_PID" 2>/dev/null || true
+
 
 tail -n 200 "$FROOKY_LOG" || true
 
