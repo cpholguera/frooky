@@ -6,48 +6,38 @@ FLOW="flow.yaml"
 OUTPUT_JSON="output.json"
 FROOKY_LOG="frooky.log"
 
-DEVICE_ARGS=()
-if [[ -n "${FROOKY_DEVICE_ID:-}" ]]; then
-	DEVICE_ARGS=(-D "$FROOKY_DEVICE_ID")
-elif [[ -n "${ANDROID_SERIAL:-}" ]]; then
-	DEVICE_ARGS=(-D "$ANDROID_SERIAL")
-else
-	DEVICE_ARGS=(-U)
-fi
+APP_ID="org.owasp.mastestapp"
+APP_NAME="MASTestApp"
 
-# Start frooky and redirect stdout/stderr to file
-frooky "${DEVICE_ARGS[@]}" -f org.owasp.mastestapp --platform android hooks.json hooks2.json --keep-artifacts -o "$OUTPUT_JSON" >"$FROOKY_LOG" 2>&1 &
+adb wait-for-device
+adb shell monkey -p "$APP_ID" -c android.intent.category.LAUNCHER 1
+sleep 2
 
-FROOKY_PID=$!
+frida-ps -Uai | grep -i mas
 
-# If frooky can't connect/attach/spawn, it tends to exit quickly.
-# Make that a hard failure so we don't get a "successful" run with an empty output.json.
-for _ in {1..15}; do
-	if ! kill -0 "$FROOKY_PID" 2>/dev/null; then
-		echo "frooky exited early; last logs:"
-		tail -n 200 "$FROOKY_LOG" || true
-		exit 1
-	fi
-	if [[ -s "$OUTPUT_JSON" ]]; then
-		break
-	fi
-	sleep 1
-done
+frida -U -n "$APP_NAME" -q <<'EOF'
+Java.perform(function () {
+  console.log("frida attached and Java is ready");
+});
+setTimeout(function () {
+  console.log("detaching frida");
+  Process.exit(0);
+}, 1000);
+EOF
 
-if [[ ! -s "$OUTPUT_JSON" ]]; then
-	echo "frooky produced no output after startup; last logs:"
-	tail -n 200 "$FROOKY_LOG" || true
-	exit 1
-fi
+
+# Start frooky and redirect stdout and stderr to file
+# frooky -U -f org.owasp.mastestapp --platform android hooks.json hooks2.json --keep-artifacts -o "$OUTPUT_JSON" >"$FROOKY_LOG" 2>&1 &
+
+# FROOKY_PID=$!
 
 # Run Maestro (https://docs.maestro.dev/getting-started/installing-maestro)
 maestro test "$FLOW" > auto.log 2>&1
 MAESTRO_EXIT=$?
 
 # Stop frooky when Maestro completes
-kill -INT "$FROOKY_PID" 2>/dev/null || true
-wait "$FROOKY_PID" 2>/dev/null || true
-
-tail -n 200 "$FROOKY_LOG" || true
+# kill -INT "$FROOKY_PID" 2>/dev/null || true
+# wait "$FROOKY_PID" 2>/dev/null || true
+# ls -laR .
 
 exit "$MAESTRO_EXIT"

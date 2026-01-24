@@ -92,47 +92,28 @@ jobs:
           emulator-options: -wipe-data -no-snapshot-save -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: |
-            set -x
-            
-            # Wait for device and get root access
+            set -euxo pipefail
             adb wait-for-device
             adb root
-            sleep 2
             adb wait-for-device
-            adb shell "setenforce 0" || true
+            adb shell "setenforce 0"
+            # Confirm root access
+            adb shell "id"
 
-            # Install the app
             adb install mas-app-android/app/build/outputs/apk/debug/app-debug.apk
 
             # Download and setup frida-server
-            FRIDA_VERSION=$(frida --version)
-            echo "Frida version: $FRIDA_VERSION"
-            wget -q "https://github.com/frida/frida/releases/download/${FRIDA_VERSION}/frida-server-${FRIDA_VERSION}-android-x86_64.xz"
-            unxz "frida-server-${FRIDA_VERSION}-android-x86_64.xz"
-            adb push "frida-server-${FRIDA_VERSION}-android-x86_64" /data/local/tmp/frida-server
+            FRIDA_VERSION=$(frida --version) && echo "Frida version: $FRIDA_VERSION" && wget "https://github.com/frida/frida/releases/download/${FRIDA_VERSION}/frida-server-${FRIDA_VERSION}-android-x86_64.xz" && unxz "frida-server-${FRIDA_VERSION}-android-x86_64.xz" && adb push "frida-server-${FRIDA_VERSION}-android-x86_64" /data/local/tmp/frida-server
             adb shell "chmod 755 /data/local/tmp/frida-server"
             
-            # Start frida-server as root in background (use su -c to ensure root context)
-            adb shell "su 0 sh -c '/data/local/tmp/frida-server -D >/data/local/tmp/frida.log 2>&1 &'"
-            
-            # Wait for frida-server to be ready
-            sleep 3
-            
-            # Verify frida-server is running
-            adb shell "ps -A | grep frida-server" || echo "Warning: frida-server not found in ps"
-            adb shell "cat /data/local/tmp/frida.log" || true
-            
-            # Verify Frida can see the device
-            echo "Frida devices:"
-            frida-ls-devices
-            
-            # Get the device ID (should be emulator-5554)
-            DEVICE_ID=$(adb devices | grep -v "List" | grep "device$" | head -1 | cut -f1)
-            echo "Using device ID: $DEVICE_ID"
-            export FROOKY_DEVICE_ID="$DEVICE_ID"
+            # Start frida-server in background
+            adb shell "nohup /data/local/tmp/frida-server >/data/local/tmp/frida.log 2>&1 </dev/null &"
+
+            sleep 2
+            adb shell "ps | grep frida-server"
 
             # Run the auto.sh script from the example directory
-            cd docs/examples/android-app && chmod +x auto.sh && FROOKY_DEVICE_ID="$DEVICE_ID" ./auto.sh
+            cd docs/examples/android-app && chmod +x auto.sh && ./auto.sh
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -140,16 +121,21 @@ jobs:
           name: MASTestApp.apk
           path: mas-app-android/app/build/outputs/apk/debug/app-debug.apk
 
+      - name: Collect artifacts
+        if: always()
+        run: |
+          mkdir -p artifact
+          cp ~/.maestro/tests/**/* artifact/ 2>/dev/null || true
+          cp docs/examples/android-app/auto.log artifact/ 2>/dev/null || true
+          cp docs/examples/android-app/frooky.log artifact/ 2>/dev/null || true
+          cp docs/examples/android-app/output.json artifact/ 2>/dev/null || true
+          cp **/before.png artifact/ 2>/dev/null || true
+          cp **/after.png artifact/ 2>/dev/null || true
+
       - name: Upload Dynamic Test Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dynamic-test-results
-          path: |
-            ~/.maestro/tests/**/*
-            docs/examples/android-app/auto.log
-            docs/examples/android-app/frooky.log
-            docs/examples/android-app/output.json
-            docs/examples/android-app/tmp/
-            **/before.png
-            **/after.png
+          path: artifact
+
