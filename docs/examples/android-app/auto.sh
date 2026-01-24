@@ -13,15 +13,17 @@ adb wait-for-device
 adb shell monkey -p "$APP_ID" -c android.intent.category.LAUNCHER 1
 sleep 2
 
+frida-ps -Uai | grep -i mas
+
 PID="$(frida-ps -Uai | awk '$3=="org.owasp.mastestapp"{print $1; exit}')"
 echo "Target pid, $PID"
 
 set +e
-
-frida -U -p "$PID" -q -l frida_sanity.js
+timeout 5s frida -U -p "$PID" -l frida_sanity.js
 RC=$?
 set -e
 echo "frida exit code, $RC"
+
 
 # Start frooky and redirect stdout and stderr to file
 # frooky -U -f org.owasp.mastestapp --platform android hooks.json hooks2.json --keep-artifacts -o "$OUTPUT_JSON" >"$FROOKY_LOG" 2>&1 &
