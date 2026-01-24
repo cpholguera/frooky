@@ -107,7 +107,7 @@ function generateHooksFile() {
 
     try {
         fs.writeFileSync(hooksFilePath, tsContent);
-        console.log(`Hoooks location: ${hooksFilePath}`);
+        console.log(`Hooks location: ${hooksFilePath}`);
     } catch (error) {
         console.error('Error writing _hooks.ts:', error.message);
         process.exit(1);
