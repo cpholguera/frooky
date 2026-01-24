@@ -123,21 +123,16 @@ jobs:
       #     name: MASTestApp.apk
       #     path: mas-app-android/app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Collect artifacts
-        if: always()
-        run: |
-          mkdir -p artifact
-          cp ~/.maestro/tests/**/* artifact/ 2>/dev/null || true
-          cp docs/examples/android-app/auto.log artifact/ 2>/dev/null || true
-          cp docs/examples/android-app/frooky.log artifact/ 2>/dev/null || true
-          cp docs/examples/android-app/output.json artifact/ 2>/dev/null || true
-          cp **/before.png artifact/ 2>/dev/null || true
-          cp **/after.png artifact/ 2>/dev/null || true
-
       - name: Upload Dynamic Test Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dynamic-test-results
-          path: artifact
-
+          path: |
+            ~/.maestro/tests/**/*
+            docs/examples/android-app/auto.log
+            docs/examples/android-app/frooky.log
+            docs/examples/android-app/output.json
+            docs/examples/android-app/tmp/
+            **/before.png
+            **/after.png
