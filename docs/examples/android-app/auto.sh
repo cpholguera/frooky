@@ -26,13 +26,14 @@ echo "Target pid, $PID"
 
 
 # Start frooky and redirect stdout and stderr to file
-# timeout 5s frooky -U -f org.owasp.mastestapp --platform android hooks.json hooks2.json --keep-artifacts -o "$OUTPUT_JSON" >"$FROOKY_LOG" 2>&1 &
+# frooky -U -f org.owasp.mastestapp --platform android hooks.json hooks2.json --keep-artifacts -o "$OUTPUT_JSON" >"$FROOKY_LOG" 2>&1 &
 
 set +e
-timeout 5s frooky -U -p "$PID" --platform android hooks.json hooks2.json --keep-artifacts -o "$OUTPUT_JSON" >"$FROOKY_LOG" 2>&1 &
+timeout 5s frooky -U -p "$PID" --platform android hooks.json hooks2.json --keep-artifacts -o "$OUTPUT_JSON" >"$FROOKY_LOG" 2>&1
 RC=$?
 set -e
 echo "frooky exit code, $RC"
+tail -n 200 "$FROOKY_LOG" || true
 
 FROOKY_PID=$!
 
