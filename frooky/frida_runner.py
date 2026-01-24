@@ -3,7 +3,6 @@ from __future__ import annotations
 import frida
 import time
 import subprocess
-import os
 import sys
 import json
 import shutil
