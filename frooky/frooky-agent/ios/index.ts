@@ -1,4 +1,4 @@
 import { target } from '../tmp/_hooks.ts';
+import { runFrookyAgent } from './base_script.ts'
 
-console.log("iOS Stub")
-console.log(target.category)
+runFrookyAgent(target)
