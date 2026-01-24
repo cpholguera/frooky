@@ -24,7 +24,7 @@ $ npm run build-android ../../docs/examples/hooks*.json
 This will create two files: 
 
 1. `./tmp/_hooks.ts`: Merged hooks from the JSON files
-1. `./tmp/_agent.ts`: frooky agent which can be run with frida
+1. `./tmp/_agent.js`: frooky agent which can be run with frida
 
 ## Development workflow 
 
