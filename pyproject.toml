@@ -47,8 +47,8 @@ include = ["frooky*"]
 
 [tool.setuptools.package-data]
 frooky = [
-  "agent/android/**/*.js",
-  "agent/ios/**/*.js",
+  "agent/android/**/*.ts",
+  "agent/ios/**/*.ts",
 ]
 
 [tool.setuptools_scm]
