@@ -232,7 +232,7 @@ function runCompileAgent() {
         ${compressOption ? ' -c' : ''}`;
 
     execSync(command, { stdio: 'inherit' });
-    if (verbose) { console.log(`Agent compiling sucessful. Location: ${agentPath}`) }
+    if (verbose) { console.log(`Agent compiling successful. Location: ${agentPath}`) }
 }
 
 function runWatch() {
