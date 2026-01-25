@@ -139,14 +139,14 @@ jobs:
           echo "## maestro" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '```sh' >> $GITHUB_STEP_SUMMARY
-          cat ios-test-results/auto.log 2>/dev/null || echo "No auto.log found" >> $GITHUB_STEP_SUMMARY
+          cat ios-test-results/auto.log >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "No auto.log found" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           echo "## frooky" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '```sh' >> $GITHUB_STEP_SUMMARY
-          cat ios-test-results/frooky.log 2>/dev/null || echo "No frooky.log found" >> $GITHUB_STEP_SUMMARY
+          cat ios-test-results/frooky.log >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "No frooky.log found" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
