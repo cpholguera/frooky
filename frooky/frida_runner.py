@@ -178,7 +178,7 @@ class FrookyRunner:
         """Print the Frooky header with session information."""
 
         # Get agent Frida version
-        agent_frida_version_path = Path(".") / "frooky" / "agent" / "dist" / "version.json"
+        agent_frida_version_path = Path(__file__).resolve().parent / "agent" / "dist" / "version.json"
         agent_frida_version_json = json.loads(agent_frida_version_path.read_text(encoding="utf-8"))
         agent_frida_version = str(agent_frida_version_json['frida'])
         
