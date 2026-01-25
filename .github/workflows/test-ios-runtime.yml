@@ -124,5 +124,3 @@ jobs:
             docs/examples/ios-app/tmp/
             **/before.png
             **/after.png
-
-
