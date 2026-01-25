@@ -30,7 +30,7 @@ These agents use the `rpc` API from Frida in order to fetch the `hooks.json` at 
 
 ## Development workflow 
 
-I you want to work on the frooky agent code itself, it is recommended using Frida in combination with the following commands:
+If you want to work on the frooky agent code itself, it is recommended to use Frida in combination with the following commands:
 
 ```sh
 $ npm run watch-frida-android ../../docs/examples/hooks*.json
