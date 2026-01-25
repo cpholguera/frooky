@@ -22,6 +22,17 @@ def _run_build_scripts():
     agent_dir = Path(__file__).parent / "frooky" / "agent"
     subprocess.check_call(['npm', 'install'], cwd=agent_dir)
 
+    try:
+        subprocess.check_call(
+            ['npm', 'audit', '--audit-level=moderate'],
+            cwd=agent_dir
+        )
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(
+            f"npm audit found vulnerabilities. "
+            f"Run 'npm audit' in {agent_dir} for details."
+        ) from e
+
     # Compile frooky agents
     subprocess.run(
         ["npm", "run", "prod-frooky-android" ],
