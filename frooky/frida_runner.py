@@ -23,7 +23,6 @@ class RunnerOptions:
     attach_identifier: Optional[str] = None
     attach_pid: Optional[int] = None
     spawn: Optional[str] = None
-    keep_artifacts: bool = False
 
 
 class FrookyRunner:
