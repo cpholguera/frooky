@@ -12,6 +12,7 @@ from importlib import resources
 from pathlib import Path
 from typing import Optional
 
+from ._version import __version__ as frooky_version
 from .resources import read_text
 
 
@@ -264,7 +265,7 @@ class FrookyRunner:
         
         # Info lines to display on the right
         info = [
-            f"Powered by Frida {frida_version}",
+            f"v{frooky_version} - Powered by Frida {frida_version}",
             f"Target: {self._get_target_description()}",
             "",
             f"Device: {self.device.name}" + (f" ({self.device.id})" if self.device.id else ""),
