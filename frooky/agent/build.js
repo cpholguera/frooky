@@ -22,7 +22,7 @@ const argv = minimist(process.argv.slice(2), {
     default: {
         t: 'frooky',
         w: false,
-        c: true,
+        c: false,
         'keep-build-dir': false,
         'type-check': 'full'
     }
