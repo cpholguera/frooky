@@ -30,7 +30,7 @@ const argv = minimist(process.argv.slice(2), {
 
 // args
 const targetOption = argv.target;
-const platfromOption = argv.platform;
+const platformOption = argv.platform;
 const typeCheckOption = argv['type-check'];
 const keepBuildDirOption = argv['keep-build-dir'];
 const watchOption = argv.watch;
@@ -40,11 +40,11 @@ const verbose = argv.verbose;
 const hooksFilePaths = argv._;
 
 // config paths
-const sourceDir = path.join(__dirname, platfromOption);
+const sourceDir = path.join(__dirname, platformOption);
 const distDir = path.join(__dirname, 'dist');
 const buildDir = path.join(distDir, 'build');
 const combinedHookPath = path.join(buildDir, '_hooks.ts');
-const agentPath = path.join(distDir, `agent-${platfromOption}.js`)
+const agentPath = path.join(distDir, `agent-${platformOption}.js`)
 const versionPath = path.join(distDir, `version.json`)
 
 
@@ -167,7 +167,7 @@ function showHelp() {
 function validateInput() {
     // validate target
     const validPlatforms = ['android', 'ios'];
-    if (!validPlatforms.includes(platfromOption)) {
+    if (!validPlatforms.includes(platformOption)) {
         console.error(`Platform must be one of: ${validPlatforms.join(', ')}`);
         process.exit(1);
     }
@@ -210,7 +210,7 @@ function setupBuildDir() {
     }
 
     // copy code to build dir
-    fs.cpSync(path.join(__dirname, platfromOption), `${buildDir}`, { recursive: true });
+    fs.cpSync(path.join(__dirname, platformOption), `${buildDir}`, { recursive: true });
 
     // Remove the index file we're NOT using
     const unusedTarget = targetOption === 'frida' ? 'frooky' : 'frida';
