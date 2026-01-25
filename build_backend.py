@@ -35,12 +35,12 @@ def _run_build_scripts():
 
     # Compile frooky agents
     subprocess.run(
-        ["npm", "run", "prod-frooky-android" ],
+        ["npm", "run", "prod-frooky-android"],
         cwd=agent_dir,
         check=True
     )
     subprocess.run(
-        ["npm", "run", "prod-frooky-ios" ],
+        ["npm", "run", "prod-frooky-ios"],
         cwd=agent_dir,
         check=True
     )
