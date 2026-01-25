@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { execSync, spawn } from 'child_process';
+import { spawnSync, spawn } from 'child_process';
 import path from 'path';
 import chokidar from 'chokidar';
 import minimist from 'minimist';
@@ -42,11 +42,10 @@ const hooksFilePaths = argv._;
 // config paths
 const sourceDir = path.join(__dirname, platformOption);
 const distDir = path.join(__dirname, 'dist');
-const buildDir = path.join(distDir, 'build');
+const buildDir = path.join(__dirname, 'build');
 const combinedHookPath = path.join(buildDir, '_hooks.ts');
 const agentPath = path.join(distDir, `agent-${platformOption}.js`)
 const versionPath = path.join(distDir, `version.json`)
-
 
 
 if (helpOption) {
@@ -222,16 +221,15 @@ function setupBuildDir() {
     if (targetOption == 'frida') {
         generateHooksFile();
     }
-
 }
 
 function runCompileAgent() {
-    const command = `frida-compile ${path.join(buildDir, `index.${targetOption}.ts`)} \
-        -o ${agentPath} \
-        -T ${typeCheckOption}\
-        ${compressOption ? ' -c' : ''}`;
-
-    execSync(command, { stdio: 'inherit' });
+    spawnSync('frida-compile', [
+        path.join(buildDir, `index.${targetOption}.ts`),
+        '-o', agentPath,
+        '-T', typeCheckOption,
+        ...(compressOption ? ['-c'] : [])
+    ], { stdio: 'inherit' });
     if (verbose) { console.log(`Agent compiling successful. Location: ${agentPath}`) }
 }
 
@@ -239,12 +237,12 @@ function runWatch() {
     return new Promise((resolve, reject) => {
         // Start frida-compile in watch mode
         const fridaProcess = spawn('frida-compile', [
-            `${path.join(buildDir, `index.${targetOption}.ts`)}`,
+            path.join(buildDir, `index.${targetOption}.ts`),
             '-o', agentPath,
             '-w',
             '-T', typeCheckOption,
             ...(compressOption ? ['-c'] : [])
-        ].filter(Boolean), { stdio: 'inherit'});
+        ], { stdio: 'inherit' });
 
         // Watch hook files for changes
         const watcherHooks = chokidar.watch(hooksFilePaths, {
