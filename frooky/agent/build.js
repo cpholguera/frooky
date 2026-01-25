@@ -182,7 +182,7 @@ function validateInput() {
     // validate hooks files
     if (targetOption === 'frida') {
         if (hooksFilePaths.length == 0) {
-            console.error(`No hook files provide. Provide one or more hook.json files.`);
+            console.error(`No hook files provided. Provide one or more hook.json files.`);
             process.exit(1);
         }
         hooksFilePaths.forEach(file => {
