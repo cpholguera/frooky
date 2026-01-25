@@ -5,10 +5,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build-frooky-android": "node scripts/build-prod.js -p android -c",
-    "build-frooky-ios": "node scripts/build-prod.js -p ios -c",
-    "watch-frida-android": "node scripts/watch-dev.js -p android -c --no-typecheck",
-    "watch-frida-ios": "node scripts/watch-dev.js -p ios --no-typecheck"
+    "build-frooky-android": "node build.js -p android -c --no-typecheck",
+    "build-frooky-ios": "node build.js -p ios -c --no-typecheck",
+    "watch-frida-android": "node build.js -p android -c --no-typecheck",
+    "watch-frida-ios": "node build.js -p ios --no-typecheck"
   },
   "devDependencies": {
     "@types/frida-gum": "^19.0.1",
