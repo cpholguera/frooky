@@ -123,16 +123,28 @@ jobs:
       #     name: MASTestApp.apk
       #     path: mas-app-android/app/build/outputs/apk/debug/app-debug.apk
 
+      - name: Prepare artifacts for upload
+        if: always()
+        run: |
+          mkdir -p android-test-results
+          
+          # Copy files from example directory
+          cd docs/examples/android-app
+          for file in auto.log frooky.log output.json before.png after.png; do
+            cp "$file" "$GITHUB_WORKSPACE/android-test-results/" 2>/dev/null || true
+          done
+          cp -r tmp "$GITHUB_WORKSPACE/android-test-results/" 2>/dev/null || true
+          cd "$GITHUB_WORKSPACE"
+          
+          # Copy maestro log from most recent test run
+          LATEST_TEST=$(find ~/.maestro/tests -type f -name "maestro.log" 2>/dev/null | head -1)
+          if [ -n "$LATEST_TEST" ]; then
+            cp "$LATEST_TEST" android-test-results/maestro.log
+          fi
+
       - name: Upload Dynamic Test Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: dynamic-test-results
-          path: |
-            ~/.maestro/tests/**/*
-            docs/examples/android-app/auto.log
-            docs/examples/android-app/frooky.log
-            docs/examples/android-app/output.json
-            docs/examples/android-app/tmp/
-            **/before.png
-            **/after.png
+          name: android-dynamic-test-results
+          path: android-test-results/*
