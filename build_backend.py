@@ -20,7 +20,7 @@ def _run_build_scripts():
 
     # Install npm
     agent_dir = Path(__file__).parent / "frooky" / "agent"
-    subprocess.check_call(['npm', 'ci', '--ignore-scripts'], cwd=agent_dir)
+    subprocess.check_call(['npm', 'ci'], cwd=agent_dir)
 
     # Compile frooky agents
     subprocess.run(

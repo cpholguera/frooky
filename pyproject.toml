@@ -48,3 +48,9 @@ include = ["frooky*"]
 
 [tool.setuptools_scm]
 version_file = "frooky/_version.py"
+
+[tool.setuptools.package-data]
+frooky = [
+    "agent/dist/*.js",
+    "version.json"
+]
