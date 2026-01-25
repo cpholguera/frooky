@@ -8,9 +8,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from .resources import read_text
-
-
 @dataclass
 class RunnerOptions:
     """Options for the FrookyRunner."""
