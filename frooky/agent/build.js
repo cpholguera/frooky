@@ -276,7 +276,6 @@ function runWatch() {
         });
 
         fridaProcess.on('error', (err) => {
-            // Clean up watchers and process on error
             fridaProcess.kill();
             watcherHooks.close();
             watcherSource.close();
