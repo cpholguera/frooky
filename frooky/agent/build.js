@@ -95,7 +95,7 @@ function safeCompiledFridaVersion() {
 
     fs.writeFileSync(versionPath, JSON.stringify(versionInfo, null, 2));
 
-    if (verbose) { console.log(`Frida version written to ${versionPath}`)};
+    if (verbose) { console.log(`Frida version written to ${versionPath}`); };
     return versionInfo;
   } catch (error) {
     console.error('Error writing Frida versions:', error.message);
