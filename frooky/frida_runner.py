@@ -40,8 +40,8 @@ class FrookyRunner:
         self.total_errors: int = 0
 
     def _prepare_targets(self) -> dict:
-        """Combine user hooks with platform scripts."""
-        # Read all hook files as JSON and merge hooks arrays
+        """Load hook JSON files and merge their category and hooks into a single target."""
+        # Read all hook files as JSON and merge their hooks arrays
         merged_hooks = []
         category = None
         
