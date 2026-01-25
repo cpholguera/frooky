@@ -4,6 +4,7 @@ import path from 'path';
 import chokidar from 'chokidar';
 import minimist from 'minimist';
 import { fileURLToPath } from 'url';
+import { join } from 'path'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -44,6 +45,8 @@ const distDir = path.join(__dirname, 'dist');
 const buildDir = path.join(distDir, 'build');
 const combinedHookPath = path.join(buildDir, '_hooks.ts');
 const agentPath = path.join(distDir, `agent-${platfromOption}-${targetOption}.js`)
+const versionPath = path.join(distDir, `version.json`)
+
 
 
 if (helpOption) {
@@ -53,6 +56,7 @@ validateInput();
 
 try {
     setupBuildDir();
+    safeCompiledFridaVersion();
 
     if (watchOption) {
         await runWatch()
@@ -67,6 +71,37 @@ try {
     } 
 }
 
+
+function safeCompiledFridaVersion() {
+  try {
+    const fridaPackagePath = join(__dirname, 'node_modules', 'frida', 'package.json');
+    const fridaJavaBridgePath = join(__dirname, 'node_modules', 'frida-java-bridge', 'package.json');
+    const fridaSwiftBridgePath = join(__dirname, 'node_modules', 'frida-swift-bridge', 'package.json');
+    const fridaObjcBridgePath = join(__dirname, 'node_modules', 'frida-objc-bridge', 'package.json');
+
+    const fridaPackage = JSON.parse(fs.readFileSync(fridaPackagePath, 'utf8'));
+    const fridaJavaBridge = JSON.parse(fs.readFileSync(fridaJavaBridgePath, 'utf8'));
+    const fridaSwiftBridge = JSON.parse(fs.readFileSync(fridaSwiftBridgePath, 'utf8'));
+    const fridaObjcBridge = JSON.parse(fs.readFileSync(fridaObjcBridgePath, 'utf8'));
+
+
+    const versionInfo = {
+      frida: fridaPackage.version,
+      'frida-java-bridge': fridaJavaBridge.version,
+      'frida-swift-bridge': fridaSwiftBridge.version,
+      'frida-objc-bridge': fridaObjcBridge.version,
+      timestamp: new Date().toISOString()
+    };
+
+    fs.writeFileSync(versionPath, JSON.stringify(versionInfo, null, 2));
+
+    if (verbose) { console.log(`Frida version written to ${versionPath}`)};
+    return versionInfo;
+  } catch (error) {
+    console.error('Error writing Frida versions:', error.message);
+    return null;
+  }
+}
 
 function cleanupBuildDir() {
     fs.rmSync(buildDir, { recursive: true, force: true });
