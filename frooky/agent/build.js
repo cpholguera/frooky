@@ -152,7 +152,7 @@ function showHelp() {
     -t, --target <name>       Target environment (frooky, frida) [default: frooky]
     -p, --platform <name>     Platform (android, ios)
     --type-check <name>       Sets TypeScript type checking (full, none) [default: full]
-    -w, --watch               Re-Compiles agent.js every time code or hooks chagne [default: false]
+    -w, --watch               Re-Compiles agent.js every time code or hooks change [default: false]
     -c, --compress            Compress agent.js [default: false]
     -v, --verbose             Verbose output [default: false]
     --keep-build-dir          Keeps the build directory after compiling the agent [default: false]
