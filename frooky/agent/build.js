@@ -138,7 +138,7 @@ function generateHooksFile() {
 
     try {
         fs.writeFileSync(combinedHookPath, tsContent);
-        if (verbose) { console.log(`Hook compiling sucessful. Location: ${combinedHookPath}`) }
+        if (verbose) { console.log(`Hook compiling successful. Location: ${combinedHookPath}`) }
     } catch (error) {
         console.error('Error writing hooks.ts:', error.message);
         process.exit(1);
