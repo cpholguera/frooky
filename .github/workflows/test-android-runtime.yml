@@ -142,9 +142,26 @@ jobs:
             cp "$LATEST_TEST" android-test-results/maestro.log
           fi
 
+      - name: Evaluate Test Results
+        if: always()
+        run: |
+          cd docs/examples/android-app
+          chmod +x ../evaluate.sh
+          ../evaluate.sh | tee $GITHUB_WORKSPACE/evaluation.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+          exit $EXIT_CODE
+
       - name: Create Job Summary
         if: always()
         run: |
+          # Add evaluation results at the top
+          if [ -f evaluation.txt ]; then
+            cat evaluation.txt >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "---" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
           echo "# Android Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
