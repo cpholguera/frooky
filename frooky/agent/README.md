@@ -17,8 +17,8 @@ $ npm install
 ### Build standalone frooky agents
 
 ```sh
-$ npm run prod-frooky-android"
-$ npm run dev-frooky-ios"
+$ npm run prod-frooky-android
+$ npm run dev-frooky-ios
 ```
 
 This will create two files: 
