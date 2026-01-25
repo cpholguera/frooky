@@ -44,7 +44,7 @@ const sourceDir = path.join(__dirname, platfromOption);
 const distDir = path.join(__dirname, 'dist');
 const buildDir = path.join(distDir, 'build');
 const combinedHookPath = path.join(buildDir, '_hooks.ts');
-const agentPath = path.join(distDir, `agent-${platfromOption}-${targetOption}.js`)
+const agentPath = path.join(distDir, `agent-${platfromOption}.js`)
 const versionPath = path.join(distDir, `version.json`)
 
 

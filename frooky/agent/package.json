@@ -9,8 +9,8 @@
     "prod-frooky-ios": "node build.js -p ios -c --type-check none",
     "dev-frooky-android": "node build.js -p android --type-check none",
     "dev-frooky-ios": "node build.js -p ios --type-check none",
-    "watch-frida-android": "node build.js -p android -c ---type-check none",
-    "watch-frida-ios": "node build.js -p ios --type-check none"
+    "watch-frida-android": "node build.js -p android -t frida -w --type-check none",
+    "watch-frida-ios": "node build.js -p ios -w -t frida --type-check none"
   },
   "devDependencies": {
     "@types/frida-gum": "^19.0.1",

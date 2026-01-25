@@ -278,7 +278,7 @@ class FrookyRunner:
 
 
             # Check if the agent is compiled and available
-            script_path = Path(".") / "frooky" / "agent" / "dist" / f"agent-{self.options.platform}-frooky.js"
+            script_path = Path(".") / "frooky" / "agent" / "dist" / f"agent-{self.options.platform}.js"
             if script_path.is_file():
                 script_source = script_path.read_text(encoding="utf-8")
             else:
