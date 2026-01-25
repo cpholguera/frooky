@@ -1,2 +1,11 @@
-/node_modules
-/tmp/*
+# # frooky compiled hooks
+android/_hooks.ts
+ios/_hooks.ts
+
+# node
+node_modules/
+package-lock.json
+
+# Packaging/build outputs
+build/
+dist/
