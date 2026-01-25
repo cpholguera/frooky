@@ -194,8 +194,8 @@ class FrookyRunner:
         
         # Info lines to display on the right
         info = [
-            f"v{frooky_version} - Powered by Frida {frida_version}",
             f"Running with Frida {frida_version}",
+            f"Agent compiled with Frida {agent_frida_version}",
             f"Target: {self._get_target_description()}",
             "",
             f"Device: {self.device.name}" + (f" ({self.device.id})" if self.device.id else ""),
