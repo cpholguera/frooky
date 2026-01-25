@@ -5,5 +5,3 @@ rpc.exports = {
     runFrookyAgent(target)
   }
 };
-
-console.log('test')

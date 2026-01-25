@@ -2,23 +2,13 @@ from __future__ import annotations
 
 import frida
 import time
-import subprocess
 import sys
 import json
-import shutil
 from dataclasses import dataclass
-from importlib import resources
 from pathlib import Path
 from typing import Optional
 
 from .resources import read_text
-
-
-BRIDGES = [
-    "frida-java-bridge",
-    "frida-objc-bridge",
-    "frida-swift-bridge",
-]
 
 
 @dataclass
@@ -51,34 +41,32 @@ class FrookyRunner:
         self.total_hooks: Optional[int] = None
         self.total_errors: int = 0
 
-    def _ensure_bridges(self) -> None:
-        """Ensure Frida bridges are installed."""
-        for bridge in BRIDGES:
-            try:
-                subprocess.check_call(
-                    ["frida-pm", "install", bridge],
-                    stdout=sys.stdout,
-                    stderr=sys.stderr,
-                )
-            except subprocess.CalledProcessError:
-                pass
-
-    def _compile_agent(self):
-        """Combine user hooks.json and compile the agent using the node build script"""
-
-        platform = self.options.platform
-        frooky_agent_folder =  Path("frooky", "agent")
-        frooky_agent_build_script = Path(frooky_agent_folder, "build.js")
-
-        subprocess.run(
-            ["node", frooky_agent_build_script, "-p", platform, "-T", "none"] + self.options.hook_paths,    # TODO: Remove "-T", "none" after TS migration
-            check=True
-        )
-
-        return Path(frooky_agent_folder, "tmp", "_agent.js")
+    def _prepare_targets(self) -> dict:
+        """Combine user hooks with platform scripts."""
+        # Read all hook files as JSON and merge hooks arrays
+        merged_hooks = []
+        category = None
+        
+        for hook_path in self.options.hook_paths:
+            with open(hook_path, "r", encoding="utf-8") as f:
+                hook_data = json.load(f)
+            
+            # Take category from first file that has one
+            if category is None and "category" in hook_data:
+                category = hook_data["category"]
+            
+            # Merge hooks
+            if "hooks" in hook_data:
+                merged_hooks.extend(hook_data["hooks"])
+        
+        # Build the target object
+        return  {
+            "category": category or "FROOKY",
+            "hooks": merged_hooks
+        }
 
 
-    def _create_message_handler(self):
+    def _create_message_handler(self) -> None:
         """Create a message handler closure with access to output path."""
         output_path = self.options.output_path
 
@@ -272,33 +260,9 @@ class FrookyRunner:
         else:
             raise RuntimeError("No target specified")
 
-    def _cleanup_artifacts(self) -> None:
-        """Remove temporary artifacts created during execution."""
-        artifacts = [
-            Path("frooky", "agent", "tmp"),
-            Path("node_modules"),
-            Path("package.json"),
-            Path("package-lock.json"),
-        ]
-        
-        for artifact in artifacts:
-            try:
-                if artifact.is_dir():
-                    shutil.rmtree(artifact)
-                elif artifact.is_file():
-                    artifact.unlink()
-            except Exception:
-                # Silently ignore cleanup errors
-                pass
-
     def run(self) -> int:
         """Run the Frooky hooks."""
         try:
-            self._ensure_bridges()
-
-            # Combine user hooks with platform base script
-            built_agent = self._compile_agent()
-
             # Clear/overwrite the output file at start
             with open(self.options.output_path, "w", encoding="utf-8") as f:
                 pass  # Truncate file
@@ -312,13 +276,21 @@ class FrookyRunner:
             # Print header with all session info
             self._print_header()
 
-            # Load script
-            with open(built_agent, "r", encoding="utf-8") as f:
-                script_source = f.read()
+            script_path = Path(".") / "frooky" / "agent" / "dist" / f"agent-{self.options.platform}-frooky.js"
+
+            # Check if file exists and is a file
+            if script_path.is_file():
+                script_source = script_path.read_text(encoding="utf-8")
+            else:
+                raise FileNotFoundError(f"Frooky agent not found under the path '{script_path}'.\nMake sure to compile the agent first using: \n\n$ cd frooky/agent\n$ npm run prod-frooky-{self.options.platform}")
 
             self.script = self.session.create_script(script_source)
             self.script.on("message", self._create_message_handler())
             self.script.load()
+
+            # Combine the user provided hooks.json and send the to the agent
+            targets = self._prepare_targets()
+            self.script.exports_sync.run_frooky_agent(targets)
 
             # Resume if spawned
             if self.options.spawn:
@@ -348,9 +320,5 @@ class FrookyRunner:
                     self.session.detach()
                 except Exception:
                     pass
-            
-            # Clean up artifacts unless --keep-artifacts was specified
-            if not self.options.keep_artifacts:
-                self._cleanup_artifacts()
 
         return 0
