@@ -177,8 +177,13 @@ class FrookyRunner:
 
     def _print_header(self) -> None:
         """Print the Frooky header with session information."""
-        # Get Frida version
+        # Get local Frida version
         frida_version = frida.__version__
+
+        # Get agent Frida version
+        agent_frida_version_path = Path(".") / "frooky" / "agent" / "dist" / "version.json"
+        agent_frida_version_json = json.loads(agent_frida_version_path.read_text(encoding="utf-8"))
+        agent_frida_version = str(agent_frida_version_json['frida'])
         
         # Logo lines
         logo = [
@@ -192,7 +197,8 @@ class FrookyRunner:
         
         # Info lines to display on the right
         info = [
-            f"Powered by Frida {frida_version}",
+            f"Running with Frida {frida_version}",
+            f"Agent compiled with Frida {agent_frida_version}",
             f"Target: {self._get_target_description()}",
             "",
             f"Device: {self.device.name}" + (f" ({self.device.id})" if self.device.id else ""),
@@ -273,16 +279,16 @@ class FrookyRunner:
             # Attach or spawn
             self.session = self._attach_or_spawn()
 
-            # Print header with all session info
-            self._print_header()
 
+            # Check if the agent is compiled and available
             script_path = Path(".") / "frooky" / "agent" / "dist" / f"agent-{self.options.platform}-frooky.js"
-
-            # Check if file exists and is a file
             if script_path.is_file():
                 script_source = script_path.read_text(encoding="utf-8")
             else:
                 raise FileNotFoundError(f"Frooky agent not found under the path '{script_path}'.\nMake sure to compile the agent first using: \n\n$ cd frooky/agent\n$ npm run prod-frooky-{self.options.platform}")
+
+            # Print header with all session info
+            self._print_header()
 
             self.script = self.session.create_script(script_source)
             self.script.on("message", self._create_message_handler())

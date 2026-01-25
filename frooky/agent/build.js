@@ -90,7 +90,7 @@ function safeCompiledFridaVersion() {
       'frida-java-bridge': fridaJavaBridge.version,
       'frida-swift-bridge': fridaSwiftBridge.version,
       'frida-objc-bridge': fridaObjcBridge.version,
-      timestamp: new Date().toISOString()
+      buildtime: new Date().toISOString()
     };
 
     fs.writeFileSync(versionPath, JSON.stringify(versionInfo, null, 2));
