@@ -17,30 +17,31 @@ $ npm install
 ### Build standalone frooky agents
 
 ```sh
-$ npm run build-ios ../../docs/examples/hooks*.json
-$ npm run build-android ../../docs/examples/hooks*.json
+$ npm run prod-frooky-android"
+$ npm run dev-frooky-ios"
 ```
 
 This will create two files: 
 
-1. `./tmp/_hooks.ts`: Merged hooks from the JSON files
-1. `./tmp/_agent.js`: frooky agent which can be run with frida
+1. `./dist/agent-android.js`: Compressed production build of the frooky agent for android.
+1. `./dist/agent-ios.js`: Uncompressed build of the frooky agent for iOS. Better for development.
+
+These agents use the `rpc` API from Frida in order to fetch the `hooks.json` at runtime.
 
 ## Development workflow 
 
-To continuously recompile on change, keep this running in a terminal:
+I you want to work on the frooky agent code itself, it is recommended using Frida in combination with the following commands:
 
 ```sh
-$ npm run watch-ios ../../docs/examples/hooks*.json
-$ npm run watch-android ../../docs/examples/hooks*.json
+$ npm run watch-frida-android ../../docs/examples/hooks*.json
+$ npm run watch-frida-ios ../../docs/examples/hooks*.json
 ```
 
 Now you can use frida to run the compiled agent:
 
 ```sh
-$ frida -U -f org.owasp.mastestapp -l ./tmp/_agent.js
+$ frida -U -f org.owasp.mastestapp -l ./dist/agent-android.js
+$ frida -U -f org.owasp.mastestapp -l ./dist/agent-ios.js
 ```
 
 The agent will update when you change the code, but also the JSON hook files.
-
-And use an editor like Visual Studio Code for code completion and instant type-checking feedback.
