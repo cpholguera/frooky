@@ -3,21 +3,21 @@
   "version": "0.0.1",
   "description": "Frooky frida agent.",
   "private": true,
+  "type": "module",
   "scripts": {
-    "build-android": "node build.js -p android",
-    "build-ios": "node build.js -p ios",
-    "watch-android": "node build.js -p android -w",
-    "watch-ios": "node build.js -p ios -w"
+    "build-frooky-android": "node scripts/build-prod.js -p android -c",
+    "build-frooky-ios": "node scripts/build-prod.js -p ios -c",
+    "watch-frida-android": "node scripts/watch-dev.js -p android -c --no-typecheck",
+    "watch-frida-ios": "node scripts/watch-dev.js -p ios --no-typecheck"
   },
   "devDependencies": {
     "@types/frida-gum": "^19.0.1",
-    "@types/node": "^25.0.10"
-  },
-  "dependencies": {
+    "@types/node": "^25.0.10",
     "chokidar": "^5.0.0",
     "frida-compile": "^19.0.4",
-    "frida-java-bridge": "^7.0.8",
-    "minimist": "^1.2.8",
-    "glob": "^13.0.0"
+    "frida-java-bridge": "^7.0.11",
+    "frida-objc-bridge": "^8.0.5",
+    "frida-swift-bridge": "^3.0.2",
+    "minimist": "^1.2.8"
   }
 }

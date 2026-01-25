@@ -2,7 +2,7 @@ import Java from "frida-java-bridge"
 import Thread from "frida-java-bridge";
 
 import { decodeArgByDescriptor, filtersPass } from "./native_decoder.js"
-import { decodeArguments } from "./android_decoder.js"
+import { decodeArguments } from "./android-decoder.js"
 
 /**
  * Lists the first method matching the given class and method name.

@@ -1,7 +1,3 @@
-# # frooky compiled hooks
-android/_hooks.ts
-ios/_hooks.ts
-
 # node
 node_modules/
 package-lock.json
