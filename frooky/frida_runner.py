@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
+from ._version import __version__ as frooky_version
+
 @dataclass
 class RunnerOptions:
     """Options for the FrookyRunner."""
@@ -174,8 +176,6 @@ class FrookyRunner:
 
     def _print_header(self) -> None:
         """Print the Frooky header with session information."""
-        # Get local Frida version
-        frida_version = frida.__version__
 
         # Get agent Frida version
         agent_frida_version_path = Path(".") / "frooky" / "agent" / "dist" / "version.json"
@@ -194,7 +194,7 @@ class FrookyRunner:
         
         # Info lines to display on the right
         info = [
-            f"Running with Frida {frida_version}",
+            f"v{frooky_version} - Powered by Frida {frida.__version__}",
             f"Agent compiled with Frida {agent_frida_version}",
             f"Target: {self._get_target_description()}",
             "",
