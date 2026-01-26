@@ -178,7 +178,10 @@ class FrookyRunner:
 
         # Get agent Frida version
         agent_frida_version_path = Path(__file__).resolve().parent / "agent" / "dist" / "version.json"
-        agent_frida_version_json = json.loads(agent_frida_version_path.read_text(encoding="utf-8"))
+        try:
+            agent_frida_version_json = json.loads(agent_frida_version_path.read_text(encoding="utf-8"))
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Frooky agent not found. Make sure to compile the agent first using './compileAgent.sh'")
         agent_frida_version = str(agent_frida_version_json['frida'])
         
         # Logo lines
@@ -278,9 +281,9 @@ class FrookyRunner:
 
             # Check if the agent is compiled and available
             script_path = Path(".") / "frooky" / "agent" / "dist" / f"agent-{self.options.platform}.js"
-            if script_path.is_file():
+            try:
                 script_source = script_path.read_text(encoding="utf-8")
-            else:
+            except FileNotFoundError:
                 raise FileNotFoundError(f"Frooky agent not found. Make sure to compile the agent first using './compileAgent.sh'")
 
             # Print header with all session info
