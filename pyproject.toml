@@ -52,5 +52,5 @@ version_file = "frooky/_version.py"
 [tool.setuptools.package-data]
 frooky = [
     "agent/dist/*.js",
-    "version.json"
+    "agent/dist/version.json"
 ]
