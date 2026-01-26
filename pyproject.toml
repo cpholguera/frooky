@@ -45,11 +45,11 @@ frooky = "frooky.cli:main"
 where = ["."]
 include = ["frooky*"]
 
-[tool.setuptools_scm]
-version_file = "frooky/_version.py"
-
 [tool.setuptools.package-data]
 frooky = [
     "agent/dist/*.js",
     "agent/dist/version.json"
 ]
+
+[tool.setuptools_scm]
+version_file = "frooky/_version.py"
