@@ -281,7 +281,7 @@ class FrookyRunner:
             if script_path.is_file():
                 script_source = script_path.read_text(encoding="utf-8")
             else:
-                raise FileNotFoundError(f"Frooky agent not found under the path '{script_path}'.\nMake sure to compile the agent first using: \n\n$ cd frooky/agent\n$ npm run prod-frooky-{self.options.platform}")
+                raise FileNotFoundError(f"Frooky agent not found. Make sure to compile the agent first using './compileAgent.sh'")
 
             # Print header with all session info
             self._print_header()
