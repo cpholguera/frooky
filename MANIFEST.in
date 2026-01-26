@@ -1,7 +1,5 @@
-include build_backend.py
-
 # Exclude build artifacts and dev dependencies
-prune frooky/agent/node_modules
+prune frooky/agent
 
 # Include compiled frooky agent outputs
 include frooky/agent/dist/*.js

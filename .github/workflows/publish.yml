@@ -12,6 +12,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch all history and tags for setuptools-scm
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: 'npm'
+          cache-dependency-path: './frooky/agent/package-lock.json'
+      - run: chmod +x compileAgent.sh
+      - run: ./compileAgent.sh --prod
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"

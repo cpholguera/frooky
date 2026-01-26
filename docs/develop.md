@@ -17,16 +17,24 @@ This document describes how to set up a local development environment for the re
     source venv/bin/activate
     ```
 
-2. Install the CLI:
+
+2. Compiling the frooky agent:
+
+    ```bash
+    ./compileAgent.sh --dev
+    ```
+
+3. Install the CLI for development:
 
     ```bash
     pip install -e .
     ```
 
-3. Ensure which CLI version you're running:
+4. Ensure which CLI version you're running:
 
     ```bash
     which frooky
     ```
    
    The output must be a path within the VENV directory, typically ending with `venv/bin/frooky`. If not, a different version might be used instead, such as a global installation.
+   
