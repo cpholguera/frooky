@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@types/frida-gum": "^19.0.1",
-    "@types/node": "^25.0.10",
+    "@types/node": "^24.10.9",
     "chokidar": "^5.0.0",
     "frida-compile": "^19.0.4",
     "frida-java-bridge": "^7.0.11",
