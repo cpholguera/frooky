@@ -38,12 +38,9 @@ jobs:
 
       - name: Verify agent artifacts in wheel
         run: |
-          python -c "from pathlib import Path; import frooky; \
-            agent_dir = Path(frooky.__file__).parent / 'agent' / 'dist'; \
-            assert agent_dir.exists(), 'agent/dist missing'; \
-            assert (agent_dir / 'agent-android.js').exists(), 'android agent missing'; \
-            assert (agent_dir / 'agent-ios.js').exists(), 'ios agent missing'; \
-            print('✓ All agent artifacts present')"
+          unzip -l dist/*.whl | grep "frooky/agent/dist/agent-android.js"
+          unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
+          echo "All agent artifacts present in wheel"
 
       - name: Upload verified build artifacts
         uses: actions/upload-artifact@v4
