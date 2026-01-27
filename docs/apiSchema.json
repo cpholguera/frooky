@@ -120,7 +120,7 @@
     "javaHook": {
       "allOf": [
         {
-          "$ref": "#/definitions/javaHookCore"
+          "$ref": "#/definitions/javaMethods"
         },
         {
           "type": "object",
@@ -131,7 +131,7 @@
               "description": "Stack trace depth"
             },
             "prerequisites": {
-              "$ref": "#/definitions/javaHookCore"
+              "$ref": "#/definitions/javaMethods"
             }
           }
         }
