@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import sys
 import argparse
 from pathlib import Path
+from importlib.resources import files
+
 
 from . import __version__
 from .frida_runner import FrookyRunner, RunnerOptions
@@ -47,6 +50,20 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
+
+    # Validate that the android and agents are compiled and accessible
+    agent_dist_path = files('frooky') / "agent" / "dist"
+    required_files = [
+        agent_dist_path / "version.json",
+        agent_dist_path / "agent-android.js",
+        agent_dist_path / "agent-ios.js"
+    ]
+
+    if not all(file.exists() for file in required_files):
+        print(f"Frida agent files not found in: {agent_dist_path}\n"
+            f"If you don't use the distributed version, make sure to manually compile the agents first.",
+            file=sys.stderr)
+        sys.exit(1)
 
     # Validate device selection
     device_count = sum([args.usb, args.device is not None])

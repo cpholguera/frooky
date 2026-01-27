@@ -7,6 +7,8 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
+from importlib.resources import files
+
 
 from ._version import __version__ as frooky_version
 
@@ -177,11 +179,8 @@ class FrookyRunner:
         """Print the Frooky header with session information."""
 
         # Get agent Frida version
-        agent_frida_version_path = Path(__file__).resolve().parent / "agent" / "dist" / "version.json"
-        try:
-            agent_frida_version_json = json.loads(agent_frida_version_path.read_text(encoding="utf-8"))
-        except FileNotFoundError:
-            raise FileNotFoundError(f"Frooky agent not found. Make sure to compile the agent first using './compileAgent.sh'")
+        agent_frida_version_path = files('frooky') / "agent" / "dist" / "version.json"
+        agent_frida_version_json = json.loads(agent_frida_version_path.read_text(encoding="utf-8"))
         agent_frida_version = str(agent_frida_version_json['frida'])
         
         # Logo lines
@@ -280,12 +279,8 @@ class FrookyRunner:
 
 
             # Check if the agent is compiled and available
-            script_path = Path(".") / "frooky" / "agent" / "dist" / f"agent-{self.options.platform}.js"
-            try:
-                script_source = script_path.read_text(encoding="utf-8")
-            except FileNotFoundError:
-                raise FileNotFoundError(f"Frooky agent not found. Make sure to compile the agent first using './compileAgent.sh'")
-
+            script_path = files('frooky') / "agent" / "dist" / f"agent-{self.options.platform}.js"
+            script_source = script_path.read_text(encoding="utf-8")
             # Print header with all session info
             self._print_header()
 
