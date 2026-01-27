@@ -1,51 +1,22 @@
-name: publish
+name: Publish Python Package
 
 on:
   push:
     tags:
       - "v*"
-  workflow_call:
-    outputs:
-      artifact-name:
-        description: "Name of the uploaded artifact"
-        value: ${{ jobs.build.outputs.artifact-name }}
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    outputs:
-      artifact-name: ${{ steps.upload.outputs.artifact-name }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Fetch all history and tags for setuptools-scm
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: 'npm'
-          cache-dependency-path: './frooky/agent/package-lock.json'
-      - run: chmod +x compileAgent.sh
-      - run: ./compileAgent.sh --prod
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-      - run: python -m pip install --upgrade build
-      - run: python -m build
-      - uses: actions/upload-artifact@v4
-        id: upload
-        with:
-          name: dist
-          path: dist/*
+    uses: ./.github/workflows/build.yml
 
   publish:
-    needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: build
     permissions:
       id-token: write
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: dist
+          name: ${{ needs.build.outputs.artifact-name }}
           path: dist
       - uses: pypa/gh-action-pypi-publish@release/v1

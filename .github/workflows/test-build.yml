@@ -1,4 +1,4 @@
-name: Build Test
+name: Test Python Package
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    uses: ./.github/workflows/publish.yml
+    uses: ./.github/workflows/build.yml
 
   verify:
     needs: build
@@ -45,9 +45,9 @@ jobs:
             assert (agent_dir / 'agent-ios.js').exists(), 'ios agent missing'; \
             print('✓ All agent artifacts present')"
 
-      - name: Upload build artifacts
+      - name: Upload verified build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: dist-verified
           path: dist/*
           retention-days: 7
