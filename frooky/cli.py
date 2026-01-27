@@ -51,7 +51,7 @@ def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
 
-    # Validate that the android and agents are compiled and accessible
+    # Validate that the android and ios agents are compiled and accessible
     agent_dist_path = files('frooky') / "agent" / "dist"
     required_files = [
         agent_dist_path / "version.json",
@@ -60,8 +60,8 @@ def main() -> int:
     ]
 
     if not all(file.exists() for file in required_files):
-        print(f"Frida agent files not found in: {agent_dist_path}\n"
-            f"If you don't use the distributed version, make sure to manually compile the agents first.",
+        print(f"Frooky agent not found in: {agent_dist_path}\n"
+            f"If you don't use the distributed version, make sure to manually compile the agents first.\n",
             file=sys.stderr)
         sys.exit(1)
 
