@@ -410,7 +410,11 @@ function buildHookOperations(hook) {
     }
 
 
-    const foundMethod = enumerateFirstMethod(hook.class, method)
+    const foundMethod = enumerateFirstMethod(inputClass, method)
+    if (foundMethod === undefined) {
+      // Method not found even after loading prerequisites
+      throw new Error("Method '" + method + "' not found in class '" + inputClass + "'");
+    }
     const foundClass = foundMethod.classes[0].name
 
     if (hook.changeClassLoader) {
