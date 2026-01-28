@@ -47,8 +47,8 @@ include = ["frooky*"]
 
 [tool.setuptools.package-data]
 frooky = [
-  "android/*.js",
-  "ios/*.js",
+    "agent/dist/*.js",
+    "agent/dist/version.json"
 ]
 
 [tool.setuptools_scm]

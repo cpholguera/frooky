@@ -1,0 +1,6 @@
+# Exclude build artifacts and dev dependencies
+prune frooky/agent
+
+# Include compiled frooky agent outputs
+include frooky/agent/dist/*.js
+include frooky/agent/dist/version.json

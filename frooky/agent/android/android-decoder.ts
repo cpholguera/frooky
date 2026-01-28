@@ -334,7 +334,7 @@ function getSystemCls() {
   return _SystemCls;
 }
 
-function decodeArguments(types, args) {
+export const decodeArguments = function (types, args) {
   let parameters = [];
   let toStringMethod = getToStringMethod();
   let SystemCls = getSystemCls();

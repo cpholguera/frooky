@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import sys
 import argparse
 from pathlib import Path
+from importlib.resources import files
+
 
 from . import __version__
 from .frida_runner import FrookyRunner, RunnerOptions
@@ -40,11 +43,6 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("hooks", nargs="+", help="Path(s) to your input hook JSON file(s)")
     parser.add_argument("-o", "--output", default="output.json", help="Output JSON file")
-    parser.add_argument(
-        "--keep-artifacts",
-        action="store_true",
-        help="Keep temporary artifacts (tmp/, node_modules/, package.json, package-lock.json)",
-    )
 
     return parser
 
@@ -52,6 +50,20 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
+
+    # Validate that the android and ios agents are compiled and accessible
+    agent_dist_path = files('frooky') / "agent" / "dist"
+    required_files = [
+        agent_dist_path / "version.json",
+        agent_dist_path / "agent-android.js",
+        agent_dist_path / "agent-ios.js"
+    ]
+
+    if not all(file.exists() for file in required_files):
+        print(f"Frooky agent not found in: {agent_dist_path}\n"
+            f"If you don't use the distributed version, make sure to manually compile the agents first.\n",
+            file=sys.stderr)
+        sys.exit(1)
 
     # Validate device selection
     device_count = sum([args.usb, args.device is not None])
@@ -63,7 +75,7 @@ def main() -> int:
         hook_path = Path(hook)
         if not hook_path.exists():
             parser.error(f"Hooks file not found: {hook_path}")
-        hook_paths.append(hook_path)
+        hook_paths.append(hook_path.resolve())
 
     options = RunnerOptions(
         platform=args.platform,
@@ -76,7 +88,6 @@ def main() -> int:
         attach_identifier=args.attach_identifier,
         attach_pid=args.attach_pid,
         spawn=args.spawn,
-        keep_artifacts=args.keep_artifacts,
     )
 
     runner = FrookyRunner(options)

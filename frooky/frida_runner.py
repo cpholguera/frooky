@@ -2,26 +2,15 @@ from __future__ import annotations
 
 import frida
 import time
-import subprocess
-import os
 import sys
 import json
-import shutil
 from dataclasses import dataclass
-from importlib import resources
 from pathlib import Path
 from typing import Optional
+from importlib.resources import files
+
 
 from ._version import __version__ as frooky_version
-from .resources import read_text
-
-
-BRIDGES = [
-    "frida-java-bridge",
-    "frida-objc-bridge",
-    "frida-swift-bridge",
-]
-
 
 @dataclass
 class RunnerOptions:
@@ -36,7 +25,6 @@ class RunnerOptions:
     attach_identifier: Optional[str] = None
     attach_pid: Optional[int] = None
     spawn: Optional[str] = None
-    keep_artifacts: bool = False
 
 
 class FrookyRunner:
@@ -53,45 +41,9 @@ class FrookyRunner:
         self.total_hooks: Optional[int] = None
         self.total_errors: int = 0
 
-    def _ensure_bridges(self) -> None:
-        """Ensure Frida bridges are installed."""
-        for bridge in BRIDGES:
-            try:
-                subprocess.check_call(
-                    ["frida-pm", "install", bridge],
-                    stdout=sys.stdout,
-                    stderr=sys.stderr,
-                )
-            except subprocess.CalledProcessError:
-                pass
-
-    def _build_agent(self, src_agent: Path, built_agent: Path) -> None:
-        """Build the agent script if needed."""
-        if not built_agent.exists() or (
-            built_agent.stat().st_mtime < src_agent.stat().st_mtime
-        ):
-            subprocess.check_call(
-                ["npx", "frida-compile", str(src_agent), "-o", str(built_agent)],
-                stdout=sys.stdout,
-                stderr=sys.stderr,
-            )
-
-    def _get_platform_scripts(self) -> list[str]:
-        """Get all .js files from the platform folder, with base_script.js last."""
-        platform = self.options.platform
-        platform_dir = resources.files("frooky").joinpath(platform)
-        
-        script_files = [
-            item.name for item in platform_dir.iterdir()
-            if item.name.endswith(".js") and item.name != "base_script.js"
-        ]
-        script_files.append("base_script.js")
-        
-        return script_files
-
-    def _prepare_script(self, tmp_dir: Path) -> Path:
-        """Combine user hooks with platform scripts."""
-        # Read all hook files as JSON and merge hooks arrays
+    def _prepare_targets(self) -> dict:
+        """Load hook JSON files and merge their category and hooks into a single target."""
+        # Read all hook files as JSON and merge their hooks arrays
         merged_hooks = []
         category = None
         
@@ -108,38 +60,13 @@ class FrookyRunner:
                 merged_hooks.extend(hook_data["hooks"])
         
         # Build the target object
-        target = {
+        return  {
             "category": category or "FROOKY",
             "hooks": merged_hooks
         }
-        
-        # Generate JavaScript declaration
-        user_hooks = f"var target = {json.dumps(target, indent=2)};"
 
-        # Get all platform scripts dynamically
-        platform = self.options.platform
-        script_files = self._get_platform_scripts()
-        
-        platform_scripts = []
-        for script_file in script_files:
-            script_path = f"{platform}/{script_file}"
-            try:
-                script_content = read_text(script_path)
-                platform_scripts.append(script_content)
-            except FileNotFoundError:
-                pass  # Skip if file doesn't exist
 
-        # Combine: user hooks define 'target', platform scripts use it
-        combined = f"{user_hooks}\n\n" + "\n\n".join(platform_scripts)
-
-        # Write merged agent to tmp/agent.js
-        combined_path = tmp_dir / "agent.js"
-        with open(combined_path, "w", encoding="utf-8") as f:
-            f.write(combined)
-
-        return combined_path
-
-    def _create_message_handler(self):
+    def _create_message_handler(self) -> None:
         """Create a message handler closure with access to output path."""
         output_path = self.options.output_path
 
@@ -250,8 +177,11 @@ class FrookyRunner:
 
     def _print_header(self) -> None:
         """Print the Frooky header with session information."""
-        # Get Frida version
-        frida_version = frida.__version__
+
+        # Get agent Frida version
+        agent_frida_version_path = files('frooky') / "agent" / "dist" / "version.json"
+        agent_frida_version_json = json.loads(agent_frida_version_path.read_text(encoding="utf-8"))
+        agent_frida_version = str(agent_frida_version_json['frida'])
         
         # Logo lines
         logo = [
@@ -265,7 +195,8 @@ class FrookyRunner:
         
         # Info lines to display on the right
         info = [
-            f"v{frooky_version} - Powered by Frida {frida_version}",
+            f"v{frooky_version} - Powered by Frida {frida.__version__}",
+            f"Agent compiled with Frida {agent_frida_version}",
             f"Target: {self._get_target_description()}",
             "",
             f"Device: {self.device.name}" + (f" ({self.device.id})" if self.device.id else ""),
@@ -333,40 +264,9 @@ class FrookyRunner:
         else:
             raise RuntimeError("No target specified")
 
-    def _cleanup_artifacts(self) -> None:
-        """Remove temporary artifacts created during execution."""
-        artifacts = [
-            Path("tmp"),
-            Path("node_modules"),
-            Path("package.json"),
-            Path("package-lock.json"),
-        ]
-        
-        for artifact in artifacts:
-            try:
-                if artifact.is_dir():
-                    shutil.rmtree(artifact)
-                elif artifact.is_file():
-                    artifact.unlink()
-            except Exception:
-                # Silently ignore cleanup errors
-                pass
-
     def run(self) -> int:
         """Run the Frooky hooks."""
         try:
-            self._ensure_bridges()
-
-            # Set up paths
-            tmp_dir = Path("tmp")
-            tmp_dir.mkdir(exist_ok=True)
-            built_agent = tmp_dir / "_agent.js"
-
-            # Combine user hooks with platform base script
-            src_agent = self._prepare_script(tmp_dir)
-
-            self._build_agent(src_agent, built_agent)
-
             # Clear/overwrite the output file at start
             with open(self.options.output_path, "w", encoding="utf-8") as f:
                 pass  # Truncate file
@@ -377,16 +277,20 @@ class FrookyRunner:
             # Attach or spawn
             self.session = self._attach_or_spawn()
 
+
+            # Check if the agent is compiled and available
+            script_path = files('frooky') / "agent" / "dist" / f"agent-{self.options.platform}.js"
+            script_source = script_path.read_text(encoding="utf-8")
             # Print header with all session info
             self._print_header()
-
-            # Load script
-            with open(built_agent, "r", encoding="utf-8") as f:
-                script_source = f.read()
 
             self.script = self.session.create_script(script_source)
             self.script.on("message", self._create_message_handler())
             self.script.load()
+
+            # Combine the user provided hooks.json and send the to the agent
+            targets = self._prepare_targets()
+            self.script.exports_sync.run_frooky_agent(targets)
 
             # Resume if spawned
             if self.options.spawn:
@@ -416,9 +320,5 @@ class FrookyRunner:
                     self.session.detach()
                 except Exception:
                     pass
-            
-            # Clean up artifacts unless --keep-artifacts was specified
-            if not self.options.keep_artifacts:
-                self._cleanup_artifacts()
 
         return 0

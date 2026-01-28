@@ -1,6 +1,9 @@
 import Java from "frida-java-bridge"
 import Thread from "frida-java-bridge";
 
+import { decodeArgByDescriptor, filtersPass } from "./native_decoder.js"
+import { decodeArguments } from "./android-decoder.js"
+
 /**
  * Lists the first method matching the given class and method name.
  * @param {string} clazz - Java class name
@@ -513,7 +516,7 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
 }
 
 // Main execution: separate native hooks from Java hooks
-(() => {
+export function runFrookyAgent(target) {
   // Separate hooks into native and Java categories
   const nativeHooks = [];
   const javaHooks = [];
@@ -632,4 +635,4 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
       });
     }, delay);
   });
-})();
+};

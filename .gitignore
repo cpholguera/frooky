@@ -1,13 +1,6 @@
 # Frooky local debug artifacts
-tmp/
 output.json
 *.jsonl
-
-# node
-node_modules/
-package.json
-package-lock.json
-
 
 # Python bytecode
 __pycache__/
