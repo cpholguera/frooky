@@ -1,5 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "frooky-config.schema.json",
   "title": "frooky Configuration",
   "description": "Schema for defining hooks for frooky.",
   "type": "array",
@@ -94,6 +95,7 @@
         }
       },
       "minItems": 1,
+      "required": ["name"],
       "description": "Array of methods to hook"
     },
     "javaHookCore": {
@@ -131,7 +133,8 @@
               "description": "Stack trace depth"
             },
             "prerequisites": {
-              "$ref": "#/definitions/javaMethods"
+              "$ref": "#/definitions/javaMethods",
+              "description": "These methods are called without arguments before hooking the target function."
             }
           }
         }

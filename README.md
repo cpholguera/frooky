@@ -44,6 +44,15 @@ frooky -U -f com.example.app --platform android storage.json crypto.json
 
 See `frooky -h` for more options.
 
+## JSON API Reference
+
+Please visit the [API Reference](docs/api/README.md) to read about the full specification.
+
+You can also use the [API JSON schema](/api/frooky-config.schema.json) as template in order to easily develop valid a valid `hooks.json`.
+
+We also recommend using auto complete extensions such as XXXXXX for further support.
+
+
 ## Example
 
 We'll use the OWASP MAS [MASTG-DEMO-0072](https://mas.owasp.org/MASTG/demos/android/MASVS-CRYPTO/MASTG-DEMO-0072/MASTG-DEMO-0072/) app to demonstrate hooking a cryptographic key generation method.
