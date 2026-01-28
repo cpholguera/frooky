@@ -415,6 +415,9 @@ function buildHookOperations(hook) {
       // Method not found even after loading prerequisites
       throw new Error("Method '" + method + "' not found in class '" + inputClass + "'");
     }
+    if (!foundMethod.classes || foundMethod.classes.length === 0) {
+      throw new Error("No classes found for method '" + method + "' in class '" + inputClass + "'");
+    }
     const foundClass = foundMethod.classes[0].name
 
     if (hook.changeClassLoader) {
