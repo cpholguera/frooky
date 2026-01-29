@@ -98,6 +98,8 @@ npm run watch-android   # Auto-recompile on Android agent changes
 npm run watch-ios       # Auto-recompile on iOS agent changes
 ```
 
+Note: Use either `watch-android` or `watch-ios` depending on which platform you're working on.
+
 ## Testing & CI/CD
 
 ### Test Infrastructure
@@ -134,7 +136,7 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 
 ### 2. **Version Management**
    - Version is determined by `setuptools-scm` from git tags and commits
-   - Requires full git history: `git clone` with `--depth 0` or fetch with `fetch-depth: 0`
+   - Requires full git history: `git clone` without depth restrictions or fetch with `fetch-depth: 0` in CI
    - Generated version file: `frooky/_version.py` (git-ignored, auto-created during build)
    - **Do not manually edit version numbers**
 
@@ -201,7 +203,8 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 2. **Set up dev environment**: Virtual env + compile agents
 3. **Make changes**: Edit relevant files
 4. **Rebuild as needed**:
-   - Agent changes: `cd frooky/agent && npm run dev-{platform}`
+   - Android agent changes: `cd frooky/agent && npm run dev-android`
+   - iOS agent changes: `cd frooky/agent && npm run dev-ios`
    - Python changes: No rebuild needed with `pip install -e .`
 5. **Test manually**: Run `frooky` commands against test apps/hooks
 6. **Verify CI would pass**: Run full build + install verification locally
