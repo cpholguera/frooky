@@ -12,6 +12,7 @@ one or multiple `hook.json` file with the instrumentation instructions.
 ```sh
 cd agent/
 npm install
+```
 
 This will create two files: 
 
@@ -27,5 +28,6 @@ If you want to work on the frooky agent code itself, it is recommended to use Fr
 ```sh
 npm run watch-frida-android ../../docs/examples/hooks*.json
 npm run watch-frida-ios ../../docs/examples/hooks*.json
+```
 
 The agent will update when you change the code, but also the JSON hook files.
