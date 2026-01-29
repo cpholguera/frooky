@@ -5,7 +5,13 @@
     "module": "es2022",
     "strict": true,
     "noEmit": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "types": [
+      "frida-gum",
+      "frida-java-bridge",
+      "frida-objc-bridge",
+      "frida-swift-bridge"
+    ]
   },
   "include": [
     "ios/**/*",
