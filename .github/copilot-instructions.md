@@ -5,6 +5,7 @@
 **Frooky** is a Frida-powered dynamic instrumentation tool for mobile app security testing on Android and iOS. It allows security testers to hook Java/Kotlin methods and native C/C++ functions using simple JSON configuration files.
 
 ### Key Technologies
+
 - **Languages**: Python 3.10+ (CLI), TypeScript/JavaScript (Frida agent)
 - **Frameworks**: Frida (dynamic instrumentation), setuptools (Python packaging)
 - **Build Tools**: npm/Node.js (for agent compilation), Python build module
@@ -50,23 +51,25 @@ frooky/
 Frooky uses a **two-stage build** that must be executed in order:
 
 1. **Agent Compilation** (TypeScript → JavaScript):
+
    ```bash
    ./compileAgent.sh --prod    # Production build (minified)
    ./compileAgent.sh --dev     # Development build (unminified)
    ```
-   - Runs inside `frooky/agent/` directory
-   - Executes `npm ci` to install dependencies
-   - Compiles TypeScript sources from `android/` and `ios/` subdirectories
-   - Outputs to `frooky/agent/dist/agent-{android,ios}.js`
-   - **CRITICAL**: Agent artifacts MUST exist before Python package build
+    - Runs inside `frooky/agent/` directory
+    - Executes `npm ci` to install dependencies
+    - Compiles TypeScript sources from `android/` and `ios/` subdirectories
+    - Outputs to `frooky/agent/dist/agent-{android,ios}.js`
+    - **CRITICAL**: Agent artifacts MUST exist before Python package build
 
 2. **Python Package Build**:
+
    ```bash
    python -m build
    ```
-   - Packages the Python CLI and includes pre-built agent artifacts
-   - Uses `setuptools-scm` for versioning from git tags
-   - Outputs wheel (`.whl`) and source tarball (`.tar.gz`) to `dist/`
+    - Packages the Python CLI and includes pre-built agent artifacts
+    - Uses `setuptools-scm` for versioning from git tags
+    - Outputs wheel (`.whl`) and source tarball (`.tar.gz`) to `dist/`
 
 ### Development Setup
 
@@ -106,12 +109,10 @@ Note: Use `watch-android` and/or `watch-ios` depending on which platform you're 
 
 - **No unit tests currently exist** - the project only does CI verification at the moment, but testing of the codebase is in planning
 - **CI Verification** (`test-build.yml`):
-  - Builds the package (agent + Python wheel)
-  - Verifies wheel can be installed
-  - Checks that `frooky --help` runs successfully
-  - Validates agent artifacts are included in wheel:
-    - `frooky/agent/dist/agent-android.js`
-    - `frooky/agent/dist/agent-ios.js`
+    - Builds the package (agent + Python wheel)
+    - Verifies wheel can be installed
+    - Checks that `frooky --help` runs successfully
+    - Validates agent artifacts are included in wheel: `frooky/agent/dist/agent-android.js` and `frooky/agent/dist/agent-ios.js`
 
 ### Running CI Checks Locally
 
@@ -130,37 +131,44 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 ## Important Gotchas & Considerations
 
 ### 1. **Agent Artifacts Must Be Built First**
-   - **ALWAYS** run `./compileAgent.sh` before `python -m build`
-   - Python packaging will fail or produce incomplete artifacts if agents are missing
-   - The `compileAgent.sh` script must be executable (`chmod +x compileAgent.sh`)
+
+- **ALWAYS** run `./compileAgent.sh` before `python -m build`
+- Python packaging will fail or produce incomplete artifacts if agents are missing
+- The `compileAgent.sh` script must be executable (`chmod +x compileAgent.sh`)
 
 ### 2. **Version Management**
-   - Version is determined by `setuptools-scm` from git tags and commits
-   - Requires full git history: `git clone` without depth restrictions or fetch with `fetch-depth: 0` in CI
-   - Generated version file: `frooky/_version.py` (git-ignored, auto-created during build)
-   - **Do not manually edit version numbers**
+
+- Version is determined by `setuptools-scm` from git tags and commits
+- Requires full git history: `git clone` without depth restrictions or fetch with `fetch-depth: 0` in CI
+- Generated version file: `frooky/_version.py` (git-ignored, auto-created during build)
+- **Do not manually edit version numbers**
 
 ### 3. **Node.js Environment**
-   - Agent requires Node.js 24+ (as specified in CI)
-   - Use `npm ci` (not `npm install`) for consistent dependency installation
-   - Package lock file is at `frooky/agent/package-lock.json`
+
+- Agent requires Node.js 24+ (as specified in CI)
+- Use `npm ci` (not `npm install`) for consistent dependency installation
+- Package lock file is at `frooky/agent/package-lock.json`
 
 ### 4. **Python Version Compatibility**
-   - Supports Python 3.10, 3.11, 3.12, 3.13
-   - Uses modern Python features (e.g., `from __future__ import annotations`)
+
+- Supports Python 3.10, 3.11, 3.12, 3.13
+- Uses modern Python features (e.g., `from __future__ import annotations`)
 
 ### 5. **Frida Dependencies**
-   - Requires `frida>=17.5.2` and `frida-tools>=14.5.0`
-   - These are system-dependent native packages that may take time to install
+
+- Requires `frida>=17.5.2` and `frida-tools>=14.5.0`
+- These are system-dependent native packages that may take time to install
 
 ### 6. **Output Files**
-   - Default output: `output.json` (git-ignored)
-   - Output format: JSON Lines (NDJSON) - one JSON object per line
-   - Use `jq . output.json` to pretty-print
+
+- Default output: `output.json` (git-ignored)
+- Output format: JSON Lines (NDJSON) - one JSON object per line
+- Use `jq . output.json` to pretty-print
 
 ### 7. **Git Pager Issues**
-   - **ALWAYS** use `git --no-pager` when running git commands programmatically
-   - Example: `git --no-pager status`, `git --no-pager diff`
+
+- **ALWAYS** use `git --no-pager` when running git commands programmatically
+- Example: `git --no-pager status`, `git --no-pager diff`
 
 ## Common Tasks
 
@@ -171,15 +179,18 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 4. Run `frooky --help` to make sure the agent scripts are properly compiled
 
 ### Modifying Python CLI
+
 1. Edit `frooky/cli.py` or `frooky/frida_runner.py`
 2. Changes are immediately available with `pip install -e .`
 3. Test with `frooky --help` or relevant commands
 
 ### Adding Dependencies
+
 - **Python**: Add to `dependencies` array in `pyproject.toml`
 - **Node.js**: Run `cd frooky/agent && npm install --save-dev <package>`
 
 ### Documentation Updates
+
 - Main docs are in `docs/` directory
 - README.md provides quick start and examples
 - Usage guide: `docs/usage.md`
@@ -216,9 +227,9 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 2. **Set up dev environment**: Virtual env + compile agents
 3. **Make changes**: Edit relevant files
 4. **Rebuild as needed**:
-   - Android agent changes: `cd frooky/agent && npm run dev-android`
-   - iOS agent changes: `cd frooky/agent && npm run dev-ios`
-   - Python changes: No rebuild needed with `pip install -e .`
+    - Android agent changes: `cd frooky/agent && npm run dev-android`
+    - iOS agent changes: `cd frooky/agent && npm run dev-ios`
+    - Python changes: No rebuild needed with `pip install -e .`
 5. **Test manually**: Run `frooky` commands against test apps/hooks
 6. **Verify CI would pass**: Run full build + install verification locally
 7. **Update docs** if user-facing behavior changes
@@ -248,6 +259,7 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 ## Security Considerations
 
 This is a security testing tool, so:
+
 - Be mindful of sensitive data in logs/output files
 - Output files (`output.json`, `*.jsonl`) are git-ignored by default
 - Agent code runs with elevated privileges inside target applications
@@ -258,12 +270,14 @@ This is a security testing tool, so:
 ### Build Warnings (Non-Critical)
 
 When building the package, you may encounter these warnings that can be safely ignored:
+
 - **setuptools-scm shallow repository warning**: Occurs when git history is incomplete. The build still succeeds.
 - **License format deprecation warnings**: The project uses an older license format in `pyproject.toml` that setuptools recommends updating. This is cosmetic and doesn't affect functionality.
 
 ### Errors Encountered During Onboarding
 
 During the creation of this instructions file, the following steps were validated:
+
 1. **Agent compilation** (`./compileAgent.sh --prod`): ✅ Succeeded without errors
 2. **Python package build** (`python -m build`): ✅ Succeeded with deprecation warnings (see above)
 3. **Build artifacts verification**: ✅ Both `.whl` and `.tar.gz` created successfully
