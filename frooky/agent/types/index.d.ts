@@ -34,12 +34,33 @@ export type NativeArgType =
  */
 export type direction = 'in' | 'out';
 
+
+/**
+ * Java type
+ * Specify exact method signatures using overloads.
+ */
+export interface JavaType {
+   /** Name of the Java type such as "[B", "java.lang.string", "org.owasp.mastestapp.returnValue"*/
+  name: string;
+   /** 
+    * Optional type decoder. By default, frooky will choose a default decoder. 
+    * This can be overruled for example if an integer should be decoded as a FLAG. 
+    * 
+    * An example is	`android.content.Intent.setFlags(int flags)`. If you want to decode the 
+    * argument `int flags` with a custom decoder, you must set the name of the decoder here.
+    * 
+    * The decoders available can be found in `./android/decoders`. 
+    */
+  decoder?: string
+}
+
+
 /**
  * Java method overload signature.
  * Specify exact method signatures using overloads.
  */
 export interface JavaOverload {
-  args: string[];
+  args: JavaType[];
 }
 
 /**
