@@ -185,6 +185,16 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 - Usage guide: `docs/usage.md`
 - Development guide: `docs/develop.md`
 
+### Adding Examples
+
+- Main examples are in `docs/examples` directory
+- Add new examples to demonstrate a new feature
+
+### Modifying Examples
+
+- Main examples are in `docs/examples` directory
+- Modify existing examples if a feature or the public API changes
+
 ## Key Files to Understand
 
 ### Python Side
