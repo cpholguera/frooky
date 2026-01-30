@@ -18,6 +18,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
+        "-v",
         "--version",
         action="version",
         version=f"frooky {__version__}",
