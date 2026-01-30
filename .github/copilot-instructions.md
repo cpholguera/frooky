@@ -172,7 +172,7 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 
 ## Common Tasks
 
-### Adding New Agent Hooks
+### Modifying the frooky Agent
 1. Edit TypeScript files in `frooky/agent/android/` or `frooky/agent/ios/`
 2. Recompile: `cd frooky/agent && npm run dev-{android|ios}`
 3. Test locally with `pip install -e .` and run `frooky` commands
