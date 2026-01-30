@@ -5,7 +5,6 @@ import argparse
 from pathlib import Path
 from importlib.resources import files
 
-
 from . import __version__
 from .frida_runner import FrookyRunner, RunnerOptions
 
@@ -13,9 +12,10 @@ from .frida_runner import FrookyRunner, RunnerOptions
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="frooky",
-        description="Run Frooky hooks using Frida's Python bindings.",
-        suggest_on_error=True
+        description="Run Frooky hooks using Frida's Python bindings."
     )
+
+    parser.suggest_on_error = True
 
     parser.add_argument(
         "-v",
