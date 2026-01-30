@@ -36,6 +36,21 @@ export type direction = 'in' | 'out';
 
 
 /**
+ * Base configuration for all hook types.
+ */
+export interface BaseHook {
+  /** Library/framework name */
+  module?: string;
+  /** Maximum number of stack frames to capture */
+  stackTraceLimit?: number;
+  /** Regex patterns to filter stack traces */
+  stackTraceFilter?: string[];
+  /** Enable verbose logging for troubleshooting. */
+  debug?: boolean;
+}
+
+
+/**
  * Decoder for a JavaType
  * 
  * By default, frooky will choose the appropriate decoder, but sometimes it is necessary
@@ -80,7 +95,28 @@ export interface JavaMethod {
   overloads?: JavaOverload[];
   /** Optional custom decoder for the return value.*/
   retDecoder?: JavaDecoder
+  // /** 
+  //  * Method which will trigger the hooking of the methods. --> TODO: Address recursion issue
+  // */
+  // prerequisites?: JavaMethod[];
 }
+
+
+/**
+ * Android Java/Kotlin class hooking configuration.
+ */
+export interface JavaHook extends BaseHook {
+    /** 
+     * Fully qualified class name. 
+     * Nested classes are identified with $, wildcards are supported per package level. 
+     * Example: `org.owasp.*.Http$Client`: `$Client` is an nested class within `$Http` 
+     * and `org.owasp.e.Http$Client` would be a valid match, 
+     * but `org.owasp.a.b.c.Http$Client` not.
+     * */
+  javaClass: string;
+  methods: JavaMethod[];
+}
+
 
 /**
  * Native function argument descriptor.
@@ -96,33 +132,9 @@ export interface NativeArgumentDescriptor {
   /** Argument direction: 'in' (default) or 'out' for output parameters */
   direction?: direction;
   /** Set to true to capture the function's return value */
-  returnValue?: boolean;
+  retValue?: boolean;
 }
 
-/**
- * Base configuration for all hook types.
- */
-export interface BaseHook {
-  /** Library/framework name */
-  module?: string;
-  /** Maximum number of stack frames to capture */
-  stackTraceLimit?: number;
-  /** Regex patterns to filter stack traces */
-  stackTraceFilter?: string[];
-  /** Enable verbose logging for troubleshooting */
-  debug?: boolean;
-}
-
-/**
- * Android Java/Kotlin class hooking configuration.
- */
-export interface JavaHook extends BaseHook {
-  /** Fully qualified class name */
-  javaClass: string;
-  methods: JavaMethod[];
-  /** Methods to call before hooking (e.g., class initialization) */
-  prerequisites?: JavaMethod[];
-}
 
 /**
  * Native C/C++ function hooking configuration.
@@ -139,24 +151,22 @@ export interface NativeHook extends BaseHook {
  * iOS Objective-C method hooking configuration.
  * Hook Objective-C methods using objClass and symbol.
  */
-export interface ObjectiveCHook extends Omit<BaseHook, 'module'> {
+export interface ObjectiveCHook extends BaseHook {
   /** Objective-C class name */
   objClass: string;
   /** Method selector */
   symbol: string;
-  module?: string;
   args?: NativeArgumentDescriptor[];
 }
 
 /**
  * iOS Swift method hooking configuration.
  */
-export interface SwiftHook extends Omit<BaseHook, 'module'> {
+export interface SwiftHook extends BaseHook {
   /** Swift class name */
   swiftClass: string;
   /** Mangled Swift symbol */
   symbol: string;
-  module?: string;
   args?: NativeArgumentDescriptor[];
 }
 
