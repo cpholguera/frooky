@@ -14,6 +14,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="frooky",
         description="Run Frooky hooks using Frida's Python bindings.",
+        suggest_on_error=True
     )
 
     parser.add_argument(
@@ -49,6 +50,10 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     parser = build_parser()
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+
     args = parser.parse_args()
 
     # Validate that the android and ios agents are compiled and accessible
@@ -61,8 +66,8 @@ def main() -> int:
 
     if not all(file.exists() for file in required_files):
         print(f"Frooky agent not found in: {agent_dist_path}\n"
-            f"If you don't use the distributed version, make sure to manually compile the agents first.\n",
-            file=sys.stderr)
+              f"If you don't use the distributed version, make sure to manually compile the agents first.\n",
+              file=sys.stderr)
         sys.exit(1)
 
     # Validate device selection
