@@ -7,6 +7,7 @@
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "types": [
+      "node",
       "frida-gum",
       "frida-java-bridge",
       "frida-objc-bridge",
