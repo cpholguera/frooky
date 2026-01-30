@@ -36,6 +36,19 @@ export type direction = 'in' | 'out';
 
 
 /**
+ * Decoder for a JavaType
+ * 
+ * By default, frooky will choose the appropriate decoder, but sometimes it is necessary
+ * to manually set them
+ * 
+ * An example is `android.content.Intent.setFlags(int flags)`. If you want to decode the 
+ * argument `int flags` with a custom decoder, you must set the name of the decoder here.
+ * 
+ * The decoders available can be found in `./android/decoders`. 
+ */
+export type JavaDecoder = string
+
+/**
  * Java type
  * Specify exact method signatures using overloads.
  */
@@ -45,13 +58,8 @@ export interface JavaType {
    /** 
     * Optional type decoder. By default, frooky will choose a default decoder. 
     * This can be overruled for example if an integer should be decoded as a FLAG. 
-    * 
-    * An example is	`android.content.Intent.setFlags(int flags)`. If you want to decode the 
-    * argument `int flags` with a custom decoder, you must set the name of the decoder here.
-    * 
-    * The decoders available can be found in `./android/decoders`. 
     */
-  decoder?: string
+  decoder?: JavaDecoder
 }
 
 
@@ -68,7 +76,10 @@ export interface JavaOverload {
  */
 export interface JavaMethod {
   name: string;
+  /** Optional overloads. If not set, the method without arguments is defined.*/
   overloads?: JavaOverload[];
+  /** Optional custom decoder for the return value.*/
+  retDecoder?: JavaDecoder
 }
 
 /**
