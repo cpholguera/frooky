@@ -6,14 +6,14 @@
 
 ### Key Technologies
 
-- **Languages**: Python 3.10+ (CLI), TypeScript/JavaScript (Frida agent)
+- **Languages**: Python (CLI; see `requires-python` in [`pyproject.toml`](../pyproject.toml)), TypeScript/JavaScript (Frida agent)
 - **Frameworks**: Frida (dynamic instrumentation), setuptools (Python packaging)
 - **Build Tools**: npm/Node.js (for agent compilation), Python build module
 - **Package Management**: pip (Python), npm (Node.js)
 
 ## Project Structure
 
-```
+```bash
 frooky/
 ├── frooky/                          # Main Python package
 │   ├── __init__.py                 # Package initialization
@@ -56,10 +56,10 @@ Frooky uses a **two-stage build** that must be executed in order:
    ./compileAgent.sh --prod    # Production build (minified)
    ./compileAgent.sh --dev     # Development build (unminified)
    ```
-    - Runs inside `frooky/agent/` directory
+    - Runs inside [`frooky/agent/`](../frooky/agent/) directory
     - Executes `npm ci` to install dependencies
-    - Compiles TypeScript sources from `android/` and `ios/` subdirectories
-    - Outputs to `frooky/agent/dist/agent-{android,ios}.js`
+    - Compiles TypeScript sources from [`frooky/agent/android/`](../frooky/agent/android/) and [`frooky/agent/ios/`](../frooky/agent/ios/) subdirectories
+    - Outputs to [`frooky/agent/dist/`](../frooky/agent/dist/) as `agent-{android,ios}.js`
     - **CRITICAL**: Agent artifacts MUST exist before Python package build
 
 2. **Python Package Build**:
@@ -69,7 +69,7 @@ Frooky uses a **two-stage build** that must be executed in order:
    ```
     - Packages the Python CLI and includes pre-built agent artifacts
     - Uses `setuptools-scm` for versioning from git tags
-    - Outputs wheel (`.whl`) and source tarball (`.tar.gz`) to `dist/`
+    - Outputs wheel (`.whl`) and source tarball (`.tar.gz`) to [`dist/`](../dist/)
 
 ### Development Setup
 
@@ -108,11 +108,11 @@ Note: Use `watch-android` and/or `watch-ios` depending on which platform you're 
 ### Test Infrastructure
 
 - **No unit tests currently exist** - the project only does CI verification at the moment, but testing of the codebase is in planning
-- **CI Verification** (`test-build.yml`):
+- **CI Verification** ([`.github/workflows/test-build.yml`](workflows/test-build.yml)):
     - Builds the package (agent + Python wheel)
     - Verifies wheel can be installed
     - Checks that `frooky --help` runs successfully
-    - Validates agent artifacts are included in wheel: `frooky/agent/dist/agent-android.js` and `frooky/agent/dist/agent-ios.js`
+    - Validates agent artifacts are included in wheel: [`frooky/agent/dist/agent-android.js`](../frooky/agent/dist/agent-android.js) and [`frooky/agent/dist/agent-ios.js`](../frooky/agent/dist/agent-ios.js)
 
 ### Running CI Checks Locally
 
@@ -134,34 +134,35 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 
 - **ALWAYS** run `./compileAgent.sh` before `python -m build`
 - Python packaging will fail or produce incomplete artifacts if agents are missing
-- The `compileAgent.sh` script must be executable (`chmod +x compileAgent.sh`)
+- The [`compileAgent.sh`](../compileAgent.sh) script must be executable (`chmod +x compileAgent.sh`)
 
 ### 2. **Version Management**
 
 - Version is determined by `setuptools-scm` from git tags and commits
 - Requires full git history: `git clone` without depth restrictions or fetch with `fetch-depth: 0` in CI
-- Generated version file: `frooky/_version.py` (git-ignored, auto-created during build)
+- Generated version file: [`frooky/_version.py`](../frooky/_version.py) (git-ignored, auto-created during build)
 - **Do not manually edit version numbers**
 
 ### 3. **Node.js Environment**
 
-- Agent requires Node.js 24+ (as specified in CI)
+- Node.js version is pinned in CI (see `actions/setup-node` in [`.github/workflows/build.yml`](workflows/build.yml))
 - Use `npm ci` (not `npm install`) for consistent dependency installation
-- Package lock file is at `frooky/agent/package-lock.json`
+- Package lock file is at [`frooky/agent/package-lock.json`](../frooky/agent/package-lock.json)
 
 ### 4. **Python Version Compatibility**
 
-- Supports Python 3.10, 3.11, 3.12, 3.13
+- Minimum supported Python is defined by `requires-python` in [`pyproject.toml`](../pyproject.toml)
+- The set of versions exercised in CI is defined in [`.github/workflows/`](workflows/) (see `actions/setup-python` steps)
 - Uses modern Python features (e.g., `from __future__ import annotations`)
 
 ### 5. **Frida Dependencies**
 
-- Requires `frida>=17.5.2` and `frida-tools>=14.5.0`
+- Frida dependency constraints are defined in [`pyproject.toml`](../pyproject.toml) under `project.dependencies`
 - These are system-dependent native packages that may take time to install
 
 ### 6. **Output Files**
 
-- Default output: `output.json` (git-ignored)
+- Default output: [`output.json`](../output.json) (git-ignored)
 - Output format: JSON Lines (NDJSON) - one JSON object per line
 - Use `jq . output.json` to pretty-print
 
@@ -172,54 +173,55 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 
 ## Common Tasks
 
-### Modifying the frooky Agent
-1. Edit TypeScript files in `frooky/agent/android/` or `frooky/agent/ios/`
+### Modifying the frooky 
+
+1. Edit TypeScript files in [`frooky/agent/android/`](../frooky/agent/android/) or [`frooky/agent/ios/`](../frooky/agent/ios/)
 2. Recompile: `cd frooky/agent && npm run dev-{android|ios}`
 3. Test locally with `pip install -e .` and run `frooky` commands
 4. Run `frooky --help` to make sure the agent scripts are properly compiled
 
 ### Modifying Python CLI
 
-1. Edit `frooky/cli.py` or `frooky/frida_runner.py`
+1. Edit [`frooky/cli.py`](../frooky/cli.py) or [`frooky/frida_runner.py`](../frooky/frida_runner.py)
 2. Changes are immediately available with `pip install -e .`
 3. Test with `frooky --help` or relevant commands
 
 ### Adding Dependencies
 
-- **Python**: Add to `dependencies` array in `pyproject.toml`
+- **Python**: Add to `dependencies` array in [`pyproject.toml`](../pyproject.toml)
 - **Node.js**: Run `cd frooky/agent && npm install --save-dev <package>`
 
 ### Documentation Updates
 
-- Main docs are in `docs/` directory
+- Main docs are in [`docs/`](../docs/) directory
 - README.md provides quick start and examples
-- Usage guide: `docs/usage.md`
-- Development guide: `docs/develop.md`
+- Usage guide: [`docs/usage.md`](../docs/usage.md)
+- Development guide: [`docs/develop.md`](../docs/develop.md)
 
 ### Adding Examples
 
-- Main examples are in `docs/examples` directory
+- Main examples are in [`docs/examples`](../docs/examples/) directory
 - Add new examples to demonstrate a new feature
 
 ### Modifying Examples
 
-- Main examples are in `docs/examples` directory
+- Main examples are in [`docs/examples`](../docs/examples/) directory
 - Modify existing examples if a feature or the public API changes
 
 ## Key Files to Understand
 
 ### Python Side
 
-- **`frooky/cli.py`**: Argument parsing, CLI entry point
-- **`frooky/frida_runner.py`**: Core logic for loading hooks, attaching to processes, injecting agents
-- **`pyproject.toml`**: Project metadata, dependencies, build configuration
+- **[`frooky/cli.py`](../frooky/cli.py)**: Argument parsing, CLI entry point
+- **[`frooky/frida_runner.py`](../frooky/frida_runner.py)**: Core logic for loading hooks, attaching to processes, injecting agents
+- **[`pyproject.toml`](../pyproject.toml)**: Project metadata, dependencies, build configuration
 
 ### Agent Side
 
-- **`frooky/agent/build.js`**: Custom build orchestrator (handles TypeScript compilation, file watching)
-- **`frooky/agent/android/`**: Android-specific hook implementations
-- **`frooky/agent/ios/`**: iOS-specific hook implementations
-- **`frooky/agent/package.json`**: Frida bridge dependencies, build scripts
+- **[`frooky/agent/build.js`](../frooky/agent/build.js)**: Custom build orchestrator (handles TypeScript compilation, file watching)
+- **[`frooky/agent/android/`](../frooky/agent/android/)**: Android-specific hook implementations
+- **[`frooky/agent/ios/`](../frooky/agent/ios/)**: iOS-specific hook implementations
+- **[`frooky/agent/package.json`](../frooky/agent/package.json)**: Frida bridge dependencies, build scripts
 
 ## Workflow for Code Changes
 
@@ -234,7 +236,7 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 6. **Verify CI would pass**: Run full build + install verification locally
 7. **Update docs** if user-facing behavior changes
 8. **Update examples** if an example exists or it makes sense to make one for a new feature
-9. **Update Copilot instructions** in `.github/copilot-instructions.md` if needed
+9. **Update Copilot instructions** in [`.github/copilot-instructions.md`](copilot-instructions.md) if needed
 
 ## Platform-Specific Notes
 
@@ -248,21 +250,21 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 
 - Hooks Objective-C and Swift methods
 - Uses Frida's ObjC and Swift bridges (`frida-objc-bridge` and `frida-swift-bridge`)
-- Method syntax differs from Android (see `docs/usage.md`)
+- Method syntax differs from Android (see [`docs/usage.md`](../docs/usage.md))
 
 ## Debugging Tips
 
-- **Agent not loading**: Check that `frooky/agent/dist/agent-{platform}.js` exists and is recent
+- **Agent not loading**: Check that [`frooky/agent/dist/`](../frooky/agent/dist/) contains `agent-{platform}.js` and is recent
 - **Import errors**: Ensure you're using the venv Python (`which python`)
 - **Frida connection issues**: Verify target device has `frida-server` running
-- **Build failures**: Check Node.js version (needs 24+), ensure `compileAgent.sh` is executable
+- **Build failures**: Check Node.js version (needs 24+), ensure [`compileAgent.sh`](../compileAgent.sh) is executable
 
 ## Security Considerations
 
 This is a security testing tool, so:
 
 - Be mindful of sensitive data in logs/output files
-- Output files (`output.json`, `*.jsonl`) are git-ignored by default
+- Output files ([`output.json`](../output.json), `*.jsonl`) are git-ignored by default
 - Agent code runs with elevated privileges inside target applications
 - Always test on authorized/owned devices and applications
 
@@ -273,7 +275,7 @@ This is a security testing tool, so:
 When building the package, you may encounter these warnings that can be safely ignored:
 
 - **setuptools-scm shallow repository warning**: Occurs when git history is incomplete. The build still succeeds.
-- **License format deprecation warnings**: The project uses an older license format in `pyproject.toml` that setuptools recommends updating. This is cosmetic and doesn't affect functionality.
+- **License format deprecation warnings**: The project uses an older license format in [`pyproject.toml`](../pyproject.toml) that setuptools recommends updating. This is cosmetic and doesn't affect functionality.
 
 ### Errors Encountered During Onboarding
 
