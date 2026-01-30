@@ -98,13 +98,13 @@ npm run watch-android   # Auto-recompile on Android agent changes
 npm run watch-ios       # Auto-recompile on iOS agent changes
 ```
 
-Note: Use either `watch-android` or `watch-ios` depending on which platform you're working on.
+Note: Use `watch-android` and/or `watch-ios` depending on which platform you're working on.
 
 ## Testing & CI/CD
 
 ### Test Infrastructure
 
-- **No unit tests currently exist** - the project uses CI verification instead
+- **No unit tests currently exist** - the project only does CI verification at the moment, but testing of the codebase is in planning
 - **CI Verification** (`test-build.yml`):
   - Builds the package (agent + Python wheel)
   - Verifies wheel can be installed
@@ -168,6 +168,7 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 1. Edit TypeScript files in `frooky/agent/android/` or `frooky/agent/ios/`
 2. Recompile: `cd frooky/agent && npm run dev-{android|ios}`
 3. Test locally with `pip install -e .` and run `frooky` commands
+4. Run `frooky --help` to make sure the agent scripts are properly compiled
 
 ### Modifying Python CLI
 1. Edit `frooky/cli.py` or `frooky/frida_runner.py`
@@ -187,11 +188,13 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 ## Key Files to Understand
 
 ### Python Side
+
 - **`frooky/cli.py`**: Argument parsing, CLI entry point
 - **`frooky/frida_runner.py`**: Core logic for loading hooks, attaching to processes, injecting agents
 - **`pyproject.toml`**: Project metadata, dependencies, build configuration
 
 ### Agent Side
+
 - **`frooky/agent/build.js`**: Custom build orchestrator (handles TypeScript compilation, file watching)
 - **`frooky/agent/android/`**: Android-specific hook implementations
 - **`frooky/agent/ios/`**: iOS-specific hook implementations
@@ -199,7 +202,7 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 
 ## Workflow for Code Changes
 
-1. **Identify scope**: Python CLI, Android agent, iOS agent, or docs?
+1. **Identify scope**: Python CLI, Android agent, iOS agent, docs or examples?
 2. **Set up dev environment**: Virtual env + compile agents
 3. **Make changes**: Edit relevant files
 4. **Rebuild as needed**:
@@ -209,17 +212,20 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 5. **Test manually**: Run `frooky` commands against test apps/hooks
 6. **Verify CI would pass**: Run full build + install verification locally
 7. **Update docs** if user-facing behavior changes
+8. **Update examples** if an example exists or it makes sense to make one for a new feature
 
 ## Platform-Specific Notes
 
 ### Android
-- Hooks Java/Kotlin methods using Frida's Java bridge
+
+- Hooks Java/Kotlin methods using Frida's Java bridge (`frida-java-bride`)
 - Class names use Java notation: `android.security.keystore.KeyGenParameterSpec$Builder`
 - Can hook constructors with `$init` method name
 
 ### iOS
+
 - Hooks Objective-C and Swift methods
-- Uses Frida's ObjC and Swift bridges
+- Uses Frida's ObjC and Swift bridges (`frida-objc-bridge` and `frida-swift-bridge`)
 - Method syntax differs from Android (see `docs/usage.md`)
 
 ## Debugging Tips
@@ -240,11 +246,13 @@ This is a security testing tool, so:
 ## Known Warnings & Issues
 
 ### Build Warnings (Non-Critical)
+
 When building the package, you may encounter these warnings that can be safely ignored:
 - **setuptools-scm shallow repository warning**: Occurs when git history is incomplete. The build still succeeds.
 - **License format deprecation warnings**: The project uses an older license format in `pyproject.toml` that setuptools recommends updating. This is cosmetic and doesn't affect functionality.
 
 ### Errors Encountered During Onboarding
+
 During the creation of this instructions file, the following steps were validated:
 1. **Agent compilation** (`./compileAgent.sh --prod`): ✅ Succeeded without errors
 2. **Python package build** (`python -m build`): ✅ Succeeded with deprecation warnings (see above)
