@@ -234,6 +234,7 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 6. **Verify CI would pass**: Run full build + install verification locally
 7. **Update docs** if user-facing behavior changes
 8. **Update examples** if an example exists or it makes sense to make one for a new feature
+9. **Update Copilot instructions** in `.github/copilot-instructions.md` if needed
 
 ## Platform-Specific Notes
 
