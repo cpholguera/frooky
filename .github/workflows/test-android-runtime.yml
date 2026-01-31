@@ -30,6 +30,9 @@ jobs:
       - name: Install frida-compile
         run: npm install -g frida-compile@19.0.4
 
+      - name: Compile Frida agents
+        run: ./compileAgent.sh --prod
+
       - name: Install frooky
         run: pip install -e .
 
