@@ -64,20 +64,9 @@ All hook types support these base properties:
             - name: int
 ```
 
-### Custom Decoders
+### Java Type Notation Is Frida Notation
 
-```yaml
-- javaClass: android.content.Intent
-  methods:
-    - name: setFlags
-      overloads:
-        - args:
-            - name: int
-              decoder: IntentFlagsDecoder
-      retDecoder: IntentDecoder
-```
-
-### Java Type Notation
+Examples:
 
 | Type | Notation |
 |------|----------|
