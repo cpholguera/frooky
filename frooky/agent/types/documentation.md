@@ -506,8 +506,9 @@ Use custom decoders for complex types:
       overloads:
         - args:
             - name: int
-              decoder: IntentFlagsDecoder  # Custom decoder
-      retDecoder: IntentDecoder  # Custom return value decoder
+              decoder: IntentFlagsDecoder  # Custom argument value decoder
+    - name: getFlags
+      retDecoder: IntentFlagsDecoder  # Custom return value decoder
 ```
 
 Available decoders are located in `./android/decoders`.
