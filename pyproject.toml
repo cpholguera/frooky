@@ -8,14 +8,14 @@ dynamic = ["version"]
 description = "Frida-powered hook runner based on JSON hook files."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { file = "LICENSE" }
+license = "GPL-3.0-only"
 authors = [
   { name = "Carlos Holguera", email = "holguera.cybersec@gmail.com" },
   { name = "Stefan Bernhardsgrütter", email = "stefan.bernhardsgruetter@redguard.ch" },
 ]
 keywords = ["mobile", "instrumentation", "pentest", "frida", "hook"]
 classifiers = [
-  "License :: OSI Approved",
+  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
   "Natural Language :: English",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
@@ -40,6 +40,9 @@ Repository = "https://github.com/cpholguera/frooky"
 
 [project.scripts]
 frooky = "frooky.cli:main"
+
+[tool.setuptools]
+license-files = { globs = ["LICENSE"] }
 
 [tool.setuptools.packages.find]
 where = ["."]
