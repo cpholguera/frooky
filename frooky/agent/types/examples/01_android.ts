@@ -11,7 +11,7 @@
 
 
 
-import * as Frooky from '../index'
+import * as Frooky from 'frooky'
 
 // ============================================================================
 // EXAMPLE 1: Single Java method (no arguments)
