@@ -192,14 +192,6 @@ args:
       type: <arg_type>
 ```
 
-### Finding Mangled Symbols
-
-Use `frida-trace` or `nm` to find mangled Swift symbols:
-
-```bash
-nm -gU YourApp | grep Swift
-```
-
 ### Example
 
 ```yaml
