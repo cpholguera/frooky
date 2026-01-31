@@ -489,7 +489,7 @@ Use custom decoders for complex types:
             - name: int
               decoder: IntentFlagsDecoder  # Custom argument value decoder
     - name: getFlags
-      retDecoder: IntentFlagsDecoder  # Custom return value decoder
+      decoder: IntentFlagsDecoder  # Custom return value decoder
 ```
 
 Available decoders are located in `./android/decoders`.

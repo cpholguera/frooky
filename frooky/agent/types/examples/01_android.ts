@@ -111,7 +111,7 @@ const intentFlagsHook: Frooky.JavaHook = {
           ]
         }
       ],
-      retDecoder: 'IntentDecoder'
+      decoder: 'IntentFlagsDecoder'
     }
   ],
   debug: true
