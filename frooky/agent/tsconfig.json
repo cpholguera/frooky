@@ -13,7 +13,6 @@
       "frida-objc-bridge",
       "frida-swift-bridge",
     ],
-    // "baseUrl": ".",
     "paths": {
       "frooky": ["./types/index.d.ts"]
     }

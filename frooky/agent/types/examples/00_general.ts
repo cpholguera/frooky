@@ -1,4 +1,4 @@
-import * as Frooky from '../index'
+import * as Frooky from 'frooky'
 import {
     wifiHook,
     locationHook,
