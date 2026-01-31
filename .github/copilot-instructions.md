@@ -69,7 +69,7 @@ Frooky uses a **two-stage build** that must be executed in order:
    ```
     - Packages the Python CLI and includes pre-built agent artifacts
     - Uses `setuptools-scm` for versioning from git tags
-    - Outputs wheel (`.whl`) and source tarball (`.tar.gz`) to [`dist/`](../dist/)
+    - Outputs wheel (`.whl`) and source tarball (`.tar.gz`) to `dist/`.
 
 ### Development Setup
 
@@ -112,7 +112,7 @@ Note: Use `watch-android` and/or `watch-ios` depending on which platform you're 
     - Builds the package (agent + Python wheel)
     - Verifies wheel can be installed
     - Checks that `frooky --help` runs successfully
-    - Validates agent artifacts are included in wheel: [`frooky/agent/dist/agent-android.js`](../frooky/agent/dist/agent-android.js) and [`frooky/agent/dist/agent-ios.js`](../frooky/agent/dist/agent-ios.js)
+    - Validates agent artifacts are included in wheel: `frooky/agent/dist/agent-android.js` and `frooky/agent/dist/agent-ios.js`
 
 ### Running CI Checks Locally
 
@@ -140,7 +140,7 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 
 - Version is determined by `setuptools-scm` from git tags and commits
 - Requires full git history: `git clone` without depth restrictions or fetch with `fetch-depth: 0` in CI
-- Generated version file: [`frooky/_version.py`](../frooky/_version.py) (git-ignored, auto-created during build)
+- Generated version file: `frooky/_version.py` (git-ignored, auto-created during build)
 - **Do not manually edit version numbers**
 
 ### 3. **Node.js Environment**
@@ -162,7 +162,7 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 
 ### 6. **Output Files**
 
-- Default output: [`output.json`](../output.json) (git-ignored)
+- Default output: `output.json` (git-ignored)
 - Output format: JSON Lines (NDJSON) - one JSON object per line
 - Use `jq . output.json` to pretty-print
 
@@ -254,41 +254,7 @@ unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
 
 ## Debugging Tips
 
-- **Agent not loading**: Check that [`frooky/agent/dist/`](../frooky/agent/dist/) contains `agent-{platform}.js` and is recent
+- **Agent not loading**: Check that `frooky/agent/dist/` contains `agent-{platform}.js` and is recent
 - **Import errors**: Ensure you're using the venv Python (`which python`)
 - **Frida connection issues**: Verify target device has `frida-server` running
 - **Build failures**: Check Node.js version (needs 24+), ensure [`compileAgent.sh`](../compileAgent.sh) is executable
-
-## Security Considerations
-
-This is a security testing tool, so:
-
-- Be mindful of sensitive data in logs/output files
-- Output files ([`output.json`](../output.json), `*.jsonl`) are git-ignored by default
-- Agent code runs with elevated privileges inside target applications
-- Always test on authorized/owned devices and applications
-
-## Known Warnings & Issues
-
-### Build Warnings (Non-Critical)
-
-When building the package, you may encounter these warnings that can be safely ignored:
-
-- **setuptools-scm shallow repository warning**: Occurs when git history is incomplete. The build still succeeds.
-- **License format deprecation warnings**: The project uses an older license format in [`pyproject.toml`](../pyproject.toml) that setuptools recommends updating. This is cosmetic and doesn't affect functionality.
-
-### Errors Encountered During Onboarding
-
-During the creation of this instructions file, the following steps were validated:
-
-1. **Agent compilation** (`./compileAgent.sh --prod`): ✅ Succeeded without errors
-2. **Python package build** (`python -m build`): ✅ Succeeded with deprecation warnings (see above)
-3. **Build artifacts verification**: ✅ Both `.whl` and `.tar.gz` created successfully
-4. **Agent inclusion**: ✅ Both `agent-android.js` and `agent-ios.js` included in package
-
-No critical errors were encountered, and the build system works as documented.
-
----
-
-**Last Updated**: 2026-01-29
-**Repository**: https://github.com/cpholguera/frooky
