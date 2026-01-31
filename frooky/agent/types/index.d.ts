@@ -94,7 +94,7 @@ export interface JavaMethod {
   /** Optional overloads. If not set, the method without arguments is defined.*/
   overloads?: JavaOverload[];
   /** Optional custom decoder for the return value.*/
-  retDecoder?: JavaDecoder
+  decoder?: JavaDecoder
   // /** 
   //  * Method which will trigger the hooking of the methods. --> TODO: Address recursion issue
   // */
