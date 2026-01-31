@@ -411,12 +411,9 @@ function buildHookOperations(hook) {
 
 
     const foundMethod = enumerateFirstMethod(inputClass, method)
-    if (foundMethod === undefined) {
-      // Method not found even after loading prerequisites
-      throw new Error("Method '" + method + "' not found in class '" + inputClass + "'");
-    }
-    if (!foundMethod.classes || foundMethod.classes.length === 0) {
-      throw new Error("No classes found for method '" + method + "' in class '" + inputClass + "'");
+    if (foundMethod === undefined || !foundMethod.classes || foundMethod.classes.length === 0) {
+      // Class might not be loaded yet, return input class and let Java.use() handle it
+      return inputClass;
     }
     const foundClass = foundMethod.classes[0].name
 
@@ -527,7 +524,7 @@ export function runFrookyAgent(target) {
   // Separate hooks into native and Java categories
   const nativeHooks = [];
   const javaHooks = [];
-  javaHooks.forEach(hook => {
+  target.hooks.forEach(hook => {
     if (isNativeHook(hook)) {
       nativeHooks.push(hook);
     } else {
