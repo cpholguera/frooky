@@ -1,0 +1,6 @@
+appId: org.owasp.mastestapp.MASTestApp-iOS
+---
+- assertVisible: "OWASP MAS"
+- takeScreenshot: before
+- tapOn: "Start"
+- takeScreenshot: after
