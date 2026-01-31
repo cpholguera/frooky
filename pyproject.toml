@@ -29,8 +29,8 @@ classifiers = [
 ]
 
 dependencies = [
-  "frida>=17.5.2",
-  "frida-tools>=14.5.0",
+  "frida>=17.6.2",
+  "frida-tools>=14.5.1",
 ]
 
 [project.urls]
