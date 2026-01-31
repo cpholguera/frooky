@@ -176,17 +176,18 @@ export interface SwiftHook extends BaseHook {
 export type Hook = JavaHook | NativeHook | ObjectiveCHook | SwiftHook;
 
 /**
- * Category-based hook configuration for MASTG test cases.
+ * Root hooks: array of categorized hooks for testing.
+ * When multiple hook files are provided, their hooks arrays are merged.
  */
-export interface CategoryConfig {
-  /** Category specified in the hook file */
-  category: MasCategory;
+export interface Hooks {
+  /** 
+   * OWASP Category specified in the hook file.
+   * 
+   * TODO: DISCUSSION: I think this should be optional, as otherwise it may look like that frooky
+   * is only for security testing. But we should not limit the usage by enforcing a MAS category.
+   * 
+   */
+  category?: MasCategory;
   /** Array of hooks to apply for this category */
   hooks: Hook[];
 }
-
-/**
- * Root configuration: array of categorized hooks for security testing.
- * When multiple hook files are provided, their hooks arrays are merged.
- */
-export type Config = CategoryConfig[];
