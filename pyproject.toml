@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=70", "setuptools-scm>=8"]
+requires = ["setuptools>=77", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,14 +8,14 @@ dynamic = ["version"]
 description = "Frida-powered hook runner based on JSON hook files."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { file = "LICENSE" }
+license = "GPL-3.0-only"
+license-files = ["LICENSE"]
 authors = [
   { name = "Carlos Holguera", email = "holguera.cybersec@gmail.com" },
   { name = "Stefan Bernhardsgrütter", email = "stefan.bernhardsgruetter@redguard.ch" },
 ]
 keywords = ["mobile", "instrumentation", "pentest", "frida", "hook"]
 classifiers = [
-  "License :: OSI Approved",
   "Natural Language :: English",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
@@ -29,8 +29,8 @@ classifiers = [
 ]
 
 dependencies = [
-  "frida>=17.5.2",
-  "frida-tools>=14.5.0",
+  "frida>=17.6.2",
+  "frida-tools>=14.5.1",
 ]
 
 [project.urls]
@@ -47,8 +47,8 @@ include = ["frooky*"]
 
 [tool.setuptools.package-data]
 frooky = [
-  "android/*.js",
-  "ios/*.js",
+    "agent/dist/*.js",
+    "agent/dist/version.json"
 ]
 
 [tool.setuptools_scm]

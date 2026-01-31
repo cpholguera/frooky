@@ -20,7 +20,7 @@ function _arrayBufferToHex(buffer) {
  * Decode up to `count` native arguments conservatively.
  * Tries C-string first, then 32-bit int, then 64 bytes as hex.
  */
-function decodeNativeArgs(args, count) {
+const decodeNativeArgs = function(args, count) {
   var out = [];
   var max = typeof count === 'number' ? count : 5;
   for (var i = 0; i < max; i++) {
@@ -75,7 +75,7 @@ function decodeNativeArgs(args, count) {
  * Supported types: string, int32, uint32, int64, pointer, bytes(length), bool, double
  * Returns { name, type, value } where value is a JS primitive or string.
  */
-function decodeArgByDescriptor(ptr, index, desc) {
+const decodeArgByDescriptor = function (ptr, index, desc) {
   var name = desc && desc.name ? desc.name : ("args[" + index + "]");
   var type = desc && desc.type ? desc.type : "string";
   var value = null;
@@ -130,7 +130,7 @@ function decodeArgByDescriptor(ptr, index, desc) {
  * If any descriptor includes a filter array, require that decoded value matches at least one entry.
  * For multiple descriptors with filters, all must match.
  */
-function filtersPass(decodedList, descriptors) {
+const filtersPass = function(decodedList, descriptors) {
   if (!descriptors || !descriptors.length) return true;
   var anyFilters = false;
   for (var i = 0; i < descriptors.length; i++) {
@@ -159,3 +159,6 @@ function filtersPass(decodedList, descriptors) {
   }
   return anyFilters ? true : true; // if no filters present, pass
 }
+
+
+export { decodeNativeArgs, decodeArgByDescriptor, filtersPass }

@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "lib": ["ES2024"],
+    "module": "es2022",
+    "strict": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "types": [
+      "node",
+      "frida-gum",
+      "frida-java-bridge",
+      "frida-objc-bridge",
+      "frida-swift-bridge"
+    ]
+  },
+  "include": [
+    "ios/**/*",
+    "android/**/*",
+    "shared/**/*"
+  ]
+}

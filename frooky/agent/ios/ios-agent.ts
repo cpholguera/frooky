@@ -618,7 +618,8 @@ function registerObjCHook(hook, categoryName, callback) {
 }
 
 // Main execution
-(function() {
+// Main execution: separate native hooks from Java hooks
+export function runFrookyAgent(target) {
   function callback(event) {
     send(event);
   }
@@ -665,4 +666,4 @@ function registerObjCHook(hook, categoryName, callback) {
     totalErrors: errors.length
   };
   send(summary);
-})();
+};

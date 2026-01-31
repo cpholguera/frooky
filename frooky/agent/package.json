@@ -1,0 +1,25 @@
+{
+  "name": "frooky-agent",
+  "version": "0.0.1",
+  "description": "Frooky frida agent.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prod-android": "node build.js -p android -c --type-check none",
+    "prod-ios": "node build.js -p ios -c --type-check none",
+    "dev-android": "node build.js -p android --type-check none",
+    "dev-ios": "node build.js -p ios --type-check none",
+    "watch-android": "node build.js -p android -t frida -w --type-check none",
+    "watch-ios": "node build.js -p ios -w -t frida --type-check none"
+  },
+  "devDependencies": {
+    "@types/frida-gum": "^19.0.1",
+    "@types/node": "^24.10.9",
+    "chokidar": "^5.0.0",
+    "frida-compile": "^19.0.4",
+    "frida-java-bridge": "^7.0.11",
+    "frida-objc-bridge": "^8.0.5",
+    "frida-swift-bridge": "^3.0.2",
+    "minimist": "^1.2.8"
+  }
+}

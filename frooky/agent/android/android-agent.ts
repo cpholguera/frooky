@@ -1,6 +1,9 @@
 import Java from "frida-java-bridge"
 import Thread from "frida-java-bridge";
 
+import { decodeArgByDescriptor, filtersPass } from "./native_decoder.js"
+import { decodeArguments } from "./android-decoder.js"
+
 /**
  * Lists the first method matching the given class and method name.
  * @param {string} clazz - Java class name
@@ -407,7 +410,14 @@ function buildHookOperations(hook) {
     }
 
 
-    const foundMethod = enumerateFirstMethod(hook.class, method)
+    const foundMethod = enumerateFirstMethod(inputClass, method)
+    if (foundMethod === undefined) {
+      // Method not found even after loading prerequisites
+      throw new Error("Method '" + method + "' not found in class '" + inputClass + "'");
+    }
+    if (!foundMethod.classes || foundMethod.classes.length === 0) {
+      throw new Error("No classes found for method '" + method + "' in class '" + inputClass + "'");
+    }
     const foundClass = foundMethod.classes[0].name
 
     if (hook.changeClassLoader) {
@@ -513,7 +523,7 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
 }
 
 // Main execution: separate native hooks from Java hooks
-(() => {
+export function runFrookyAgent(target) {
   // Separate hooks into native and Java categories
   const nativeHooks = [];
   const javaHooks = [];
@@ -632,4 +642,4 @@ function registerAllHooks(hook, categoryName, cachedOperations) {
       });
     }, delay);
   });
-})();
+};
