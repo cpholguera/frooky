@@ -1,5 +1,8 @@
 name: Test iOS Runtime
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
   push:
@@ -10,32 +13,30 @@ on:
       - main
 
 jobs:
-  build-and-test:
-    runs-on: macos-latest
+  build:
+    uses: ./.github/workflows/build.yml
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install frida-compile
-        run: npm install -g frida-compile@19.0.4
-
-      - name: Compile Frida agents
-        run: ./compileAgent.sh --prod
-
-      - name: Install frooky
-        run: pip install -e .
+      - name: Install frooky from wheel
+        run: pip install dist/*.whl
 
       - name: Install Maestro
         run: |
