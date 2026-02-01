@@ -16,5 +16,5 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run stub action
+      - name: Run stub action  --This should only run, when new agent code is committed, as it is an expensive test
         run: echo "This will do in the future:\n\n  - Load the Android target\n  - run node run test:android"
