@@ -87,28 +87,17 @@ jobs:
           emulator-options: -wipe-data -no-snapshot-save -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: |
-            set -eux
 
-            if adb root 2>/dev/null; then
-              adb wait-for-device
-              adb shell setenforce 0 || true
-            fi
+            ./scripts/android/prep-device.sh
 
+            ./scripts/android/install-frida-server.sh
+
+            # Install the app APK
             cd docs/examples/android-app && unzip -o MASTG-DEMO-0060.apk.zip && adb install -r MASTG-DEMO-0060.apk
 
             # adb install mas-app-android/app/build/outputs/apk/debug/app-debug.apk
 
-            # Download and setup frida-server
-            FRIDA_VERSION=$(frida --version) && echo "Frida version: $FRIDA_VERSION" && wget "https://github.com/frida/frida/releases/download/${FRIDA_VERSION}/frida-server-${FRIDA_VERSION}-android-x86_64.xz" && unxz "frida-server-${FRIDA_VERSION}-android-x86_64.xz" && adb push "frida-server-${FRIDA_VERSION}-android-x86_64" /data/local/tmp/frida-server
-            adb shell "chmod 755 /data/local/tmp/frida-server"
-            
-            # Start frida-server in background
-            adb shell "nohup /data/local/tmp/frida-server >/data/local/tmp/frida.log 2>&1 </dev/null &"
-
-            sleep 2
-            adb shell "ps | grep frida-server"
-
-            # Run the auto.sh script from the example directory
+            # Run the testing script
             cd docs/examples/android-app && chmod +x auto.sh && ./auto.sh
 
       # - name: Upload APK
