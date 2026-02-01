@@ -543,10 +543,14 @@ export function runFrookyAgent(target) {
       // Attempt to resolve symbol to surface errors early, but do not attach
       const addr = resolveNativeSymbol(hook);
       if (!addr) {
-        nativeErrors.push("Failed to resolve native symbol '" + hook.symbol + "'" + (hook.module ? " in module '" + hook.module + "'" : ""));
+        nativeErrors.push(
+          "Failed to resolve native symbol '" + hook.symbol + "'" +
+          (hook.module ? " in module '" + hook.module + "'" : "")
+        );
       }
       nativeHooksSummary.push({
-        module: hook.module || "<global>", symbol: hook.symbol
+        module: hook.module || "<global>",
+        symbol: hook.symbol
       });
     } catch (e) {
       const errMsg = "Failed to resolve native hook for symbol '" + hook.symbol + "': " + e;
@@ -558,88 +562,90 @@ export function runFrookyAgent(target) {
   // Register hooks inside Java.perform, but only after emitting both summaries
   // Enter Java.perform to allow Java stack augmentation (even if only native hooks)
   Java.perform(() => {
-    const delay = target.delay ?? 0
+    const delay = target.delay ?? 0;
 
     setTimeout(() => {
-      // Pre-compute hook operations once to avoid redundant processing
-      const hookOperationsCache = [];
-      target.hooks.forEach(hook => {
-        hookOperationsCache.push({
-          hook, built: buildHookOperations(hook)
-        });
-      });
-
-      // 1) Emit native summary
-      if (nativeHooks.length > 0) {
-        const nativeSummary = {
-          type: "native-summary",
-          hooks: nativeHooksSummary,
-          totalHooks: nativeHooksSummary.length,
-          errors: nativeErrors,
-          totalErrors: nativeErrors.length
-        };
-        send(JSON.stringify(nativeSummary, null, 2));
-      }
-
-      // 2) Emit an initial summary of all overloads that will be hooked
-      try {
-        // Aggregate map nested by class then method
-        const aggregate = {};
-        let totalHooks = 0;
-        const errors = [];
-        let totalErrors = 0;
-        hookOperationsCache.forEach(cached => {
-          totalHooks += cached.built.count;
-          if (cached.built.errors && cached.built.errors.length) {
-            Array.prototype.push.apply(errors, cached.built.errors);
-            totalErrors += cached.built.errors.length;
-          }
-          cached.built.operations.forEach(op => {
-            if (!aggregate[op.clazz]) {
-              aggregate[op.clazz] = {};
-            }
-            if (!aggregate[op.clazz][op.method]) {
-              aggregate[op.clazz][op.method] = [];
-            }
-            aggregate[op.clazz][op.method].push(op.args);
-          });
+      // Ensure all Java work runs on the Java VM thread
+      Java.perform(() => {
+        // Pre-compute hook operations once to avoid redundant processing
+        const hookOperationsCache = [];
+        javaHooks.forEach(hook => {
+          hookOperationsCache.push({ hook, built: buildHookOperations(hook) });
         });
 
-        const hooks = [];
-        for (const clazz in aggregate) {
-          if (!aggregate.hasOwnProperty(clazz)) continue;
-          const methodsMap = aggregate[clazz];
-          for (const method in methodsMap) {
-            if (!methodsMap.hasOwnProperty(method)) continue;
-            const overloads = methodsMap[method]
-              .filter(argsArr => argsArr.length > 0)
-              .map(argsArr => ({args: argsArr}));
-            hooks.push({class: clazz, method, overloads});
-          }
+        // 1) Emit native summary
+        if (nativeHooks.length > 0) {
+          const nativeSummary = {
+            type: "native-summary",
+            hooks: nativeHooksSummary,
+            totalHooks: nativeHooksSummary.length,
+            errors: nativeErrors,
+            totalErrors: nativeErrors.length
+          };
+          send(JSON.stringify(nativeSummary, null, 2));
         }
 
-        const summary = {type: "summary", hooks, totalHooks, errors, totalErrors};
-        send(JSON.stringify(summary, null, 2));
-      } catch (e) {
-        // If summary fails, don't block hooking
-        console.error("Summary generation failed, but hooking will continue. Error:", e);
-      }
+        // 2) Emit an initial summary of all overloads that will be hooked
+        try {
+          // Aggregate map nested by class then method
+          const aggregate = {};
+          let totalHooks = 0;
+          const errors = [];
+          let totalErrors = 0;
 
-      // 3) Now that both summaries were emitted, attach native hooks
-      if (nativeHooks.length > 0) {
-        nativeHooks.forEach(hook => {
-          try {
-            registerNativeHook(hook, target.category);
-          } catch (e) {
-            console.error("Failed to register native hook after summary for symbol '" + hook.symbol + "': " + e);
+          hookOperationsCache.forEach(cached => {
+            totalHooks += cached.built.count;
+            if (cached.built.errors && cached.built.errors.length) {
+              Array.prototype.push.apply(errors, cached.built.errors);
+              totalErrors += cached.built.errors.length;
+            }
+            cached.built.operations.forEach(op => {
+              if (!aggregate[op.clazz]) aggregate[op.clazz] = {};
+              if (!aggregate[op.clazz][op.method]) aggregate[op.clazz][op.method] = [];
+              aggregate[op.clazz][op.method].push(op.args);
+            });
+          });
+
+          const hooks = [];
+          for (const clazz in aggregate) {
+            if (!aggregate.hasOwnProperty(clazz)) continue;
+            const methodsMap = aggregate[clazz];
+            for (const method in methodsMap) {
+              if (!methodsMap.hasOwnProperty(method)) continue;
+
+              const overloads = methodsMap[method]
+                .filter(argsArr => Array.isArray(argsArr))
+                .map(argsArr => ({ args: argsArr }));
+
+              hooks.push({ class: clazz, method, overloads });
+            }
           }
-        });
-      }
 
-      // 4) Register Java hooks using cached operations
-      hookOperationsCache.forEach(cached => {
-        registerAllHooks(cached.hook, target.category, cached.built);
+          const summary = { type: "summary", hooks, totalHooks, errors, totalErrors };
+          send(JSON.stringify(summary, null, 2));
+        } catch (e) {
+          // If summary fails, don't block hooking
+          console.error("Summary generation failed, but hooking will continue. Error:", e);
+        }
+
+        // 3) Now that both summaries were emitted, attach native hooks
+        if (nativeHooks.length > 0) {
+          nativeHooks.forEach(hook => {
+            try {
+              registerNativeHook(hook, target.category);
+            } catch (e) {
+              console.error(
+                "Failed to register native hook after summary for symbol '" + hook.symbol + "': " + e
+              );
+            }
+          });
+        }
+
+        // 4) Register Java hooks using cached operations
+        hookOperationsCache.forEach(cached => {
+          registerAllHooks(cached.hook, target.category, cached.built);
+        });
       });
     }, delay);
   });
-};
+}
