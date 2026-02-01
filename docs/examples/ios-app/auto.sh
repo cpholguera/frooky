@@ -14,20 +14,23 @@ xcrun simctl launch booted "$APP_ID" || true
 sleep 2
 
 # List running processes (local device, not USB)
-PS_OUT="$(frida-ps -ai || true)"
+PS_OUT="$(frida-ps -Uai || true)"
 printf '%s\n' "$PS_OUT"
 
 PID="$(printf '%s\n' "$PS_OUT" | awk -v name="$APP_NAME" '$2==name{print $1; exit}')"
 echo "Target pid: $PID"
 
-if [ -z "${PID:-}" ]; then
-  echo "Could not find pid for $APP_NAME, trying to attach by name"
-  # Start frooky attaching by name instead of PID
-  nohup frooky -n "$APP_NAME" --platform ios hooks.json -o "$OUTPUT_JSON" >>"$FROOKY_LOG" 2>&1 </dev/null &
-else
-  # Start frooky attaching by PID
-  nohup frooky -p "$PID" --platform ios hooks.json -o "$OUTPUT_JSON" >>"$FROOKY_LOG" 2>&1 </dev/null &
-fi
+nohup frooky -p "$PID" --platform ios hooks.json -o "$OUTPUT_JSON" >>"$FROOKY_LOG" 2>&1 </dev/null &
+
+
+# if [ -z "${PID:-}" ]; then
+#   echo "Could not find pid for $APP_NAME, trying to attach by name"
+#   # Start frooky attaching by name instead of PID
+#   nohup frooky -n "$APP_NAME" --platform ios hooks.json -o "$OUTPUT_JSON" >>"$FROOKY_LOG" 2>&1 </dev/null &
+# else
+#   # Start frooky attaching by PID
+#   nohup frooky -p "$PID" --platform ios hooks.json -o "$OUTPUT_JSON" >>"$FROOKY_LOG" 2>&1 </dev/null &
+# fi
 
 FROOKY_PID=$!
 
