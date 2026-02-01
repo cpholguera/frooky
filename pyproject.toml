@@ -34,6 +34,12 @@ dependencies = [
   "pyyaml>=6.0",
 ]
 
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+  "pytest-cov>=4.1.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/cpholguera/frooky"
 Repository = "https://github.com/cpholguera/frooky"
@@ -55,18 +61,9 @@ frooky = [
 [tool.setuptools_scm]
 version_file = "frooky/_version.py"
 
-[tool.ruff]
-target-version = "py310"
-line-length = 320
-indent-width = 4
-
-[tool.ruff.lint]
-# Enable error (E), pyflakes (F), warning (W), and isort (I) rule sets
-select = ["E", "F", "W", "I"]
-# Disable E501 (line too long)
-ignore = ["E501"]
-
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers"
