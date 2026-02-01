@@ -1,0 +1,20 @@
+name: Test Android Agent
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  stub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run stub action
+        run: echo "This will do in the future:\n\n  - Load the Android target\n  - run node run test:android"
