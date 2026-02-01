@@ -527,7 +527,7 @@ export function runFrookyAgent(target) {
   // Separate hooks into native and Java categories
   const nativeHooks = [];
   const javaHooks = [];
-  javaHooks.forEach(hook => {
+  target.hooks.forEach(hook => {
     if (isNativeHook(hook)) {
       nativeHooks.push(hook);
     } else {

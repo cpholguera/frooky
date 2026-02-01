@@ -91,8 +91,8 @@ class FrookyRunner:
                         self.total_hooks = payload.get("totalHooks", 0)
                         self.total_errors = payload.get("totalErrors", 0)
                         self._print_hooks_line()
-                    elif event_type == "hook":
-                        # Only count hook events
+                    elif event_type in ("hook", "native-hook", "objc-hook"):
+                        # Count all hook event types
                         self.event_count += 1
                         # Extract event info for status line
                         method = payload.get("method", payload.get("symbol", "unknown"))
@@ -118,8 +118,8 @@ class FrookyRunner:
                             self.total_hooks = parsed.get("totalHooks", 0)
                             self.total_errors = parsed.get("totalErrors", 0)
                             self._print_hooks_line()
-                        elif event_type == "hook":
-                            # Only count hook events
+                        elif event_type in ("hook", "native-hook", "objc-hook"):
+                            # Count all hook event types
                             self.event_count += 1
                             # Extract event info for status line
                             method = parsed.get("method", parsed.get("symbol", "unknown"))
