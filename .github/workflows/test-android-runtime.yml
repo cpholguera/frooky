@@ -1,22 +1,13 @@
 name: Test Android Runtime
 
+on:
+  workflow_call:
+
 permissions:
   contents: read
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
 jobs:
-  build:
-    uses: ./.github/workflows/build.yml
-
   test:
-    needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 30
 

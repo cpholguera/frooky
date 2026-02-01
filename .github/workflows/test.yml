@@ -1,0 +1,33 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel in-progress runs for the same PR/branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # Build once and upload artifact
+  build:
+    uses: ./.github/workflows/build.yml
+
+  # Run all tests in parallel (they all depend on build and download the artifact)
+  verify-build:
+    needs: build
+    uses: ./.github/workflows/test-build.yml
+
+  test-android:
+    needs: build
+    uses: ./.github/workflows/test-android-runtime.yml
+
+  test-ios:
+    needs: build
+    uses: ./.github/workflows/test-ios-runtime.yml
