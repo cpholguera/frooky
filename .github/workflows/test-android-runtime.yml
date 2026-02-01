@@ -88,8 +88,10 @@ jobs:
           disable-animations: true
           script: |
 
+            chmod +x .github/scripts/android/prep-device.sh
             .github/scripts/android/prep-device.sh
 
+            chmod +x .github/scripts/android/install-frida-server.sh
             .github/scripts/android/install-frida-server.sh
 
             # Install the app APK
