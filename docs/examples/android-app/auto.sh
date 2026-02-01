@@ -17,7 +17,7 @@ PS_OUT="$(frida-ps -Uai || true)"
 printf '%s\n' "$PS_OUT"
 
 PID="$(printf '%s\n' "$PS_OUT" | awk '$3=="org.owasp.mastestapp"{print $1; exit}')"
-echo "Target pid, $PID"
+echo "Target pid: $PID"
 
 if [ -z "${PID:-}" ]; then
   echo "Could not find pid for $APP_ID"

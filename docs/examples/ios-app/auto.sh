@@ -17,11 +17,10 @@ sleep 2
 PS_OUT="$(frida-ps -ai 2>/dev/null || true)"
 printf '%s\n' "$PS_OUT"
 
-PID="$(printf '%s\n' "$PS_OUT" | awk -F': *' -v id="$APP_ID" '$1==id {print $2; exit}')"
-echo "Target pid: $PID"
+# PID="$(printf '%s\n' "$PS_OUT" | awk -F': *' -v id="$APP_ID" '$1==id {print $2; exit}')"
+# echo "Target pid: $PID"
 
-nohup frooky -p "$PID" --platform ios hooks.json -o "$OUTPUT_JSON" >>"$FROOKY_LOG" 2>&1 </dev/null &
-
+nohup frooky -n "$APP_NAME" --platform ios hooks.json -o "$OUTPUT_JSON" >>"$FROOKY_LOG" 2>&1 </dev/null &
 
 # if [ -z "${PID:-}" ]; then
 #   echo "Could not find pid for $APP_NAME, trying to attach by name"
