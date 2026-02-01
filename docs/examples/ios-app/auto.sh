@@ -44,14 +44,19 @@ MAESTRO_EXIT=$?
 
 # Stop frooky when Maestro completes
 kill -INT "$FROOKY_PID" 2>/dev/null || true
-sleep 2
-kill -TERM "$FROOKY_PID" 2>/dev/null || true
-sleep 2
+
+for _ in 1 2 3 4 5; do
+  if ! kill -0 "$FROOKY_PID" 2>/dev/null; then
+    break
+  fi
+  sleep 1
+done
+
 kill -KILL "$FROOKY_PID" 2>/dev/null || true
 wait "$FROOKY_PID" 2>/dev/null || true
 
 tail -n 200 "$FROOKY_LOG" || true
 
-ls -laR .
+# ls -laR .
 
 exit "$MAESTRO_EXIT"
