@@ -87,13 +87,13 @@ jobs:
           emulator-options: -wipe-data -no-snapshot-save -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: |
-            set -eux
-            adb wait-for-device
-            adb root
-            adb wait-for-device
-            adb shell "setenforce 0"
-            # Confirm root access
-            adb shell "id"
+            set -euo pipefail
+            set -x
+
+            if adb root 2>/dev/null; then
+              adb wait-for-device
+              adb shell setenforce 0 || true
+            fi
 
             cd docs/examples/android-app && unzip -o MASTG-DEMO-0060.apk.zip && adb install -r MASTG-DEMO-0060.apk
 
