@@ -88,9 +88,9 @@ jobs:
           disable-animations: true
           script: |
 
-            ./scripts/android/prep-device.sh
+            .github/scripts/android/prep-device.sh
 
-            ./scripts/android/install-frida-server.sh
+            .github/scripts/android/install-frida-server.sh
 
             # Install the app APK
             cd docs/examples/android-app && unzip -o MASTG-DEMO-0060.apk.zip && adb install -r MASTG-DEMO-0060.apk
