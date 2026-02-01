@@ -29,8 +29,8 @@ echo "## frooky"
 echo ""
 echo '```sh'
 cat "$RESULTS_DIR/frooky.log" 2>/dev/null || echo "No frooky.log found"
-echo '```'
 echo ""
+echo '```'
 echo ""
 
 echo "## maestro"
@@ -40,11 +40,5 @@ cat "$RESULTS_DIR/auto.log" 2>/dev/null || echo "No auto.log found"
 echo '```'
 echo ""
 echo ""
-
-echo "## Artifacts"
-echo ""
-echo '```sh'
-ls -laR "$RESULTS_DIR"
-echo '```'
 
 echo "Job summary created for $PLATFORM_TITLE tests" >&2
