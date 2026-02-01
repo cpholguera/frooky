@@ -14,7 +14,10 @@ xcrun simctl launch booted "$APP_ID" || true
 sleep 2
 
 # List running processes (local device, not USB)
-PID="$(frida-ps | awk -v name="$APP_NAME" '$0 ~ ("[[:space:]]" name "[[:space:]]*$") {print $1; exit}')"
+PS_OUT="$(frida-ps -ai 2>/dev/null || true)"
+printf '%s\n' "$PS_OUT"
+
+PID="$(printf '%s\n' "$PS_OUT" | awk -F': *' -v id="$APP_ID" '$1==id {print $2; exit}')"
 echo "Target pid: $PID"
 
 nohup frooky -p "$PID" --platform ios hooks.json -o "$OUTPUT_JSON" >>"$FROOKY_LOG" 2>&1 </dev/null &
