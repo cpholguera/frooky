@@ -1,5 +1,4 @@
 import Java from "frida-java-bridge"
-import Thread from "frida-java-bridge";
 
 import { decodeArgByDescriptor, filtersPass } from "./native_decoder.js"
 import { decodeArguments } from "./android-decoder.js"
@@ -557,17 +556,15 @@ export function runFrookyAgent(target) {
 
   // Register hooks inside Java.perform, but only after emitting both summaries
   // Enter Java.perform to allow Java stack augmentation (even if only native hooks)
-  Java.perform(() => {
-    const delay = target.delay ?? 0
+Java.perform(() => {
+  const delay = target.delay ?? 0
 
-    setTimeout(() => {
-      // Pre-compute hook operations once to avoid redundant processing
-      const hookOperationsCache = [];
-      target.hooks.forEach(hook => {
-        hookOperationsCache.push({
-          hook, built: buildHookOperations(hook)
-        });
-      });
+  setTimeout(() => {
+    Java.perform(() => {
+      const hookOperationsCache = []
+      javaHooks.forEach(hook => {
+        hookOperationsCache.push({ hook, built: buildHookOperations(hook) })
+      })
 
       // 1) Emit native summary
       if (nativeHooks.length > 0) {
@@ -640,6 +637,7 @@ export function runFrookyAgent(target) {
       hookOperationsCache.forEach(cached => {
         registerAllHooks(cached.hook, target.category, cached.built);
       });
-    }, delay);
-  });
+    })
+  }, delay)
+})
 };
