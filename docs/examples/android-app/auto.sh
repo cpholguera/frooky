@@ -49,7 +49,7 @@ ps -p "$FROOKY_PID" >/dev/null 2>&1 || true
 tail -n 20 "$FROOKY_LOG" || true
 
 # Run Maestro (https://docs.maestro.dev/getting-started/installing-maestro)
-maestro test "$FLOW" > auto.log 2>&1
+MAESTRO_CLI_NO_ANALYTICS=1 maestro test "$FLOW" > auto.log 2>&1
 MAESTRO_EXIT=$?
 
 # Stop frooky when Maestro completes
