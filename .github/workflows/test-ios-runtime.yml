@@ -108,66 +108,20 @@ jobs:
       - name: Prepare artifacts for upload
         if: always()
         run: |
-          mkdir -p ios-test-results
-          
-          # Copy files from example directory
-          cd docs/examples/ios-app
-          for file in auto.log frooky.log output.json before.png after.png; do
-            cp "$file" "$GITHUB_WORKSPACE/ios-test-results/" 2>/dev/null || true
-          done
-          cp -r tmp "$GITHUB_WORKSPACE/ios-test-results/" 2>/dev/null || true
-          cd "$GITHUB_WORKSPACE"
-          
-          # Copy maestro log from most recent test run
-          LATEST_TEST=$(find ~/.maestro/tests -type f -name "maestro.log" 2>/dev/null | head -1)
-          if [ -n "$LATEST_TEST" ]; then
-            cp "$LATEST_TEST" ios-test-results/maestro.log
-          fi
+          chmod +x .github/scripts/prepare-artifacts.sh
+          .github/scripts/prepare-artifacts.sh ios
 
       - name: Evaluate Test Results
         if: always()
         run: |
-          cd docs/examples/ios-app
-          chmod +x ../evaluate.sh
-          ../evaluate.sh | tee $GITHUB_WORKSPACE/evaluation.txt
-          EXIT_CODE=${PIPESTATUS[0]}
-          exit $EXIT_CODE
+          chmod +x .github/scripts/evaluate-results.sh
+          .github/scripts/evaluate-results.sh ios
 
       - name: Create Job Summary
         if: always()
         run: |
-          # Add evaluation results at the top
-          if [ -f evaluation.txt ]; then
-            cat evaluation.txt >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "---" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          echo "# iOS Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          echo "## frooky" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo '```sh' >> $GITHUB_STEP_SUMMARY
-          cat ios-test-results/frooky.log >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "No frooky.log found" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          echo "## maestro" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo '```sh' >> $GITHUB_STEP_SUMMARY
-          cat ios-test-results/auto.log >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "No auto.log found" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          echo "## Artifacts" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo '```sh' >> $GITHUB_STEP_SUMMARY
-          ls -laR ios-test-results >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          chmod +x .github/scripts/create-job-summary.sh
+          .github/scripts/create-job-summary.sh ios >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Dynamic Test Artifacts
         if: always()
