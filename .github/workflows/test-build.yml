@@ -1,20 +1,13 @@
-name: Test Python Package
+name: Verify Build
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_call:
 
 permissions:
   contents: read
 
 jobs:
-  build:
-    uses: ./.github/workflows/build.yml
-
   verify:
-    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

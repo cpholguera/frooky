@@ -1,0 +1,12 @@
+{
+  "category": "STORAGE",
+  "hooks": [
+    {
+      "class": "androidx.security.crypto.EncryptedSharedPreferences$Editor",
+      "methods": [
+        "putString",
+        "putStringSet"
+      ]
+    }
+  ]
+}
