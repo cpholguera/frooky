@@ -1,7 +1,5 @@
 import pytest
-from pathlib import Path
-from frooky.cli import build_parser, main
-from unittest.mock import patch
+from frooky.cli import build_parser
 
 
 class TestArgumentParsing:
