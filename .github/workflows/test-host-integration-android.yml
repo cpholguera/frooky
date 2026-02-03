@@ -1,4 +1,4 @@
-name: 'Test: Integration Tests Host'
+name: 'Test: Android Integration Tests Host'
 
 on:
   workflow_call:
