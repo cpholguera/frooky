@@ -18,6 +18,18 @@ class TestHookJavaMethod:
     @pytest.fixture
     def pid(self):
         """The process id from the running target app"""
+
+        app_id = "org.owasp.mastestapp"
+
+        subprocess.run(['adb', 'wait-for-device'], check=True)
+        subprocess.run(
+            ['adb', 'shell', 'monkey', '-p', app_id, '-c', 
+            'android.intent.category.LAUNCHER', '1'],
+            check=True
+        )
+        time.sleep(2)
+
+        # Get PID
         try:
             result = subprocess.run(
                 ['frida-ps', '-Uai'],
@@ -28,12 +40,11 @@ class TestHookJavaMethod:
             ps_output = result.stdout
             for line in ps_output.splitlines():
                 parts = line.split()
-                if len(parts) >= 3 and parts[2] == "org.owasp.mastestapp":
+                if len(parts) >= 3 and parts[2] == app_id:
                     return int(parts[0])
-            pytest.fail("Could not find pid for org.owasp.mastestapp")
-
-        except FileNotFoundError:
-            pytest.fail("frida-ps command not found")
+            pytest.fail(f"Could not find pid for {app_id}")
+        except Exception as e:
+            pytest.fail(f"Error getting PID: {e}")
 
     @pytest.fixture
     def maestro_flow_path(self):
