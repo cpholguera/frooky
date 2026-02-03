@@ -23,28 +23,24 @@ class TestHookJavaMethod:
 
         subprocess.run(['adb', 'wait-for-device'], check=True)
         subprocess.run(
-            ['adb', 'shell', 'monkey', '-p', app_id, '-c', 
-            'android.intent.category.LAUNCHER', '1'],
+            ['adb', 'shell', 'am', 'start', '-n', 
+            f'{app_id}/.MainActivity'],
             check=True
         )
         time.sleep(2)
 
-        # Get PID
-        try:
-            result = subprocess.run(
-                ['frida-ps', '-Uai'],
-                capture_output=True,
-                text=True,
-                check=False
-            )
-            ps_output = result.stdout
-            for line in ps_output.splitlines():
-                parts = line.split()
-                if len(parts) >= 3 and parts[2] == app_id:
-                    return int(parts[0])
-            pytest.fail(f"Could not find pid for {app_id}")
-        except Exception as e:
-            pytest.fail(f"Error getting PID: {e}")
+        result = subprocess.run(
+            ['adb', 'shell', 'pidof', app_id],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+
+        pid = result.stdout.strip()
+        if not pid:
+            pytest.fail(f"Could not find PID for {app_id}")
+
+        return pid
 
     @pytest.fixture
     def maestro_flow_path(self):
