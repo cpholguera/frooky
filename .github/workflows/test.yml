@@ -31,3 +31,11 @@ jobs:
   test-ios:
     needs: build
     uses: ./.github/workflows/test-ios-runtime.yml
+
+  test-host-unit:
+    needs: build
+    uses: ./.github/workflows/test-host-unit.yml
+
+  test-host-integration:
+    needs: build
+    uses: ./.github/workflows/test-host-integration.yml
