@@ -14,24 +14,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Install Python dependencies and frooky .[dev]
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install '.[dev]'
-
-      - name: Setup Node.js for agent compilation
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: 'npm'
-          cache-dependency-path: './frooky/agent/package-lock.json'
-
-      - name: Compile agents
-        run: |
-          chmod +x compileAgent.sh
-          ./compileAgent.sh --dev
-
+ 
       - name: Install Maestro
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
@@ -61,6 +44,25 @@ jobs:
 
             # Install the app APK
             cd docs/examples/android-app && unzip -o MASTG-DEMO-0060.apk.zip && adb install -r MASTG-DEMO-0060.apk
+
+
+      # TODO: Do a nice prod/dev build we can reuse
+      # -------------------------------------------
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: 'npm'
+          cache-dependency-path: './frooky/agent/package-lock.json'
+      - run: chmod +x compileAgent.sh
+      - run: ./compileAgent.sh --dev
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install Python from [dev]
+        run: python -m pip install -e '.[dev]'
+      # -------------------------------------------
 
       - name: Run frooky host integration tests for Android
         run: pytest tests/integration
