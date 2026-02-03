@@ -11,18 +11,14 @@
       "frida-gum",
       "frida-java-bridge",
       "frida-objc-bridge",
-      "frida-swift-bridge"
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "frooky": ["./types/index.d.ts"]
-    }
+      "frida-swift-bridge",
+      "./tests/test-framework.d.ts"
+    ]
   },
   "include": [
     "ios/**/*",
     "android/**/*",
     "shared/**/*",
-    "types/**/*",
-    "docs/**/*"
-, "examples"  ]
+    "tests/**/*"
+  ]
 }
