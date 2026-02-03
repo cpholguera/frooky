@@ -83,8 +83,6 @@ class AndroidTestHelper:
         )
         frooky_thread.start()
 
-        time.sleep(5)
-
         maestro_thread = threading.Thread(
             target=AndroidTestHelper.run_maestro, 
             args=(maestro_flow_path,)
