@@ -8,28 +8,41 @@ interface TestResult {
     error?: string;
 }
 
-interface TestCompleteMessage {
-    type: 'test-complete';
-    success: boolean;
-    results: TestResult[];
-    error?: string;
+interface Matcher {
+    toBe: (expected: any) => void;
+    toEqual: (expected: any) => void;
+    toBeTruthy: () => void;
+    toBeFalsy: () => void;
+    toThrow: (errorMatch?: string | RegExp) => void;
 }
 
 const tests: Array<{ name: string; fn: () => void | Promise<void> }> = [];
 
-// Use globalThis instead of global
 (globalThis as any).test = (name: string, fn: () => void | Promise<void>) => {
     tests.push({ name, fn });
 };
 
-(globalThis as any).expect = (actual: any) => ({
+(globalThis as any).expect = (actual: any): Matcher => ({
     toBe: (expected: any) => {
         if (actual !== expected) {
             throw new Error(`Expected ${actual} to be ${expected}`);
         }
     },
     toEqual: (expected: any) => {
-        if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+        // Deep equality check
+        const deepEqual = (a: any, b: any): boolean => {
+            if (a === b) return true;
+            if (a == null || b == null) return false;
+            if (typeof a !== 'object' || typeof b !== 'object') return false;
+
+            const keysA = Object.keys(a);
+            const keysB = Object.keys(b);
+            if (keysA.length !== keysB.length) return false;
+
+            return keysA.every(key => deepEqual(a[key], b[key]));
+        };
+
+        if (!deepEqual(actual, expected)) {
             throw new Error(`Expected ${JSON.stringify(actual)} to equal ${JSON.stringify(expected)}`);
         }
     },
@@ -43,7 +56,7 @@ const tests: Array<{ name: string; fn: () => void | Promise<void> }> = [];
             throw new Error(`Expected ${actual} to be falsy`);
         }
     },
-    toThrow: () => {
+    toThrow: (errorMatch?: string | RegExp) => {
         if (typeof actual !== 'function') {
             throw new Error('Expected a function');
         }
@@ -51,7 +64,15 @@ const tests: Array<{ name: string; fn: () => void | Promise<void> }> = [];
             actual();
             throw new Error('Expected function to throw');
         } catch (e) {
-            // Expected to throw
+            if (errorMatch && e instanceof Error) {
+                const message = e.message;
+                const matches = typeof errorMatch === 'string' 
+                    ? message.includes(errorMatch)
+                    : errorMatch.test(message);
+                if (!matches) {
+                    throw new Error(`Expected error message to match ${errorMatch}`);
+                }
+            }
         }
     }
 });
