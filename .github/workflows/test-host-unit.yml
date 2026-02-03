@@ -1,4 +1,4 @@
-name: 'Test: Unit Tests Host'
+name: 'Test: Host Unit Tests'
 
 on:
   workflow_call:
