@@ -1,4 +1,4 @@
-"""Tests for good case lifecycle."""
+"""Tests for good case lifecycle on Android."""
 import time
 import pytest
 import json
