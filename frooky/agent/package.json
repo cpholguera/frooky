@@ -5,12 +5,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prod-android": "node build.js -p android -c --type-check none",
-    "prod-ios": "node build.js -p ios -c --type-check none",
-    "dev-android": "node build.js -p android --type-check none",
-    "dev-ios": "node build.js -p ios --type-check none",
-    "watch-android": "node build.js -p android -t frida -w --type-check none",
-    "watch-ios": "node build.js -p ios -w -t frida --type-check none"
+    "build:prod:android": "node build.js -p android -c --type-check none",
+    "build:prod:ios": "node build.js -p ios -c --type-check none",
+    "build:dev:android": "node build.js -p android --type-check none",
+    "build:dev:ios": "node build.js -p ios --type-check none",
+    "build:watch:android": "node build.js -p android -t frida -w --type-check none",
+    "build:watch:ios": "node build.js -p ios -w -t frida --type-check none",
+    "build:test:android": "frida-compile --type-check none tests/android/runner.ts -o dist/agent-test-android.js",
+    "build:test:ios": "frida-compile --type-check none tests/ios/runner.ts -o dist/agent-test-ios.js",
+    "test:android": "npm run build:test:android && node run-tests.js -p android",
+    "test:ios": "npm run build:test:ios && node run-tests.js -p ios"
   },
   "devDependencies": {
     "@types/frida-gum": "^19.0.1",

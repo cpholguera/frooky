@@ -5,15 +5,15 @@ npm ci
 
 case "$1" in
     --prod)
-        npm run prod-android
-        npm run prod-ios
+        npm run build:prod:android
+        npm run build:prod:ios
         ;;
     --dev)
-        npm run dev-android
-        npm run dev-ios
+        npm run build:dev:android
+        npm run build:dev:ios
         ;;
     *)
-        echo "Usage: $0 {--prod|--dev|--watch-android|--watch-ios}"
+        echo "Usage: $0 {--prod|--dev}"
         exit 1
         ;;
 esac
