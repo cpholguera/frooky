@@ -1,9 +1,10 @@
 name: 'Test: Integration Tests Host'
 
+on:
+  workflow_call:
+
 permissions:
   contents: read
-
-on: [push, pull_request]
 
 jobs:
   test:
