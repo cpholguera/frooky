@@ -27,7 +27,7 @@ jobs:
       - run: ./compileAgent.sh --prod
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.14"
       - run: python -m pip install --upgrade build
       - run: python -m build
       - uses: actions/upload-artifact@v4

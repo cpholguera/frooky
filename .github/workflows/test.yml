@@ -29,7 +29,6 @@ jobs:
     uses: ./.github/workflows/test-host-unit.yml
 
   test-host-integration-android:
-    needs: build
     uses: ./.github/workflows/test-host-integration-android.yml
 
   # test-host-integration-ios:
