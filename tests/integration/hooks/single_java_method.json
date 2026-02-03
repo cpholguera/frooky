@@ -3,7 +3,9 @@
   "hooks": [
     {
       "class": "android.app.SharedPreferencesImpl$EditorImpl",
-      "methods": ["putString"]
+      "methods": [
+        "putString"
+      ]
     }
   ]
 }

@@ -38,98 +38,84 @@ class TestHookJavaMethod:
         if output_file.exists():
             output_file.unlink()
 
-    def wait_for_target_hook(self, target_class, target_methods, timeout=10):
-        """Scan output.json NDJSON for target class and all specified methods."""
-        output_file = Path("output.json")
-        start_time = time.time()
-        found_methods = set()
+    def _scan_target_hook(self, output_file, target_class, target_methods):
+        """Scan output NDJSON for target class and all specified methods."""
         target_methods_set = set(target_methods)
+        found_methods = set()
 
-        while time.time() - start_time < timeout:
-            if output_file.exists():
+        with open(output_file, 'r') as f:
+            for line in f:
+                print(line)
                 try:
-                    with open(output_file, 'r') as f:
-                        for line in f:
-                            if line := line.strip():
-                                try:
-                                    entry = json.loads(line)
-                                    if entry.get("class") == target_class:
-                                        if (method := entry.get("method")) in target_methods_set:
-                                            found_methods.add(method)
-                                            if found_methods == target_methods_set:
-                                                return True
-                                except json.JSONDecodeError:
-                                    continue
-                except IOError:
+                    entry = json.loads(line.strip())
+
+                    # Check summary entries for hooks
+                    if entry.get("type") == "summary" and "hooks" in entry:
+                        for hook in entry["hooks"]:
+                            if hook.get("class") == target_class and (method := hook.get("method")) in target_methods_set:
+                                found_methods.add(method)
+                                if found_methods == target_methods_set:
+                                    return True
+
+                    # Check individual hook entries
+                    if entry.get("class") == target_class and (method := entry.get("method")) in target_methods_set:
+                        found_methods.add(method)
+                        if found_methods == target_methods_set:
+                            return True
+                except json.JSONDecodeError:
                     pass
-            time.sleep(1)
 
         return False
 
-    def run_maestro_flow(self, flow_path):
-        """Run Maestro flow in a separate thread."""
-        try:
-            result = subprocess.run(
-                ["maestro", "test", str(flow_path)],
-                capture_output=True,
-                text=True,
-                timeout=30
-            )
-            if result.returncode != 0:
-                print(f"Maestro failed: {result.stderr}")
-            return result.returncode == 0
-        except subprocess.TimeoutExpired:
-            print("Maestro flow timed out")
-            return False
-        except Exception as e:
-            print(f"Maestro error: {e}")
-            return False
 
-    def _run_hook_test(self, hook_file, target_class, target_methods, sample_app_process, maestro_flow_path):
-        """Common logic for running hook tests with Maestro."""
-        output_file = Path("output.json")
-        maestro_success = False
-
+    def _run_frooky(self, sample_app_process, hook_file, stop_event):
+        """Run Frooky and monitor stop_event."""
         process = subprocess.Popen(
             ["frooky", "-U", "-f", sample_app_process, "--platform", "android", str(hook_file)],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
 
+        # Wait until stop_event is set
+        while not stop_event.is_set():
+            time.sleep(1)
+
+        process.terminate()
         try:
-            # Wait for output.json creation (Frooky is ready)
-            start_time = time.time()
-            while time.time() - start_time < 10:
-                if output_file.exists():
-                    time.sleep(0.5)
-                    break
-                time.sleep(0.1)
+            process.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+            process.kill()
 
-            assert output_file.exists(), "output.json was not created"
 
-            # Start Maestro flow in background thread
-            maestro_thread = threading.Thread(
-                target=lambda: setattr(self, '_maestro_result', self.run_maestro_flow(maestro_flow_path))
-            )
-            maestro_thread.start()
+    def _run_maestro(self, flow_path):
+        """Run Maestro flow and wait for completion."""
+        process = subprocess.Popen(
+            ["maestro", "test", str(flow_path)],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        process.wait()
 
-            # Wait for target hooks while Maestro runs
-            assert self.wait_for_target_hook(target_class, target_methods), \
-                "Target hook(s) not found in output.json"
 
-            # Wait for Maestro to complete
-            maestro_thread.join(timeout=35)
-            maestro_success = getattr(self, '_maestro_result', False)
+    def _run_hook_test(self, hook_file, target_class, target_methods, sample_app_process, maestro_flow_path):
+        """Common logic for running hook tests with Maestro."""
+        output_file = Path("output.json")
+        stop_frooky = threading.Event()
 
-            assert maestro_success, "Maestro flow failed or timed out"
+        frooky_thread = threading.Thread(target=self._run_frooky, args=(sample_app_process, hook_file, stop_frooky))
+        frooky_thread.start()
 
-        finally:
-            process.terminate()
-            try:
-                process.wait(timeout=2)
-            except subprocess.TimeoutExpired:
-                process.kill()
-                process.wait()
+        maestro_thread = threading.Thread(target=self._run_maestro, args=(maestro_flow_path,))
+        maestro_thread.start()
+        maestro_thread.join()
+
+        stop_frooky.set()
+        frooky_thread.join()
+
+        assert output_file.exists(), "output.json was not created"
+        hooks_found = self._scan_target_hook(output_file, target_class, target_methods)
+        assert hooks_found, "Target hook(s) not found in output.json"
+
 
     def test_hook_single_java_method(self, sample_app_process, hooks_dir, maestro_flow_path):
         """Test hooking a single Java method in a real process."""
