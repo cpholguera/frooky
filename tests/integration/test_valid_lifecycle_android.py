@@ -16,9 +16,24 @@ class TestHookJavaMethod:
         return Path(__file__).parent / "hooks"
 
     @pytest.fixture
-    def sample_app_process(self):
-        """Test app identifier - adjust to your actual test app."""
-        return "org.owasp.mastestapp"
+    def pid(self):
+        """The process id from the running target app"""
+        try:
+            result = subprocess.run(
+                ['frida-ps', '-Uai'],
+                capture_output=True,
+                text=True,
+                check=False
+            )
+            ps_output = result.stdout
+            for line in ps_output.splitlines():
+                parts = line.split()
+                if len(parts) >= 3 and parts[2] == "org.owasp.mastestapp":
+                    return int(parts[0])
+            pytest.fail("Could not find pid for org.owasp.mastestapp")
+
+        except FileNotFoundError:
+            pytest.fail("frida-ps command not found")
 
     @pytest.fixture
     def maestro_flow_path(self):
@@ -68,13 +83,13 @@ class TestHookJavaMethod:
         return False
 
 
-    def _run_frooky(self, sample_app_process, hook_file, stop_event, output_file):
+    def _run_frooky(self, pid, hook_file, stop_event, output_file):
         """Run Frooky and monitor stop_event."""
         process = subprocess.Popen(
             [
                 "frooky", 
                 "-U", 
-                "-f", sample_app_process, 
+                "-p", pid, 
                 "--platform", "android",
                 "-o", str(output_file),  # Add explicit output file
                 str(hook_file)
@@ -134,22 +149,22 @@ class TestHookJavaMethod:
         assert hooks_found, "Target hook(s) not found in output.json"
 
 
-    def test_hook_single_java_method(self, sample_app_process, hooks_dir, maestro_flow_path):
+    def test_hook_single_java_method(self, pid, hooks_dir, maestro_flow_path):
         """Test hooking a single Java method in a real process."""
         self._run_hook_test(
             hooks_dir / "single_java_method.json",
             "android.app.SharedPreferencesImpl$EditorImpl",
             ["putString"],
-            sample_app_process,
+            pid,
             maestro_flow_path
         )
 
-    def test_hook_multiple_java_methods(self, sample_app_process, hooks_dir, maestro_flow_path):
+    def test_hook_multiple_java_methods(self, pid, hooks_dir, maestro_flow_path):
         """Test hooking multiple Java methods in a real process."""
         self._run_hook_test(
             hooks_dir / "multiple_java_methods.json",
             "androidx.security.crypto.EncryptedSharedPreferences$Editor",
             ["putString", "putStringSet"],
-            sample_app_process,
+            pid,
             maestro_flow_path
         )
