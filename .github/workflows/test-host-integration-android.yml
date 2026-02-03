@@ -45,7 +45,7 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Start Android Emulator and install target app
+      - name: Start Android Emulator and run integration tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -54,7 +54,6 @@ jobs:
           emulator-options: -wipe-data -no-snapshot-save -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: |
-
             chmod +x .github/scripts/android/prep-device.sh
             .github/scripts/android/prep-device.sh
 
@@ -63,7 +62,8 @@ jobs:
 
             # Install the app APK
             cd docs/examples/android-app && unzip -o MASTG-DEMO-0060.apk.zip && adb install -r MASTG-DEMO-0060.apk
+            cd ../../..
 
+            # Run pytest while emulator is still running
+            pytest tests/integration
 
-      - name: Run frooky host integration tests for Android
-        run: pytest tests/integration
