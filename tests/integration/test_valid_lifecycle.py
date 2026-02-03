@@ -68,12 +68,19 @@ class TestHookJavaMethod:
         return False
 
 
-    def _run_frooky(self, sample_app_process, hook_file, stop_event):
+    def _run_frooky(self, sample_app_process, hook_file, stop_event, output_file):
         """Run Frooky and monitor stop_event."""
         process = subprocess.Popen(
-            ["frooky", "-U", "-f", sample_app_process, "--platform", "android", str(hook_file)],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
+            [
+                "frooky", 
+                "-U", 
+                "-f", sample_app_process, 
+                "--platform", "android",
+                "-o", str(output_file),  # Add explicit output file
+                str(hook_file)
+            ],
+            stdout=subprocess.PIPE,  # Capture instead of suppressing
+            stderr=subprocess.PIPE
         )
 
         # Wait until stop_event is set
@@ -82,9 +89,13 @@ class TestHookJavaMethod:
 
         process.terminate()
         try:
-            process.wait(timeout=2)
+            stdout, stderr = process.communicate(timeout=2)
+            if stderr:
+                print(f"Frooky stderr: {stderr.decode()}")
         except subprocess.TimeoutExpired:
             process.kill()
+            stdout, stderr = process.communicate()
+
 
 
     def _run_maestro(self, flow_path):
@@ -102,8 +113,14 @@ class TestHookJavaMethod:
         output_file = Path("output.json")
         stop_frooky = threading.Event()
 
-        frooky_thread = threading.Thread(target=self._run_frooky, args=(sample_app_process, hook_file, stop_frooky))
+        frooky_thread = threading.Thread(
+            target=self._run_frooky, 
+            args=(sample_app_process, hook_file, stop_frooky, output_file)
+        )
         frooky_thread.start()
+
+        # Give frooky time to attach before starting Maestro
+        time.sleep(5)
 
         maestro_thread = threading.Thread(target=self._run_maestro, args=(maestro_flow_path,))
         maestro_thread.start()
@@ -112,7 +129,7 @@ class TestHookJavaMethod:
         stop_frooky.set()
         frooky_thread.join()
 
-        assert output_file.exists(), "output.json was not created"
+        assert output_file.exists(), f"output.json was not created. Check if frooky supports -o flag or writes to a different location"
         hooks_found = self._scan_target_hook(output_file, target_class, target_methods)
         assert hooks_found, "Target hook(s) not found in output.json"
 
