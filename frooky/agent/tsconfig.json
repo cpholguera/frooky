@@ -12,7 +12,7 @@
       "frida-java-bridge",
       "frida-objc-bridge",
       "frida-swift-bridge",
-      "./tests/test-framework.d.ts"
+      "./tests/agent-test-framework.d.ts"
     ]
   },
   "include": [

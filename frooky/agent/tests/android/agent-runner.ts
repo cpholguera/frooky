@@ -1,5 +1,5 @@
 // tests/android/test-runner.ts
-import { runTests } from '../test-framework';
+import { runTests } from '../agent-test-framework';
 import Java from "frida-java-bridge";
 
 // Import all test files
