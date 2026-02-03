@@ -16,8 +16,8 @@ permissions:
 
 jobs:
   # Build once and upload artifact
-  build:
-    uses: ./.github/workflows/build.yml
+  prod-build:
+    uses: ./.github/workflows/prod-build.yml
 
   # Run all tests in parallel (they all depend on build and download the artifact)
   verify-build:
