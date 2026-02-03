@@ -2,4 +2,3 @@ appId: org.owasp.mastestapp
 ---
 - assertVisible: "OWASP MAS"
 - tapOn: "Start"
-- stopApp
