@@ -63,22 +63,7 @@ jobs:
             # adb install mas-app-android/app/build/outputs/apk/debug/app-debug.apk
 
             # Run the testing script
-            cd docs/examples/android-app && chmod +x auto.sh && ./auto.sh
-
-      # - name: Upload APK
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: MASTestApp.apk
-      #     path: mas-app-android/app/build/outputs/apk/debug/app-debug.apk
-
-      - name: Prepare artifacts for upload
-        if: always()
-        run: |
-          chmod +x .github/scripts/prepare-artifacts.sh
-          .github/scripts/prepare-artifacts.sh android
-
-
-
+            cd docs/examples/android-app && chmod +x auto-integration.sh && ./auto-integration.sh
 
 
       - uses: actions/setup-python@v5
