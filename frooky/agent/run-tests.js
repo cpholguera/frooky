@@ -60,7 +60,7 @@ async function runTests() {
                 testComplete = true;
 
                 if (payload.success) {
-                    console.log('\n✅ PASSE: All tests passed.');
+                    console.log('\n✅ PASS: All tests passed.');
                     exitCode = 0;
                 } else {
                     console.error('\n❌ FAIL: Some tests failed.');
