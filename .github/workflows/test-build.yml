@@ -1,4 +1,4 @@
-name: Verify Build
+name: Verify Production Build
 
 on:
   workflow_call:
