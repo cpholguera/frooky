@@ -17,7 +17,6 @@ class AndroidTestHelper:
 
         with open(output_file, 'r') as f:
             for line in f:
-                print(line)
                 try:
                     entry = json.loads(line.strip())
 
