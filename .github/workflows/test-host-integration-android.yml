@@ -65,9 +65,5 @@ jobs:
             cd docs/examples/android-app && unzip -o MASTG-DEMO-0060.apk.zip && adb install -r MASTG-DEMO-0060.apk
 
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.14"
-
       - name: Run frooky host integration tests for Android
         run: pytest tests/integration
