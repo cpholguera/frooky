@@ -15,20 +15,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Install Python dependencies and frooky .[dev]
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install '.[dev]'
+
+      - name: Setup Node.js for agent compilation
         uses: actions/setup-node@v4
         with:
           node-version: "24"
           cache: 'npm'
           cache-dependency-path: './frooky/agent/package-lock.json'
 
-      - name: Compile agent
+      - name: Compile agents
         run: |
           chmod +x compileAgent.sh
           ./compileAgent.sh --dev
-
-      - name: Install development version of frooky
-        run: pip install '.[dev]'
 
       - name: Install Maestro
         run: |
@@ -41,7 +43,7 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Start Android Emulator and Run Tests
+      - name: Start Android Emulator and install target app
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
