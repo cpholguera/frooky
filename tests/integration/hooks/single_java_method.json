@@ -1,0 +1,9 @@
+{
+  "category": "STORAGE",
+  "hooks": [
+    {
+      "class": "android.app.SharedPreferencesImpl$EditorImpl",
+      "methods": ["putString"]
+    }
+  ]
+}
