@@ -1,4 +1,4 @@
-name: Build Python Package
+name: Prod Build Python Package
 
 on:
   workflow_call:
