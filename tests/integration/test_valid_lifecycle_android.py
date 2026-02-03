@@ -52,7 +52,8 @@ class TestHookJavaMethod:
 
         if output_file.exists():
             output_file.unlink()
-
+            
+    # TODO: We should make this method more generic, so we match an incomplete SHOULD json with the ACTUAL json
     def _scan_target_hook(self, output_file, target_class, target_methods):
         """Scan output NDJSON for target class and all specified methods."""
         target_methods_set = set(target_methods)
