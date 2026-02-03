@@ -1,4 +1,4 @@
-name: Python Tests
+name: Test Frooky Host
 
 permissions:
   contents: read

@@ -1,8 +1,10 @@
+"""Tests for CLI functionality such as parsing arguments or command validation."""
+
 import pytest
 from frooky.cli import build_parser
 
-
 class TestArgumentParsing:
+    """Tests for CLI argument parsing functionality."""
 
     def test_parser_requires_platform(self, capsys):
         """Platform argument is required"""
@@ -26,4 +28,3 @@ class TestArgumentParsing:
         captured = capsys.readouterr()
         assert "invalid choice" in captured.err.lower()
         assert invalid_platform in captured.err.lower()
-
