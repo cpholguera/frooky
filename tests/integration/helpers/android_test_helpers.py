@@ -71,14 +71,14 @@ class AndroidTestHelper:
         process.wait()
 
     @staticmethod
-    def run_hook_test(hook_file, target_class, target_methods, sample_app_process, maestro_flow_path):
+    def run_hook_test(hook_file, target_class, target_methods, pid, maestro_flow_path):
         """Common logic for running hook tests with Maestro."""
         output_file = Path("output.json")
         stop_frooky = threading.Event()
 
         frooky_thread = threading.Thread(
             target=AndroidTestHelper.run_frooky, 
-            args=(sample_app_process, hook_file, stop_frooky, output_file)
+            args=(pid, hook_file, stop_frooky, output_file)
         )
         frooky_thread.start()
 
