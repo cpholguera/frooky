@@ -25,7 +25,7 @@ class TestHookJavaMethod:
     def test_hook_java_multiple_methods(self, pid, hooks_dir, maestro_flow_path):
         """Test hooking multiple Java methods in a real process."""
 
-        target_patterns = [
+        expected_patterns = [
             {
                 "class": "androidx.security.crypto.EncryptedSharedPreferences$Editor",
                 "method": "putString",
@@ -38,7 +38,7 @@ class TestHookJavaMethod:
 
         run_hook_test(
             hooks_dir / "java_multiple_methods.json",
-            target_patterns,
+            expected_patterns,
             pid,
             maestro_flow_path,
             "android"
@@ -48,7 +48,7 @@ class TestHookJavaMethod:
     def test_hook_java_single_method_overload(self, pid, hooks_dir, maestro_flow_path):
         """Test hooking single Java methods and one overload."""
 
-        target_patterns = [
+        expected_patterns = [
             {
                 "class": "androidx.security.crypto.EncryptedSharedPreferences",
                 "method": "create",
@@ -74,7 +74,7 @@ class TestHookJavaMethod:
 
         run_hook_test(
             hooks_dir / "java_single_method_overload.json",
-            target_patterns,
+            expected_patterns,
             pid,
             maestro_flow_path,
             "android"
