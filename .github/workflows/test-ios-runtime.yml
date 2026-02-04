@@ -1,0 +1,131 @@
+name: Test iOS Runtime
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install frooky from wheel
+        run: pip install dist/*.whl
+
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Clone mas-app-ios repository
+        uses: actions/checkout@v4
+        with:
+          repository: cpholguera/mas-app-ios
+          path: mas-app-ios
+
+      - name: Copy example files
+        run: |
+          EXAMPLE_DIR="docs/examples/ios-app"
+
+          # Copy MastgTest.swift if it exists
+          if [ -f "$EXAMPLE_DIR/MastgTest.swift" ]; then
+            cp -f "$EXAMPLE_DIR/MastgTest.swift" mas-app-ios/MASTestApp/MastgTest.swift
+            echo "Copied MastgTest.swift"
+          fi
+
+      - name: Build the app for simulator
+        run: |
+          cd mas-app-ios
+          
+          # Copy the CI config file
+          cp .github/Local.xcconfig.ci Local.xcconfig
+          
+          # Get the default scheme
+          DEFAULT_SCHEME=$(xcodebuild -list -json | jq -r '.project.targets[0]')
+          echo "Using scheme: $DEFAULT_SCHEME"
+          
+          # Build for simulator
+          xcodebuild build \
+            -project "MASTestApp.xcodeproj" \
+            -scheme "$DEFAULT_SCHEME" \
+            -destination "platform=iOS Simulator,name=iPhone 16" \
+            -derivedDataPath "$GITHUB_WORKSPACE/DerivedData" \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+          
+          echo "Build succeeded"
+
+      - name: Boot iOS Simulator
+        run: |
+          # List available simulators
+          xcrun simctl list devices available
+          
+          # Boot iPhone 16 simulator
+          xcrun simctl boot "iPhone 16" || echo "Simulator already booted"
+          
+          # Wait for simulator to be ready
+          sleep 5
+
+      - name: Install app on simulator
+        run: |
+          # Find the built .app
+          APP_PATH=$(find "$GITHUB_WORKSPACE/DerivedData" -name "*.app" -type d | head -1)
+          echo "Found app at: $APP_PATH"
+          
+          if [ -z "$APP_PATH" ]; then
+            echo "Error: Could not find the built .app file."
+            exit 1
+          fi
+          
+          # Install the app
+          xcrun simctl install "iPhone 16" "$APP_PATH"
+          echo "App installed successfully"
+
+      - name: Run Tests
+        run: |
+          set -eux
+          
+          # Run the auto.sh script from the example directory
+          cd docs/examples/ios-app && chmod +x auto.sh && ./auto.sh
+
+      - name: Prepare artifacts for upload
+        if: always()
+        run: |
+          chmod +x .github/scripts/prepare-artifacts.sh
+          .github/scripts/prepare-artifacts.sh ios
+
+      - name: Evaluate Test Results
+        if: always()
+        run: |
+          chmod +x .github/scripts/evaluate-results.sh
+          .github/scripts/evaluate-results.sh ios
+
+      - name: Create Job Summary
+        if: always()
+        run: |
+          chmod +x .github/scripts/create-job-summary.sh
+          .github/scripts/create-job-summary.sh ios >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Dynamic Test Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-dynamic-test-results
+          path: ios-test-results/*
