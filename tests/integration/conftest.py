@@ -4,8 +4,6 @@ import subprocess
 from pathlib import Path
 import pytest
 import json
-from deepdiff import DeepDiff
-import sys
 
 @pytest.fixture
 def hooks_dir():
