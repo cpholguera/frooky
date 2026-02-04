@@ -1,0 +1,134 @@
+name: Test Android Runtime
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install frooky from wheel
+        run: pip install dist/*.whl
+
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
+
+      # - name: Set up JDK 17
+      #   uses: actions/setup-java@v4
+      #   with:
+      #     java-version: '17'
+      #     distribution: 'temurin'
+
+      # - name: Setup Gradle
+      #   uses: gradle/actions/setup-gradle@v4
+
+      # - name: Clone mas-app-android repository
+      #   uses: actions/checkout@v4
+      #   with:
+      #     repository: cpholguera/mas-app-android
+      #     path: mas-app-android
+
+      # - name: Copy example files and build APK
+      #   run: |
+      #     EXAMPLE_DIR="docs/examples/android-app"
+
+      #     # Copy MastgTest.kt if it exists
+      #     if [ -f "$EXAMPLE_DIR/MastgTest.kt" ]; then
+      #       cp -f "$EXAMPLE_DIR/MastgTest.kt" mas-app-android/app/src/main/java/org/owasp/mastestapp/MastgTest.kt
+      #       echo "Copied MastgTest.kt"
+      #     fi
+
+      #     # Copy build.gradle.kts.libs if it exists
+      #     if [ -f "$EXAMPLE_DIR/build.gradle.kts.libs" ]; then
+      #       sed -i '/\/\/ ADD_LIBS_HERE/{
+      #         r '"$EXAMPLE_DIR/build.gradle.kts.libs"'
+      #         d
+      #       }' mas-app-android/app/build.gradle.kts
+      #       echo "Replaced libs in build.gradle.kts"
+      #     fi
+
+      #     # Build the APK
+      #     cd mas-app-android
+      #     ./gradlew assembleDebug --stacktrace
+      #     echo "Build succeeded"
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Start Android Emulator and Run Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          emulator-options: -wipe-data -no-snapshot-save -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+
+            chmod +x .github/scripts/android/prep-device.sh
+            .github/scripts/android/prep-device.sh
+
+            chmod +x .github/scripts/android/install-frida-server.sh
+            .github/scripts/android/install-frida-server.sh
+
+            # Install the app APK
+            cd docs/examples/android-app && unzip -o MASTG-DEMO-0060.apk.zip && adb install -r MASTG-DEMO-0060.apk
+
+            # adb install mas-app-android/app/build/outputs/apk/debug/app-debug.apk
+
+            # Run the testing script
+            cd docs/examples/android-app && chmod +x auto.sh && ./auto.sh
+
+      # - name: Upload APK
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: MASTestApp.apk
+      #     path: mas-app-android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Prepare artifacts for upload
+        if: always()
+        run: |
+          chmod +x .github/scripts/prepare-artifacts.sh
+          .github/scripts/prepare-artifacts.sh android
+
+      - name: Evaluate Test Results
+        if: always()
+        run: |
+          chmod +x .github/scripts/evaluate-results.sh
+          .github/scripts/evaluate-results.sh android
+
+      - name: Create Job Summary
+        if: always()
+        run: |
+          chmod +x .github/scripts/create-job-summary.sh
+          .github/scripts/create-job-summary.sh android >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Dynamic Test Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-dynamic-test-results
+          path: android-test-results/*
