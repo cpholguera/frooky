@@ -60,21 +60,31 @@ def cleanup_output_json():
         output_file.unlink()
 
 
-def matches_pattern_recursive(target, pattern):
-    
-    
-    print(target, file=sys.stderr)
-    print(pattern, file=sys.stderr)
-
-    
+def matches_subset_pattern_recursive(target, pattern):
+    """
+    Check if pattern is a subset of target structure.
+    - For dicts: pattern keys must exist in target with matching values
+    - For lists: pattern and target must have same length, each element must match
+    - For primitives: must be equal
+    """
     if isinstance(pattern, dict):
         if not isinstance(target, dict):
             return False
         return all(
-            key in target and matches_pattern_recursive(target[key], value)
+            key in target and matches_subset_pattern_recursive(target[key], value)
             for key, value in pattern.items()
         )
-    return target == pattern
+    elif isinstance(pattern, list):
+        if not isinstance(target, list):
+            return False
+        if len(pattern) != len(target):
+            return False
+        return all(
+            matches_subset_pattern_recursive(target[i], pattern[i])
+            for i in range(len(pattern))
+        )
+    else:
+        return target == pattern
 
 
 def contains_all_hooks(output_file, target_hooks):
