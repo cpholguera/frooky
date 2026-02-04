@@ -7,7 +7,7 @@ class TestHookJavaMethod:
     def test_hook_java_single_method(self, pid, hooks_dir, maestro_flow_path):
         """Test hooking a single Java method in a real process."""
 
-        target_patterns = [
+        expected_patterns = [
             {
                 "class": "android.app.SharedPreferencesImpl$EditorImpl",
                 "method": "putString",
@@ -16,7 +16,7 @@ class TestHookJavaMethod:
 
         run_hook_test(
             hooks_dir / "java_single_method.json",
-            target_patterns,
+            expected_patterns,
             pid,
             maestro_flow_path,
             "android"
