@@ -85,7 +85,7 @@ def matches_subset_pattern_recursive(target, pattern):
         return target == pattern
 
 
-def contains_all_hooks(output_file, target_hooks):
+def contains_expected_patterns(output_file, target_hooks):
     """Scan output NDJSON for hooks matching the specified patterns. Returns true if all have been found"""
 
     found_patterns = [False] * len(target_hooks)
@@ -154,7 +154,7 @@ def run_maestro_blocking(flow_path, timeout=60):
         raise
 
 
-def run_hook_test(hook_file, target_patterns, pid, maestro_flow_path, platform):
+def run_hook_test(hook_file, expected_patterns, pid, maestro_flow_path, platform):
     """Common logic for running hook tests with Maestro."""
     output_file = Path("output.json")
 
@@ -175,4 +175,4 @@ def run_hook_test(hook_file, target_patterns, pid, maestro_flow_path, platform):
                 print(f"Frooky stderr (after kill): {stderr.decode()}")
 
     assert output_file.exists(), "output.json was not created"
-    assert contains_all_hooks(output_file, target_patterns), "not all target patterns have been found in output.json"
+    assert contains_expected_patterns(output_file, expected_patterns), "not all target patterns have been found in output.json"
