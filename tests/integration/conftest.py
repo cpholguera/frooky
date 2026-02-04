@@ -3,7 +3,9 @@ import time
 import subprocess
 from pathlib import Path
 import pytest
-
+import json
+from deepdiff import DeepDiff
+import sys
 
 @pytest.fixture
 def hooks_dir():
@@ -56,3 +58,113 @@ def cleanup_output_json():
 
     if output_file.exists():
         output_file.unlink()
+
+
+def matches_pattern_recursive(target, pattern):
+    
+    
+    print(target, file=sys.stderr)
+    print(pattern, file=sys.stderr)
+
+    
+    if isinstance(pattern, dict):
+        if not isinstance(target, dict):
+            return False
+        return all(
+            key in target and matches_pattern_recursive(target[key], value)
+            for key, value in pattern.items()
+        )
+    return target == pattern
+
+
+def contains_all_hooks(output_file, target_hooks):
+    """Scan output NDJSON for hooks matching the specified patterns. Returns true if all have been found"""
+
+    found_patterns = [False] * len(target_hooks)
+
+    with open(output_file, 'r') as f:
+        for line in f:           
+            try:
+                entry = json.loads(line)
+
+                # Skip summary entries
+                if entry.get("type") == "summary":
+                    continue
+
+                # Compare this entry against each pattern
+                for idx, pattern in enumerate(target_hooks):
+                    if not found_patterns[idx]:
+                        if matches_pattern_recursive(entry, pattern):
+                            found_patterns[idx] = True
+
+                            if all(found_patterns):
+                                return True
+
+            except json.JSONDecodeError:
+                pass
+
+    return all(found_patterns)
+
+
+def run_frooky(pid, hook_file, output_file, platform):
+    """Start Frooky process and return it."""
+    return subprocess.Popen(
+        [
+            "frooky", 
+            "-U", 
+            "-p", pid, 
+            "--platform", platform,
+            "-o", output_file,
+            hook_file
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+
+def run_maestro_blocking(flow_path, timeout=60):
+    """Run Maestro flow and wait for completion with timeout."""
+    process = subprocess.Popen(
+        ["maestro", "test", str(flow_path)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+
+    try:
+        stdout, stderr = process.communicate(timeout=timeout)
+        if stderr:
+            print(f"Maestro stderr: {stderr.decode()}")
+        if process.returncode != 0:
+            print(f"Maestro failed with return code {process.returncode}")
+            if stdout:
+                print(f"Maestro stdout: {stdout.decode()}")
+    except subprocess.TimeoutExpired:
+        process.kill()
+        stdout, stderr = process.communicate()
+        print(f"Maestro timed out after {timeout} seconds")
+        if stderr:
+            print(f"Maestro stderr: {stderr.decode()}")
+        raise
+
+
+def run_hook_test(hook_file, target_patterns, pid, maestro_flow_path, platform):
+    """Common logic for running hook tests with Maestro."""
+    output_file = Path("output.json")
+
+    frooky_process = run_frooky(pid, hook_file, output_file, platform)
+
+    try:
+        run_maestro_blocking(maestro_flow_path, timeout=60)
+    finally:
+        frooky_process.terminate()
+        try:
+            _, stderr = frooky_process.communicate(timeout=2)
+            if stderr:
+                print(f"Frooky stderr: {stderr.decode()}")
+        except subprocess.TimeoutExpired:
+            frooky_process.kill()
+            _, stderr = frooky_process.communicate()
+            if stderr:
+                print(f"Frooky stderr (after kill): {stderr.decode()}")
+
+    assert output_file.exists(), "output.json was not created"
+    assert contains_all_hooks(output_file, target_patterns), "not all target patterns have been found in output.json"
