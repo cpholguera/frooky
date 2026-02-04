@@ -95,10 +95,6 @@ def contains_expected_patterns(output_file, target_hooks):
             try:
                 entry = json.loads(line)
 
-                # Skip summary entries
-                if entry.get("type") == "summary":
-                    continue
-
                 # Compare this entry against each pattern
                 for idx, pattern in enumerate(target_hooks):
                     if not found_patterns[idx]:
