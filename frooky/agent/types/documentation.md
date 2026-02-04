@@ -432,17 +432,15 @@ hooks:
 
 ### Stack Trace Filtering
 
-Filter out noisy framework calls:
+Filter out calls which do not originate from your target app, but maybe from an noisy SDK:
 
 ```yaml
-- javaClass: com.example.MyClass
+- javaClass: android.content.SharedPreferences
   methods:
-    - name: sensitiveMethod
-  stackTraceLimit: 20
+    - name: getString
+  stackTraceLimit: 10
   stackTraceFilter:
-    - "^java\\."
-    - "^android\\."
-    - "^com\\.android\\."
+    - "^org\\.owasp.\\."
 ```
 
 ### Debug Mode
@@ -527,11 +525,11 @@ hooks:
 
 ### 2. Use Stack Trace Filtering
 
-Reduce noise in logs:
+Reduce noise in logs by only including events relevant to you:
 
 ```yaml
 stackTraceFilter:
-  - "^java\\."
+  - "^org\\.owasp\\."
   - "^android\\."
 ```
 
@@ -550,16 +548,4 @@ Improve hook reliability:
 ```yaml
 - module: libcrypto.so
   symbol: EVP_EncryptInit_ex
-```
-
-### 5. Document Custom Decoders
-
-```yaml
-- javaClass: android.content.Intent
-  methods:
-    - name: setFlags
-      overloads:
-        - args:
-            - name: int
-              decoder: IntentFlagsDecoder  # Decodes Intent flags as human-readable strings
 ```
