@@ -104,7 +104,7 @@ def contains_all_hooks(output_file, target_hooks):
                 # Compare this entry against each pattern
                 for idx, pattern in enumerate(target_hooks):
                     if not found_patterns[idx]:
-                        if matches_pattern_recursive(entry, pattern):
+                        if matches_subset_pattern_recursive(entry, pattern):
                             found_patterns[idx] = True
 
                             if all(found_patterns):
