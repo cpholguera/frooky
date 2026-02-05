@@ -103,5 +103,12 @@ jobs:
           xcrun simctl install "iPhone 16" "$APP_PATH"
           echo "App installed successfully"
 
+
+      - name: Start iOS app
+        run: |
+          xcrun simctl launch booted MASTestApp
+          sleep 10
+
       - name: Run iOS integration tests
         run: pytest tests/integration/ios
+
