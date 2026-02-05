@@ -70,7 +70,7 @@ class TestHookJavaMethod:
         assert contains_subset_of(
             expected_patterns, output_file_path), "output.json did not contain the expected pattern as a subset."
 
-    def test_hook_java_single_method_overload(self, pid, output_file_path, android_mastestapp_start):
+    def test_hook_java_single_method_overload(self, pid, output_file_path, mastestapp_start):
         """Test hooking single Java methods and one overload."""
 
         hooks = {
@@ -95,7 +95,7 @@ class TestHookJavaMethod:
         }
 
         run_frooky("android", hooks, pid, output_file_path,
-                   android_mastestapp_start)
+                   mastestapp_start)
 
         expected_patterns = [
             {
