@@ -8,16 +8,13 @@ import pytest
 import json
 
 
-@pytest.fixture
-def android_mastestapp_start():
+@pytest.fixture(params=["android", "ios"])
+def mastestapp_start(request):
     """Returns a maestro flow which pushes the start button from the ios MAS test app"""
-    return Path(__file__).parent / "maestro" / "android_mastestapp_start.yaml"
 
+    platform = request.param
 
-@pytest.fixture
-def ios_mastestapp_start():
-    """Returns a maestro flow which pushes the start button from the Android MAS test app"""
-    return Path(__file__).parent / "maestro" / "ios_mastestapp_start.yaml"
+    return Path(__file__).parent / "maestro" / f'{platform}-mastestapp-start.yaml'
 
 
 @pytest.fixture(params=["android", "ios"])

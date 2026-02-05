@@ -45,13 +45,35 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Start Android Emulator and run integration tests
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-34
+
+      - name: Create AVD snapshot (if not cached)
+        if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
           target: google_apis
           arch: x86_64
-          emulator-options: -wipe-data -no-snapshot-save -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: false
+          script: echo "Generated clean AVD snapshot"
+
+      - name: Run tests with clean emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -wipe-data -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: |
             chmod +x .github/scripts/android/prep-device.sh
@@ -60,10 +82,9 @@ jobs:
             chmod +x .github/scripts/android/install-frida-server.sh
             .github/scripts/android/install-frida-server.sh
 
-            # Install the app APK
             cd docs/examples/android-app && unzip -o MASTG-DEMO-0060.apk.zip && adb install -r MASTG-DEMO-0060.apk
             cd ../../..
 
-            # Run pytest while emulator is still running
+            # Run Android integration tests
             pytest tests/integration/android
 
