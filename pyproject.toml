@@ -69,4 +69,4 @@ python_functions = ["test_*"]
 addopts = "-v --strict-markers"
 
 [tool.pylint.MASTER]
-load-plugins = ["pylint-pytest"]
+load-plugins = "pylint_pytest"
