@@ -121,7 +121,7 @@ def run_frooky(platform, hooks, pid, output_file_path, maestro_flow_path):
     fd, hooks_path = tempfile.mkstemp(suffix='.json', text=True)
     with os.fdopen(fd, 'w') as f:
         json.dump(hooks, f)
-    
+
     # run frooky as background process
     frooky_process = subprocess.Popen(
         [
