@@ -65,6 +65,7 @@ def pid(platform):
         pytest.fail(f"Could not find PID for iOS app {app_id}: {result.stderr}")
 
 
+
 @pytest.fixture
 def output_file_path():
     """Return path to output.json file."""
@@ -72,105 +73,105 @@ def output_file_path():
 
 
 @pytest.fixture(autouse=True)
-def cleanup_output_json():
+def cleanup_output_json(output_file_path):
     """Remove output.json before and after each test."""
-    output_file = Path("output.json")
-
-    if output_file.exists():
-        output_file.unlink()
+    if output_file_path.exists():
+        output_file_path.unlink()
 
     yield
 
-    if output_file.exists():
-        output_file.unlink()
+    if output_file_path.exists():
+        output_file_path.unlink()
 
 
-def matches_subset_pattern_recursive(target, pattern):
+def matches_subset_pattern_recursive(event, pattern):
     """
-    Check if pattern is a subset of target structure.
-    - For dicts: pattern keys must exist in target with matching values
+    Check if pattern is a subset of event structure.
+    - For dicts: pattern keys must exist in event with matching values
     - For lists: pattern and target must have same length, each element must match
     - For primitives: must be equal
     """
     if isinstance(pattern, dict):
-        if not isinstance(target, dict):
+        if not isinstance(event, dict):
             return False
         return all(
-            key in target and matches_subset_pattern_recursive(
-                target[key], value)
+            key in event and matches_subset_pattern_recursive(
+                event[key], value)
             for key, value in pattern.items()
         )
     elif isinstance(pattern, list):
-        if not isinstance(target, list):
+        if not isinstance(event, list):
             return False
-        if len(pattern) != len(target):
+        if len(pattern) != len(event):
             return False
         return all(
-            matches_subset_pattern_recursive(target[i], pattern[i])
+            matches_subset_pattern_recursive(event[i], pattern[i])
             for i in range(len(pattern))
         )
     else:
-        return target == pattern
+        return event == pattern
 
 
-def contains_subset_of(target_hooks, output_file_path):
-    """Scan output NDJSON for hooks matching the specified patterns. Returns true if all have been found"""
 
-    found_patterns = [False] * len(target_hooks)
+@pytest.fixture
+def number_of_matched_events(output_file_path):
+    """Factory fixture to scan output NDJSON for hooks matching the specified patterns."""
 
-    with open(output_file_path, 'r') as f:
-        for line in f:
-            try:
-                entry = json.loads(line)
+    def _count_matches(expected_event):
+        number_of_matched_events = 0
 
-                # Compare this entry against each pattern
-                for idx, pattern in enumerate(target_hooks):
-                    if not found_patterns[idx]:
-                        if matches_subset_pattern_recursive(entry, pattern):
-                            found_patterns[idx] = True
+        with open(output_file_path, 'r') as f:
+            for line in f:
+                try:
+                    entry = json.loads(line)
+                    if matches_subset_pattern_recursive(entry, expected_event):
+                        number_of_matched_events += 1
+                except json.JSONDecodeError:
+                    pass
 
-                            if all(found_patterns):
-                                return True
+        return number_of_matched_events
 
-            except json.JSONDecodeError:
-                pass
+    return _count_matches
 
-    return all(found_patterns)
 
-def run_frooky(platform, hooks, pid, output_file_path, maestro_flow_path):
-    """Common logic for running hook tests with Maestro."""
+@pytest.fixture
+def run_frooky(platform, pid, output_file_path, mastestapp_start):
+    """Factory fixture for running hook tests with Maestro."""
 
-    # create a temporary hook.json file
-    fd, hooks_path = tempfile.mkstemp(suffix='.json', text=True)
-    with os.fdopen(fd, 'w') as f:
-        json.dump(hooks, f)
+    def _run_frooky(hook):
+        # write the hooks into a temporary file
+        fd, hook_path = tempfile.mkstemp(suffix='.json', text=True)
+        with os.fdopen(fd, 'w') as f:
+            json.dump(hook, f)
 
-    # run frooky as background process
-    frooky_process = subprocess.Popen(
-        [
-            "frooky",
-            *(["-U"] if platform == "android" else []),
-            "-p", pid,
-            "--platform", platform,
-            "-o", output_file_path,
-            hooks_path
-        ]
-    )
-
-    try:
-        # run maestro as blocking foreground process
-        maestro_timeout = 60
-        subprocess.run(
-            ["maestro", "test","--platform", platform , str(maestro_flow_path)],
-            timeout=maestro_timeout,
-            check=True
+        # run frooky as background process
+        frooky_process = subprocess.Popen(
+            [
+                "frooky",
+                *(["-U"] if platform == "android" else []),
+                "-p", pid,
+                "--platform", platform,
+                "-o", output_file_path,
+                hook_path
+            ]
         )
-    finally:
-        if os.path.exists(hooks_path):
-            os.remove(hooks_path)
-        frooky_process.terminate()
+
         try:
-            frooky_process.wait(timeout=2)
-        except subprocess.TimeoutExpired:
-            frooky_process.kill()
-            frooky_process.wait()
+            # run maestro as blocking foreground process
+            maestro_timeout = 60
+            subprocess.run(
+                ["maestro", "test", "--platform", platform, str(mastestapp_start)],
+                timeout=maestro_timeout,
+                check=True
+            )
+        finally:
+            if os.path.exists(hook_path):
+                os.remove(hook_path)
+            frooky_process.terminate()
+            try:
+                frooky_process.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                frooky_process.kill()
+                frooky_process.wait()
+
+    return _run_frooky
