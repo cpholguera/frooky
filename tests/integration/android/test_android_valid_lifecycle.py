@@ -12,11 +12,10 @@ class TestHookJavaMethod:
             "category": "STORAGE",
             "hooks": [
                 {
-                    "class": "android.app.SharedPreferencesImpl$EditorImpl",
+                    "class": "androidx.security.crypto.EncryptedSharedPreferences$Editor",
                     "methods": [
                         "putString"
-                    ],
-                    "filterEventsByStacktrace": ["org.owasp.mastestapp"]
+                    ]
                 }
             ]
         }
@@ -24,12 +23,12 @@ class TestHookJavaMethod:
         run_frooky(hook)
 
         expected_pattern = {
-                "class": "android.app.SharedPreferencesImpl$EditorImpl",
+                "class": "androidx.security.crypto.EncryptedSharedPreferences$Editor",
                 "method": "putString",
             }
 
         assert output_file_path.exists(), "output.json was not created"
-        assert number_of_matched_events(expected_pattern) == 3, "Not the amount of expected matched events found."
+        assert number_of_matched_events(expected_pattern) == 2, "Not the amount of expected matched events found."
 
     def test_hook_java_single_method_overload(self, run_frooky, number_of_matched_events, output_file_path):
         """Test hooking single Java methods and one overload."""
