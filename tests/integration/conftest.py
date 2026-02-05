@@ -8,6 +8,7 @@ import json
 import sys
 import pytest
 
+
 @pytest.fixture(params=["android", "ios"])
 def platform(request):
     """Platform to test against."""
@@ -18,6 +19,7 @@ def platform(request):
 def mastestapp_start(platform):
     """Returns a maestro flow which pushes the start button from the MAS test app"""
     return Path(__file__).parent / "maestro" / f'{platform}-mastestapp-start.yaml'
+
 
 def get_android_pid():
     """Makes sure the Android app is running and returns the process id."""
@@ -62,8 +64,8 @@ def get_ios_app_name():
 
         return app_name
     except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Could not launch iOS app {app_name}: {e.stderr}") from e
-
+        raise RuntimeError(
+            f"Could not launch iOS app {app_name}: {e.stderr}") from e
 
 
 @pytest.fixture
@@ -112,7 +114,6 @@ def matches_subset_pattern_recursive(event, pattern):
         return event == pattern
 
 
-
 @pytest.fixture
 def number_of_matched_events(output_file_path):
     """Factory fixture to scan output NDJSON for hooks matching the specified patterns."""
@@ -139,15 +140,18 @@ def run_frooky(platform, output_file_path, mastestapp_start):
     """Factory fixture for running hook tests with Maestro."""
 
     def _run_frooky(hook):
+        temp_hook_path = None
+        frooky_process = None
+
         # write the hooks into a temporary file
         fd, temp_hook_path = tempfile.mkstemp(suffix='.json', text=True)
         with os.fdopen(fd, 'w') as f:
             json.dump(hook, f)
 
-        # run frooky as background process
-        # start Android with PID, and iOS with app name
-        frooky_process = subprocess.Popen(
-            [
+        try:
+            # run frooky as background process
+            # start Android with PID, and iOS with app name
+            frooky_process = subprocess.Popen([
                 "frooky",
                 *(["-U"] if platform == "android" else []),
                 *(["-p", get_android_pid()] if platform == "android" else []),
@@ -156,32 +160,40 @@ def run_frooky(platform, output_file_path, mastestapp_start):
                 "-o", output_file_path,
                 temp_hook_path
             ],
-            text=True
-        )
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
 
-        maestro_timeout = 600
-        try:
+            # Wait to ensure frooky started successfully
+            time.sleep(5)
+            if frooky_process.poll() is not None:
+                _, stderr = frooky_process.communicate()
+                raise RuntimeError(f"Frooky failed to start: {stderr}")
+
+            # Run Maestro test
             subprocess.run(
-                ["maestro", "test", "--platform", platform, str(mastestapp_start)],
-                timeout=maestro_timeout,
+                [
+                    "maestro",
+                    "test",
+                    "--platform", platform,
+                    str(mastestapp_start)],
+                timeout=600,
                 check=True,
                 capture_output=True,
                 text=True
             )
-        except subprocess.TimeoutExpired as e:
-            print(e, file=sys.stderr)
-            raise
-        except subprocess.CalledProcessError as e:
-            print(e, file=sys.stderr)
-            raise
+
         finally:
-            if os.path.exists(temp_hook_path):
+            if temp_hook_path and os.path.exists(temp_hook_path):
                 os.remove(temp_hook_path)
-            frooky_process.terminate()
-            try:
-                frooky_process.wait(timeout=2)
-            except subprocess.TimeoutExpired:
-                frooky_process.kill()
-                frooky_process.wait()
+
+            if frooky_process:
+                frooky_process.terminate()
+                try:
+                    frooky_process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    frooky_process.kill()
+                    frooky_process.wait()
 
     return _run_frooky
