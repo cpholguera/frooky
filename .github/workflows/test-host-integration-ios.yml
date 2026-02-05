@@ -77,11 +77,22 @@ jobs:
 
           echo "Build succeeded"
 
+
       - name: Boot iOS Simulator
         run: |
-          echo "Waiting for Simulator to be ready..."
-          xcrun simctl bootstatus "iPhone 16" -b
+          DEVICE_NAME="iPhone 16"
 
+          # Check if simulator is already booted
+          if xcrun simctl list devices | grep "$DEVICE_NAME" | grep -q "Booted"; then
+            echo "Simulator '$DEVICE_NAME' is already running."
+          else
+            echo "Simulator '$DEVICE_NAME' is not running. Attempting to boot..."
+            xcrun simctl boot "$DEVICE_NAME" || { echo "Error: Failed to boot simulator"; exit 1; }
+          fi
+
+          # Wait for simulator to be ready
+          echo "Waiting for Simulator to be ready..."
+          xcrun simctl bootstatus "$DEVICE_NAME" -b || { echo "Error: Simulator failed to reach ready state"; exit 1; }
           echo "Simulator is ready."
 
 
