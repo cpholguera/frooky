@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   test:
-    runs-on: macos-13
+    runs-on: macos-latest
     timeout-minutes: 30
 
     steps:
@@ -88,7 +88,7 @@ jobs:
           # Wait for simulator to be ready
           sleep 10
 
-      - name: Install app on simulator
+      - name: Install app on simulator and run integration tests
         run: |
           # Find the built .app
           APP_PATH=$(find "$GITHUB_WORKSPACE/DerivedData" -name "*.app" -type d | head -1)
@@ -103,5 +103,7 @@ jobs:
           xcrun simctl install "iPhone 16" "$APP_PATH"
           echo "App installed successfully"
 
-      - name: Run iOS integration tests
-        run: pytest tests/integration/ios
+          # Wait for simulator to be ready
+          sleep 10
+
+          pytest tests/integration/ios
