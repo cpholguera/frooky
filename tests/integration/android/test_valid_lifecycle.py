@@ -7,7 +7,7 @@ from conftest import run_frooky, contains_subset_of
 class TestHookJavaMethod:
     """Tests for handling errors on the target related to Java methods."""
 
-    def test_hook_java_single_method(self, pid, output_file_path, android_mastestapp_start):
+    def test_hook_java_single_method(self, pid, output_file_path, mastestapp_start):
         """Test hooking a single Java method in a real process."""
 
         hooks = {
@@ -23,7 +23,7 @@ class TestHookJavaMethod:
         }
 
         run_frooky("android", hooks, pid, output_file_path,
-                   android_mastestapp_start)
+                   mastestapp_start)
 
         expected_patterns = [
             {
@@ -36,7 +36,7 @@ class TestHookJavaMethod:
         assert contains_subset_of(
             expected_patterns, output_file_path), "output.json did not contain the expected pattern as a subset."
 
-    def test_hook_java_multiple_methods(self, pid, output_file_path, android_mastestapp_start):
+    def test_hook_java_multiple_methods(self, pid, output_file_path, mastestapp_start):
         """Test hooking multiple Java methods in a real process."""
 
         hooks = {
@@ -52,8 +52,7 @@ class TestHookJavaMethod:
             ]
         }
 
-        run_frooky("android", hooks, pid, output_file_path,
-                   android_mastestapp_start)
+        run_frooky("android", hooks, pid, output_file_path, mastestapp_start)
 
         expected_patterns = [
             {
