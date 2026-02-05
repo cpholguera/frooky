@@ -79,9 +79,6 @@ jobs:
 
       - name: Boot iOS Simulator
         run: |
-          # List available simulators
-          xcrun simctl list devices available
-
           echo "Waiting for Simulator to be ready..."
           xcrun simctl bootstatus "iPhone 16" -b
 
