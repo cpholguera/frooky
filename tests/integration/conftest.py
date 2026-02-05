@@ -140,7 +140,7 @@ def run_frooky(platform, output_file_path, mastestapp_start):
 
     def _run_frooky(hook):
         # write the hooks into a temporary file
-        fd, hook_path = tempfile.mkstemp(suffix='.json', text=True)
+        fd, temp_hook_path = tempfile.mkstemp(suffix='.json', text=True)
         with os.fdopen(fd, 'w') as f:
             json.dump(hook, f)
 
@@ -154,29 +154,28 @@ def run_frooky(platform, output_file_path, mastestapp_start):
                 *(["-n", get_ios_app_name()] if platform == "ios" else []),
                 "--platform", platform,
                 "-o", output_file_path,
-                hook_path
+                temp_hook_path
             ]
         )
 
-        time.sleep(10)
-
+        maestro_timeout = 60
         try:
-            # run maestro as blocking foreground process
-            maestro_timeout = 120
-
             subprocess.run(
-                [
-                    "maestro", 
-                    "test", 
-                    "--platform", platform,
-                    str(mastestapp_start)
-                ],
+                ["maestro", "test", "--platform", platform, str(mastestapp_start)],
                 timeout=maestro_timeout,
-                check=True
+                check=True,
+                capture_output=True,
+                text=True
             )
+        except subprocess.TimeoutExpired as e:
+            print(e, file=sys.stderr)
+            raise
+        except subprocess.CalledProcessError as e:
+            print(e, file=sys.stderr)
+            raise
         finally:
-            if os.path.exists(hook_path):
-                os.remove(hook_path)
+            if os.path.exists(temp_hook_path):
+                os.remove(temp_hook_path)
             frooky_process.terminate()
             try:
                 frooky_process.wait(timeout=2)
