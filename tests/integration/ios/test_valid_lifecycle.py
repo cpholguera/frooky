@@ -2,6 +2,7 @@
 import pytest
 from conftest import run_frooky, contains_subset_of
 
+
 @pytest.mark.parametrize("pid", ["ios"], indirect=True)
 @pytest.mark.parametrize("mastestapp_start", ["ios"], indirect=True)
 class TestHookNativeMethod:
@@ -29,8 +30,7 @@ class TestHookNativeMethod:
             ]
         }
 
-        run_frooky("ios", hooks, pid, output_file_path,
-                   mastestapp_start)
+        run_frooky("ios", hooks, pid, output_file_path, mastestapp_start)
 
         # expected_patterns = [
         #     {
