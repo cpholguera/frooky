@@ -5,8 +5,8 @@ import time
 import subprocess
 from pathlib import Path
 import json
-import pytest
 import sys
+import pytest
 
 @pytest.fixture(params=["android", "ios"])
 def platform(request):
@@ -158,7 +158,7 @@ def run_frooky(platform, output_file_path, mastestapp_start):
             ]
         )
 
-        maestro_timeout = 60
+        maestro_timeout = 300
         try:
             subprocess.run(
                 ["maestro", "test", "--platform", platform, str(mastestapp_start)],
