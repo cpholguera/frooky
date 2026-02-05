@@ -145,7 +145,7 @@ def run_frooky(platform, output_file_path, mastestapp_start):
             json.dump(hook, f)
 
         # run frooky as background process
-        # start Android with PID, and iOS with 
+        # start Android with PID, and iOS with app name
         frooky_process = subprocess.Popen(
             [
                 "frooky",
