@@ -4,23 +4,25 @@ import tempfile
 import time
 import subprocess
 from pathlib import Path
-import pytest
 import json
+import pytest
 
 
 @pytest.fixture(params=["android", "ios"])
-def mastestapp_start(request):
-    """Returns a maestro flow which pushes the start button from the ios MAS test app"""
+def platform(request):
+    """Platform to test against."""
+    return request.param
 
-    platform = request.param
 
+@pytest.fixture
+def mastestapp_start(platform):
+    """Returns a maestro flow which pushes the start button from the MAS test app"""
     return Path(__file__).parent / "maestro" / f'{platform}-mastestapp-start.yaml'
 
 
-@pytest.fixture(params=["android", "ios"])
-def pid(request):
+@pytest.fixture
+def pid(platform):
     """The process id from the running target app"""
-    platform = request.param
 
     if platform == "android":
         app_id = "org.owasp.mastestapp"
@@ -42,7 +44,7 @@ def pid(request):
 
         pid = result.stdout.strip()
         if not pid:
-            pytest.fail(f"Could not find PID for {app_id}")
+            pytest.fail(f"Could not find PID for Android app  {app_id}")
 
         return pid
 
@@ -60,7 +62,7 @@ def pid(request):
             pid = result.stdout.strip().split(':')[-1].strip()
             return pid
 
-        pytest.fail(f"Could not launch {app_id}: {result.stderr}")
+        pytest.fail(f"Could not find PID for iOS app {app_id}: {result.stderr}")
 
 
 @pytest.fixture
@@ -135,7 +137,6 @@ def contains_subset_of(target_hooks, output_file_path):
 
     return all(found_patterns)
 
-
 def run_frooky(platform, hooks, pid, output_file_path, maestro_flow_path):
     """Common logic for running hook tests with Maestro."""
 
@@ -148,7 +149,7 @@ def run_frooky(platform, hooks, pid, output_file_path, maestro_flow_path):
     frooky_process = subprocess.Popen(
         [
             "frooky",
-            "-U",
+            *(["-U"] if platform == "android" else []),
             "-p", pid,
             "--platform", platform,
             "-o", output_file_path,
@@ -160,7 +161,7 @@ def run_frooky(platform, hooks, pid, output_file_path, maestro_flow_path):
         # run maestro as blocking foreground process
         maestro_timeout = 60
         subprocess.run(
-            ["maestro", "test", str(maestro_flow_path)],
+            ["maestro", "test","--platform", platform , str(maestro_flow_path)],
             timeout=maestro_timeout,
             check=True
         )
