@@ -72,5 +72,6 @@ jobs:
             # Install the app APK
             cd docs/examples/android-app && unzip -o MASTG-DEMO-0060.apk.zip && adb install -r MASTG-DEMO-0060.apk
 
-            # Run Android integration
-            pytest tests/integration/android
+            # Run Android integration tests
+            cd ~/
+            pytest tests/integration/test_android*
