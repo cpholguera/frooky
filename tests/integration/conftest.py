@@ -149,7 +149,7 @@ def run_frooky(platform, output_file_path, mastestapp_start):
                 *(["-U"] if platform == "android" else []),
                 *(["-p", get_android_pid()] if platform == "android" else []),
                 *(["-n", get_ios_name()] if platform == "ios" else []),
-                "--platform", platform,
+                *(["--platform", platform] if platform == "android" else []),
                 "-o", output_file_path,
                 hook_path
             ]
