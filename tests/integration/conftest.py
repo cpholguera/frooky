@@ -50,17 +50,16 @@ def get_ios_name():
     app_id = "org.owasp.mastestapp.MASTestApp-iOS"
     app_name = "MASTestApp"
 
-    result = subprocess.run(
-        ['xcrun', 'simctl', 'launch', 'booted', app_id],
-        capture_output=True,
-        text=True,
-        check=True
-    )
-    
-    if result.returncode == 0:
+    try:
+        subprocess.run(
+            ['xcrun', 'simctl', 'launch', 'booted', app_id],
+            capture_output=True,
+            text=True,
+            check=True
+        )
         return app_name
-    else:
-        raise Exception(f"Could not launch iOS app {app_id}: {e.stderr}")
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"Could not launch iOS app {app_id}: {e.stderr}") from e
 
 
 
