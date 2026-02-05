@@ -1,77 +1,39 @@
 """Tests for good case lifecycle on Android."""
 import pytest
-from conftest import run_frooky, contains_subset_of
-
 
 @pytest.mark.parametrize("platform", ["android"], indirect=True)
 class TestHookJavaMethod:
     """Tests for handling errors on the target related to Java methods."""
 
-    def test_hook_java_single_method(self, platform, pid, output_file_path, mastestapp_start):
+    def test_hook_java_single_method(self, run_frooky, number_of_matched_events, output_file_path):
         """Test hooking a single Java method in a real process."""
 
-        hooks = {
+        hook = {
             "category": "STORAGE",
             "hooks": [
                 {
-                        "class": "android.app.SharedPreferencesImpl$EditorImpl",
-                        "methods": [
-                            "putString"
-                        ]
+                    "class": "android.app.SharedPreferencesImpl$EditorImpl",
+                    "methods": [
+                        "putString"
+                    ]
                 }
             ]
         }
 
-        run_frooky(platform, hooks, pid, output_file_path, mastestapp_start)
+        run_frooky(hook)
 
-        expected_patterns = [
-            {
+        expected_pattern = {
                 "class": "android.app.SharedPreferencesImpl$EditorImpl",
                 "method": "putString",
             }
-        ]
 
         assert output_file_path.exists(), "output.json was not created"
-        assert contains_subset_of(
-            expected_patterns, output_file_path), "output.json did not contain the expected pattern as a subset."
+        assert number_of_matched_events(expected_pattern) == 3, "Not the amount of expected matched events found."
 
-    def test_hook_java_multiple_methods(self, platform, pid, output_file_path, mastestapp_start):
-        """Test hooking multiple Java methods in a real process."""
-
-        hooks = {
-            "category": "STORAGE",
-            "hooks": [
-                {
-                        "class": "androidx.security.crypto.EncryptedSharedPreferences$Editor",
-                        "methods": [
-                            "putString",
-                            "putStringSet"
-                        ]
-                }
-            ]
-        }
-
-        run_frooky(platform, hooks, pid, output_file_path, mastestapp_start)
-
-        expected_patterns = [
-            {
-                "class": "androidx.security.crypto.EncryptedSharedPreferences$Editor",
-                "method": "putString",
-            },
-            {
-                "class": "androidx.security.crypto.EncryptedSharedPreferences$Editor",
-                "method": "putStringSet",
-            },
-        ]
-
-        assert output_file_path.exists(), "output.json was not created"
-        assert contains_subset_of(
-            expected_patterns, output_file_path), "output.json did not contain the expected pattern as a subset."
-
-    def test_hook_java_single_method_overload(self, platform, pid, output_file_path, mastestapp_start):
+    def test_hook_java_single_method_overload(self, run_frooky, number_of_matched_events, output_file_path):
         """Test hooking single Java methods and one overload."""
 
-        hooks = {
+        hook = {
             "category": "STORAGE",
             "hooks": [
                 {
@@ -92,10 +54,9 @@ class TestHookJavaMethod:
             ]
         }
 
-        run_frooky(platform, hooks, pid, output_file_path, mastestapp_start)
+        run_frooky(hook)
 
-        expected_patterns = [
-            {
+        expected_event = {
                 "class": "androidx.security.crypto.EncryptedSharedPreferences",
                 "method": "create",
                 "inputParameters": [
@@ -116,8 +77,39 @@ class TestHookJavaMethod:
                     }
                 ],
             }
-        ]
 
         assert output_file_path.exists(), "output.json was not created"
-        assert contains_subset_of(
-            expected_patterns, output_file_path), "output.json did not contain the expected pattern as a subset."
+        assert number_of_matched_events(expected_event) == 1, "Not the amount of expected matched events found."
+
+
+    def test_hook_java_multiple_methods(self, run_frooky, number_of_matched_events, output_file_path):
+        """Test hooking a single Java method in a real process."""
+
+        hook = {
+            "category": "STORAGE",
+            "hooks": [
+                {
+                        "class": "androidx.security.crypto.EncryptedSharedPreferences$Editor",
+                        "methods": [
+                            "putString",
+                            "putStringSet"
+                        ]
+                }
+            ]
+        }
+
+        run_frooky(hook)
+
+        expected_pattern_putString = {
+                "class": "androidx.security.crypto.EncryptedSharedPreferences$Editor",
+                "method": "putString",
+            }
+
+        expected_pattern_putStringSet = {
+                "class": "androidx.security.crypto.EncryptedSharedPreferences$Editor",
+                "method": "putStringSet",
+            }
+
+        assert output_file_path.exists(), "output.json was not created"
+        assert number_of_matched_events(expected_pattern_putString) == 2, "Not the amount of expected matched events found."
+        assert number_of_matched_events(expected_pattern_putStringSet) == 1, "Not the amount of expected matched events found."

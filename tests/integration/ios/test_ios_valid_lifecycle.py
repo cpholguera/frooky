@@ -1,13 +1,11 @@
 """Tests for good case lifecycle on iOS."""
 import pytest
-from conftest import run_frooky, contains_subset_of
-
 
 @pytest.mark.parametrize("platform", ["ios"], indirect=True)
 class TestHookNativeMethod:
     """Tests for handling errors on the target related to Java methods."""
 
-    def test_hook_native(self, platform, pid, output_file_path, mastestapp_start):
+    def test_hook_native(self, run_frooky, number_of_matched_events, output_file_path):
         """Test hooking a single Java method in a real process."""
 
         hooks = {
@@ -29,10 +27,9 @@ class TestHookNativeMethod:
             ]
         }
 
-        run_frooky(platform, hooks, pid, output_file_path, mastestapp_start)
+        run_frooky(hooks)
 
-        expected_patterns = [
-            {
+        expected_event = {
                 "type": "native-hook",
                 "symbol": "open",
                 "inputParameters": [
@@ -42,8 +39,6 @@ class TestHookNativeMethod:
                     }
                 ],
             }
-        ]
 
         assert output_file_path.exists(), "output.json was not created"
-        assert contains_subset_of(
-            expected_patterns, output_file_path), "output.json did not contain the expected pattern as a subset."
+        assert number_of_matched_events(expected_event) == 4, "Not the amount of expected matched events found."
