@@ -158,9 +158,11 @@ def run_frooky(platform, output_file_path, mastestapp_start):
             ]
         )
 
+        time.sleep(10)
+
         try:
             # run maestro as blocking foreground process
-            maestro_timeout = 60
+            maestro_timeout = 120
 
             subprocess.run(
                 [
