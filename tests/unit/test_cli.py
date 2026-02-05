@@ -3,6 +3,7 @@
 import pytest
 from frooky.cli import build_parser
 
+
 class TestArgumentParsing:
     """Tests for CLI argument parsing functionality."""
 
@@ -22,7 +23,8 @@ class TestArgumentParsing:
         invalid_platform = "windows_phone"
         parser = build_parser()
         with pytest.raises(SystemExit) as exc_info:
-            parser.parse_args(["-U", "-F", "--platform", invalid_platform, "hooks.yaml"])
+            parser.parse_args(
+                ["-U", "-F", "--platform", invalid_platform, "hooks.yaml"])
 
         assert exc_info.value.code == 2
         captured = capsys.readouterr()
