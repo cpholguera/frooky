@@ -74,4 +74,4 @@ jobs:
 
             # Run Android integration tests
             cd ~/
-            pytest tests/integration/test_android*
+            pytest tests/integration/android
