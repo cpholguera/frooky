@@ -165,7 +165,8 @@ def run_frooky(platform, pid, output_file_path, mastestapp_start):
                 timeout=maestro_timeout,
                 check=True,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT
+                stderr=subprocess.STDOUT,
+                stdin=subprocess.DEVNULL
             )
         finally:
             if os.path.exists(hook_path):
