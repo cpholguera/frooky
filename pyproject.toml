@@ -37,6 +37,7 @@ dependencies = [
 dev = [
   "pytest>=8.0.0",
   "pytest-cov>=4.1.0"
+  "pylint-pytest>=1.1.8"
 ]
 
 [project.urls]
@@ -66,3 +67,7 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --strict-markers"
+
+
+[tool.pylint.MASTER]
+load-plugins = ["pylint-pytest"]
