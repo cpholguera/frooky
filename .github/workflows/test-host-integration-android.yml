@@ -65,5 +65,5 @@ jobs:
             cd ../../..
 
             # Run pytest while emulator is still running
-            pytest tests/integration
+            pytest tests/integration/android
 
