@@ -98,6 +98,8 @@ jobs:
 
       - name: Install app on simulator
         run: |
+          DEVICE_NAME="iPhone 16"
+
           # Find the built .app
           APP_PATH=$(find "$GITHUB_WORKSPACE/DerivedData" -name "*.app" -type d | head -1)
           echo "Found app at: $APP_PATH"
@@ -108,7 +110,7 @@ jobs:
           fi
 
           # Install the app
-          xcrun simctl install "iPhone 16" "$APP_PATH"
+          xcrun simctl install "$DEVICE_NAME" "$APP_PATH"
           echo "App installed successfully"
 
       - name: Run iOS integration tests
