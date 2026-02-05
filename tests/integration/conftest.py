@@ -161,7 +161,12 @@ def run_frooky(platform, pid, output_file_path, mastestapp_start):
             maestro_timeout = 60
 
             subprocess.run(
-                ["maestro", "test", "--platform", platform, str(mastestapp_start)],
+                [
+                    "maestro", 
+                    "test", 
+                    # "--platform", platform, 
+                    str(mastestapp_start)
+                ],
                 timeout=maestro_timeout,
                 check=True,
                 stdout=subprocess.PIPE,
