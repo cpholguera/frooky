@@ -164,7 +164,7 @@ def run_frooky(platform, pid, output_file_path, mastestapp_start):
                 [
                     "maestro", 
                     "test", 
-                    # "--platform", platform, 
+                    *(["--platform", "iOS"] if platform == "ios" else ["--platform", platform]),
                     str(mastestapp_start)
                 ],
                 timeout=maestro_timeout,
