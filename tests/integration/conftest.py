@@ -29,7 +29,7 @@ def get_android_pid():
             f'{app_id}/.MainActivity'],
         check=True
     )
-    time.sleep(2)
+    time.sleep(5)
 
     result = subprocess.run(
         ['adb', 'shell', 'pidof', app_id],
@@ -45,10 +45,9 @@ def get_android_pid():
     return str(target_app_pid)
 
 
-def get_ios_name():
+def get_ios_app_id():
     """Makes sure the iOS app is running and returns the name id."""
     app_id = "org.owasp.mastestapp.MASTestApp-iOS"
-    app_name = "MASTestApp"
 
     try:
         subprocess.run(
@@ -57,7 +56,8 @@ def get_ios_name():
             text=True,
             check=True
         )
-        return app_name
+        time.sleep(5)
+        return app_id
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"Could not launch iOS app {app_id}: {e.stderr}") from e
 
@@ -148,7 +148,7 @@ def run_frooky(platform, output_file_path, mastestapp_start):
                 "frooky",
                 *(["-U"] if platform == "android" else []),
                 *(["-p", get_android_pid()] if platform == "android" else []),
-                *(["-n", get_ios_name()] if platform == "ios" else []),
+                *(["-n", get_ios_app_id()] if platform == "ios" else []),
                 "--platform", platform,
                 "-o", output_file_path,
                 hook_path
