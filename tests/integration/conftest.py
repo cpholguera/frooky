@@ -122,6 +122,10 @@ def number_of_matched_events(output_file_path):
 
         with open(output_file_path, 'r') as f:
             for line in f:
+
+
+                print(f'\ncurrent output file line:\n {line}\n')
+
                 try:
                     entry = json.loads(line)
                     if matches_subset_pattern_recursive(entry, expected_event):
