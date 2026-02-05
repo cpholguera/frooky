@@ -1,7 +1,8 @@
 """Tests for good case lifecycle on iOS."""
+import pytest
 from conftest import run_frooky, contains_subset_of
 
-
+@pytest.mark.parametrize("pid", ["ios"], indirect=True)
 class TestHookNativeMethod:
     """Tests for handling errors on the target related to Java methods."""
 
