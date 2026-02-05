@@ -38,7 +38,7 @@ class TestHookNativeMethod:
         # ]
 
         # Read and print entire file content
-        with open('output_file_path.txt', 'r') as file:
+        with open(output_file_path, 'r') as file:
             content = file.read()
             print(content)
 
