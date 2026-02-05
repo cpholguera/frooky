@@ -164,7 +164,8 @@ def run_frooky(platform, pid, output_file_path, mastestapp_start):
                 [
                     "maestro", 
                     "test", 
-                    *(["--platform", "iOS"] if platform == "ios" else ["--platform", platform]),
+                    "--platform", platform, 
+                    "--reinstall-driver",
                     str(mastestapp_start)
                 ],
                 timeout=maestro_timeout,
