@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 import json
 import pytest
-
+import sys
 
 @pytest.fixture(params=["android", "ios"])
 def platform(request):
@@ -19,50 +19,48 @@ def mastestapp_start(platform):
     """Returns a maestro flow which pushes the start button from the MAS test app"""
     return Path(__file__).parent / "maestro" / f'{platform}-mastestapp-start.yaml'
 
+def get_android_pid():
+    """Makes sure the Android app is running and returns the process id."""
+    app_id = "org.owasp.mastestapp"
 
-@pytest.fixture
-def pid(platform):
-    """The process id from the running target app"""
+    subprocess.run(['adb', 'wait-for-device'], check=True)
+    subprocess.run(
+        ['adb', 'shell', 'am', 'start', '-n',
+            f'{app_id}/.MainActivity'],
+        check=True
+    )
+    time.sleep(2)
 
-    if platform == "android":
-        app_id = "org.owasp.mastestapp"
+    result = subprocess.run(
+        ['adb', 'shell', 'pidof', app_id],
+        capture_output=True,
+        text=True,
+        check=True
+    )
 
-        subprocess.run(['adb', 'wait-for-device'], check=True)
-        subprocess.run(
-            ['adb', 'shell', 'am', 'start', '-n',
-             f'{app_id}/.MainActivity'],
-            check=True
-        )
-        time.sleep(2)
+    target_app_pid = result.stdout.strip()
+    if not target_app_pid:
+        pytest.fail(f"Could not find PID for Android app  {app_id}")
 
-        result = subprocess.run(
-            ['adb', 'shell', 'pidof', app_id],
-            capture_output=True,
-            text=True,
-            check=True
-        )
+    return str(target_app_pid)
 
-        target_app_pid = result.stdout.strip()
-        if not pid:
-            pytest.fail(f"Could not find PID for Android app  {app_id}")
 
-        return target_app_pid
+def get_ios_name():
+    """Makes sure the iOS app is running and returns the name id."""
+    app_id = "org.owasp.mastestapp.MASTestApp-iOS"
+    app_name = "MASTestApp"
 
-    elif platform == "ios":
-        app_id = "org.owasp.mastestapp.MASTestApp-iOS"
-
-        result = subprocess.run(
-            ['xcrun', 'simctl', 'launch', 'booted', app_id],
-            capture_output=True,
-            text=True,
-            check=False
-        )
-
-        if result.returncode == 0:
-            target_app_pid = result.stdout.strip().split(':')[-1].strip()
-            return target_app_pid
-
-        pytest.fail(f"Could not find PID for iOS app {app_id}: {result.stderr}")
+    result = subprocess.run(
+        ['xcrun', 'simctl', 'launch', 'booted', app_id],
+        capture_output=True,
+        text=True,
+        check=True
+    )
+    
+    if result.returncode == 0:
+        return app_name
+    else:
+        raise Exception(f"Could not launch iOS app {app_id}: {e.stderr}")
 
 
 
@@ -135,7 +133,7 @@ def number_of_matched_events(output_file_path):
 
 
 @pytest.fixture
-def run_frooky(platform, pid, output_file_path, mastestapp_start):
+def run_frooky(platform, output_file_path, mastestapp_start):
     """Factory fixture for running hook tests with Maestro."""
 
     def _run_frooky(hook):
@@ -145,11 +143,13 @@ def run_frooky(platform, pid, output_file_path, mastestapp_start):
             json.dump(hook, f)
 
         # run frooky as background process
+        # start Android with PID, and iOS with 
         frooky_process = subprocess.Popen(
             [
                 "frooky",
                 *(["-U"] if platform == "android" else []),
-                "-p", pid,
+                *(["-p", get_android_pid()] if platform == "android" else []),
+                *(["-n", get_ios_name()] if platform == "ios" else []),
                 "--platform", platform,
                 "-o", output_file_path,
                 hook_path
@@ -164,15 +164,11 @@ def run_frooky(platform, pid, output_file_path, mastestapp_start):
                 [
                     "maestro", 
                     "test", 
-                    "--platform", platform, 
-                    "--reinstall-driver",
+                    "--platform", platform,
                     str(mastestapp_start)
                 ],
                 timeout=maestro_timeout,
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                stdin=subprocess.DEVNULL
+                check=True
             )
         finally:
             if os.path.exists(hook_path):
