@@ -1,4 +1,4 @@
-name: 'Test: Host Integrations Tests iOS'
+name: "Test: Host Integrations Tests iOS"
 
 on:
   workflow_call:
@@ -23,7 +23,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install frooky from wheel
         run: pip install dist/*.whl
@@ -52,14 +52,14 @@ jobs:
       - name: Build the app for simulator
         run: |
           cd mas-app-ios
-          
+
           # Copy the CI config file
           cp .github/Local.xcconfig.ci Local.xcconfig
-          
+
           # Get the default scheme
           DEFAULT_SCHEME=$(xcodebuild -list -json | jq -r '.project.targets[0]')
           echo "Using scheme: $DEFAULT_SCHEME"
-          
+
           # Build for simulator
           xcodebuild build \
             -project "MASTestApp.xcodeproj" \
@@ -69,17 +69,17 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
-          
+
           echo "Build succeeded"
 
       - name: Boot iOS Simulator
         run: |
           # List available simulators
           xcrun simctl list devices available
-          
+
           # Boot iPhone 16 simulator
           xcrun simctl boot "iPhone 16" || echo "Simulator already booted"
-          
+
           # Wait for simulator to be ready
           sleep 5
 
@@ -88,22 +88,15 @@ jobs:
           # Find the built .app
           APP_PATH=$(find "$GITHUB_WORKSPACE/DerivedData" -name "*.app" -type d | head -1)
           echo "Found app at: $APP_PATH"
-          
+
           if [ -z "$APP_PATH" ]; then
             echo "Error: Could not find the built .app file."
             exit 1
           fi
-          
+
           # Install the app
           xcrun simctl install "iPhone 16" "$APP_PATH"
           echo "App installed successfully"
 
-      - name: Run Tests
+      - name: Run iOS integration tests
         run: pytest tests/integration/ios
-
-      - name: Upload Dynamic Test Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-dynamic-test-results
-          path: ios-test-results/*
