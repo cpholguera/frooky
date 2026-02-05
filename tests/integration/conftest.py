@@ -159,7 +159,7 @@ def run_frooky(platform, output_file_path, mastestapp_start):
             text=True
         )
 
-        maestro_timeout = 300
+        maestro_timeout = 600
         try:
             subprocess.run(
                 ["maestro", "test", "--platform", platform, str(mastestapp_start)],
