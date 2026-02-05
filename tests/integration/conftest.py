@@ -155,7 +155,8 @@ def run_frooky(platform, output_file_path, mastestapp_start):
                 "--platform", platform,
                 "-o", output_file_path,
                 temp_hook_path
-            ]
+            ],
+            text=True
         )
 
         maestro_timeout = 300
