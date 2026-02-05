@@ -104,6 +104,4 @@ jobs:
           echo "App installed successfully"
 
       - name: Run iOS integration tests
-        run: |
-          cd ~/
-          pytest tests/integration/ios
+        run: pytest tests/integration/ios
