@@ -5,7 +5,7 @@ from conftest import run_frooky, contains_subset_of
 class TestHookNativeMethod:
     """Tests for handling errors on the target related to Java methods."""
 
-    def test_hook_java_single_method(self, pid, output_file_path, org_owasp_mastestapp_start):
+    def test_hook_java_single_method(self, pid, output_file_path, ios_mastestapp_start):
         """Test hooking a single Java method in a real process."""
 
         hooks = {
@@ -28,7 +28,7 @@ class TestHookNativeMethod:
         }
 
         run_frooky("ios", hooks, pid, output_file_path,
-                   org_owasp_mastestapp_start)
+                   ios_mastestapp_start)
 
         # expected_patterns = [
         #     {

@@ -9,9 +9,15 @@ import json
 
 
 @pytest.fixture
-def org_owasp_mastestapp_start():
-    """Returns a maestro flow which pushes the start button from the MAS test apps"""
-    return Path(__file__).parent / "maestro" / "org-owasp-mastestapp-start.yaml"
+def android_mastestapp_start():
+    """Returns a maestro flow which pushes the start button from the ios MAS test app"""
+    return Path(__file__).parent / "maestro" / "android_mastestapp_start.yaml"
+
+
+@pytest.fixture
+def ios_mastestapp_start():
+    """Returns a maestro flow which pushes the start button from the Android MAS test app"""
+    return Path(__file__).parent / "maestro" / "ios_mastestapp_start.yaml"
 
 
 @pytest.fixture

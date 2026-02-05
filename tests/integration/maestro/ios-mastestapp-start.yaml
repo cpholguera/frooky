@@ -1,0 +1,4 @@
+appId: org.owasp.mastestapp.MASTestApp-iOS
+---
+- assertVisible: "OWASP MAS"
+- tapOn: "Start"
