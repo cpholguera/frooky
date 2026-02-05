@@ -1,14 +1,17 @@
 """Shared fixtures for Android integration tests."""
+import os
+import tempfile
 import time
 import subprocess
 from pathlib import Path
 import pytest
 import json
 
+
 @pytest.fixture
-def hooks_dir():
-    """Return path to integration test hooks directory."""
-    return Path(__file__).parent / "hooks"
+def org_owasp_mastestapp_start():
+    """Returns a maestro flow which pushes the start button from the MAS test apps"""
+    return Path(__file__).parent / "maestro" / "org-owasp-mastestapp-start.yaml"
 
 
 @pytest.fixture
@@ -18,8 +21,8 @@ def pid():
 
     subprocess.run(['adb', 'wait-for-device'], check=True)
     subprocess.run(
-        ['adb', 'shell', 'am', 'start', '-n', 
-        f'{app_id}/.MainActivity'],
+        ['adb', 'shell', 'am', 'start', '-n',
+         f'{app_id}/.MainActivity'],
         check=True
     )
     time.sleep(2)
@@ -39,9 +42,9 @@ def pid():
 
 
 @pytest.fixture
-def maestro_flow_path():
-    """Return path to Maestro flow file."""
-    return Path(__file__).parent / "maestro" / "flow.yaml"
+def output_file_path():
+    """Return path to output.json file."""
+    return Path(__file__).parent / "output.json"
 
 
 @pytest.fixture(autouse=True)
@@ -69,7 +72,8 @@ def matches_subset_pattern_recursive(target, pattern):
         if not isinstance(target, dict):
             return False
         return all(
-            key in target and matches_subset_pattern_recursive(target[key], value)
+            key in target and matches_subset_pattern_recursive(
+                target[key], value)
             for key, value in pattern.items()
         )
     elif isinstance(pattern, list):
@@ -85,13 +89,13 @@ def matches_subset_pattern_recursive(target, pattern):
         return target == pattern
 
 
-def contains_expected_patterns(output_file, target_hooks):
+def contains_subset_of(target_hooks, output_file_path):
     """Scan output NDJSON for hooks matching the specified patterns. Returns true if all have been found"""
 
     found_patterns = [False] * len(target_hooks)
 
-    with open(output_file, 'r') as f:
-        for line in f:           
+    with open(output_file_path, 'r') as f:
+        for line in f:
             try:
                 entry = json.loads(line)
 
@@ -110,65 +114,40 @@ def contains_expected_patterns(output_file, target_hooks):
     return all(found_patterns)
 
 
-def run_frooky(pid, hook_file, output_file, platform):
-    """Start Frooky process and return it."""
-    return subprocess.Popen(
-        [
-            "frooky", 
-            "-U", 
-            "-p", pid, 
-            "--platform", platform,
-            "-o", output_file,
-            hook_file
-        ],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
-
-def run_maestro_blocking(flow_path, timeout=60):
-    """Run Maestro flow and wait for completion with timeout."""
-    process = subprocess.Popen(
-        ["maestro", "test", str(flow_path)],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
-
-    try:
-        stdout, stderr = process.communicate(timeout=timeout)
-        if stderr:
-            print(f"Maestro stderr: {stderr.decode()}")
-        if process.returncode != 0:
-            print(f"Maestro failed with return code {process.returncode}")
-            if stdout:
-                print(f"Maestro stdout: {stdout.decode()}")
-    except subprocess.TimeoutExpired:
-        process.kill()
-        stdout, stderr = process.communicate()
-        print(f"Maestro timed out after {timeout} seconds")
-        if stderr:
-            print(f"Maestro stderr: {stderr.decode()}")
-        raise
-
-
-def run_hook_test(hook_file, expected_patterns, pid, maestro_flow_path, platform):
+def run_frooky(platform, hooks, pid, output_file_path, maestro_flow_path):
     """Common logic for running hook tests with Maestro."""
-    output_file = Path("output.json")
 
-    frooky_process = run_frooky(pid, hook_file, output_file, platform)
+    # create a temporary hook.json file
+    fd, hooks_path = tempfile.mkstemp(suffix='.json', text=True)
+    with os.fdopen(fd, 'w') as f:
+        json.dump(hooks, f)
+    
+    # run frooky as background process
+    frooky_process = subprocess.Popen(
+        [
+            "frooky",
+            "-U",
+            "-p", pid,
+            "--platform", platform,
+            "-o", output_file_path,
+            hooks_path
+        ]
+    )
 
     try:
-        run_maestro_blocking(maestro_flow_path, timeout=60)
+        # run maestro as blocking foreground process
+        maestro_timeout = 60
+        subprocess.run(
+            ["maestro", "test", str(maestro_flow_path)],
+            timeout=maestro_timeout,
+            check=True
+        )
     finally:
+        if os.path.exists(hooks_path):
+            os.remove(hooks_path)
         frooky_process.terminate()
         try:
-            _, stderr = frooky_process.communicate(timeout=2)
-            if stderr:
-                print(f"Frooky stderr: {stderr.decode()}")
+            frooky_process.wait(timeout=2)
         except subprocess.TimeoutExpired:
             frooky_process.kill()
-            _, stderr = frooky_process.communicate()
-            if stderr:
-                print(f"Frooky stderr (after kill): {stderr.decode()}")
-
-    assert output_file.exists(), "output.json was not created"
-    assert contains_expected_patterns(output_file, expected_patterns), "not all target patterns have been found in output.json"
+            frooky_process.wait()
