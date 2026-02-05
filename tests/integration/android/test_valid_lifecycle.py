@@ -4,6 +4,7 @@ from conftest import run_frooky, contains_subset_of
 
 
 @pytest.mark.parametrize("pid", ["android"], indirect=True)
+@pytest.mark.parametrize("mastestapp_start", ["android"], indirect=True)
 class TestHookJavaMethod:
     """Tests for handling errors on the target related to Java methods."""
 
