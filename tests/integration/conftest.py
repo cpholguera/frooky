@@ -42,11 +42,11 @@ def pid(platform):
             check=True
         )
 
-        pid = result.stdout.strip()
+        target_app_pid = result.stdout.strip()
         if not pid:
             pytest.fail(f"Could not find PID for Android app  {app_id}")
 
-        return pid
+        return target_app_pid
 
     elif platform == "ios":
         app_id = "org.owasp.mastestapp.MASTestApp-iOS"
@@ -59,8 +59,8 @@ def pid(platform):
         )
 
         if result.returncode == 0:
-            pid = result.stdout.strip().split(':')[-1].strip()
-            return pid
+            target_app_pid = result.stdout.strip().split(':')[-1].strip()
+            return target_app_pid
 
         pytest.fail(f"Could not find PID for iOS app {app_id}: {result.stderr}")
 
@@ -118,18 +118,18 @@ def number_of_matched_events(output_file_path):
     """Factory fixture to scan output NDJSON for hooks matching the specified patterns."""
 
     def _count_matches(expected_event):
-        number_of_matched_events = 0
+        matched_events_counter = 0
 
-        with open(output_file_path, 'r') as f:
+        with open(output_file_path, 'r', encoding="utf8") as f:
             for line in f:
                 try:
                     entry = json.loads(line)
                     if matches_subset_pattern_recursive(entry, expected_event):
-                        number_of_matched_events += 1
+                        matched_events_counter += 1
                 except json.JSONDecodeError:
                     pass
 
-        return number_of_matched_events
+        return matched_events_counter
 
     return _count_matches
 
