@@ -1,7 +1,9 @@
 """Tests for good case lifecycle on Android."""
+import pytest
 from conftest import run_frooky, contains_subset_of
 
 
+@pytest.mark.parametrize("pid", ["android"], indirect=True)
 class TestHookJavaMethod:
     """Tests for handling errors on the target related to Java methods."""
 

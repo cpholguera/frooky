@@ -20,31 +20,50 @@ def ios_mastestapp_start():
     return Path(__file__).parent / "maestro" / "ios_mastestapp_start.yaml"
 
 
-@pytest.fixture
-def pid():
+@pytest.fixture(params=["android", "ios"])
+def pid(request):
     """The process id from the running target app"""
-    app_id = "org.owasp.mastestapp"
+    platform = request.param
 
-    subprocess.run(['adb', 'wait-for-device'], check=True)
-    subprocess.run(
-        ['adb', 'shell', 'am', 'start', '-n',
-         f'{app_id}/.MainActivity'],
-        check=True
-    )
-    time.sleep(2)
+    if platform == "android":
+        app_id = "org.owasp.mastestapp"
 
-    result = subprocess.run(
-        ['adb', 'shell', 'pidof', app_id],
-        capture_output=True,
-        text=True,
-        check=True
-    )
+        subprocess.run(['adb', 'wait-for-device'], check=True)
+        subprocess.run(
+            ['adb', 'shell', 'am', 'start', '-n',
+             f'{app_id}/.MainActivity'],
+            check=True
+        )
+        time.sleep(2)
 
-    pid = result.stdout.strip()
-    if not pid:
-        pytest.fail(f"Could not find PID for {app_id}")
+        result = subprocess.run(
+            ['adb', 'shell', 'pidof', app_id],
+            capture_output=True,
+            text=True,
+            check=True
+        )
 
-    return pid
+        pid = result.stdout.strip()
+        if not pid:
+            pytest.fail(f"Could not find PID for {app_id}")
+
+        return pid
+
+    elif platform == "ios":
+        app_id = "org.owasp.mastestapp.MASTestApp-iOS"
+
+        result = subprocess.run(
+            ['xcrun', 'simctl', 'launch', 'booted', app_id],
+            capture_output=True,
+            text=True,
+            check=False
+        )
+
+        if result.returncode == 0:
+            pid = result.stdout.strip().split(':')[-1].strip()
+            return pid
+
+        pytest.fail(f"Could not launch {app_id}: {result.stderr}")
 
 
 @pytest.fixture
