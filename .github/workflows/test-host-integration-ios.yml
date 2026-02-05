@@ -86,7 +86,7 @@ jobs:
           xcrun simctl boot "iPhone 16" || echo "Simulator already booted"
 
           # Wait for simulator to be ready
-          sleep 5
+          sleep 10
 
       - name: Install app on simulator
         run: |
