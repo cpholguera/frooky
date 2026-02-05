@@ -159,10 +159,13 @@ def run_frooky(platform, pid, output_file_path, mastestapp_start):
         try:
             # run maestro as blocking foreground process
             maestro_timeout = 60
+
             subprocess.run(
                 ["maestro", "test", "--platform", platform, str(mastestapp_start)],
                 timeout=maestro_timeout,
-                check=True
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT
             )
         finally:
             if os.path.exists(hook_path):
