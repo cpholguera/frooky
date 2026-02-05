@@ -1,4 +1,4 @@
-name: 'Test: Host Integrations Tests Android'
+name: "Test: Host Integrations Tests Android"
 
 on:
   workflow_call:
@@ -14,15 +14,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
- 
 
       # TODO: Do a nice prod/dev build we can reuse
       # -------------------------------------------
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-          cache: 'npm'
-          cache-dependency-path: './frooky/agent/package-lock.json'
+          cache: "npm"
+          cache-dependency-path: "./frooky/agent/package-lock.json"
       - run: chmod +x compileAgent.sh
       - run: ./compileAgent.sh --dev
 
@@ -54,37 +53,24 @@ jobs:
             ~/.android/adb*
           key: avd-34
 
-      - name: Create AVD snapshot (if not cached)
-        if: steps.avd-cache.outputs.cache-hit != 'true'
+      - name: Start Android Emulator and Run Android Integration Tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
           target: google_apis
           arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-          disable-animations: false
-          script: echo "Generated clean AVD snapshot"
-
-      - name: Run tests with clean emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          force-avd-creation: false
-          emulator-options: -wipe-data -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -wipe-data -no-snapshot-save -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: |
+
             chmod +x .github/scripts/android/prep-device.sh
             .github/scripts/android/prep-device.sh
 
             chmod +x .github/scripts/android/install-frida-server.sh
             .github/scripts/android/install-frida-server.sh
 
+            # Install the app APK
             cd docs/examples/android-app && unzip -o MASTG-DEMO-0060.apk.zip && adb install -r MASTG-DEMO-0060.apk
-            cd ../../..
 
-            # Run Android integration tests
+            # Run Android integration
             pytest tests/integration/android
-
