@@ -15,7 +15,8 @@ class TestHookJavaMethod:
                     "class": "android.app.SharedPreferencesImpl$EditorImpl",
                     "methods": [
                         "putString"
-                    ]
+                    ],
+                    "filterEventsByStacktrace": ["org.owasp.mastestapp"]
                 }
             ]
         }
@@ -49,7 +50,8 @@ class TestHookJavaMethod:
                                     "androidx.security.crypto.EncryptedSharedPreferences$PrefValueEncryptionScheme"
                                 ]
                             }
-                        ]
+                        ],
+                        "filterEventsByStacktrace": ["org.owasp.mastestapp"]
                 }
             ]
         }
@@ -93,7 +95,8 @@ class TestHookJavaMethod:
                         "methods": [
                             "putString",
                             "putStringSet"
-                        ]
+                        ],
+                        "filterEventsByStacktrace": ["org.owasp.mastestapp"]
                 }
             ]
         }
