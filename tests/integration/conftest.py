@@ -124,7 +124,10 @@ def number_of_matched_events(output_file_path):
             for line in f:
                 try:
                     entry = json.loads(line)
-                    print(f'\nCurrent NDJSON Object:\n {entry["stackTrace"]}\n')
+                    try:
+                        print(f'\nCurrent NDJSON Object:\n {entry["stackTrace"]}\n')
+                    except:
+                        pass
                     if matches_subset_pattern_recursive(entry, expected_event):
                         number_of_matched_events += 1
                 except json.JSONDecodeError:
