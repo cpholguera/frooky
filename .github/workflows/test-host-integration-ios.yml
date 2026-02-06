@@ -27,7 +27,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.14"
-          cache: 'pip'
+          cache: "pip"
 
       - name: Install Python from [dev]
         run: python -m pip install -e '.[dev]'
@@ -64,13 +64,6 @@ jobs:
             cp -f "$EXAMPLE_DIR/MastgTest.swift" mas-app-ios/MASTestApp/MastgTest.swift
             echo "Copied MastgTest.swift"
           fi
-
-      - name: Cache Xcode DerivedData
-        uses: irgaly/xcode-cache@v1
-        with:
-          key: xcode-deriveddata-${{ runner.os }}-${{ hashFiles('mas-app-ios/**/*.swift', 'mas-app-ios/**/*.xcodeproj/**') }}
-          restore-keys: |
-            xcode-deriveddata-${{ runner.os }}-
 
       - name: Build the app for simulator
         run: |
