@@ -12,7 +12,7 @@ export function uuidv4(): string {
 
 /**
  * Makes a hex dump of a byte array. The dump is limited by the length parameter.
- * @param bytes - Byte array to be decoded to hexadecimal.
+ * @param bytes - Bytes to be decoded to hexadecimal.
  * @param length - Number of bytes which will be decoded. If not provided, all bytes are decoded.
  * @returns The hexadecimal decoded bytes (e.g., "0x22aa3482ef...")
  */
