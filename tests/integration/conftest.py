@@ -166,7 +166,8 @@ def run_frooky(platform, output_file_path, app_id, mastestapp_start_path):
                 _, stderr = frooky_process.communicate()
                 raise RuntimeError(f"Frooky failed to start: {stderr}")
 
-            # Run Maestro test
+            # Run Maestro test and make sure we have enough time to run.
+            # This is especially important for iOS GitHub tests, they can be slow.
             maestro_timeout = 600
             subprocess.run(
                 [
