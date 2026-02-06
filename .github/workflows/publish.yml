@@ -12,6 +12,7 @@ jobs:
     uses: ./.github/workflows/build.yml
 
   verify-build:
+    needs: [build]
     permissions:
       contents: read
     uses: ./.github/workflows/test-build.yml
