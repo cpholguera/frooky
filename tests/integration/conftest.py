@@ -5,7 +5,6 @@ import time
 import subprocess
 from pathlib import Path
 import json
-import sys
 import pytest
 
 
@@ -16,57 +15,54 @@ def platform(request):
 
 
 @pytest.fixture
-def mastestapp_start(platform):
+def mastestapp_start_path(platform):
     """Returns a maestro flow which pushes the start button from the MAS test app"""
     return Path(__file__).parent / "maestro" / f'{platform}-mastestapp-start.yaml'
 
 
-def get_android_pid():
-    """Makes sure the Android app is running and returns the process id."""
-    app_id = "org.owasp.mastestapp"
+@pytest.fixture
+def app_id(platform):
+    """Start the app and return PID (Android) or app name (iOS)."""
+    if platform == "android":
+        app_id = "org.owasp.mastestapp"
 
-    subprocess.run(['adb', 'wait-for-device'], check=True)
-    subprocess.run(
-        ['adb', 'shell', 'am', 'start', '-n',
-            f'{app_id}/.MainActivity'],
-        check=True
-    )
-
-    time.sleep(5)
-
-    result = subprocess.run(
-        ['adb', 'shell', 'pidof', app_id],
-        capture_output=True,
-        text=True,
-        check=True
-    )
-
-    target_app_pid = result.stdout.strip()
-    if not target_app_pid:
-        pytest.fail(f"Could not find PID for Android app  {app_id}")
-
-    return str(target_app_pid)
-
-
-def get_ios_app_name():
-    """Makes sure the iOS app is running and returns the app name."""
-    app_id = "org.owasp.mastestapp.MASTestApp-iOS"
-    app_name = "MASTestApp"
-
-    try:
+        subprocess.run(['adb', 'wait-for-device'], check=True)
         subprocess.run(
-            ['xcrun', 'simctl', 'launch', 'booted', app_id],
+            ['adb', 'shell', 'am', 'start', '-n', f'{app_id}/.MainActivity'],
+            check=True
+        )
+        time.sleep(5)
+
+        result = subprocess.run(
+            ['adb', 'shell', 'pidof', app_id],
             capture_output=True,
             text=True,
             check=True
         )
 
-        time.sleep(5)
+        pid = result.stdout.strip()
+        if not pid:
+            pytest.fail(f"Could not find PID for Android app {app_id}")
 
-        return app_name
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(
-            f"Could not launch iOS app {app_name}: {e.stderr}") from e
+        return pid
+
+    else:  # ios
+        app_id = "org.owasp.mastestapp.MASTestApp-iOS"
+        app_name = "MASTestApp"
+
+        try:
+            subprocess.run(
+                ['xcrun', 'simctl', 'launch', 'booted', app_id],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            time.sleep(5)
+
+            return app_name
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                f"Could not launch iOS app {app_name}: {e.stderr}") from e
 
 
 @pytest.fixture
@@ -137,7 +133,7 @@ def number_of_matched_events(output_file_path):
 
 
 @pytest.fixture
-def run_frooky(platform, output_file_path, mastestapp_start):
+def run_frooky(platform, output_file_path, app_id, mastestapp_start_path):
     """Factory fixture for running hook tests with Maestro."""
 
     def _run_frooky(hook):
@@ -155,8 +151,7 @@ def run_frooky(platform, output_file_path, mastestapp_start):
             frooky_process = subprocess.Popen([
                 "frooky",
                 *(["-U"] if platform == "android" else []),
-                *(["-p", get_android_pid()] if platform == "android" else []),
-                *(["-n", get_ios_app_name()] if platform == "ios" else []),
+                *(["-p"] if platform == "android" else ["-n"]), app_id,
                 "--platform", platform,
                 "-o", output_file_path,
                 temp_hook_path
@@ -165,8 +160,8 @@ def run_frooky(platform, output_file_path, mastestapp_start):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
-
             time.sleep(5)
+            
             if frooky_process.poll() is not None:
                 _, stderr = frooky_process.communicate()
                 raise RuntimeError(f"Frooky failed to start: {stderr}")
@@ -178,7 +173,7 @@ def run_frooky(platform, output_file_path, mastestapp_start):
                     "maestro",
                     "test",
                     "--platform", platform,
-                    str(mastestapp_start)
+                    str(mastestapp_start_path)
                 ],
                 timeout=maestro_timeout,
                 check=True,
