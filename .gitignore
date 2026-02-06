@@ -1,6 +1,7 @@
 # Frooky local debug artifacts
 output.json
 *.jsonl
+*.json.swp
 
 # Python bytecode
 __pycache__/
