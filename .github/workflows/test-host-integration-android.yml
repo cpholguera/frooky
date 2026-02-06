@@ -20,20 +20,32 @@ jobs:
           node-version: "24"
           cache: "npm"
           cache-dependency-path: "./frooky/agent/package-lock.json"
+
       - run: chmod +x compileAgent.sh
       - run: ./compileAgent.sh --dev
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.14"
+          cache: 'pip'
 
       - name: Install Python from [dev]
         run: python -m pip install -e '.[dev]'
 
+      - name: Cache Maestro
+        uses: actions/cache@v4
+        id: maestro-cache
+        with:
+          path: ~/.maestro
+          key: maestro-${{ runner.os }}
+
       - name: Install Maestro
+        if: steps.maestro-cache.outputs.cache-hit != 'true'
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
-          echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Add Maestro to PATH
+        run: echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
 
       - name: Enable KVM
         run: |
@@ -50,6 +62,24 @@ jobs:
             ~/.android/adb*
           key: avd-34
 
+      - name: Cache Frida Server
+        uses: actions/cache@v4
+        id: frida-cache
+        with:
+          path: ~/.frida-server
+          key: frida-server-${{ runner.os }}-android-34
+
+      - name: Cache APK
+        uses: actions/cache@v4
+        id: apk-cache
+        with:
+          path: docs/examples/android-app/MASTG-DEMO-0060.apk
+          key: mastg-demo-apk-${{ hashFiles('docs/examples/android-app/MASTG-DEMO-0060.apk.zip') }}
+
+      - name: Extract APK
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        run: cd docs/examples/android-app && unzip -o MASTG-DEMO-0060.apk.zip
+
       - name: Start Android Emulator and Run Android Integration Tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -59,7 +89,6 @@ jobs:
           emulator-options: -wipe-data -no-snapshot-save -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: |
-
             chmod +x .github/scripts/android/prep-device.sh
             .github/scripts/android/prep-device.sh
 
@@ -67,8 +96,7 @@ jobs:
             .github/scripts/android/install-frida-server.sh
 
             # Install the app APK
-            cd docs/examples/android-app && unzip -o MASTG-DEMO-0060.apk.zip && adb install -r MASTG-DEMO-0060.apk
+            adb install -r docs/examples/android-app/MASTG-DEMO-0060.apk
 
             # Run Android integration tests
-            cd ~/
             pytest tests/integration/android
