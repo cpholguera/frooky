@@ -11,7 +11,7 @@
 
 `frooky` is a [Frida](https://www.frida.re/)-based dynamic analysis tool for Android and iOS apps based on JSON hook files.
 
-[![PyPi](https://badge.fury.io/py/frooky.svg)](https://pypi.python.org/pypi/frooky)
+![PyPI - Version](https://img.shields.io/pypi/v/frooky?color=fuchsia) [![Test](https://github.com/cpholguera/frooky/actions/workflows/test.yml/badge.svg)](https://github.com/cpholguera/frooky/actions/workflows/test.yml)
 
 - Hook Java/Kotlin methods and native C/C++ functions
 - Simple JSON hook file format
