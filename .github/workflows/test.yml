@@ -19,10 +19,10 @@ jobs:
   build:
     uses: ./.github/workflows/build.yml
 
-  # # Run all tests in parallel (they all depend on build and download the artifact)
-  # verify-build:
-  #   needs: build
-  #   uses: ./.github/workflows/test-build.yml
+  # Run all tests in parallel (they all depend on build and download the artifact)
+  verify-build:
+    needs: build
+    uses: ./.github/workflows/test-build.yml
 
   # test-android:
   #   needs: build
