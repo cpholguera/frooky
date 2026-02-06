@@ -8,7 +8,7 @@ import {
 import {
     openHook,
     readHook
-} from "./02_android_native"
+} from "./02_native"
 import {
     userDefaultsHook,
     fileManagerHook,

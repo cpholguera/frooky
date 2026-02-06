@@ -4,12 +4,12 @@
 
 Frooky supports four types of hooks:
 
-| Hook Type | Platform | Description |
-|-----------|----------|-------------|
-| `JavaHook` | Android | Hook Java/Kotlin methods |
-| `NativeHook` | Android/iOS | Hook native C/C++ functions |
-| `ObjectiveCHook` | iOS | Hook Objective-C methods |
-| `SwiftHook` | iOS | Hook Swift methods |
+| Hook Type        | Platform    | Description                 |
+| ---------------- | ----------- | --------------------------- |
+| `JavaHook`       | Android     | Hook Java/Kotlin methods    |
+| `NativeHook`     | Android/iOS | Hook native C/C++ functions |
+| `ObjectiveCHook` | iOS         | Hook Objective-C methods    |
+| `SwiftHook`      | iOS         | Hook Swift methods          |
 
 ## YAML Configuration
 
@@ -26,12 +26,12 @@ hooks:
 
 All hook types support these base properties:
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `module` | string | Library/framework name (optional) |
-| `stackTraceLimit` | number | Maximum stack frames to capture |
+| Property           | Type     | Description                           |
+| ------------------ | -------- | ------------------------------------- |
+| `module`           | string   | Library/framework name (optional)     |
+| `stackTraceLimit`  | number   | Maximum stack frames to capture       |
 | `stackTraceFilter` | string[] | Regex patterns to filter stack traces |
-| `debug` | boolean | Enable verbose logging |
+| `debug`            | boolean  | Enable verbose logging                |
 
 ## Java Hooks
 
@@ -68,13 +68,13 @@ All hook types support these base properties:
 
 Examples:
 
-| Type | Notation |
-|------|----------|
-| Primitive int | `int` |
-| String | `java.lang.String` |
-| Byte array | `[B` |
-| String array | `[Ljava.lang.String;` |
-| Custom class | `com.example.MyClass` |
+| Type          | Notation              |
+| ------------- | --------------------- |
+| Primitive int | `int`                 |
+| String        | `java.lang.String`    |
+| Byte array    | `[B`                  |
+| String array  | `[Ljava.lang.String;` |
+| Custom class  | `com.example.MyClass` |
 
 ## Native Hooks
 
@@ -90,18 +90,18 @@ Examples:
 
 ### Supported Argument Types
 
-| Type | Description |
-|------|-------------|
-| `string` | Null-terminated C string |
-| `int32` | 32-bit signed integer |
-| `uint32` | 32-bit unsigned integer |
-| `int64` | 64-bit signed integer |
-| `pointer` | Memory address |
-| `bytes` | Raw bytes (requires length) |
-| `bool` | Boolean value |
-| `double` | 64-bit floating point |
-| `CFData` | iOS CFData object |
-| `CFDictionary` | iOS CFDictionary object |
+| Type           | Description                 |
+| -------------- | --------------------------- |
+| `string`       | Null-terminated C string    |
+| `int32`        | 32-bit signed integer       |
+| `uint32`       | 32-bit unsigned integer     |
+| `int64`        | 64-bit signed integer       |
+| `pointer`      | Memory address              |
+| `bytes`        | Raw bytes (requires length) |
+| `bool`         | Boolean value               |
+| `double`       | 64-bit floating point       |
+| `CFData`       | iOS CFData object           |
+| `CFDictionary` | iOS CFDictionary object     |
 
 ### Buffer Arguments
 
@@ -162,11 +162,11 @@ args:
 
 ### Method Selectors
 
-| Method Type | Selector Format |
-|-------------|-----------------|
+| Method Type     | Selector Format           |
+| --------------- | ------------------------- |
 | Instance method | `- methodName:withParam:` |
-| Class method | `+ methodName:withParam:` |
-| No parameters | `- methodName` |
+| Class method    | `+ methodName:withParam:` |
+| No parameters   | `- methodName`            |
 
 ### Example
 
@@ -496,16 +496,16 @@ Available decoders are located in `./android/decoders`.
 
 Frooky supports categorizing hooks by OWASP Mobile Application Security (MAS) testing domains:
 
-| Category | Description |
-|----------|-------------|
-| `STORAGE` | Data storage and privacy |
-| `CRYPTO` | Cryptographic operations |
-| `AUTH` | Authentication mechanisms |
-| `NETWORK` | Network communication |
-| `PLATFORM` | Platform interaction |
-| `CODE` | Code quality and build |
+| Category     | Description                            |
+| ------------ | -------------------------------------- |
+| `STORAGE`    | Data storage and privacy               |
+| `CRYPTO`     | Cryptographic operations               |
+| `AUTH`       | Authentication mechanisms              |
+| `NETWORK`    | Network communication                  |
+| `PLATFORM`   | Platform interaction                   |
+| `CODE`       | Code quality and build                 |
 | `RESILIENCE` | Resilience against reverse engineering |
-| `PRIVACY` | Privacy controls |
+| `PRIVACY`    | Privacy controls                       |
 
 ## Best Practices
 

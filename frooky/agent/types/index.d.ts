@@ -4,20 +4,20 @@
  * OWASP MAS (Mobile Application Security) risk categories.
  * Used to classify security hooks by their testing domain.
  */
-export type MasCategory = 
-  | 'STORAGE' 
-  | 'CRYPTO' 
-  | 'AUTH' 
-  | 'NETWORK' 
-  | 'PLATFORM' 
-  | 'CODE' 
-  | 'RESILIENCE' 
+export type MasCategory =
+  | 'STORAGE'
+  | 'CRYPTO'
+  | 'AUTH'
+  | 'NETWORK'
+  | 'PLATFORM'
+  | 'CODE'
+  | 'RESILIENCE'
   | 'PRIVACY';
 
 /**
  * Frida native type mappings for function arguments.
  */
-export type NativeArgType = 
+export type NativeArgType =
   | 'string'       // Null-terminated C string
   | 'int32'        // 32-bit signed integer
   | 'uint32'       // 32-bit unsigned integer
@@ -68,12 +68,12 @@ export type JavaDecoder = string
  * Specify exact method signatures using overloads.
  */
 export interface JavaType {
-   /** Name of the Java type such as "[B", "java.lang.string", "org.owasp.mastestapp.returnValue"*/
+  /** Name of the Java type such as "[B", "java.lang.string", "org.owasp.mastestapp.returnValue"*/
   name: string;
-   /** 
-    * Optional type decoder. By default, frooky will choose a default decoder. 
-    * This can be overruled for example if an integer should be decoded as a FLAG. 
-    */
+  /** 
+   * Optional type decoder. By default, frooky will choose a default decoder. 
+   * This can be overruled for example if an integer should be decoded as a FLAG. 
+   */
   decoder?: JavaDecoder
 }
 
@@ -106,13 +106,13 @@ export interface JavaMethod {
  * Android Java/Kotlin class hooking configuration.
  */
 export interface JavaHook extends BaseHook {
-    /** 
-     * Fully qualified class name. 
-     * Nested classes are identified with $, wildcards are supported per package level. 
-     * Example: `org.owasp.*.Http$Client`: `$Client` is an nested class within `$Http` 
-     * and `org.owasp.e.Http$Client` would be a valid match, 
-     * but `org.owasp.a.b.c.Http$Client` not.
-     * */
+  /** 
+   * Fully qualified class name. 
+   * Nested classes are identified with $, wildcards are supported per package level. 
+   * Example: `org.owasp.*.Http$Client`: `$Client` is an nested class within `$Http` 
+   * and `org.owasp.e.Http$Client` would be a valid match, 
+   * but `org.owasp.a.b.c.Http$Client` not.
+   * */
   javaClass: string;
   methods: JavaMethod[];
 }

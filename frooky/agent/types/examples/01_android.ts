@@ -9,8 +9,6 @@
  * the documentation or examples/ folder
  */
 
-
-
 import * as Frooky from 'frooky'
 
 // ============================================================================
@@ -104,7 +102,7 @@ const intentFlagsHook: Frooky.JavaHook = {
       overloads: [
         {
           args: [
-            { 
+            {
               name: 'int',
               decoder: 'IntentFlagsDecoder'
             }
@@ -164,8 +162,8 @@ const sqliteHook: Frooky.JavaHook = {
 }
 
 
-export { 
-  wifiHook, 
+export {
+  wifiHook,
   locationHook,
   urlHook,
   intentHook,

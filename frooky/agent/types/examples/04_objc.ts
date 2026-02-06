@@ -67,4 +67,4 @@ const coreDataHook: Frooky.ObjectiveCHook = {
   debug: true
 }
 
-export { userDefaultsObjCHook, nsDataHook, secItemHook, urlSessionHook, coreDataHook  }
+export { userDefaultsObjCHook, nsDataHook, secItemHook, urlSessionHook, coreDataHook }
