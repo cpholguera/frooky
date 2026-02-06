@@ -1,6 +1,7 @@
 """Tests for good case lifecycle on iOS."""
 import pytest
 
+
 @pytest.mark.parametrize("platform", ["ios"], indirect=True)
 class TestHookNativeMethod:
     """Tests for handling errors on the target related to Java methods."""
@@ -30,15 +31,16 @@ class TestHookNativeMethod:
         run_frooky(hooks)
 
         expected_event = {
-                "type": "native-hook",
-                "symbol": "open",
-                "inputParameters": [
+            "type": "native-hook",
+            "symbol": "open",
+            "inputParameters": [
                     {
                         "type": "string",
                         "name": "path"
                     }
-                ],
-            }
+            ],
+        }
 
         assert output_file_path.exists(), "output.json was not created"
-        assert number_of_matched_events(expected_event) == 4, "Not the amount of expected matched events found."
+        assert number_of_matched_events(
+            expected_event) == 4, "Not the amount of expected matched events found."
