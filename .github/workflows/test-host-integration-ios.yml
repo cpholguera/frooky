@@ -1,0 +1,115 @@
+name: "Test: Host Integrations Tests iOS"
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: "./frooky/agent/package-lock.json"
+
+      - run: chmod +x compileAgent.sh
+      - run: ./compileAgent.sh --dev
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: "pip"
+
+      - name: Install Python from [dev]
+        run: python -m pip install -e '.[dev]'
+
+      - name: Cache Maestro
+        id: cache-maestro
+        uses: actions/cache@v4
+        with:
+          path: ~/.maestro
+          key: maestro-${{ runner.os }}-${{ hashFiles('**/maestro-version') }}
+          restore-keys: |
+            maestro-${{ runner.os }}-
+
+      - name: Install Maestro
+        if: steps.cache-maestro.outputs.cache-hit != 'true'
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Add Maestro to PATH
+        if: steps.cache-maestro.outputs.cache-hit == 'true'
+        run: echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Clone mas-app-ios repository
+        uses: actions/checkout@v4
+        with:
+          repository: cpholguera/mas-app-ios
+          path: mas-app-ios
+
+      - name: Copy example files
+        run: |
+          EXAMPLE_DIR="docs/examples/ios-app"
+          if [ -f "$EXAMPLE_DIR/MastgTest.swift" ]; then
+            cp -f "$EXAMPLE_DIR/MastgTest.swift" mas-app-ios/MASTestApp/MastgTest.swift
+            echo "Copied MastgTest.swift"
+          fi
+
+      - name: Build the app for simulator
+        run: |
+          cd mas-app-ios
+          cp .github/Local.xcconfig.ci Local.xcconfig
+          DEFAULT_SCHEME=$(xcodebuild -list -json | jq -r '.project.targets[0]')
+          echo "Using scheme: $DEFAULT_SCHEME"
+
+          xcodebuild build \
+            -project "MASTestApp.xcodeproj" \
+            -scheme "$DEFAULT_SCHEME" \
+            -destination "platform=iOS Simulator,name=iPhone 16" \
+            -derivedDataPath "$GITHUB_WORKSPACE/DerivedData" \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+          echo "Build succeeded"
+
+      - name: Boot iOS Simulator
+        run: |
+          DEVICE_NAME="iPhone 16"
+          if xcrun simctl list devices | grep "$DEVICE_NAME" | grep -q "Booted"; then
+            echo "Simulator '$DEVICE_NAME' is already running."
+          else
+            echo "Simulator '$DEVICE_NAME' is not running. Attempting to boot..."
+            xcrun simctl boot "$DEVICE_NAME" || { echo "Error: Failed to boot simulator"; exit 1; }
+          fi
+
+          echo "Waiting for Simulator to be ready..."
+          xcrun simctl bootstatus "$DEVICE_NAME" -b || { echo "Error: Simulator failed to reach ready state"; exit 1; }
+          echo "Simulator is ready."
+
+      - name: Install app on simulator
+        run: |
+          DEVICE_NAME="iPhone 16"
+          APP_PATH=$(find "$GITHUB_WORKSPACE/DerivedData" -name "*.app" -type d | head -1)
+          echo "Found app at: $APP_PATH"
+
+          if [ -z "$APP_PATH" ]; then
+            echo "Error: Could not find the built .app file."
+            exit 1
+          fi
+
+          xcrun simctl install "$DEVICE_NAME" "$APP_PATH"
+          echo "App installed successfully"
+
+      - name: Run iOS integration tests
+        run: pytest tests/integration/ios

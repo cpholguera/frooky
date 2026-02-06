@@ -24,10 +24,9 @@ jobs:
     needs: build
     uses: ./.github/workflows/test-build.yml
 
-  test-android:
-    needs: build
-    uses: ./.github/workflows/test-android-runtime.yml
+  test-host-integration-android:
+    uses: ./.github/workflows/test-host-integration-android.yml
 
-  test-ios:
+  test-host-integration-ios:
     needs: build
-    uses: ./.github/workflows/test-ios-runtime.yml
+    uses: ./.github/workflows/test-host-integration-ios.yml

@@ -1,0 +1,95 @@
+name: "Test: Host Integrations Tests Android"
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: "./frooky/agent/package-lock.json"
+
+      - run: chmod +x compileAgent.sh
+      - run: ./compileAgent.sh --dev
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: 'pip'
+
+      - name: Install Python from [dev]
+        run: python -m pip install -e '.[dev]'
+
+      - name: Cache Maestro
+        uses: actions/cache@v4
+        id: maestro-cache
+        with:
+          path: ~/.maestro
+          key: maestro-${{ runner.os }}
+
+      - name: Install Maestro
+        if: steps.maestro-cache.outputs.cache-hit != 'true'
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+
+      - name: Add Maestro to PATH
+        run: echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-34
+
+      - name: Cache APK
+        uses: actions/cache@v4
+        id: apk-cache
+        with:
+          path: docs/examples/android-app/MASTG-DEMO-0060.apk
+          key: mastg-demo-apk-${{ hashFiles('docs/examples/android-app/MASTG-DEMO-0060.apk.zip') }}
+
+      - name: Extract APK
+        if: steps.apk-cache.outputs.cache-hit != 'true'
+        run: cd docs/examples/android-app && unzip -o MASTG-DEMO-0060.apk.zip
+
+      - name: Start Android Emulator and Run Android Integration Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          emulator-options: -wipe-data -no-snapshot-save -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            chmod +x .github/scripts/android/prep-device.sh
+            .github/scripts/android/prep-device.sh
+
+            chmod +x .github/scripts/android/install-frida-server.sh
+            .github/scripts/android/install-frida-server.sh
+
+            # Install the app APK
+            adb install -r docs/examples/android-app/MASTG-DEMO-0060.apk
+
+            # Run Android integration tests
+            pytest tests/integration/android

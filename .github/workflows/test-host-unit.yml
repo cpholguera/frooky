@@ -1,0 +1,32 @@
+name: "Test: Host Unit Tests"
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: "./frooky/agent/package-lock.json"
+      - run: chmod +x compileAgent.sh
+      - run: ./compileAgent.sh --dev
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install Python from [dev]
+        run: python -m pip install -e '.[dev]'
+
+      - name: Run host unit tests
+        run: pytest tests/unit
