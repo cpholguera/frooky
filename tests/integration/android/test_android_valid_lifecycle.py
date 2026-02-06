@@ -6,7 +6,7 @@ import pytest
 class TestHookJavaMethod:
     """Tests for handling errors on the target related to Java methods."""
 
-    def test_hook_java_single_method(self, run_frooky, number_of_matched_events, output_file_path):
+    def test_hook_java_single_method(self, run_frooky, count_matched_events):
         """Test hooking a single Java method in a real process."""
 
         hook = {
@@ -28,11 +28,10 @@ class TestHookJavaMethod:
             "method": "putString",
         }
 
-        assert output_file_path.exists(), "output.json was not created"
-        assert number_of_matched_events(
+        assert count_matched_events(
             expected_pattern) == 2, "Not the amount of expected matched events found."
 
-    def test_hook_java_single_method_overload(self, run_frooky, number_of_matched_events, output_file_path):
+    def test_hook_java_single_method_overload(self, run_frooky, count_matched_events):
         """Test hooking single Java methods and one overload."""
 
         hook = {
@@ -81,11 +80,10 @@ class TestHookJavaMethod:
             ],
         }
 
-        assert output_file_path.exists(), "output.json was not created"
-        assert number_of_matched_events(
+        assert count_matched_events(
             expected_event) == 1, "Not the amount of expected matched events found."
 
-    def test_hook_java_multiple_methods(self, run_frooky, number_of_matched_events, output_file_path):
+    def test_hook_java_multiple_methods(self, run_frooky, count_matched_events):
         """Test hooking a single Java method in a real process."""
 
         hook = {
@@ -114,8 +112,7 @@ class TestHookJavaMethod:
             "method": "putStringSet",
         }
 
-        assert output_file_path.exists(), "output.json was not created"
-        assert number_of_matched_events(
+        assert count_matched_events(
             expected_pattern_putString) == 2, "Not the amount of expected matched events found."
-        assert number_of_matched_events(
+        assert count_matched_events(
             expected_pattern_putStringSet) == 1, "Not the amount of expected matched events found."
