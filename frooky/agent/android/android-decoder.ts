@@ -1,24 +1,5 @@
-/**
- * Makes a hex dump of a byte array. The dump is limited by the length parameter.
- * @param {Uint8Array} bytes - Byte array to be decoded to hexadecimal.
- * @param {number} length - Number of bytes which will be decoded.
- * @returns {string} The hexadecimal decoded bytes (e.g., "0x22aa3482ef...")
- */
-function byteArrayHexDump(bytes, length) {
-  let appendix = "...";
-  if (bytes.length < length) {
-    length = bytes.length;
-    appendix = "";
-  }
+import { toHexString } from "../shared/utils.js"
 
-  let hexString = "0x";
-  for (let i = 0; i < length; i++) {
-    hexString =
-      hexString + ("0" + (bytes[i] & 0xff).toString(16)).slice(-2);
-  }
-
-  return hexString + appendix;
-}
 
 /**
  * Converts a byte value to its uri-encoded representation
@@ -53,7 +34,7 @@ function byteToString(bytes, length) {
     return decodeURIComponent(result).replace(/\0.*$/g, "");
   } catch (e) {
     // make a hex dump in case, the byte array contains raw binary data
-    return byteArrayHexDump(bytes, length);
+    return toHexString(bytes, length);
   }
 }
 
