@@ -20,5 +20,5 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: ${{ needs.build.outputs.artifact-name }}
-          path: dist
+          path: .
       - uses: pypa/gh-action-pypi-publish@release/v1
