@@ -62,13 +62,6 @@ jobs:
             ~/.android/adb*
           key: avd-34
 
-      - name: Cache Frida Server
-        uses: actions/cache@v4
-        id: frida-cache
-        with:
-          path: ~/.frida-server
-          key: frida-server-${{ runner.os }}-android-34
-
       - name: Cache APK
         uses: actions/cache@v4
         id: apk-cache
