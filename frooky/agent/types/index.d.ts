@@ -32,8 +32,7 @@ export type NativeArgType =
 /**
  * Argument direction for pointer/buffer types.
  */
-export type direction = 'in' | 'out';
-
+export type Direction = 'in' | 'out';
 
 /**
  * Base configuration for all hook types.
@@ -68,7 +67,7 @@ export type JavaDecoder = string
  * Specify exact method signatures using overloads.
  */
 export interface JavaType {
-  /** Name of the Java type such as "[B", "java.lang.string", "org.owasp.mastestapp.returnValue"*/
+  /** Java type descriptor such as "[B", "java.lang.string", "org.owasp.mastestapp.returnValue"*/
   name: string;
   /** 
    * Optional type decoder. By default, frooky will choose a default decoder. 
@@ -122,7 +121,7 @@ export interface JavaHook extends BaseHook {
  * Native function argument descriptor.
  * Defines how arguments should be captured.
  */
-export interface NativeArgumentDescriptor {
+export interface NativeArgDescriptor {
   name: string;
   type: NativeArgType;
   /** Fixed buffer length */
@@ -130,7 +129,7 @@ export interface NativeArgumentDescriptor {
   /** Index of argument containing buffer length */
   lengthInArg?: number;
   /** Argument direction: 'in' (default) or 'out' for output parameters */
-  direction?: direction;
+  direction?: Direction;
   /** Set to true to capture the function's return value */
   retValue?: boolean;
 }
@@ -144,7 +143,7 @@ export interface NativeHook extends BaseHook {
   /** Function symbol name or address */
   symbol: string;
   /** Argument descriptors defining how to capture function parameters */
-  args?: NativeArgumentDescriptor[];
+  args?: NativeArgDescriptor[];
 }
 
 /**
@@ -156,7 +155,7 @@ export interface ObjectiveCHook extends BaseHook {
   objClass: string;
   /** Method selector */
   symbol: string;
-  args?: NativeArgumentDescriptor[];
+  args?: NativeArgDescriptor[];
 }
 
 /**
@@ -167,7 +166,7 @@ export interface SwiftHook extends BaseHook {
   swiftClass: string;
   /** Mangled Swift symbol */
   symbol: string;
-  args?: NativeArgumentDescriptor[];
+  args?: NativeArgDescriptor[];
 }
 
 /**
