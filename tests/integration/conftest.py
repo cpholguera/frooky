@@ -8,6 +8,34 @@ import json
 import pytest
 
 
+def _matches_subset_pattern_recursive(event, pattern):
+    """
+    Check if pattern is a subset of event structure.
+    - For dicts: pattern keys must exist in event with matching values
+    - For lists: pattern and target must have same length, each element must match
+    - For primitives: must be equal
+    """
+    if isinstance(pattern, dict):
+        if not isinstance(event, dict):
+            return False
+        return all(
+            key in event and _matches_subset_pattern_recursive(
+                event[key], value)
+            for key, value in pattern.items()
+        )
+    elif isinstance(pattern, list):
+        if not isinstance(event, list):
+            return False
+        if len(pattern) != len(event):
+            return False
+        return all(
+            _matches_subset_pattern_recursive(event[i], pattern[i])
+            for i in range(len(pattern))
+        )
+    else:
+        return event == pattern
+
+
 @pytest.fixture(params=["android", "ios"])
 def platform(request):
     """Platform to test against."""
@@ -83,53 +111,25 @@ def cleanup_output_json(output_file_path):
         output_file_path.unlink()
 
 
-def matches_subset_pattern_recursive(event, pattern):
-    """
-    Check if pattern is a subset of event structure.
-    - For dicts: pattern keys must exist in event with matching values
-    - For lists: pattern and target must have same length, each element must match
-    - For primitives: must be equal
-    """
-    if isinstance(pattern, dict):
-        if not isinstance(event, dict):
-            return False
-        return all(
-            key in event and matches_subset_pattern_recursive(
-                event[key], value)
-            for key, value in pattern.items()
-        )
-    elif isinstance(pattern, list):
-        if not isinstance(event, list):
-            return False
-        if len(pattern) != len(event):
-            return False
-        return all(
-            matches_subset_pattern_recursive(event[i], pattern[i])
-            for i in range(len(pattern))
-        )
-    else:
-        return event == pattern
-
-
 @pytest.fixture
-def number_of_matched_events(output_file_path):
+def count_matched_events(output_file_path):
     """Factory fixture to scan output NDJSON for hooks matching the specified patterns."""
 
-    def _count_matches(expected_event):
+    def _count_matched_events(expected_event):
         matched_events_counter = 0
 
         with open(output_file_path, 'r', encoding="utf8") as f:
             for line in f:
                 try:
                     entry = json.loads(line)
-                    if matches_subset_pattern_recursive(entry, expected_event):
+                    if _matches_subset_pattern_recursive(entry, expected_event):
                         matched_events_counter += 1
                 except json.JSONDecodeError:
                     pass
 
         return matched_events_counter
 
-    return _count_matches
+    return _count_matched_events
 
 
 @pytest.fixture
@@ -161,7 +161,7 @@ def run_frooky(platform, output_file_path, app_id, mastestapp_start_path):
                 stderr=subprocess.PIPE
             )
             time.sleep(5)
-            
+
             if frooky_process.poll() is not None:
                 _, stderr = frooky_process.communicate()
                 raise RuntimeError(f"Frooky failed to start: {stderr}")
