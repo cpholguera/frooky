@@ -177,7 +177,8 @@ def run_frooky(platform, output_file_path, mastestapp_start):
                     "maestro",
                     "test",
                     "--platform", platform,
-                    str(mastestapp_start)],
+                    str(mastestapp_start)
+                ],
                 timeout=600,
                 check=True,
                 capture_output=True,
