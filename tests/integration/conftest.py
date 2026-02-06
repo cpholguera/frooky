@@ -165,13 +165,13 @@ def run_frooky(platform, output_file_path, mastestapp_start):
                 stderr=subprocess.PIPE
             )
 
-            # Wait to ensure frooky started successfully
             time.sleep(5)
             if frooky_process.poll() is not None:
                 _, stderr = frooky_process.communicate()
                 raise RuntimeError(f"Frooky failed to start: {stderr}")
 
             # Run Maestro test
+            maestro_timeout = 600
             subprocess.run(
                 [
                     "maestro",
@@ -179,7 +179,7 @@ def run_frooky(platform, output_file_path, mastestapp_start):
                     "--platform", platform,
                     str(mastestapp_start)
                 ],
-                timeout=600,
+                timeout=maestro_timeout,
                 check=True,
                 capture_output=True,
                 text=True
