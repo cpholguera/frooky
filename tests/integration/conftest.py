@@ -31,6 +31,7 @@ def get_android_pid():
             f'{app_id}/.MainActivity'],
         check=True
     )
+
     time.sleep(5)
 
     result = subprocess.run(
@@ -48,7 +49,7 @@ def get_android_pid():
 
 
 def get_ios_app_name():
-    """Makes sure the iOS app is running and returns the name id."""
+    """Makes sure the iOS app is running and returns the app name."""
     app_id = "org.owasp.mastestapp.MASTestApp-iOS"
     app_name = "MASTestApp"
 
