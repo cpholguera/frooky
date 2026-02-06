@@ -34,4 +34,4 @@ jobs:
         id: upload
         with:
           name: dist
-          path: dist/*
+          path: dist/
