@@ -302,7 +302,7 @@ This is done by declaring the types in each `<objc_method>`. The syntax the same
 
 ### Basic Syntax
 
-The minimum necessary property is `<symbol>`:
+The minimum necessary property is `symbol`:
 
 ```yaml
 - symbol: <symbol>
@@ -417,7 +417,7 @@ To capture the function's return value, add a descriptor with `retValue: true`:
 > [!IMPORTANT]
 > At the moment, frooky only supports `SwiftHook` if the mangled symbols have not been striped. These are required to lookup the location of the method during runtime. Usually, productive build are stripped of them.
 >
-> At them moment, frooky does mot support other means of Swift function hooking, because they require manual reverse engineering, which is not the focus of frooky at the time.
+> At them moment, frooky does not support other means of Swift function hooking, because they require manual reverse engineering, which is not the focus of frooky at the time.
 >
 
 ### Basic Syntax
