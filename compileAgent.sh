@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
 
-cd ./frooky/agent
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+cd "$SCRIPT_DIR/frooky/agent"
 npm ci
 
 case "$1" in

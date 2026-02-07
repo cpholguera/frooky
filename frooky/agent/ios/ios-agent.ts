@@ -1,42 +1,13 @@
 import ObjC from "frida-objc-bridge";
-// import Swift from "frida-swift-bridge";
+import { uuidv4, toHex } from "../shared/utils.js"
 
-/**
- * Generates a v4 UUID
- * @returns {string} v4 UUID (e.g. "bf01006f-1d6c-4faa-8680-36818b4681bc")
- */
-function generateUUID() {
-  var d = new Date().getTime();
-  var d2 =
-    (typeof performance !== "undefined" &&
-      performance.now &&
-      performance.now() * 1000) ||
-    0;
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16;
-    if (d > 0) {
-      r = (d + r) % 16 | 0;
-      d = Math.floor(d / 16);
-    } else {
-      r = (d2 + r) % 16 | 0;
-      d2 = Math.floor(d2 / 16);
-    }
-    return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
-  });
-}
 
 // --- Native argument decoding utilities (mirroring Android native) ---
 function _arrayBufferToHex(buffer) {
-  try {
-    var bytes = new Uint8Array(buffer);
-    var hex = [];
-    for (var i = 0; i < bytes.length; i++) {
-      var h = bytes[i].toString(16);
-      if (h.length < 2) h = "0" + h;
-      hex.push(h);
-    }
-    return hex.join("");
-  } catch (e) {
+  try{
+      var bytes = new Uint8Array(buffer);
+      return toHex(bytes)
+  }catch (e) {
     return "<hex-conversion-error>";
   }
 }
@@ -469,7 +440,7 @@ function registerNativeHook(hook, categoryName, callback) {
       } catch (eFilt) {}
 
       this.event = {
-        id: generateUUID(),
+        id: uuidv4(),
         type: "native-hook",
         category: categoryName,
         time: new Date().toISOString(),
@@ -599,7 +570,7 @@ function registerObjCHook(hook, categoryName, callback) {
       }
 
       this.event = {
-        id: generateUUID(),
+        id: uuidv4(),
         type: "objc-hook",
         category: categoryName,
         time: new Date().toISOString(),
