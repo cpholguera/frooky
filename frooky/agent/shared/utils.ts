@@ -95,15 +95,6 @@ export function toHexAndAscii(
     length: number = Infinity,
     placeholder: string = "."
 ): [string, string] {
-    const [lengthToDecode, ellipsis] = getDecodeBounds(bytes, length);
-    const hexArray = new Array(lengthToDecode);
-    const asciiArray = new Array(lengthToDecode);
 
-    for (let i = 0; i < lengthToDecode; i++) {
-        const byte = bytes[i];
-        hexArray[i] = HEX_TABLE[byte];
-        asciiArray[i] = isPrintable(byte) ? String.fromCharCode(byte) : placeholder;
-    }
-
-    return ["0x" + hexArray.join("") + ellipsis, asciiArray.join("") + ellipsis];
+    return [ toHex(bytes, length), toAscii(bytes, length, placeholder) ]
 }
