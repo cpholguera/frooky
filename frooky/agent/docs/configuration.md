@@ -13,19 +13,15 @@ This documentation describes the structure of a hook file and provides examples 
     - [Basic Syntax](#basic-syntax)
     - [Method Overloads](#method-overloads)
     - [Java Type Signatures](#java-type-signatures)
-  - [Swift Hook Configuration](#swift-hook-configuration)
-    - [Basic Syntax](#basic-syntax-1)
-    - [Argument Descriptors](#argument-descriptors)
-    - [Supported Argument Types](#supported-argument-types)
   - [Objective-C Hook Configuration](#objective-c-hook-configuration)
-    - [Basic Syntax](#basic-syntax-2)
-    - [Argument Descriptors](#argument-descriptors-1)
-    - [iOS-Specific Types](#ios-specific-types)
+    - [Basic Syntax](#basic-syntax-1)
   - [Native Hook Configuration](#native-hook-configuration)
-    - [Basic Syntax](#basic-syntax-3)
-    - [Argument Descriptors](#argument-descriptors-2)
+    - [Basic Syntax](#basic-syntax-2)
+    - [Argument Descriptors](#argument-descriptors)
     - [Buffer Handling](#buffer-handling)
     - [Capturing Return Values](#capturing-return-values)
+  - [Swift Hook Configuration](#swift-hook-configuration)
+    - [Basic Syntax](#basic-syntax-3)
 
 For each of the feature described here, there are examples in the [examples folder](../docs/examples/).
 
@@ -75,17 +71,17 @@ What kind of a type the `<hook_configuration>` is, is determined by a unique pro
 
 Frooky supports four types of hooks:
 
-| Hook Type        | Unique Property | Platform    | Description                                 |
-| ---------------- | --------------- | ----------- | ------------------------------------------- |
-| `JavaHook`       | `javaClass`     | Android     | Hook for Java/Kotlin methods                |
-| `SwiftHook`      | `swiftClass`    | iOS         | Hook for Swift methods                      |
-| `ObjectiveCHook` | `objClass`      | iOS         | Hook for Objective-C methods                |
-| `NativeHook`     | `module`        | Android/iOS | Hook for native functions (C/C++/Rust etc.) |
+| Hook Type        | Unique Properties | Platform    | Description                                 |
+| ---------------- | ---------------   | ----------- | ------------------------------------------- |
+| `JavaHook`       | `javaClass`       | Android     | Hook for Java/Kotlin methods                |
+| `ObjectiveCHook` | `objClass`        | iOS         | Hook for Objective-C methods                |
+| `NativeHook`     | `module`          | Android/iOS | Hook for native functions (C/C++/Rust etc.) |
+| `SwiftHook`      | `swiftClass`      | iOS         | Hook for Swift methods                      |
 
 > [!WARNING]
-> When loading a `<hook_configuration>`, frooky will validate it against a JSON schema in order to detect invalid configuration.
+> When loading a `<hook_configuration>`, frooky will validate it against a JSON schema in order to detect invalid configuration. This makes sure, that the `<hook_configuration>` does not contain hooks for different platforms for example.
 >
-> This makes sure, that the `<hook_configuration>` does not contain hooks for different platforms for example.
+> At the moment, frooky only supports `SwiftHook` if the symbols have not been striped.
 
 ### Properties for All Type of Hooks
 
@@ -106,7 +102,7 @@ The following properties can be used for all types:
 
 ### Basic Syntax
 
-The minimum necessary properties are `<class_name>` and one `<method_name>`:
+The minimum necessary properties are `javaClass` and `methods`:
 
 ```yaml
 - javaClass: <class_name>
@@ -164,11 +160,11 @@ If you only want to hook a certain overload, specify it by adding one or more `o
 >     - name: putExtra
 >       overloads:
 >         - args:
->            - name: java.lang.String
->            - name: java.lang.String
+>            - type: java.lang.String
+>            - type: java.lang.String
 >        - args:
->            - name: java.lang.String
->            - name: "[Z"
+>            - type: java.lang.String
+>            - type: "[Z"
 >  ```
 >
 > This will *only* hook the following methods:
@@ -215,82 +211,16 @@ The following table shows the different kinds of types and their representation 
 
 ---------------------------
 
-## Swift Hook Configuration
-
-### Basic Syntax
-
-The minimum necessary properties are `<swift_class>` and `<symbol>`:
-
-```yaml
-- swiftClass: <swift_class>
-  symbol: <symbol>
-```
-
-> [!NOTE]
-> **Example:**
->
-> ```yaml
-> - swiftClass: MyApp.NetworkManager
->   symbol: _$s5MyApp14NetworkManagerC11sendRequestyyF
-> ```
->
-> This `<hook_configuration>` will hook the mangled Swift method symbol.
-
-> [!TIP]
->
-> Swift symbols are typically mangled. Use tools like `swift-demangle` or `nm` to find the correct symbol names.
->
-> Example demangled: `MyApp.NetworkManager.sendRequest() -> ()`
-
-### Argument Descriptors
-
-To capture function arguments, add `args` with `NativeArgDescriptor` objects:
-
-```yaml
-- swiftClass: <swift_class>
-  symbol: <symbol>
-  args:
-    - name: <arg_name>
-      type: <native_arg_type>
-```
-
-> [!NOTE]
-> **Example:**
->
-> ```yaml
-> - swiftClass: MyApp.CryptoManager
->   symbol: _$s5MyApp13CryptoManagerC7encryptySS4data_SStF
->   args:
->     - name: data
->       type: string
->     - name: key
->       type: string
-> ```
-
-### Supported Argument Types
-
-| Type           | Description                      |
-|----------------|----------------------------------|
-| `string`       | Null-terminated C string         |
-| `int32`        | 32-bit signed integer            |
-| `uint32`       | 32-bit unsigned integer          |
-| `int64`        | 64-bit signed integer            |
-| `pointer`      | Memory address                   |
-| `bytes`        | Raw bytes (requires length)      |
-| `bool`         | Boolean value                    |
-| `double`       | 64-bit floating point            |
-
----------------------------
-
 ## Objective-C Hook Configuration
 
 ### Basic Syntax
 
-The minimum necessary properties are `<obj_class>` and `<symbol>`:
+The minimum necessary properties are `objClass` and `symbol`:
 
 ```yaml
 - objClass: <obj_class>
-  symbol: <symbol>
+  methods:
+    - selector: <method_selector>
 ```
 
 > [!NOTE]
@@ -298,56 +228,29 @@ The minimum necessary properties are `<obj_class>` and `<symbol>`:
 >
 > ```yaml
 > - objClass: NSURLSession
->   symbol: "- dataTaskWithURL:"
+>   methods:
+>    - selector: "- downloadTaskWithURL:(NSURL *) url"
 > ```
 >
-> This `<hook_configuration>` will hook the Objective-C instance method.
+> This `<hook_configuration>` will hook the following Objective-C methods:
+>
+> ```objectivec
+> + (NSURLSession *) sessionWithConfiguration:(NSURLSessionConfiguration *) configuration 
+>                                    delegate:(id<NSURLSessionDelegate>) delegate 
+>                               delegateQueue:(NSOperationQueue *) queue;
+> - (NSURLSessionDownloadTask *) downloadTaskWithURL:(NSURL *) url;
+> ```
+
+Frooky decodes the arguments based on the `<method_selector>`.
 
 > [!TIP]
 >
-> Objective-C method selectors use the following format:
+> Objective-C method selectors can hook instance ans class methods:
 >
-> - **Instance methods**: `- methodName:` or `- methodName:withParam:`
-> - **Class methods**: `+ methodName:` or `+ methodName:withParam:`
+> - **Instance methods**: `- biometryType`
+> - **Type methods**: `+ removeProperties:(NSArray *) properties`
 >
 > Use colons (`:`) to indicate parameters in the selector.
-
-### Argument Descriptors
-
-To capture method arguments, add `args` with `NativeArgDescriptor` objects:
-
-```yaml
-- objClass: <obj_class>
-  symbol: <symbol>
-  args:
-    - name: <arg_name>
-      type: <native_arg_type>
-```
-
-> [!NOTE]
-> **Example:**
->
-> ```yaml
-> - objClass: NSFileManager
->   symbol: "- createFileAtPath:contents:attributes:"
->   args:
->     - name: path
->       type: string
->     - name: contents
->       type: bytes
->       lengthInArg: 2
->     - name: attributes
->       type: CFDictionary
-> ```
-
-### iOS-Specific Types
-
-| Type           | Description                      |
-|----------------|----------------------------------|
-| `CFData`       | iOS CFData object                |
-| `CFDictionary` | iOS CFDictionary object          |
-
----------------------------
 
 ## Native Hook Configuration
 
@@ -463,18 +366,34 @@ To capture the function's return value, add a descriptor with `retValue: true`:
 >       retValue: true
 > ```
 
+## Swift Hook Configuration
 
+> [!WARNING]
+> At the moment, frooky only supports `SwiftHook` if the mangled symbols have not been striped. These are required to lookup the location of the method during runtime. Usually, productive build are stripped of them.
+>
+> At them moment, frooky does mot support other means of Swift function hooking, because they require manual reverse engineering, which is not the focus of frooky at the time.
+>
 
+### Basic Syntax
 
+The minimum necessary properties for a `SwiftHook` are `swiftClass` and `mangledSymbol`:
 
+```yaml
+- swiftClass: <swift_class>
+  mangledSymbol: <mangled_symbol>
+```
 
-
-
+> [!NOTE]
+> **Example:**
+>
+> ```yaml
+> - swiftClass: MyApp.NetworkManager
+>   mangledSymbol: _$s5MyApp14NetworkManagerC11sendRequestyyF
+> ```
+>
+> This `<hook_configuration>` will hook the mangled Swift method symbol.
 
 <!-- 
-
-
-
 
 ### Basic Syntax
 
@@ -498,27 +417,9 @@ To capture the function's return value, add a descriptor with `retValue: true`:
       type: string
 ```
 
-
 ## Objective-C Hook Configuration
 
 ## Native Hook Configuration
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ---------------------------
 ## TypeScript API
