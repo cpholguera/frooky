@@ -9,13 +9,13 @@ This documentation describes the structure of a hook file and provides examples 
 A frooky configuration contains optional metadata about the hooks, and a set of `<hook_configuration>`.
 
 ```yaml
-metadata:
-  name: <name>                 # Optional: Name of the hook collection.
-  platform: Android|iOS        # Optional: Target platform
-  description: <description>   # Optional: Description of what the hook collection does.
-  masCategory: <mas_category>  # Optional: STORAGE, CRYPTO, AUTH, NETWORK, etc.
-  author: <author>             # Optional: Your name or organization
-  version: <version>           # Optional: Semantic version (e.g., v1)
+metadata:                      # All metadata are optional
+  name: <name>                 # Name of the hook collection
+  platform: Android|iOS        # Target platform
+  description: <description>   # Description of what the hook collection does
+  masCategory: <mas_category>  # STORAGE, CRYPTO, AUTH, NETWORK, etc
+  author: <author>             # Your name or organization
+  version: <version>           # Semantic version (e.g., v1)
 
 hooks:
   - <hook_configuration>       # Hook object - see hooks section below
