@@ -67,6 +67,44 @@ All hook types support these optional properties:
 
 ## Java Hook Configuration
 
+### Java Type Signatures
+
+Frida, and therefore frooky, accept both Java Native Interface (JNI) type signatures but also its own, slightly different types.
+
+The following table shows the different kinds of types and their representation in Java, JNI and Frida:
+
+| Kind                | Java Type                | JNI Type Signature       | Frida Type Signature     |
+|---------------------|--------------------------|--------------------------|--------------------------|
+| Primitive           | `boolean`                | `Z`                      | `boolean`                |
+|                     | `byte`                   | `B`                      | `byte`                   |
+|                     | `char`                   | `C`                      | `char`                   |
+|                     | `short`                  | `S`                      | `short`                  |
+|                     | `int`                    | `I`                      | `int`                    |
+|                     | `long`                   | `J`                      | `long`                   |
+|                     | `float`                  | `F`                      | `float`                  |
+|                     | `double`                 | `D`                      | `double`                 |
+|                     | `void`                   | `V`                      | `void`                   |
+| Primitive Array     | `boolean[]`              | `[Z`                     | `[Z`                     |
+|                     | `byte[]`                 | `[B`                     | `[B`                     |
+|                     | `char[]`                 | `[C`                     | `[C`                     |
+|                     | `short[]`                | `[S`                     | `[S`                     |
+|                     | `int[]`                  | `[I`                     | `[I`                     |
+|                     | `long[]`                 | `[J`                     | `[J`                     |
+|                     | `float[]`                | `[F`                     | `[F`                     |
+|                     | `double[]`               | `[D`                     | `[D`                     |
+| Reference           | `java.lang.String`       | `Ljava/lang/String;`     | `java.lang.String`       |
+|                     | `java.lang.Object`       | `Ljava/lang/Object;`     | `java.lang.Object`       |
+|                     | `com.example.MyClass`    | `Lcom/example/MyClass;`  | `com.example.MyClass`    |
+| Reference Array     | `String[]`               | `[Ljava/lang/String;`    | `[Ljava.lang.String`     |
+|                     | `Object[]`               | `[Ljava/lang/Object;`    | `[Ljava.lang.Object`     |
+|                     | `MyClass[]`              | `[Lcom/example/MyClass;` | `[Lcom.example.MyClass`  |
+| Multi-Dimensional   | `int[][]`                | `[[I`                    | `[[I`                    |
+|                     | `byte[][]`               | `[[B`                    | `[[B`                    |
+|                     | `String[][]`             | `[[Ljava/lang/String;`   | `[[Ljava.lang.String`    |
+
+> [!NOTE]
+> While both JNI and Frida Type signatures are valid, it is more common to use Frida Type Signatures.
+
 ### Basic Syntax
 
 The minimum necessary properties are `<class_name>` and one `<method_name>`:
@@ -92,18 +130,20 @@ For this case *all* methods from the class will be hooked.
 > This will hook the following methods:
 >
 > ```kotlin
-> android.webkit.WebView.()
+> android.webkit.WebView()
 > android.webkit.WebView.loadUrl(url: String)
 > android.webkit.WebView.loadUrl(url: String, additionalHttpHeaders: MutableMap<String!, String!>)
 > ```
 
 > [!TIP]
 >
-> You can use the following syntax for dynamic `<class_name>` lookup at runtime:
+> Use the following syntax for dynamic `<class_name>` lookup at runtime:
 >
 > - **Exact match**: `org.owasp.mastestapp.MainActivity`
 > - **Wildcards**: `org.owasp.*.Http$Client` (per package level)
 > - **Nested classes**: Use `$` separator (e.g., `Outer$Inner`)
+>
+> `$init` is the `<method_name>` of the constructor of a class.
 
 ### Method Overloads
 
@@ -131,18 +171,6 @@ If you only want to hook a certain overload, specify it by adding one or more `o
 >            - name: java.lang.String
 >            - name: int
 >  ```
-
-### Java Type Notation Is Frida Notation
-
-Examples:
-
-| Type          | Notation              |
-| ------------- | --------------------- |
-| Primitive int | `int`                 |
-| String        | `java.lang.String`    |
-| Byte array    | `[B`                  |
-| String array  | `[Ljava.lang.String;` |
-| Custom class  | `com.example.MyClass` |
 
 ## Native Hook Configuration
 
