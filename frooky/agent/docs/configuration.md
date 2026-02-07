@@ -4,24 +4,24 @@ A frooky hook configuration describes how to hook a Java, Swift, Objective-C or 
 
 This documentation describes the structure of a hook file and provides examples for the various cases.
 
-- [Frooky Hook Documentation](#frooky-hook-documentation)
-  - [Frooky Configuration](#frooky-configuration)
-  - [Basic Hook Configuration](#basic-hook-configuration)
-    - [Hook Types](#hook-types)
-    - [Properties for All Type of Hooks](#properties-for-all-type-of-hooks)
-  - [Java Hook Configuration](#java-hook-configuration)
-    - [Basic Syntax](#basic-syntax)
-    - [Method Overloads](#method-overloads)
-    - [Java Type Signatures](#java-type-signatures)
-  - [Objective-C Hook Configuration](#objective-c-hook-configuration)
-    - [Basic Syntax](#basic-syntax-1)
-  - [Native Hook Configuration](#native-hook-configuration)
-    - [Basic Syntax](#basic-syntax-2)
-    - [Argument Descriptors](#argument-descriptors)
-    - [Buffer Handling](#buffer-handling)
-    - [Capturing Return Values](#capturing-return-values)
-  - [Swift Hook Configuration](#swift-hook-configuration)
-    - [Basic Syntax](#basic-syntax-3)
+<!-- no toc -->
+- [Frooky Configuration](#frooky-configuration)
+- [Basic Hook Configuration](#basic-hook-configuration)
+  - [Hook Types](#hook-types)
+  - [Properties for All Type of Hooks](#properties-for-all-type-of-hooks)
+- [Java Hook Configuration](#java-hook-configuration)
+  - [Basic Syntax](#basic-syntax)
+  - [Method Overloads](#method-overloads)
+  - [Java Type Signatures](#java-type-signatures)
+- [Objective-C Hook Configuration](#objective-c-hook-configuration)
+  - [Basic Syntax](#basic-syntax-1)
+- [Native Hook Configuration](#native-hook-configuration)
+  - [Basic Syntax](#basic-syntax-2)
+  - [Argument Descriptors](#argument-descriptors)
+  - [Buffer Handling](#buffer-handling)
+  - [Capturing Return Values](#capturing-return-values)
+- [Swift Hook Configuration](#swift-hook-configuration)
+  - [Basic Syntax](#basic-syntax-3)
 
 For each of the feature described here, there are examples in the [examples folder](../docs/examples/).
 
@@ -170,8 +170,8 @@ If you only want to hook a certain overload, specify it by adding one or more `o
 > This will *only* hook the following methods:
 >
 > ```kotlin
-> android.content.Intent.putExtra(name: String, value: String)
-> android.content.Intent.putExtra(name: String, value: boolean[])
+> open fun android.content.Intent.putExtra(name: String!, value: String?): Intent
+> open fun android.content.Intent.putExtra(name: String!, value: BooleanArray?): Intent
 > ```
 
 ### Java Type Signatures
