@@ -11,21 +11,94 @@ export function uuidv4(): string {
 }
 
 /**
- * Makes a hex dump of a byte array. The dump is limited by the length parameter.
- * @param bytes - Bytes to be decoded to hexadecimal.
- * @param length - Number of bytes which will be decoded. If not provided, all bytes are decoded.
- * @returns The hexadecimal decoded bytes (e.g., "0x22aa3482ef...")
+ * Determines the actual length to decode and whether ellipsis is needed.
+ * @param bytes - Bytes array to check length against.
+ * @param length - Maximum number of bytes to decode.
+ * @returns A tuple [lengthToDecode, ellipsis] where lengthToDecode is the actual length and ellipsis is "..." or "".
+ * @throws {RangeError} If length is negative.
  */
-export function toHexString(bytes: Uint8Array, length: number = Infinity): string {
+function getDecodeBounds(bytes: Uint8Array, length: number): [number, string] {
     if (length < 0) {
         throw new RangeError("Length cannot be negative");
     }
-    const lengthToDecode = Math.min(bytes.length, length);
-    const appendix = bytes.length > length ? "..." : "";
-    
-    const hexString = Array.from(bytes.subarray(0, lengthToDecode))
-        .map(byte => byte.toString(16).padStart(2, "0"))
-        .join("");
 
-    return "0x" + hexString + appendix;
+    if (bytes.length > length) {
+        return [length, "..."];
+    }
+    return [bytes.length, ""];
+}
+
+/**
+ * Checks if a byte is printable ASCII.
+ * @param byte - Byte value to check.
+ * @returns True if the byte represents a printable character (32-126) or tab/newline/carriage return.
+ */
+function isPrintable(byte: number): boolean {
+    return (byte >= 32 && byte <= 126) || byte === 9 || byte === 10 || byte === 13;
+}
+
+/**
+ * Fast bytes to hexadecimal conversion.
+ * @param bytes - Bytes to be decoded as hexadecimal.
+ * @param length - Number of bytes which will be decoded. Defaults to Infinity.
+ * @returns The hexadecimal decoded bytes (e.g., "0x22aa3482ef...")
+ * @throws {RangeError} If length is negative.
+ */
+export function toHex(bytes: Uint8Array, length: number = Infinity): string {
+    const [lengthToDecode, ellipsis] = getDecodeBounds(bytes, length);
+
+    let result = "0x";
+    for (let i = 0; i < lengthToDecode; i++) {
+        const byte = bytes[i];
+        result += (byte < 16 ? "0" : "") + byte.toString(16);
+    }
+
+    return result + ellipsis;
+}
+
+/**
+ * Fast bytes to ascii conversion.
+ * @param bytes - Bytes to be decoded as ascii.
+ * @param length - Number of bytes which will be decoded. Defaults to Infinity.
+ * @param placeholder - Placeholder for ascii representation of not-printable bytes. Defaults to "."
+ * @returns The decoded bytes (e.g., "...qsf._fHello.!.a....")
+ * @throws {RangeError} If length is negative.
+ */
+export function toAscii(bytes: Uint8Array, length: number = Infinity, placeholder: string = "."): string {
+    const [lengthToDecode, ellipsis] = getDecodeBounds(bytes, length);
+
+    let result = "";
+    for (let i = 0; i < lengthToDecode; i++) {
+        const byte = bytes[i];
+        result += isPrintable(byte) ? String.fromCharCode(byte) : placeholder;
+    }
+
+    return result + ellipsis;
+}
+
+/**
+ * Fast bytes to hexadecimal and ASCII conversion.
+ * @param bytes - Bytes to be decoded.
+ * @param length - Number of bytes which will be decoded. Defaults to Infinity.
+ * @param placeholder - Placeholder for ascii representation of not-printable bytes. Defaults to "."
+ * @returns A tuple [hex, ascii] with the decoded representations.
+ * @throws {RangeError} If length is negative.
+ */
+export function toHexAndAscii(
+    bytes: Uint8Array,
+    length: number = Infinity,
+    placeholder: string = "."
+): [string, string] {
+    const [lengthToDecode, ellipsis] = getDecodeBounds(bytes, length);
+
+    let hex = "0x";
+    let ascii = "";
+
+    for (let i = 0; i < lengthToDecode; i++) {
+        const byte = bytes[i];
+        hex += (byte < 16 ? "0" : "") + byte.toString(16);
+        ascii += isPrintable(byte) ? String.fromCharCode(byte) : placeholder;
+    }
+
+    return [hex + ellipsis, ascii + ellipsis];
 }

@@ -1,12 +1,12 @@
 import ObjC from "frida-objc-bridge";
-import { uuidv4, toHexString } from "../shared/utils.js"
+import { uuidv4, toHex } from "../shared/utils.js"
 
 
 // --- Native argument decoding utilities (mirroring Android native) ---
 function _arrayBufferToHex(buffer) {
   try{
       var bytes = new Uint8Array(buffer);
-      return toHexString(bytes)
+      return toHex(bytes)
   }catch (e) {
     return "<hex-conversion-error>";
   }

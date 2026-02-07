@@ -1,42 +1,5 @@
-import { toHexString } from "../shared/utils.js"
-
-
-/**
- * Converts a byte value to its uri-encoded representation
- * @param {number} byte - The byte value to encode (0-255)
- * @returns {string} The uri-encoded string (e.g., "%20", "%0A")
- */
-function getUriCode(byte) {
-  const text = byte.toString(16);
-  if (byte < 16) {
-    return "%0" + text;
-  }
-  return "%" + text;
-}
-
-/**
- * Tries to decode a byte array to either a string or a hex dump depending on the content of the array.
- * @param {Uint8Array} bytes - Byte array to be decoded to hexadecimal.
- * @param {number} length - Number of bytes which will be decoded.
- * @returns {string} The decoded bytes (e.g., "This is some decoded string." or "0x22aa3482ef...")
- */
-function byteToString(bytes, length) {
-  if (bytes.length < length) {
-    length = bytes.length;
-  }
-
-  try {
-    // try to decode strings
-    let result = "";
-    for (let i = 0; i < length; ++i) {
-      result += getUriCode(bytes[i]);
-    }
-    return decodeURIComponent(result).replace(/\0.*$/g, "");
-  } catch (e) {
-    // make a hex dump in case, the byte array contains raw binary data
-    return toHexString(bytes, length);
-  }
-}
+import Java from "frida-java-bridge"
+import { toAscii, toHex, toHexAndAscii } from "../shared/utils.js"
 
 /**
  * Generates a simple hash from a string.
@@ -155,7 +118,7 @@ function decodeValue(type, value) {
 
         case "[B":
           // for performance reasons only decode the first 256 bytes of the full byte array
-          readableValue = byteToString(value, 256);
+          readableValue = toHex(value, 256);
           break;
 
         case "[C":
