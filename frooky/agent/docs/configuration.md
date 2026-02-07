@@ -34,16 +34,16 @@ You will not only find `hooks.yaml` files there but also TypeScript code which s
 A frooky configuration contains optional metadata about the hook collection, and a set of `<hook_configuration>`.
 
 ```yaml
-metadata:                        # All metadata are optional
-  name: <name>                   # Name of the hook collection
-  platform: Android|iOS          # Target platform
-  description: <description>     # Description of what the hook collection does
-  masCategory: <mas_category>    # STORAGE, CRYPTO, AUTH, NETWORK, etc
-  author: <author>               # Your name or organization
-  version: <version>             # Semantic version (e.g., v1)
+metadata:                         # All metadata are optional
+  name: <name>                    # Name of the hook collection
+  platform: Android|iOS           # Target platform
+  description: <description>      # Description of what the hook collection does
+  masCategory: <mas_category>     # STORAGE, CRYPTO, AUTH, NETWORK, etc
+  author: <author>                # Your name or organization
+  version: <version>              # Semantic version (e.g., v1)
 
-hooks:
-  - <hook_configuration>         # Collection of hook configurations
+hooks:                            # Collection of hook configurations
+  - <hook_configuration>
 ```
 
 > [!NOTE]
@@ -105,8 +105,8 @@ The following properties can be used for all types:
 The minimum necessary properties are `javaClass` and `methods`:
 
 ```yaml
-javaClass: <class_name>        # Fully qualified Java class name
-methods:                       # List of methods to be hooked
+javaClass: <class_name>           # Fully qualified Java class name
+methods:                          # List of methods to be hooked
   - <java_method>
 ```
 
@@ -146,26 +146,27 @@ For this case *all* methods from the class will be hooked.
 If you only want to hook a certain overload, specify it by adding one or more `overload`:
 
 ```yaml
-- javaClass: <class_name>
-  methods:
-    - name: <method_name>
-      overloads: <overload>
+javaClass: <class_name>           # Fully qualified Java class name 
+methods:
+  - name: <method_name>           # Name of the Java method
+    overloads:                    # List of overloads to be hooked
+      - <overload>       
 ```
 
 > [!NOTE]
 > **Example:**
 >
 > ```yaml
-> - javaClass: android.content.Intent
->   methods:
->     - name: putExtra
->       overloads:
->         - args:
->            - type: java.lang.String
->            - type: java.lang.String
+> javaClass: android.content.Intent
+> methods:
+>   - name: putExtra
+>     overloads:
+>       - args:
+>          - type: java.lang.String
+>          - type: java.lang.String
 >        - args:
->            - type: java.lang.String
->            - type: "[Z"
+>          - type: java.lang.String
+>          - type: "[Z"
 >  ```
 >
 > This will *only* hook the following methods:
@@ -175,37 +176,19 @@ If you only want to hook a certain overload, specify it by adding one or more `o
 > open fun android.content.Intent.putExtra(name: String!, value: BooleanArray?): Intent
 > ```
 
-### Java Type Signatures
+### Type Signatures
 
 Frida, and therefore frooky, accept both [JNI type signatures](https://docs.oracle.com/en/java/javase/25/docs/specs/jni/types.html) but also their own, slightly different type signatures.
 
 The following table shows the different kinds of types and their representation in Java, JNI and Frida:
 
-| Kind                | Java Type Signature      | JNI Type Signature       | Frida Type Signature     |
-|---------------------|--------------------------|--------------------------|--------------------------|
-| Primitive           | `boolean`                | `Z`                      | `boolean`                |
-|                     | `byte`                   | `B`                      | `byte`                   |
-|                     | `char`                   | `C`                      | `char`                   |
-|                     | `short`                  | `S`                      | `short`                  |
-|                     | `int`                    | `I`                      | `int`                    |
-|                     | `long`                   | `J`                      | `long`                   |
-|                     | `float`                  | `F`                      | `float`                  |
-|                     | `double`                 | `D`                      | `double`                 |
-|                     | `void`                   | `V`                      | `void`                   |
-| Primitive Array     | `boolean[]`              | `[Z`                     | `[Z`                     |
-|                     | `byte[]`                 | `[B`                     | `[B`                     |
-|                     | `char[]`                 | `[C`                     | `[C`                     |
-|                     | `short[]`                | `[S`                     | `[S`                     |
-|                     | `int[]`                  | `[I`                     | `[I`                     |
-|                     | `long[]`                 | `[J`                     | `[J`                     |
-|                     | `float[]`                | `[F`                     | `[F`                     |
-|                     | `double[]`               | `[D`                     | `[D`                     |
-| Reference           | `java.lang.Object`       | `Ljava/lang/Object;`     | `java.lang.Object`       |
-|                     | `com.example.MyClass`    | `Lcom/example/MyClass;`  | `com.example.MyClass`    |
-| Reference Array     | `Object[]`               | `[Ljava/lang/Object;`    | `[Ljava.lang.Object`     |
-|                     | `MyClass[]`              | `[Lcom/example/MyClass;` | `[Lcom.example.MyClass`  |
-| Multi-Dimensional   | `int[][]`                | `[[I`                    | `[[int`                  |
-|                     | `String[][]`             | `[[Ljava/lang/String;`   | `[[Ljava.lang.String`    |
+| Kind              | Java Type Signature                                                                           | JNI Type Signature                                           | Frida Type Signature                                                                                 |
+|-------------------|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| Primitive         | `boolean`<br>`byte`<br>`char`<br>`short`<br>`int`<br>`long`<br>`float`<br>`double`<br>`void`  | `Z`<br>`B`<br>`C`<br>`S`<br>`I`<br>`J`<br>`F`<br>`D`<br>`V`  | `boolean`<br>`byte`<br>`char`<br>`short`<br>`int`<br>`long`<br>`float`<br>`double`<br>`void`         |
+| Primitive Array   | `boolean[]`<br>`byte[]`<br>...                                                                | `[Z`<br>`[B`<br>...                                          | `[Z`<br>`[B`<br>...                                                                                  |
+| Reference         | `java.lang.Object`<br>`org.owasp.MyClass`<br>...                                              | `Ljava/lang/Object;`<br>`Lorg/owasp/MyClass`<br>...          | `java.lang.Object`<br>`org.owasp.MyClass`<br>...                                                   |
+| Reference Array   | `Object[]`<br>`MyClass[]`<br>...                                                              | `[Ljava/lang/Object;`<br>`[Lorg/owasp/MyClass`<br>...        | `[Ljava.lang.Object`<br>`[Lorg.owasp.MyClass`<br>...                                               |
+| Multi-Dimensional | `int[][]`<br>`String[][]`<br>...                                                              | `[[I`<br>`[[Ljava/lang/String;`<br>...                       | `[[int`<br>`[[Ljava.lang.String`<br>...                                                              |
 
 > [!NOTE]
 > While both JNI and Frida type signatures are valid, it is more common to use Frida type signatures.
@@ -219,18 +202,18 @@ The following table shows the different kinds of types and their representation 
 The minimum necessary properties are `objcClass` and `methods`:
 
 ```yaml
-- objClass: <objc_class>
-  methods:
-    - <objc_method>
+objClass: <objc_class>            # Fully qualified Objective-C class
+methods:                          # List of Objective-C methods to be hooked
+  - <objc_method>
 ```
 
 > [!NOTE]
 > **Example:**
 >
 > ```yaml
-> - objClass: LAContext
->   methods:
->    - name: "- invalidate"
+> objClass: LAContext
+> methods:
+>  - name: "- invalidate"
 > ```
 >
 > This `<hook_configuration>` will hook the following Objective-C method:
@@ -254,11 +237,12 @@ If a `<objc_method>` has a return value or method arguments, frooky needs to how
 This is done by declaring the types in each `<objc_method>`. The syntax the same as used in the [official documentation](https://developer.apple.com/documentation?language=objc).
 
 ```yaml
-- objClass: <class_name>
-  methods:
-    - name: <method_name>
-      args: <positional_argument_types>
-      ret:  <return_type>
+objClass: <class_name>            # Fully qualified Objective-C class
+methods:                       
+  - name: <method_name>           # Name of the Objective-C method to be hooked
+    args:                         # Positional list of argument types
+      - <argument_type>    
+    ret: <return_type>            # Type of the return value
 ```
 
 > [!NOTE]
@@ -266,20 +250,22 @@ This is done by declaring the types in each `<objc_method>`. The syntax the same
 > **Example:**
 >
 > ```yaml
-> - objClass:  LAPrivateKey
->   methods:
->    - name: "- setCredential"
->      args:
->        - "(NSData *) credential"
->        - "(LACredentialType) type"
->      ret: (BOOL)
+> objClass:  LAPrivateKey
+> methods:
+>  - name: "- setCredential"
+>    args:
+>      - "(NSData *) credential"
+>      - "(LACredentialType) type"
+>    ret: (BOOL)
 >  ```
 >
 > Frooky will now try to decode the arguments and the return value based the type.
 >
 
 > [!IMPORTANT]
-> At the moment, frooky provides decoders for simple types. More complex functions such as the following with a callback argument, are not yet implemented.
+> At the moment, frooky provides decoders for simple types. It may therefor be, that the data is not decoded in depth.
+>
+> An example:
 >
 > ```yaml
 > - objClass:   LAPublicKey
@@ -287,16 +273,41 @@ This is done by declaring the types in each `<objc_method>`. The syntax the same
 >    - name: "- decryptData"
 >      args:
 >        - "(NSData *) data"
->        - "secKeyAlgorithm:(SecKeyAlgorithm) algorithm"
->        - "completion:(void (^)(NSData * , NSError * )) handler;"
+>        - "(SecKeyAlgorithm) algorithm"
+>        - "(void (^)(NSData * , NSError * )) handler"
 > ```
 >
-> This `<hook_configuration>` encrypts the data and calls the `handler` after finishing. If we want to access the decrypted data, we need to hook the handler, in order to access its first argument of `(NSData * , NSError * )` where the decrypted data is.
+> This `<hook_configuration>` encrypts the data and invokes the handler upon completion. To access the decrypted data, we must hook the handler implementation itself, as we need to intercept its first argument `(NSData * , NSError * )` when the method calls the handler after decryption finishes.
 >
 > At the moment, this feature is not yet implemented. You can find more on the topic of custom decoders in chapter [Custom Decoders](#custom-decoders).
 >
 
 ## Native Hook Configuration
+
+### Basic Syntax
+
+The minimum necessary properties are `module` and `symbols`:
+
+```yaml
+module: <native_class>          # Fully qualified Objective-C class
+symbols:                        # List of Objective-C methods to be hooked
+  - <symbol>
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### Basic Syntax
 
