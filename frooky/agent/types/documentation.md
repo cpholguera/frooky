@@ -54,13 +54,13 @@ Frooky supports four types of hooks:
 > [!WARNING]
 > The set must be compatible with one target platform. It is not possible to mix a `JavaHook` and a `ObjectiveCHook` in the same `hooks` list.
 
-### Common Properties
+### Optional Properties
 
-All hook types support these base properties:
+All hook types support these optional properties:
 
 | Property           | Type     | Description                           |
 | ------------------ | -------- | ------------------------------------- |
-| `module`           | string   | Library/framework name (optional)     |
+| `module`           | string   | Library/framework name                |
 | `stackTraceLimit`  | number   | Maximum stack frames to capture       |
 | `stackTraceFilter` | string[] | Regex patterns to filter stack traces |
 | `debug`            | boolean  | Enable verbose logging                |
