@@ -31,19 +31,19 @@ You will not only find `hooks.yaml` files there but also TypeScript code which s
 
 ## Frooky Configuration
 
-A frooky configuration contains optional metadata about the hooks, and a set of `<hook_configuration>`.
+A frooky configuration contains optional metadata about the hook collection, and a set of `<hook_configuration>`.
 
 ```yaml
-metadata:                      # All metadata are optional
-  name: <name>                 # Name of the hook collection
-  platform: Android|iOS        # Target platform
-  description: <description>   # Description of what the hook collection does
-  masCategory: <mas_category>  # STORAGE, CRYPTO, AUTH, NETWORK, etc
-  author: <author>             # Your name or organization
-  version: <version>           # Semantic version (e.g., v1)
+metadata:                        # All metadata are optional
+  name: <name>                   # Name of the hook collection
+  platform: Android|iOS          # Target platform
+  description: <description>     # Description of what the hook collection does
+  masCategory: <mas_category>    # STORAGE, CRYPTO, AUTH, NETWORK, etc
+  author: <author>               # Your name or organization
+  version: <version>             # Semantic version (e.g., v1)
 
 hooks:
-  - <hook_configuration>       # Hook object - see hooks section below
+  - <hook_configuration>         # Collection of hook configurations
 ```
 
 > [!NOTE]
@@ -80,10 +80,8 @@ Frooky supports four types of hooks:
 | `NativeHook`     | `module`          | Android/iOS | Hook for native functions (C/C++/Rust etc.) |
 | `SwiftHook`      | `swiftClass`      | iOS         | Hook for Swift methods                      |
 
-> [!WARNING]
+> [!IMPORTANT]
 > When loading a `<hook_configuration>`, frooky will validate it against a JSON schema in order to detect invalid configuration. This makes sure, that the `<hook_configuration>` does not contain hooks for different platforms for example.
->
-> At the moment, frooky only supports `SwiftHook` if the symbols have not been striped.
 
 ### Properties for All Type of Hooks
 
@@ -107,9 +105,9 @@ The following properties can be used for all types:
 The minimum necessary properties are `javaClass` and `methods`:
 
 ```yaml
-- javaClass: <class_name>
-  methods:
-    - <java_method>
+javaClass: <class_name>        # Fully qualified Java class name
+methods:                       # List of methods to be hooked
+  - <java_method>
 ```
 
 For this case *all* methods from the class will be hooked.
@@ -118,10 +116,10 @@ For this case *all* methods from the class will be hooked.
 > **Example:**
 >
 > ```yaml
-> - javaClass: android.webkit.WebView 
->   methods:
->     - name: $init
->     - name: loadUrl
+> javaClass: android.webkit.WebView 
+> methods:
+>   - name: $init
+>   - name: loadUrl
 > ```
 >
 > This `<hook_configuration>` will hook the following methods:
@@ -415,7 +413,7 @@ To capture the function's return value, add a descriptor with `retValue: true`:
 ## Swift Hook Configuration
 
 > [!IMPORTANT]
-> At the moment, frooky only supports `SwiftHook` if the mangled symbols have not been striped. These are required to lookup the location of the method during runtime. Usually, productive build are stripped of them.
+> At the moment, frooky only supports `SwiftHook` if the mangled symbols have not been stripped. These are required to lookup the location of the method during runtime. Usually, productive build are stripped of them.
 >
 > At them moment, frooky does not support other means of Swift function hooking, because they require manual reverse engineering, which is not the focus of frooky at the time.
 >
