@@ -36,6 +36,8 @@ hooks:
 >   - <hook_configuration> 
 > ```
 
+---------------------------
+
 ## Hook Configuration
 
 A `<hook_configuration>` consists of one or more of the following hook types:
@@ -64,6 +66,8 @@ All hook types support these optional properties:
 | `stackTraceLimit`  | number   | Maximum stack frames to capture       |
 | `stackTraceFilter` | string[] | Regex patterns to filter stack traces |
 | `debug`            | boolean  | Enable verbose logging                |
+
+---------------------------
 
 ## Java Hook Configuration
 
@@ -144,7 +148,7 @@ For this case *all* methods from the class will be hooked.
 
 ### Method Overloads
 
-If you only want to hook a certain overload, specify it by adding one or more `overload`:
+If you only want to hook a certain overload, specify it by adding one or more `overload`.
 
 ```yaml
 - javaClass: <class_name>
@@ -166,112 +170,17 @@ If you only want to hook a certain overload, specify it by adding one or more `o
 >            - name: java.lang.String
 >        - args:
 >            - name: java.lang.String
->            - name: int
+>            - name: "[Z"
 >  ```
+>
+> This will *only* hook the following methods:
+>
+> ```kotlin
+> android.content.Intent.putExtra(name: String, value: String)
+> android.content.Intent.putExtra(name: String, value: boolean[])
+> ```
 
-## Native Hook Configuration
-
-### Basic Syntax
-
-```yaml
-- module: <library.so>
-  symbol: <function_name>
-  args:
-    - name: <arg_name>
-      type: <arg_type>
-```
-
-### Supported Argument Types
-
-| Type           | Description                 |
-| -------------- | --------------------------- |
-| `string`       | Null-terminated C string    |
-| `int32`        | 32-bit signed integer       |
-| `uint32`       | 32-bit unsigned integer     |
-| `int64`        | 64-bit signed integer       |
-| `pointer`      | Memory address              |
-| `bytes`        | Raw bytes (requires length) |
-| `bool`         | Boolean value               |
-| `double`       | 64-bit floating point       |
-| `CFData`       | iOS CFData object           |
-| `CFDictionary` | iOS CFDictionary object     |
-
-### Buffer Arguments
-
-#### Fixed Length
-
-```yaml
-- module: libcrypto.so
-  symbol: EVP_EncryptInit_ex
-  args:
-    - name: key
-      type: bytes
-      length: 32
-```
-
-#### Dynamic Length
-
-```yaml
-- module: libc.so
-  symbol: read
-  args:
-    - name: buf
-      type: bytes
-      lengthInArg: 2  # Length is in argument at index 2
-    - name: count
-      type: uint32
-```
-
-### Argument Direction
-
-```yaml
-args:
-  - name: output_buffer
-    type: bytes
-    length: 256
-    direction: out  # 'in' (default) or 'out'
-```
-
-### Capturing Return Values
-
-```yaml
-args:
-  - name: result
-    type: int32
-    retValue: true
-```
-
-## Objective-C Hook Configuration
-
-### Basic Syntax
-
-```yaml
-- objClass: <ClassName>
-  symbol: <method_selector>
-  args:
-    - name: <arg_name>
-      type: <arg_type>
-```
-
-### Method Selectors
-
-| Method Type     | Selector Format           |
-| --------------- | ------------------------- |
-| Instance method | `- methodName:withParam:` |
-| Class method    | `+ methodName:withParam:` |
-| No parameters   | `- methodName`            |
-
-### Example
-
-```yaml
-- objClass: NSUserDefaults
-  symbol: "- setObject:forKey:"
-  args:
-    - name: value
-      type: pointer
-    - name: key
-      type: string
-```
+---------------------------
 
 ## Swift Hook Configuration
 
@@ -297,6 +206,21 @@ args:
       type: string
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---------------------------
 ## TypeScript API
 
 ### Type Definitions
