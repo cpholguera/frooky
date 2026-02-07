@@ -59,7 +59,8 @@ The minimum necessary properties are `<class_name>` and one `<method_name>`:
 
 For this case *all* methods from the class will be hooked.
 
-> [!NOTE]Example
+> [!NOTE]
+> Example
 >
 > ```yaml
 > - javaClass: android.webkit.WebView 
@@ -77,7 +78,8 @@ For this case *all* methods from the class will be hooked.
 > android.webkit.WebView.loadUrl(url: String, additionalHttpHeaders: MutableMap<String!, String!>)
 > ```
 
-> [!TIP]Dynamic Lookup
+> [!TIP]
+> Dynamic Lookup
 > You can use the following syntax for dynamic `<class_name>` lookup at runtime:
 >
 > - **Exact match**: `org.owasp.mastestapp.MainActivity`
@@ -95,7 +97,8 @@ If you only want to hook a certain overload, specify it by adding one or more `o
     - overloads: <overload>
 ```
 
-> [!NOTE]Example
+> [!NOTE]
+> Example
 >
 > ```yaml
 > - javaClass: android.content.Intent
