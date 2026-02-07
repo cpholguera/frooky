@@ -4,6 +4,10 @@ A frooky hook configuration describes how to hook a Java, Swift, Objective-C or 
 
 This documentation describes the structure of a hook file and provides examples for the various cases.
 
+1. [Frooky Configuration](#frooky-configuration)
+2. [Basic Hook Configuration](#basic-hook-configuration)
+3. [Java Hook Configuration](#java-hook-configuration)
+
 ## Frooky Configuration
 
 A frooky configuration contains optional metadata about the hooks, and a set of `<hook_configuration>`.
@@ -38,7 +42,7 @@ hooks:
 
 ---------------------------
 
-## Hook Configuration
+## Basic Hook Configuration
 
 A `<hook_configuration>` consists of one or more of the following hook types:
 
