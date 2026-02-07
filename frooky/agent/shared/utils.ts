@@ -10,7 +10,7 @@ export function uuidv4(): string {
     );
 }
 
-const HEX_TABLE:  readonly string[] = Object.freeze(
+const HEX_TABLE:  readonly string[]= Object.freeze(
     Array.from({ length: 256 }, (_, i) => 
         (i < 16 ? '0' : '') + i.toString(16)
     )
@@ -95,6 +95,15 @@ export function toHexAndAscii(
     length: number = Infinity,
     placeholder: string = "."
 ): [string, string] {
+    const [lengthToDecode, ellipsis] = getDecodeBounds(bytes, length);
+    const hexArray = new Array(lengthToDecode);
+    const asciiArray = new Array(lengthToDecode);
 
-    return [ toHex(bytes, length), toAscii(bytes, length, placeholder) ]
+    for (let i = 0; i < lengthToDecode; i++) {
+        const byte = bytes[i];
+        hexArray[i] = HEX_TABLE[byte];
+        asciiArray[i] = isPrintable(byte) ? String.fromCharCode(byte) : placeholder;
+    }
+
+    return ["0x" + hexArray.join("") + ellipsis, asciiArray.join("") + ellipsis];
 }
