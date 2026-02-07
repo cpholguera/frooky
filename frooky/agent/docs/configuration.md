@@ -15,6 +15,7 @@ This documentation describes the structure of a hook file and provides examples 
   - [Java Type Signatures](#java-type-signatures)
 - [Objective-C Hook Configuration](#objective-c-hook-configuration)
   - [Basic Syntax](#basic-syntax-1)
+  - [Argument and Return Types](#argument-and-return-types)
 - [Native Hook Configuration](#native-hook-configuration)
   - [Basic Syntax](#basic-syntax-2)
   - [Argument Descriptors](#argument-descriptors)
@@ -22,6 +23,7 @@ This documentation describes the structure of a hook file and provides examples 
   - [Capturing Return Values](#capturing-return-values)
 - [Swift Hook Configuration](#swift-hook-configuration)
   - [Basic Syntax](#basic-syntax-3)
+- [Custom Decoders](#custom-decoders)
 
 For each of the feature described here, there are examples in the [examples folder](../docs/examples/).
 
@@ -107,7 +109,7 @@ The minimum necessary properties are `javaClass` and `methods`:
 ```yaml
 - javaClass: <class_name>
   methods:
-    - name: <method_name>
+    - <java_method>
 ```
 
 For this case *all* methods from the class will be hooked.
@@ -137,18 +139,19 @@ For this case *all* methods from the class will be hooked.
 > - **Exact match**: `org.owasp.mastestapp.MainActivity`
 > - **Wildcards**: `org.owasp.*.Http$Client` (per package level)
 > - **Nested classes**: Use `$` separator (e.g., `Outer$Inner`)
->
-> `$init` is the `<method_name>` of the constructor of a class.
+
+> [!TIP]
+> It is Frida convention that `$init` is the name of the constructor of a class.
 
 ### Method Overloads
 
-If you only want to hook a certain overload, specify it by adding one or more `overload`.
+If you only want to hook a certain overload, specify it by adding one or more `overload`:
 
 ```yaml
 - javaClass: <class_name>
   methods:
     - name: <method_name>
-    - overloads: <overload>
+      overloads: <overload>
 ```
 
 > [!NOTE]
@@ -215,42 +218,85 @@ The following table shows the different kinds of types and their representation 
 
 ### Basic Syntax
 
-The minimum necessary properties are `objClass` and `symbol`:
+The minimum necessary properties are `objcClass` and `methods`:
 
 ```yaml
-- objClass: <obj_class>
+- objClass: <objc_class>
   methods:
-    - selector: <method_selector>
+    - <objc_method>
 ```
 
 > [!NOTE]
 > **Example:**
 >
 > ```yaml
-> - objClass: NSURLSession
+> - objClass: LAContext
 >   methods:
->    - selector: "- downloadTaskWithURL:(NSURL *) url"
+>    - name: "- invalidate"
 > ```
 >
-> This `<hook_configuration>` will hook the following Objective-C methods:
+> This `<hook_configuration>` will hook the following Objective-C method:
 >
 > ```objectivec
-> + (NSURLSession *) sessionWithConfiguration:(NSURLSessionConfiguration *) configuration 
->                                    delegate:(id<NSURLSessionDelegate>) delegate 
->                               delegateQueue:(NSOperationQueue *) queue;
-> - (NSURLSessionDownloadTask *) downloadTaskWithURL:(NSURL *) url;
+> - (void) invalidate;
 > ```
-
-Frooky decodes the arguments based on the `<method_selector>`.
 
 > [!TIP]
 >
-> Objective-C method selectors can hook instance ans class methods:
+> Objective-C method selectors can hook instance and class methods:
 >
 > - **Instance methods**: `- biometryType`
-> - **Type methods**: `+ removeProperties:(NSArray *) properties`
+> - **Type methods**: `+ removeProperties`
 >
-> Use colons (`:`) to indicate parameters in the selector.
+
+### Argument and Return Types
+
+If a `<objc_method>` has a return value or method arguments, frooky needs to how to decode them.
+
+This is done by declaring the types in each `<objc_method>`. The syntax the same as used in the [official documentation](https://developer.apple.com/documentation?language=objc).
+
+```yaml
+- objClass: <class_name>
+  methods:
+    - name: <method_name>
+      args: <positional_argument_types>
+      ret:  <return_type>
+```
+
+> [!NOTE]
+>
+> **Example:**
+>
+> ```yaml
+> - objClass:  LAPrivateKey
+>   methods:
+>    - name: "- setCredential"
+>      args:
+>        - "(NSData *) credential"
+>        - "(LACredentialType) type"
+>      ret: (BOOL)
+>  ```
+>
+> Frooky will now try to decode the arguments and the return value based the type.
+>
+
+> [!IMPORTANT]
+> At the moment, frooky provides decoders for simple types. More complex functions such as the following with a callback argument, are not yet implemented.
+>
+> ```yaml
+> - objClass:   LAPublicKey
+>   methods:
+>    - name: "- decryptData"
+>      args:
+>        - "(NSData *) data"
+>        - "secKeyAlgorithm:(SecKeyAlgorithm) algorithm"
+>        - "completion:(void (^)(NSData * , NSError * )) handler;"
+> ```
+>
+> This `<hook_configuration>` encrypts the data and calls the `handler` after finishing. If we want to access the decrypted data, we need to hook the handler, in order to access its first argument of `(NSData * , NSError * )` where the decrypted data is.
+>
+> At the moment, this feature is not yet implemented. You can find more on the topic of custom decoders in chapter [Custom Decoders](#custom-decoders).
+>
 
 ## Native Hook Configuration
 
@@ -368,7 +414,7 @@ To capture the function's return value, add a descriptor with `retValue: true`:
 
 ## Swift Hook Configuration
 
-> [!WARNING]
+> [!IMPORTANT]
 > At the moment, frooky only supports `SwiftHook` if the mangled symbols have not been striped. These are required to lookup the location of the method during runtime. Usually, productive build are stripped of them.
 >
 > At them moment, frooky does mot support other means of Swift function hooking, because they require manual reverse engineering, which is not the focus of frooky at the time.
