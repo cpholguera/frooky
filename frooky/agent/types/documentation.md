@@ -10,13 +10,33 @@ A frooky configuration contains optional metadata about the hooks, and a set of 
 
 ```yaml
 metadata:
+  name: <name>                 # Optional: Name of the hook collection.
+  platform: Android|iOS        # Optional: Target platform
+  description: <description>   # Optional: Description of what the hook collection does.
   masCategory: <mas_category>  # Optional: STORAGE, CRYPTO, AUTH, NETWORK, etc.
+  author: <author>             # Optional: Your name or organization
+  version: <version>           # Optional: Semantic version (e.g., v1)
 
 hooks:
-  - <hook_configuration>
+  - <hook_configuration>       # Hook object - see hooks section below
 ```
 
-## Basic Hook Configuration
+> [!NOTE]
+> **Example:**
+>
+> ```yaml
+> metadata: android.webkit.WebView 
+>   name: RNG initialization
+>   description: Hooks all RNG initialization methods on Android (Java, kotlin, native)
+>   masCategory: CRYPTOGRAPHY
+>   author: mas@owasp.org
+>   version: v1
+>
+> hooks:
+>   - <hook_configuration> 
+> ```
+
+## Hook Configuration
 
 A `<hook_configuration>` consists of one or more of the following hook types:
 
@@ -60,26 +80,25 @@ The minimum necessary properties are `<class_name>` and one `<method_name>`:
 For this case *all* methods from the class will be hooked.
 
 > [!NOTE]
-> Example
+> **Example:**
 >
 > ```yaml
 > - javaClass: android.webkit.WebView 
 >   methods:
+>     - name: $init
 >     - name: loadUrl
 > ```
 >
-> This will hook two methods:
+> This will hook the following methods:
 >
 > ```kotlin
+> android.webkit.WebView.()
 > android.webkit.WebView.loadUrl(url: String)
-> ```
->
-> ```kotlin
 > android.webkit.WebView.loadUrl(url: String, additionalHttpHeaders: MutableMap<String!, String!>)
 > ```
 
 > [!TIP]
-> Dynamic Lookup
+>
 > You can use the following syntax for dynamic `<class_name>` lookup at runtime:
 >
 > - **Exact match**: `org.owasp.mastestapp.MainActivity`
@@ -98,7 +117,7 @@ If you only want to hook a certain overload, specify it by adding one or more `o
 ```
 
 > [!NOTE]
-> Example
+> **Example:**
 >
 > ```yaml
 > - javaClass: android.content.Intent
