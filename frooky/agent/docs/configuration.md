@@ -4,13 +4,28 @@ A frooky hook configuration describes how to hook a Java, Swift, Objective-C or 
 
 This documentation describes the structure of a hook file and provides examples for the various cases.
 
-1. [Frooky Configuration](#frooky-configuration)
-1. [Basic Hook Configuration](#basic-hook-configuration)
-    - [Java Hook Configuration](#java-hook-configuration)
-    - [Swift Hook Configuration](#swift-hook-configuration)
-    - [Objective-C Hook Configuration](#objective-c-hook-configuration)
-    - [Native Hook Configuration](#native-hook-configuration)
-1. [Custom Decoders](#custom-decoders)
+- [Frooky Hook Documentation](#frooky-hook-documentation)
+  - [Frooky Configuration](#frooky-configuration)
+  - [Basic Hook Configuration](#basic-hook-configuration)
+    - [Hook Types](#hook-types)
+    - [Properties for All Type of Hooks](#properties-for-all-type-of-hooks)
+  - [Java Hook Configuration](#java-hook-configuration)
+    - [Basic Syntax](#basic-syntax)
+    - [Method Overloads](#method-overloads)
+    - [Java Type Signatures](#java-type-signatures)
+  - [Swift Hook Configuration](#swift-hook-configuration)
+    - [Basic Syntax](#basic-syntax-1)
+    - [Argument Descriptors](#argument-descriptors)
+    - [Supported Argument Types](#supported-argument-types)
+  - [Objective-C Hook Configuration](#objective-c-hook-configuration)
+    - [Basic Syntax](#basic-syntax-2)
+    - [Argument Descriptors](#argument-descriptors-1)
+    - [iOS-Specific Types](#ios-specific-types)
+  - [Native Hook Configuration](#native-hook-configuration)
+    - [Basic Syntax](#basic-syntax-3)
+    - [Argument Descriptors](#argument-descriptors-2)
+    - [Buffer Handling](#buffer-handling)
+    - [Capturing Return Values](#capturing-return-values)
 
 For each of the feature described here, there are examples in the [examples folder](../docs/examples/).
 
@@ -65,25 +80,25 @@ Frooky supports four types of hooks:
 | `JavaHook`       | `javaClass`     | Android     | Hook for Java/Kotlin methods                |
 | `SwiftHook`      | `swiftClass`    | iOS         | Hook for Swift methods                      |
 | `ObjectiveCHook` | `objClass`      | iOS         | Hook for Objective-C methods                |
-| `NativeHook`     | `native`        | Android/iOS | Hook for native functions (C/C++/Rust etc.) |
+| `NativeHook`     | `module`        | Android/iOS | Hook for native functions (C/C++/Rust etc.) |
 
 > [!WARNING]
-> The `<hook_configuration>` must be valid according to the provided JSON schema.
+> When loading a `<hook_configuration>`, frooky will validate it against a JSON schema in order to detect invalid configuration.
 >
 > This makes sure, that the `<hook_configuration>` does not contain hooks for different platforms for example.
 
-### Optional Properties
+### Properties for All Type of Hooks
 
-There are differences between Android, iOS or native hooks. Nevertheless, they share a few common properties. 
+There are differences between Android, iOS or native hooks. Nevertheless, they share a few common properties.
 
-These are the optional properties they all share:
+The following properties can be used for all types:
 
-| Property           | Type     | Description                           |
-| ------------------ | -------- | ------------------------------------- |
-| `module`           | string   | Library/framework name                |
-| `stackTraceLimit`  | number   | Maximum stack frames to capture       |
-| `stackTraceFilter` | string[] | Regex patterns to filter stack traces |
-| `debug`            | boolean  | Enable verbose logging                |
+| Property           | Type     | Description                                            |
+| ------------------ | -------- | -------------------------------------------------------|
+| `module`           | string   | Library/framework name. Mandatory for `NativeHook`.    |
+| `stackTraceLimit`  | number   | Maximum stack frames to capture                        |
+| `stackTraceFilter` | string[] | Regex patterns to filter stack traces                  |
+| `debug`            | boolean  | Enable verbose logging                                 |
 
 ---------------------------
 
@@ -165,7 +180,7 @@ If you only want to hook a certain overload, specify it by adding one or more `o
 
 ### Java Type Signatures
 
-Frida, and therefore frooky, accept both [JNI type signatures](https://docs.oracle.com/en/java/javase/25/docs/specs/jni/types.html) but also its own, slightly different types.
+Frida, and therefore frooky, accept both [JNI type signatures](https://docs.oracle.com/en/java/javase/25/docs/specs/jni/types.html) but also their own, slightly different type signatures.
 
 The following table shows the different kinds of types and their representation in Java, JNI and Frida:
 
@@ -196,11 +211,270 @@ The following table shows the different kinds of types and their representation 
 |                     | `String[][]`             | `[[Ljava/lang/String;`   | `[[Ljava.lang.String`    |
 
 > [!NOTE]
-> While both JNI and Frida Type signatures are valid, it is more common to use Frida Type Signatures.
+> While both JNI and Frida type signatures are valid, it is more common to use Frida type signatures.
 
 ---------------------------
 
 ## Swift Hook Configuration
+
+### Basic Syntax
+
+The minimum necessary properties are `<swift_class>` and `<symbol>`:
+
+```yaml
+- swiftClass: <swift_class>
+  symbol: <symbol>
+```
+
+> [!NOTE]
+> **Example:**
+>
+> ```yaml
+> - swiftClass: MyApp.NetworkManager
+>   symbol: _$s5MyApp14NetworkManagerC11sendRequestyyF
+> ```
+>
+> This `<hook_configuration>` will hook the mangled Swift method symbol.
+
+> [!TIP]
+>
+> Swift symbols are typically mangled. Use tools like `swift-demangle` or `nm` to find the correct symbol names.
+>
+> Example demangled: `MyApp.NetworkManager.sendRequest() -> ()`
+
+### Argument Descriptors
+
+To capture function arguments, add `args` with `NativeArgDescriptor` objects:
+
+```yaml
+- swiftClass: <swift_class>
+  symbol: <symbol>
+  args:
+    - name: <arg_name>
+      type: <native_arg_type>
+```
+
+> [!NOTE]
+> **Example:**
+>
+> ```yaml
+> - swiftClass: MyApp.CryptoManager
+>   symbol: _$s5MyApp13CryptoManagerC7encryptySS4data_SStF
+>   args:
+>     - name: data
+>       type: string
+>     - name: key
+>       type: string
+> ```
+
+### Supported Argument Types
+
+| Type           | Description                      |
+|----------------|----------------------------------|
+| `string`       | Null-terminated C string         |
+| `int32`        | 32-bit signed integer            |
+| `uint32`       | 32-bit unsigned integer          |
+| `int64`        | 64-bit signed integer            |
+| `pointer`      | Memory address                   |
+| `bytes`        | Raw bytes (requires length)      |
+| `bool`         | Boolean value                    |
+| `double`       | 64-bit floating point            |
+
+---------------------------
+
+## Objective-C Hook Configuration
+
+### Basic Syntax
+
+The minimum necessary properties are `<obj_class>` and `<symbol>`:
+
+```yaml
+- objClass: <obj_class>
+  symbol: <symbol>
+```
+
+> [!NOTE]
+> **Example:**
+>
+> ```yaml
+> - objClass: NSURLSession
+>   symbol: "- dataTaskWithURL:"
+> ```
+>
+> This `<hook_configuration>` will hook the Objective-C instance method.
+
+> [!TIP]
+>
+> Objective-C method selectors use the following format:
+>
+> - **Instance methods**: `- methodName:` or `- methodName:withParam:`
+> - **Class methods**: `+ methodName:` or `+ methodName:withParam:`
+>
+> Use colons (`:`) to indicate parameters in the selector.
+
+### Argument Descriptors
+
+To capture method arguments, add `args` with `NativeArgDescriptor` objects:
+
+```yaml
+- objClass: <obj_class>
+  symbol: <symbol>
+  args:
+    - name: <arg_name>
+      type: <native_arg_type>
+```
+
+> [!NOTE]
+> **Example:**
+>
+> ```yaml
+> - objClass: NSFileManager
+>   symbol: "- createFileAtPath:contents:attributes:"
+>   args:
+>     - name: path
+>       type: string
+>     - name: contents
+>       type: bytes
+>       lengthInArg: 2
+>     - name: attributes
+>       type: CFDictionary
+> ```
+
+### iOS-Specific Types
+
+| Type           | Description                      |
+|----------------|----------------------------------|
+| `CFData`       | iOS CFData object                |
+| `CFDictionary` | iOS CFDictionary object          |
+
+---------------------------
+
+## Native Hook Configuration
+
+### Basic Syntax
+
+The minimum necessary property is `<symbol>`:
+
+```yaml
+- symbol: <symbol>
+```
+
+> [!NOTE]
+> **Example:**
+>
+> ```yaml
+> - symbol: open
+>   args:
+>     - name: pathname
+>       type: string
+>     - name: flags
+>       type: int32
+> ```
+>
+> This `<hook_configuration>` will hook the native `open()` function.
+
+> [!TIP]
+>
+> Native hooks work on both Android and iOS platforms for C/C++ functions.
+>
+> Use `module` property to specify the library containing the symbol:
+>
+> ```yaml
+> - symbol: SSL_write
+>   module: libssl.so
+> ```
+
+### Argument Descriptors
+
+Native hooks require explicit argument descriptors to capture parameters:
+
+```yaml
+- symbol: <symbol>
+  args:
+    - name: <arg_name>
+      type: <native_arg_type>
+      direction: <in|out>
+```
+
+> [!NOTE]
+> **Example:**
+>
+> ```yaml
+> - symbol: memcpy
+>   args:
+>     - name: dest
+>       type: pointer
+>       direction: out
+>     - name: src
+>       type: bytes
+>       length: 256
+>       direction: in
+>     - name: n
+>       type: uint32
+> ```
+
+### Buffer Handling
+
+For buffer arguments, specify length using one of these methods:
+
+| Property      | Description                              |
+|---------------|------------------------------------------|
+| `length`      | Fixed buffer length in bytes             |
+| `lengthInArg` | Index of argument containing the length  |
+
+> [!NOTE]
+> **Example:**
+>
+> ```yaml
+> - symbol: read
+>   args:
+>     - name: fd
+>       type: int32
+>     - name: buf
+>       type: bytes
+>       lengthInArg: 2
+>       direction: out
+>     - name: count
+>       type: uint32
+> ```
+
+### Capturing Return Values
+
+To capture the function's return value, add a descriptor with `retValue: true`:
+
+```yaml
+- symbol: <symbol>
+  args:
+    - name: <return_name>
+      type: <native_arg_type>
+      retValue: true
+```
+
+> [!NOTE]
+> **Example:**
+>
+> ```yaml
+> - symbol: malloc
+>   args:
+>     - name: size
+>       type: uint32
+>     - name: result
+>       type: pointer
+>       retValue: true
+> ```
+
+
+
+
+
+
+
+
+
+<!-- 
+
+
+
 
 ### Basic Syntax
 
@@ -588,4 +862,4 @@ Improve hook reliability:
 ```yaml
 - module: libcrypto.so
   symbol: EVP_EncryptInit_ex
-```
+``` -->
