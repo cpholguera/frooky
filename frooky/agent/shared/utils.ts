@@ -10,6 +10,12 @@ export function uuidv4(): string {
     );
 }
 
+const HEX_TABLE:  readonly string[] = Object.freeze(
+    Array.from({ length: 256 }, (_, i) => 
+        (i < 16 ? '0' : '') + i.toString(16)
+    )
+);
+
 /**
  * Determines the actual length to decode and whether ellipsis is needed.
  * @param bytes - Bytes array to check length against.
@@ -46,14 +52,14 @@ function isPrintable(byte: number): boolean {
  */
 export function toHex(bytes: Uint8Array, length: number = Infinity): string {
     const [lengthToDecode, ellipsis] = getDecodeBounds(bytes, length);
+    const hexArray = new Array(lengthToDecode);
 
-    let result = "0x";
     for (let i = 0; i < lengthToDecode; i++) {
         const byte = bytes[i];
-        result += (byte < 16 ? "0" : "") + byte.toString(16);
+        hexArray[i] = HEX_TABLE[byte];
     }
 
-    return result + ellipsis;
+    return "0x" + hexArray.join("") + ellipsis;
 }
 
 /**
@@ -66,14 +72,14 @@ export function toHex(bytes: Uint8Array, length: number = Infinity): string {
  */
 export function toAscii(bytes: Uint8Array, length: number = Infinity, placeholder: string = "."): string {
     const [lengthToDecode, ellipsis] = getDecodeBounds(bytes, length);
+    const asciiArray = new Array(lengthToDecode);
 
-    let result = "";
     for (let i = 0; i < lengthToDecode; i++) {
         const byte = bytes[i];
-        result += isPrintable(byte) ? String.fromCharCode(byte) : placeholder;
+        asciiArray[i] = isPrintable(byte) ? String.fromCharCode(byte) : placeholder;
     }
 
-    return result + ellipsis;
+    return asciiArray.join("") + ellipsis;
 }
 
 /**
@@ -90,15 +96,14 @@ export function toHexAndAscii(
     placeholder: string = "."
 ): [string, string] {
     const [lengthToDecode, ellipsis] = getDecodeBounds(bytes, length);
-
-    let hex = "0x";
-    let ascii = "";
+    const hexArray = new Array(lengthToDecode);
+    const asciiArray = new Array(lengthToDecode);
 
     for (let i = 0; i < lengthToDecode; i++) {
         const byte = bytes[i];
-        hex += (byte < 16 ? "0" : "") + byte.toString(16);
-        ascii += isPrintable(byte) ? String.fromCharCode(byte) : placeholder;
+        hexArray[i] = HEX_TABLE[byte];
+        asciiArray[i] = isPrintable(byte) ? String.fromCharCode(byte) : placeholder;
     }
 
-    return [hex + ellipsis, ascii + ellipsis];
+    return ["0x" + hexArray.join("") + ellipsis, asciiArray.join("") + ellipsis];
 }
