@@ -69,11 +69,11 @@ All hook types support these optional properties:
 
 ### Java Type Signatures
 
-Frida, and therefore frooky, accept both Java Native Interface (JNI) type signatures but also its own, slightly different types.
+Frida, and therefore frooky, accept both [JNI type signatures](https://docs.oracle.com/en/java/javase/25/docs/specs/jni/types.html) but also its own, slightly different types.
 
 The following table shows the different kinds of types and their representation in Java, JNI and Frida:
 
-| Kind                | Java Type                | JNI Type Signature       | Frida Type Signature     |
+| Kind                | Java Type Signature      | JNI Type Signature       | Frida Type Signature     |
 |---------------------|--------------------------|--------------------------|--------------------------|
 | Primitive           | `boolean`                | `Z`                      | `boolean`                |
 |                     | `byte`                   | `B`                      | `byte`                   |
@@ -92,14 +92,11 @@ The following table shows the different kinds of types and their representation 
 |                     | `long[]`                 | `[J`                     | `[J`                     |
 |                     | `float[]`                | `[F`                     | `[F`                     |
 |                     | `double[]`               | `[D`                     | `[D`                     |
-| Reference           | `java.lang.String`       | `Ljava/lang/String;`     | `java.lang.String`       |
-|                     | `java.lang.Object`       | `Ljava/lang/Object;`     | `java.lang.Object`       |
+| Reference           | `java.lang.Object`       | `Ljava/lang/Object;`     | `java.lang.Object`       |
 |                     | `com.example.MyClass`    | `Lcom/example/MyClass;`  | `com.example.MyClass`    |
-| Reference Array     | `String[]`               | `[Ljava/lang/String;`    | `[Ljava.lang.String`     |
-|                     | `Object[]`               | `[Ljava/lang/Object;`    | `[Ljava.lang.Object`     |
+| Reference Array     | `Object[]`               | `[Ljava/lang/Object;`    | `[Ljava.lang.Object`     |
 |                     | `MyClass[]`              | `[Lcom/example/MyClass;` | `[Lcom.example.MyClass`  |
 | Multi-Dimensional   | `int[][]`                | `[[I`                    | `[[I`                    |
-|                     | `byte[][]`               | `[[B`                    | `[[B`                    |
 |                     | `String[][]`             | `[[Ljava/lang/String;`   | `[[Ljava.lang.String`    |
 
 > [!NOTE]
