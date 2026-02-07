@@ -4,6 +4,7 @@ import * as Frooky from 'frooky'
 // EXAMPLE 1: Simple native function with basic types
 // ============================================================================
 const openHook: Frooky.NativeHook = {
+  native: true,
   module: 'libc.so',
   symbol: 'open',
   args: [
@@ -18,6 +19,7 @@ const openHook: Frooky.NativeHook = {
 // EXAMPLE 2: Function with pointer and length
 // ============================================================================
 const readHook: Frooky.NativeHook = {
+  native: true,
   module: 'libc.so',
   symbol: 'read',
   args: [
@@ -32,6 +34,7 @@ const readHook: Frooky.NativeHook = {
 // EXAMPLE 3: OpenSSL encryption function
 // ============================================================================
 const encryptHook: Frooky.NativeHook = {
+  native: true,
   module: 'libcrypto.so',
   symbol: 'EVP_EncryptInit_ex',
   args: [
@@ -49,6 +52,7 @@ const encryptHook: Frooky.NativeHook = {
 // EXAMPLE 4: SSL write with dynamic buffer
 // ============================================================================
 const sslWriteHook: Frooky.NativeHook = {
+  native: true,
   module: 'libssl.so',
   symbol: 'SSL_write',
   args: [

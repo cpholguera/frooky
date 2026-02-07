@@ -5,8 +5,16 @@ A frooky hook configuration describes how to hook a Java, Swift, Objective-C or 
 This documentation describes the structure of a hook file and provides examples for the various cases.
 
 1. [Frooky Configuration](#frooky-configuration)
-2. [Basic Hook Configuration](#basic-hook-configuration)
-3. [Java Hook Configuration](#java-hook-configuration)
+1. [Basic Hook Configuration](#basic-hook-configuration)
+    - [Java Hook Configuration](#java-hook-configuration)
+    - [Swift Hook Configuration](#swift-hook-configuration)
+    - [Objective-C Hook Configuration](#objective-c-hook-configuration)
+    - [Native Hook Configuration](#native-hook-configuration)
+1. [Custom Decoders](#custom-decoders)
+
+For each of the feature described here, there are examples in the [examples folder](../docs/examples/).
+
+You will not only find `hooks.yaml` files there but also TypeScript code which shows, how the various types can be used to develop frooky, or [custom decoders](#custom-decoders) for certain cases.
 
 ## Frooky Configuration
 
@@ -48,21 +56,27 @@ A `<hook_configuration>` consists of one or more of the following hook types:
 
 ### Hook Types
 
+What kind of a type the `<hook_configuration>` is, is determined by a unique property.
+
 Frooky supports four types of hooks:
 
-| Hook Type        | Platform    | Description                 |
-| ---------------- | ----------- | --------------------------- |
-| `JavaHook`       | Android     | Hook Java/Kotlin methods    |
-| `NativeHook`     | Android/iOS | Hook native C/C++ functions |
-| `ObjectiveCHook` | iOS         | Hook Objective-C methods    |
-| `SwiftHook`      | iOS         | Hook Swift methods          |
+| Hook Type        | Unique Property | Platform    | Description                                 |
+| ---------------- | --------------- | ----------- | ------------------------------------------- |
+| `JavaHook`       | `javaClass`     | Android     | Hook for Java/Kotlin methods                |
+| `SwiftHook`      | `swiftClass`    | iOS         | Hook for Swift methods                      |
+| `ObjectiveCHook` | `objClass`      | iOS         | Hook for Objective-C methods                |
+| `NativeHook`     | `native`        | Android/iOS | Hook for native functions (C/C++/Rust etc.) |
 
 > [!WARNING]
-> The set must be compatible with one target platform. It is not possible to mix a `JavaHook` and a `ObjectiveCHook` in the same `hooks` list.
+> The `<hook_configuration>` must be valid according to the provided JSON schema.
+>
+> This makes sure, that the `<hook_configuration>` does not contain hooks for different platforms for example.
 
 ### Optional Properties
 
-All hook types support these optional properties:
+There are differences between Android, iOS or native hooks. Nevertheless, they share a few common properties. 
+
+These are the optional properties they all share:
 
 | Property           | Type     | Description                           |
 | ------------------ | -------- | ------------------------------------- |
@@ -74,41 +88,6 @@ All hook types support these optional properties:
 ---------------------------
 
 ## Java Hook Configuration
-
-### Java Type Signatures
-
-Frida, and therefore frooky, accept both [JNI type signatures](https://docs.oracle.com/en/java/javase/25/docs/specs/jni/types.html) but also its own, slightly different types.
-
-The following table shows the different kinds of types and their representation in Java, JNI and Frida:
-
-| Kind                | Java Type Signature      | JNI Type Signature       | Frida Type Signature     |
-|---------------------|--------------------------|--------------------------|--------------------------|
-| Primitive           | `boolean`                | `Z`                      | `boolean`                |
-|                     | `byte`                   | `B`                      | `byte`                   |
-|                     | `char`                   | `C`                      | `char`                   |
-|                     | `short`                  | `S`                      | `short`                  |
-|                     | `int`                    | `I`                      | `int`                    |
-|                     | `long`                   | `J`                      | `long`                   |
-|                     | `float`                  | `F`                      | `float`                  |
-|                     | `double`                 | `D`                      | `double`                 |
-|                     | `void`                   | `V`                      | `void`                   |
-| Primitive Array     | `boolean[]`              | `[Z`                     | `[Z`                     |
-|                     | `byte[]`                 | `[B`                     | `[B`                     |
-|                     | `char[]`                 | `[C`                     | `[C`                     |
-|                     | `short[]`                | `[S`                     | `[S`                     |
-|                     | `int[]`                  | `[I`                     | `[I`                     |
-|                     | `long[]`                 | `[J`                     | `[J`                     |
-|                     | `float[]`                | `[F`                     | `[F`                     |
-|                     | `double[]`               | `[D`                     | `[D`                     |
-| Reference           | `java.lang.Object`       | `Ljava/lang/Object;`     | `java.lang.Object`       |
-|                     | `com.example.MyClass`    | `Lcom/example/MyClass;`  | `com.example.MyClass`    |
-| Reference Array     | `Object[]`               | `[Ljava/lang/Object;`    | `[Ljava.lang.Object`     |
-|                     | `MyClass[]`              | `[Lcom/example/MyClass;` | `[Lcom.example.MyClass`  |
-| Multi-Dimensional   | `int[][]`                | `[[I`                    | `[[I`                    |
-|                     | `String[][]`             | `[[Ljava/lang/String;`   | `[[Ljava.lang.String`    |
-
-> [!NOTE]
-> While both JNI and Frida Type signatures are valid, it is more common to use Frida Type Signatures.
 
 ### Basic Syntax
 
@@ -132,7 +111,7 @@ For this case *all* methods from the class will be hooked.
 >     - name: loadUrl
 > ```
 >
-> This will hook the following methods:
+> This `<hook_configuration>` will hook the following methods:
 >
 > ```kotlin
 > android.webkit.WebView()
@@ -184,6 +163,41 @@ If you only want to hook a certain overload, specify it by adding one or more `o
 > android.content.Intent.putExtra(name: String, value: boolean[])
 > ```
 
+### Java Type Signatures
+
+Frida, and therefore frooky, accept both [JNI type signatures](https://docs.oracle.com/en/java/javase/25/docs/specs/jni/types.html) but also its own, slightly different types.
+
+The following table shows the different kinds of types and their representation in Java, JNI and Frida:
+
+| Kind                | Java Type Signature      | JNI Type Signature       | Frida Type Signature     |
+|---------------------|--------------------------|--------------------------|--------------------------|
+| Primitive           | `boolean`                | `Z`                      | `boolean`                |
+|                     | `byte`                   | `B`                      | `byte`                   |
+|                     | `char`                   | `C`                      | `char`                   |
+|                     | `short`                  | `S`                      | `short`                  |
+|                     | `int`                    | `I`                      | `int`                    |
+|                     | `long`                   | `J`                      | `long`                   |
+|                     | `float`                  | `F`                      | `float`                  |
+|                     | `double`                 | `D`                      | `double`                 |
+|                     | `void`                   | `V`                      | `void`                   |
+| Primitive Array     | `boolean[]`              | `[Z`                     | `[Z`                     |
+|                     | `byte[]`                 | `[B`                     | `[B`                     |
+|                     | `char[]`                 | `[C`                     | `[C`                     |
+|                     | `short[]`                | `[S`                     | `[S`                     |
+|                     | `int[]`                  | `[I`                     | `[I`                     |
+|                     | `long[]`                 | `[J`                     | `[J`                     |
+|                     | `float[]`                | `[F`                     | `[F`                     |
+|                     | `double[]`               | `[D`                     | `[D`                     |
+| Reference           | `java.lang.Object`       | `Ljava/lang/Object;`     | `java.lang.Object`       |
+|                     | `com.example.MyClass`    | `Lcom/example/MyClass;`  | `com.example.MyClass`    |
+| Reference Array     | `Object[]`               | `[Ljava/lang/Object;`    | `[Ljava.lang.Object`     |
+|                     | `MyClass[]`              | `[Lcom/example/MyClass;` | `[Lcom.example.MyClass`  |
+| Multi-Dimensional   | `int[][]`                | `[[I`                    | `[[int`                  |
+|                     | `String[][]`             | `[[Ljava/lang/String;`   | `[[Ljava.lang.String`    |
+
+> [!NOTE]
+> While both JNI and Frida Type signatures are valid, it is more common to use Frida Type Signatures.
+
 ---------------------------
 
 ## Swift Hook Configuration
@@ -209,6 +223,14 @@ If you only want to hook a certain overload, specify it by adding one or more `o
     - name: key
       type: string
 ```
+
+
+## Objective-C Hook Configuration
+
+## Native Hook Configuration
+
+
+
 
 
 
