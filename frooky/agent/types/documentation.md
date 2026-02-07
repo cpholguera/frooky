@@ -1,6 +1,26 @@
 # Frooky Hook Documentation
 
-## Hook Types
+A frooky hook configuration describes how to hook a Java, Swift, Objective-C or native process.
+
+This documentation describes the structure of a hook file and provides examples for the various cases.
+
+## Frooky Configuration
+
+A frooky configuration contains optional metadata about the hooks, and a set of `<hook_configuration>`.
+
+```yaml
+metadata:
+  masCategory: <mas_category>  # Optional: STORAGE, CRYPTO, AUTH, NETWORK, etc.
+
+hooks:
+  - <hook_configuration>
+```
+
+## Basic Hook Configuration
+
+A `<hook_configuration>` consists of one or more of the following hook types:
+
+### Hook Types
 
 Frooky supports four types of hooks:
 
@@ -11,16 +31,8 @@ Frooky supports four types of hooks:
 | `ObjectiveCHook` | iOS         | Hook Objective-C methods    |
 | `SwiftHook`      | iOS         | Hook Swift methods          |
 
-## YAML Configuration
-
-### Basic Structure
-
-```yaml
-category: <MAS_CATEGORY>  # Optional: STORAGE, CRYPTO, AUTH, NETWORK, etc.
-
-hooks:
-  - <hook_configuration>
-```
+> [!WARNING]
+> The set must be compatible with one target platform. It is not possible to mix a `JavaHook` and a `ObjectiveCHook` in the same `hooks` list.
 
 ### Common Properties
 
@@ -33,36 +45,70 @@ All hook types support these base properties:
 | `stackTraceFilter` | string[] | Regex patterns to filter stack traces |
 | `debug`            | boolean  | Enable verbose logging                |
 
-## Java Hooks
+## Java Hook Configuration
 
 ### Basic Syntax
 
+The minimum necessary properties are `<class_name>` and one `<method_name>`:
+
 ```yaml
-- javaClass: <fully.qualified.ClassName>
+- javaClass: <class_name>
   methods:
-    - name: <methodName>
+    - name: <method_name>
 ```
 
-### Class Name Patterns
+For this case *all* methods from the class will be hooked.
 
-- **Exact match**: `org.owasp.mastestapp.MainActivity`
-- **Wildcards**: `org.owasp.*.Http$Client` (per package level)
-- **Nested classes**: Use `$` separator (e.g., `Outer$Inner`)
+> [!NOTE]Example
+>
+> ```yaml
+> - javaClass: android.webkit.WebView 
+>   methods:
+>     - name: loadUrl
+> ```
+>
+> This will hook two methods:
+>
+> ```kotlin
+> android.webkit.WebView.loadUrl(url: String)
+> ```
+>
+> ```kotlin
+> android.webkit.WebView.loadUrl(url: String, additionalHttpHeaders: MutableMap<String!, String!>)
+> ```
+
+> [!TIP]Dynamic Lookup
+> You can use the following syntax for dynamic `<class_name>` lookup at runtime:
+>
+> - **Exact match**: `org.owasp.mastestapp.MainActivity`
+> - **Wildcards**: `org.owasp.*.Http$Client` (per package level)
+> - **Nested classes**: Use `$` separator (e.g., `Outer$Inner`)
 
 ### Method Overloads
 
+If you only want to hook a certain overload, specify it by adding one or more `overload`:
+
 ```yaml
-- javaClass: android.content.Intent
+- javaClass: <class_name>
   methods:
-    - name: putExtra
-      overloads:
-        - args:
-            - name: java.lang.String
-            - name: java.lang.String
-        - args:
-            - name: java.lang.String
-            - name: int
+    - name: <method_name>
+    - overloads: <overload>
 ```
+
+> [!NOTE]Example
+>
+> ```yaml
+> - javaClass: android.content.Intent
+>   methods:
+>     - name: putExtra
+>       overloads:
+>         - args:
+>            - name: java.lang.String
+>            - name: java.lang.String
+>        - args:
+>            - name: java.lang.String
+>            - name: int
+>  ```
 
 ### Java Type Notation Is Frida Notation
 
@@ -76,7 +122,7 @@ Examples:
 | String array  | `[Ljava.lang.String;` |
 | Custom class  | `com.example.MyClass` |
 
-## Native Hooks
+## Native Hook Configuration
 
 ### Basic Syntax
 
@@ -148,7 +194,7 @@ args:
     retValue: true
 ```
 
-## Objective-C Hooks
+## Objective-C Hook Configuration
 
 ### Basic Syntax
 
@@ -180,7 +226,7 @@ args:
       type: string
 ```
 
-## Swift Hooks
+## Swift Hook Configuration
 
 ### Basic Syntax
 
@@ -423,9 +469,6 @@ hooks:
       - name: task
         type: pointer
         retValue: true
-    stackTraceFilter:
-      - "^libsystem_"
-      - "^Foundation"
 ```
 
 ## Advanced Features
