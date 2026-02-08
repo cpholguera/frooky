@@ -11,7 +11,7 @@ import {
     cipherHook,
     bufferHook,
     webViewHook
-} from "./01_android"
+} from "../typeScript/01_android"
 import {
     openHook,
     readHook,
@@ -20,14 +20,14 @@ import {
     opensslHook,
     customDecoderHook,
     outputParamHook
-} from "./02_native"
+} from "../typeScript/02_native"
 import {
     userDefaultsHook,
     fileManagerHook,
     keychainHook,
     multipleSwiftHook,
     filteredSwiftHook
-} from "./03_swift"
+} from "../typeScript/03_swift"
 import {
     userDefaultsObjCHook,
     nsDataHook,
@@ -37,7 +37,7 @@ import {
     coreDataHook,
     urlSessionHook,
     dataProcessingHook
-} from "./04_objc"
+} from "../typeScript/04_objc"
 
 
 // ============================================================================

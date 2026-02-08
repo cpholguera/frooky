@@ -1,0 +1,103 @@
+metadata:
+  name: Objective-C Hook Examples
+  platform: iOS
+  description: Examples of Objective-C method hooking
+  masCategory: GENERAL
+  author: Frooky Documentation
+  version: v1
+
+hooks:
+  # EXAMPLE 1: Simple Objective-C instance method
+  - objClass: NSUserDefaults
+    methods:
+      - name: "- setObject:forKey:"
+        parameters:
+          - type: (id)
+            name: value
+          - type: (NSString *)
+            name: key
+
+  # EXAMPLE 2: NSData write to file with return type
+  - objClass: NSData
+    methods:
+      - name: "- writeToFile:atomically:"
+        returnType: (BOOL)
+        parameters:
+          - type: (NSString *)
+            name: path
+          - type: (BOOL)
+            name: useAuxiliaryFile
+    stackTraceLimit: 8
+
+  # EXAMPLE 3: Objective-C class method
+  - objClass: NSURL
+    methods:
+      - name: "+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:"
+        returnType: (NSURL *)
+        parameters:
+          - type: (const char *)
+            name: path
+          - type: (BOOL)
+            name: isDir
+          - type: (NSURL *)
+            name: baseURL
+
+  # EXAMPLE 4: LAContext biometry method (no parameters)
+  - objClass: LAContext
+    methods:
+      - name: "- invalidate"
+
+  # EXAMPLE 5: Multiple methods in same class
+  - objClass: LAPrivateKey
+    methods:
+      - name: "- decryptData:secKeyAlgorithm:completion:"
+        parameters:
+          - type: (NSData *)
+            name: data
+          - type: (SecKeyAlgorithm)
+            name: algorithm
+          - type: (void (^)(NSData *, NSError *))
+            name: handler
+            decoder: LaPlaintextDecoder
+      - name: "- signData:secKeyAlgorithm:completion:"
+        parameters:
+          - type: (NSData *)
+            name: data
+          - type: (SecKeyAlgorithm)
+            name: algorithm
+          - type: (void (^)(NSData *, NSError *))
+            name: handler
+
+  # EXAMPLE 6: CoreData save with output parameter
+  - objClass: NSManagedObjectContext
+    methods:
+      - name: "- save:"
+        returnType: (BOOL)
+        parameters:
+          - type: (NSError **)
+            name: error
+            decodeAt: exit
+    debug: true
+
+  # EXAMPLE 7: Network request with stack trace filtering
+  - objClass: NSURLSession
+    methods:
+      - name: "- dataTaskWithRequest:completionHandler:"
+        returnType: (NSURLSessionDataTask *)
+        parameters:
+          - type: (NSURLRequest *)
+            name: request
+          - type: (void (^)(NSData *, NSURLResponse *, NSError *))
+            name: completionHandler
+    stackTraceFilter:
+      - "^libsystem_"
+      - "^Foundation"
+
+  # EXAMPLE 8: Method with both entry and exit decoding
+  - objClass: NSMutableData
+    methods:
+      - name: "- appendData:"
+        parameters:
+          - type: (NSData *)
+            name: data
+            decodeAt: both
