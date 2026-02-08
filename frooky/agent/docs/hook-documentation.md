@@ -4,8 +4,6 @@ A frooky hook configuration describes how to hook a Java, Swift, Objective-C or 
 
 This documentation describes the structure of a hook file and provides examples for the various cases.
 
-<!-- no toc -->
-- [Frooky Configuration](#frooky-configuration)
 - [Frooky Hook Documentation](#frooky-hook-documentation)
 - [Frooky Configuration](#frooky-configuration)
 - [Basic Hook Configuration](#basic-hook-configuration)
@@ -32,10 +30,12 @@ This documentation describes the structure of a hook file and provides examples 
 - [Advanced Features](#advanced-features)
   - [Time of Decoding](#time-of-decoding)
   - [Custom Decoders](#custom-decoders)
+    - [Example 1: Decode an Integer as Flags](#example-1-decode-an-integer-as-flags)
+    - [Example 2: Handle Asynchronous Callback](#example-2-handle-asynchronous-callback)
   
 For each of the feature described here, there are examples in the [examples folder](../docs/examples/).
 
-## Frooky Configuration
+# Frooky Configuration
 
 A frooky configuration contains optional metadata about the hook collection, and a set of `<hook_configuration>`.
 
@@ -73,11 +73,11 @@ hooks:                            # Collection of hook configurations
 
 ---------------------------
 
-## Basic Hook Configuration
+# Basic Hook Configuration
 
 A `<hook_configuration>` consists of one or more of the following hook types:
 
-### Hook Types
+## Hook Types
 
 What kind of a type the `<hook_configuration>` is, is determined by a unique property.
 
@@ -93,7 +93,7 @@ Frooky supports four types of hooks:
 > [!IMPORTANT]
 > When loading a `<hook_configuration>`, frooky will validate it against a JSON schema in order to detect invalid configuration. This makes sure, that the `<hook_configuration>` does not contain hooks for different platforms for example.
 
-### Properties for All Type of Hooks
+## Properties for All Type of Hooks
 
 There are differences between Android, iOS or native hooks. Nevertheless, they share a few common properties.
 
@@ -106,7 +106,7 @@ The following properties can be used for all types:
 | `stackTraceFilter` | string[] | Regex patterns to filter stack traces (see examples below)                     |
 | `debug`            | boolean  | Enable verbose logging                                                         |
 
-## Terminology, and Declaration Overview
+# Terminology, and Declaration Overview
 
 frooky can be used to declare hooks for different targets and programming languages. In order to avoid confusion, we list the most important terminology here:
 
@@ -128,7 +128,7 @@ frooky can be used to declare hooks for different targets and programming langua
 1. **Overloading**  
   In Java/Kotlin methods can be overloaded. An overload of a method has the same name, but a different parameter list. The return type can be different, but we do not care about that in a `<hook_configuration>`, since frooky can lookup the type at runtime.
 
-### Shared Declaration
+## Shared Declaration
 
 These declarations are used for more than only one types of hooks.
 
@@ -151,7 +151,7 @@ These declarations are used for more than only one types of hooks.
 >
 > Custom decoders can be specified by name (see [Custom Decoder](#custom-decoder) section).
 
-### `JavaHook` Declaration
+## `JavaHook` Declaration
 
 ```yaml
 javaClass: <string>                    # Fully qualified Java class name
@@ -172,7 +172,7 @@ methods:                               # List of Java methods to hook
     - <parameter_declaration>
 ```
 
-### `ObjectiveCHook` Declaration
+## `ObjectiveCHook` Declaration
 
 ```yaml
 objClass: <string>                     # Fully qualified Objective-C class name
@@ -188,7 +188,7 @@ methods:                               # List of Objective-C method declarations
     - <parameter_declaration>
 ```
 
-### `NativeHook` Declaration
+## `NativeHook` Declaration
 
 ```yaml
 module: <string>                       # Fully qualified module name (mandatory)
@@ -204,7 +204,7 @@ functions:                             # List of native symbol declarations to b
     - <parameter_declaration>
 ```
 
-### `SwiftHook` Declaration
+## `SwiftHook` Declaration
 
 ```yaml
 methods:                               # List of mangled Swift symbols
@@ -216,9 +216,9 @@ methods:                               # List of mangled Swift symbols
 
 ---------------------------
 
-## Java Hook Configuration
+# Java Hook Configuration
 
-### Basic Syntax
+## Basic Syntax
 
 The minimum necessary properties are `javaClass` and `methods`:
 
@@ -263,7 +263,7 @@ For this case *all* overloads of the specified methods from the class will be ho
 > [!TIP]
 > `$init` is the name of the constructor of a class.
 
-### Method Overloads
+## Method Overloads
 
 If you only want to hook a certain overload, specify it by adding one or more `overload`:
 
@@ -303,7 +303,7 @@ methods:                               # List of Java methods to hook
 > Intent.putExtra(name: String!, value: BooleanArray?): Intent
 > ```
 
-### Type Descriptors
+## Type Descriptors
 
 Frida, and therefore frooky, uses custom type descriptors which are based on the internal [JVM field type descriptor](https://docs.oracle.com/javase/specs/jvms/se19/html/jvms-4.html#jvms-4.3.2).
 
@@ -322,7 +322,7 @@ The following table shows the different kinds of types and their representation 
 
 ---------------------------
 
-## Objective-C Hook Configuration
+# Objective-C Hook Configuration
 
 frooky can hook Objective-C instance and class methods.
 
@@ -334,7 +334,7 @@ frooky can hook Objective-C instance and class methods.
 > - **Class methods**: `+ removeProperties`
 >
 
-### Basic Syntax
+## Basic Syntax
 
 The minimum necessary properties are `objClass` and `methods`:
 
@@ -362,7 +362,7 @@ methods:                               # List of Objective-C method declarations
 > frooky will capture when this function is called and generate an event. Since the function takes no arguments and returns no value, the event will only contain timing and call stack information.
 >
 
-### Argument and Return Types
+## Argument and Return Types
 
 If a method has a return value or method arguments, frooky needs to know how to decode them.
 
@@ -403,7 +403,7 @@ methods:
 >                                   relativeToURL:(NSURL *) baseURL;
 > ```
 
-## Native Hook Configuration
+# Native Hook Configuration
 
 > [!IMPORTANT]
 > In order to hook native functions, symbols must not be stripped. However, this is done by default for release builds on both [Android](https://developer.android.com/build/include-native-symbols) and [iOS](https://developer.apple.com/documentation/xcode/build-settings-reference#Symbols-Hidden-by-Default).
@@ -413,7 +413,7 @@ methods:
 > Libraries, plugins or frameworks however, must keep symbols for the public API. To find symbols, use tools like `nm`, `objdump`, `radare2` or `ghidra` to extract all symbols in a binary executable.
 >
 
-### Basic Syntax
+## Basic Syntax
 
 The minimum necessary properties are `module` and `functions`:
 
@@ -442,7 +442,7 @@ functions:                             # List of native symbol declarations to b
 >
 > frooky will capture when these functions are called and generate events. Since the functions take no arguments and return no value, the events will only contain timing and call stack information.
 
-### Argument and Return Types
+## Argument and Return Types
 
 If a native function has a return value or arguments, frooky needs to know how to decode them.
 
@@ -484,7 +484,7 @@ functions:                             # List of native symbol declarations to b
 >                                X509_STORE *trusted_store, X509 *cert);
 > ```
 
-## Swift Hook Configuration
+# Swift Hook Configuration
 
 > [!IMPORTANT]
 > At the moment, frooky only supports `SwiftHook` if the mangled symbols have not been stripped. These are required to lookup the location of the method during runtime. Usually, production builds are stripped of them.
@@ -492,7 +492,7 @@ functions:                             # List of native symbol declarations to b
 > At the moment, frooky does not support other means of Swift function hooking, because they require manual reverse engineering, which is not the focus of frooky at this time.
 >
 
-### Basic Syntax
+## Basic Syntax
 
 The minimum necessary property for a `SwiftHook` is `methods`:
 
@@ -516,11 +516,11 @@ methods:                               # List of mangled Swift symbols
 >
 > After you found a symbol, demangle it using `SwiftDemangle` to verify it's the correct method, then use the mangled version in your hook configuration.
 
-## Advanced Features
+# Advanced Features
 
 The previous chapters described how basic method and function hooking works. However, some use cases require more advanced configuration. These are discussed in this chapter.
 
-### Time of Decoding
+## Time of Decoding
 
 By default, arguments are decoded before the original code is called (`enter`), and the return value after (`exit`).
 
@@ -566,7 +566,7 @@ If we want to decode the argument at a different time, we need to specify that u
 > [!TIP]
 > Use `decodeAt: both` to capture the value at both entry and exit, useful for comparing before/after states.
 
-### Custom Decoders
+## Custom Decoders
 
 frooky provides decoders for primitive types and common complex types. By default, frooky chooses the decoder at runtime based on the type.
 
@@ -574,7 +574,7 @@ For example, an `int` will always be decoded as a number and if there is no deco
 
 For some cases you want to manually bypass the automatic decoder matching. Two examples:
 
-#### Example 1: Decode an Integer as Flags
+### Example 1: Decode an Integer as Flags
 
 > [!NOTE]
 > **Example Code:**
@@ -594,7 +594,7 @@ The parameter `flags` is a bitwise OR combination of [42 integers](https://devel
 
 If the result matches the value of the flag, it is set. This is a more stable way of decoding the flags compared to doing that on the host, as the flags may not be the same as on the actual device.
 
-#### Example 2: Handle Asynchronous Callback
+### Example 2: Handle Asynchronous Callback
 
 > [!NOTE]
 > **Example Code:**
