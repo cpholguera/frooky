@@ -124,8 +124,7 @@ frooky can be used to declare hooks for different targets and programming langua
   List of type declaration and their optional name used in method and function declarations.
 
 1. **Overloading**  
-  In Java/Kotlin methods can be overloaded. An overload of a method has the same name, but a different parameter list. The return typ can be different, but we do not care about that in a `<hook_configuration>`, since frooky can lookup the type at runtime. 
-
+  In Java/Kotlin methods can be overloaded. An overload of a method has the same name, but a different parameter list. The return typ can be different, but we do not care about that in a `<hook_configuration>`, since frooky can lookup the type at runtime.
 
 ### Shared Declaration
 
@@ -283,6 +282,7 @@ methods:                               # List of Java methods to hook
 >         - type: "[Z"
 >           name: value
 >  ```
+>
 > This will *only* hook the following methods:
 >
 > ```kotlin
@@ -459,8 +459,8 @@ functions:                             # List of native symbol declaration to be
 >         name: cert
 > ```
 >
-> Frooky will try to decode the arguments and the return value based the type. 
-> 
+> Frooky will try to decode the arguments and the return value based the type.
+>
 > This `<hook_configuration>` will hook the following function from the [OpenSSL Library](https://docs.openssl.org/master/man3/OSSL_CMP_validate_msg/):
 >
 > ```c
@@ -507,7 +507,7 @@ However, datastrucutres are often passed by reference. The function then changes
 
 > [!NOTE]
 > **Default decoding at method entry on Android::**
-> 
+>
 > ```yaml
 > javaClass: javax.crypto.Cipher 
 > methods:
@@ -526,7 +526,7 @@ If we want to decode the argument at at different time, we need to specify that 
 
 > [!NOTE]
 > **Decoding at method exit on Android:**
-> 
+>
 > ```yaml
 > javaClass: javax.crypto.Cipher 
 > methods:
@@ -542,21 +542,19 @@ If we want to decode the argument at at different time, we need to specify that 
 >
 > Now, `output` is decoded before the method exits.
 
-
 ### Custom Decoder
 
-frooky provides decoders for primitive types and common complex types. By default, frooky chooses the decoder at runtime. 
+frooky provides decoders for primitive types and common complex types. By default, frooky chooses the decoder at runtime.
 
 For example, an `int` will always be decoded as number and if there is no decoder available for a given type, frooky will use a fallback decoder.
 
 For some cases you want to manually bypass the automatic decoder matching. Two examples:
 
-
 #### Example 1: Decode an Integer as Flags
 
 > [!NOTE]
 > **Example Code:**
-> 
+>
 > ```yaml
 > javaClass: android.content.Intent
 > methods:
@@ -567,17 +565,15 @@ For some cases you want to manually bypass the automatic decoder matching. Two e
 >           name: flags
 >  ```
 
-
-The parameter `flags` is bitwise OR combination of [42 integers](https://developer.android.com/reference/kotlin/android/content/Intent#flags), each meaning something different. If you want to decode the flags on the device, you must provide a custom decoder which takes each flag and does a bitwise AND operation on the `flags` Integer. 
+The parameter `flags` is bitwise OR combination of [42 integers](https://developer.android.com/reference/kotlin/android/content/Intent#flags), each meaning something different. If you want to decode the flags on the device, you must provide a custom decoder which takes each flag and does a bitwise AND operation on the `flags` Integer.
 
 If the result matches the value of the flag, it is set. This is a more stable way of decoding the flags compared to do that on the host, as the flags may not be the same as on the actual device.
-
 
 #### Example 2: Handle Asynchronous Callback
 
 > [!NOTE]
 > **Example Code:**
-> 
+>
 > ```yaml
 > objClass: LAPrivateKey
 > methods:
@@ -631,4 +627,3 @@ The decoder itself must do the following:
 2. Creates a new hook for the `handler`
 
 Once called, the hook can decode the first parameter, which contains the decrypted plaintext in the form of `NSData *`
-
