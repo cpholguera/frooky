@@ -79,7 +79,7 @@ What kind of a type the `<hook_configuration>` is, is determined by a unique pro
 Frooky supports four types of hooks:
 
 | Hook Type        | Platform    | Description                                 |
-| ---------------- | ------------| ------------------------------------------- |
+| ---------------- | ----------- | ------------------------------------------- |
 | `JavaHook`       | Android     | Hook for Java/Kotlin methods                |
 | `ObjectiveCHook` | iOS         | Hook for Objective-C methods                |
 | `NativeHook`     | Android/iOS | Hook for native functions (C/C++/Rust etc.) |
@@ -124,7 +124,7 @@ frooky can be used to declare hooks for different targets and programming langua
   List of type declaration and their optional name.
 
 1. **Overloading in Java**  
-  In Java/Kotlin methods can be overloaded. A `<java_method_declaration>` is therefore structurally different than `objc_method_declaration` and `<native_symbol_declaration>`.
+  In Java/Kotlin methods can be overloaded. A `<java_method_declaration>` is therefore structurally different than `objc_method_declaration` and `<native_function_declaration>`.
 
 
 ### Shared Declaration
@@ -149,16 +149,14 @@ methods:                               # List of Java methods to hook
 
 ```yaml
 <java_method_declaration>:
-javaClass: <String>                    # Fully qualified Java class name
-methods:                               # List of Java methods to hook
-  - name: <String>                     # Name of the Java method
-    overloads:                         # Optional: List of explicit method overloads
-      - <overloads_declaration>
+  name: <String>                       # Name of the Java method
+  overloads:                           # Optional: List of explicit method overloads
+    - <overloads_declaration>
 ```
 
 ```yaml
 <overloads_declaration>:
-  - parameters:                        # Parameter list of the overloaded method
+  parameters:                          # Parameter list of the overloaded method
     - <parameter_declaration>
 ```
 
@@ -172,9 +170,9 @@ methods:                               # List of Objective-C method declarations
 
 ```yaml
 <objc_method_declaration>:
-  symbol: <String>                     # Native symbol as string
-  returnType: <String>                 # Optional: Return type of the callable
-  parameters:                          # Optional: Parameter list of the callable
+  name: <String>                       # Name of the Objective-C method
+  returnType: <String>                 # Optional: Return type of the Objective-C method
+  parameters:                          # Optional: Parameter list of the  Objective-C method
     - <parameter_declaration>
 ```
 
@@ -183,14 +181,14 @@ methods:                               # List of Objective-C method declarations
 ```yaml
 module: <String>                       # Fully qualified module name
 functions:                             # List of native symbol declaration to be hooked
-  - <native_symbol_declaration>
+  - <native_function_declaration>
 ```
 
 ```yaml
-<native_symbol_declaration>:
+<native_function_declaration>:
   symbol: <String>                     # Native symbol as string
-  returnType: <String>                 # Optional: Return type of the callable
-  parameters:                          # Optional: Parameter list of the callable
+  returnType: <String>                 # Optional: Return type of the function
+  parameters:                          # Optional: Parameter list of the function
     - <parameter_declaration>
 ```
 
@@ -213,9 +211,9 @@ methods:                               # List of mangled Swift symbols
 The minimum necessary properties are `javaClass` and `methods`:
 
 ```yaml
-javaClass: string                      # Fully qualified Java class name
+javaClass: <String>                    # Fully qualified Java class name
 methods:                               # List of Java methods to hook
-  - name: string                       # Name of the Java method
+  - <java_method_declaration>
 ```
 
 For this case *all* methods from the class will be hooked.
@@ -258,11 +256,11 @@ For this case *all* methods from the class will be hooked.
 If you only want to hook a certain overload, specify it by adding one or more `overload`:
 
 ```yaml
-javaClass: string                      # Fully qualified Java class name
+javaClass: <String>                    # Fully qualified Java class name
 methods:                               # List of Java methods to hook
-  - name: string                       # Name of the Java method
-    overloads:                         # List of explicit method overloads
-      - parameters:                    # List of parameter declarations for a one overloads
+  - name: <String>                     # Name of the Java method
+    overloads:                         # List of overloaded methods 
+      - parameters:                    # List of parameter declarations for a one overload
         - <parameter_declaration>
 ```
 
@@ -325,9 +323,9 @@ frooky can hook Objective-C instance and type methods.
 The minimum necessary properties are `objcClass` and `methods`:
 
 ```yaml
-objClass: string                       # Fully qualified Objective-C class name
+objClass: <String>                     # Fully qualified Objective-C class name
 methods:                               # List of Objective-C method declarations to be hooked
-  - <callable_declaration>
+  - <objc_method_declaration>
 ```
 
 > [!NOTE]
@@ -355,12 +353,12 @@ If a `<objc_method>` has a return value or method arguments, frooky needs to how
 This is done by declaring the types in each `<method>`. The syntax the same as used in the [official documentation](https://developer.apple.com/documentation?language=objc).
 
 ```yaml
-objClass: <class>                 # Fully qualified Objective-C class name
+objClass: <class>                      # Fully qualified Objective-C class name
 methods:                       
-  - name: <method_name>           # Name of the Objective-C method to be hooked
-    parameters:                   # List of parameters declarations which describe the positional arguments
+  - name: <String>                     # Name of the Objective-C method
+    returnType: <String>               # Return type of the Objective-C method
+    parameters:                        # Parameter list of the  Objective-C method
       - <parameter_declaration>
-    return: <type>                # Describes the return type
 ```
 
 > [!NOTE]
@@ -371,14 +369,14 @@ methods:
 > objClass: NSUrl
 > methods:
 >   - name: "+ fileURLWithFileSystemRepresentation"
->     args:
->       - - name: path
->           type: (const char *)
->       - - name: isDir
->           type: (BOOL)
->       - - name: baseURL
->           type: (NSURL *)
->     ret: (NSURL *)
+>     returnType: (NSURL *)
+>     parameters:
+>       - type: (const char *)
+>         name: path
+>       - type: (BOOL)
+>         name: isDir
+>       - type: (NSURL *)
+>         name: baseURL
 >  ```
 >
 > Frooky will try to decode the arguments and the return value based the type. This `<hook_configuration>` will hook the following [Objective-C type method](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
@@ -401,12 +399,12 @@ methods:
 
 ### Basic Syntax
 
-The minimum necessary properties are `module` and `symbols`:
+The minimum necessary properties are `module` and `functions`:
 
 ```yaml
-module: <module>                  # Name of the module the target functions are located
-functions:                        # List of of functions to be hooked
-  - <function>
+module: <String>                       # Fully qualified module name
+functions:                             # List of native symbol declaration to be hooked
+  - <native_function_declaration>
 ```
 
 > [!NOTE]
@@ -435,12 +433,12 @@ If a `<function>` has a return value or method arguments, frooky needs to how to
 This is done by declaring the types in each `<function>`. The syntax the same as [C function declarations](https://en.cppreference.com/w/c/language/function_declaration.html).
 
 ```yaml
-module: <class>                   # Fully qualified Objective-C class name
-functions:                       
-  - symbol: <symbol_name>         
-    args:                        # List of types which describe the positional arguments
-      - <type>   
-    ret: <type>                   # Describes the return type
+module: <String>                       # Fully qualified module name
+functions:                             # List of native symbol declaration to be hooked
+  - symbol: <String>                   # Native symbol as string
+    returnType: <String>               # Optional: Return type of the function
+    parameters:                        # Optional: Parameter list of the function
+      - <parameter_declaration>
 ```
 
 > [!NOTE]
@@ -451,17 +449,24 @@ functions:
 > module: libssl.so
 > functions:
 >   - symbol: OSSL_CMP_validate_cert_path
->     args:
->       - - name: ctx
->           type: const OSSL_CMP_CTX *
->       - - name: trusted_store
->           type: X509_STORE *
->       - - name: cert
->           type: X509 *
->     ret: int
+>     returnType: int
+>     parameters:
+>       - type: const OSSL_CMP_CTX *
+>         name: ctx
+>       - type: X509_STORE *
+>         name: trusted_store
+>       - type: X509 *
+>         name: cert
 > ```
 >
-> Frooky will try to decode the arguments and the return value based the type. This `<hook_configuration>` will hook the function `OSSL_CMP_validate_cert_path` from the [OpenSSL Library](https://docs.openssl.org/master/man3/OSSL_CMP_validate_msg/).
+> Frooky will try to decode the arguments and the return value based the type. 
+> 
+> This `<hook_configuration>` will hook the following function from the [OpenSSL Library](https://docs.openssl.org/master/man3/OSSL_CMP_validate_msg/):
+>
+> ```c
+> int OSSL_CMP_validate_cert_path(const OSSL_CMP_CTX *ctx,
+>                                X509_STORE *trusted_store, X509 *cert);
+> ```
 
 ## Swift Hook Configuration
 
@@ -476,7 +481,7 @@ functions:
 The minimum necessary properties for a `SwiftHook` is `methods`:
 
 ```yaml
-methods:                          # List of mangled Swift symbol
+methods:                               # List of mangled Swift symbol
   - <method>
 ```
 
