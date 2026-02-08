@@ -1,5 +1,5 @@
 import Java from "frida-java-bridge"
-import { toAscii, toHex, toHexAndAscii } from "../shared/utils.js"
+import { toHex } from "../shared/utils.js"
 
 /**
  * Generates a simple hash from a string.
