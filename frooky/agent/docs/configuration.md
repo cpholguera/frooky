@@ -197,7 +197,7 @@ The following table shows the different kinds of types and their representation 
 | Multi-Dimensional | `int[][]`<br>`String[][]`<br>...                                                              | `[[I`<br>`[[Ljava/lang/String;`<br>...                       | `[[int`<br>`[[Ljava.lang.String`<br>...                                                              |
 
 > [!NOTE]
-> While both JNI and Frida type signatures are valid, it is more common to use Frida type signatures.
+> Frooky uses Frida type descriptors.
 
 ---------------------------
 
@@ -256,18 +256,26 @@ methods:
 > **Example:**
 >
 > ```yaml
-> objClass:  LAContext
+> objClass: NSUrl
 > methods:
->   - name: "- setCredential"
+>   - name: "+ fileURLWithFileSystemRepresentation"
 >     types:
->       - - name: credential
->           type: (NSData *)
->         - name: type
->           type: (LACredentialType)
->     ret: (BOOL)
+>       - - name: path
+>           type: (const char *)
+>       - - name: isDir
+>           type: (BOOL)
+>       - - name: baseURL
+>           type: (NSURL *)
+>     ret: (NSURL *)
 >  ```
 >
-> Frooky will now decode the arguments and the return value based the provided types.
+> Frooky will try to decode the arguments and the return value based the type. This `<hook_configuration>` will hook the following [Objective-C method](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
+>
+> ```objectivec
+> + (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
+>                                     isDirectory:(BOOL) isDir 
+>                                   relativeToURL:(NSURL *) baseURL;
+> ```
 >
 
 > [!IMPORTANT]

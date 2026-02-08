@@ -227,6 +227,7 @@ This is done by declaring the types in each `<objc_method>`. The syntax the same
 >
 > ```objectivec
 > + (NSURLSession *) sessionWithConfiguration:(NSURLSessionConfiguration *) configuration;
+> ```
 >
 
 > [!IMPORTANT]
