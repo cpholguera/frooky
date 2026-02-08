@@ -154,7 +154,7 @@ javaClass: <class_name>           # Fully qualified Java class name
 methods:
   - name: <method_name>           # Name of the Java method
     types:                        # List of types which describe the overload
-      - <types>       
+      - <type>       
 ```
 
 > [!NOTE]
@@ -246,9 +246,9 @@ This is done by declaring the types in each `<objc_method>`. The syntax the same
 objClass: <class_name>            # Fully qualified Objective-C class
 methods:                       
   - name: <method_name>           # Name of the Objective-C method to be hooked
-    args:                         # Positional list of argument types
-      - <argument_type>    
-    ret: <return_type>            # Type of the return value
+    types:                        # List of types which describe the positional arguments
+      - <type>   
+    ret: <type>                   # Describes the return type
 ```
 
 > [!NOTE]
@@ -256,16 +256,18 @@ methods:
 > **Example:**
 >
 > ```yaml
-> objClass:  LAPrivateKey
+> objClass:  LAContext
 > methods:
->  - name: "- setCredential"
->    args:
->      - "(NSData *) credential"
->      - "(LACredentialType) type"
->    ret: (BOOL)
+>   - name: "- setCredential"
+>     types:
+>       - - name: credential
+>           type: (NSData *)
+>         - name: type
+>           type: (LACredentialType)
+>     ret: (BOOL)
 >  ```
 >
-> Frooky will now try to decode the arguments and the return value based the type.
+> Frooky will now decode the arguments and the return value based the provided types.
 >
 
 > [!IMPORTANT]
@@ -274,16 +276,19 @@ methods:
 > An example:
 >
 > ```yaml
-> - objClass:   LAPublicKey
+> - objClass: LAPublicKey
 >   methods:
->    - name: "- decryptData"
->      args:
->        - "(NSData *) data"
->        - "(SecKeyAlgorithm) algorithm"
->        - "(void (^)(NSData * , NSError * )) handler"
+>   - name: "- decrypt"
+>     types:
+>       - - name: data
+>           type: (NSData *)
+>       - - name: algorithm
+>           type: (SecKeyAlgorithm)
+>       - - name: handler
+>           type: (NSData * , NSError * )
 > ```
 >
-> This `<hook_configuration>` encrypts the data and invokes the handler upon completion. To access the decrypted data, we must hook the handler implementation itself, as we need to intercept its first argument `(NSData * , NSError * )` when the method calls the handler after decryption finishes.
+> This `<hook_configuration>` decrypts the data and invokes the handler upon completion. To access the decrypted data, we must hook the handler implementation itself, as we need to intercept its first argument `(NSData * , NSError * )` when the method calls the handler after decryption finishes.
 >
 > At the moment, this feature is not yet implemented. You can find more on the topic of custom decoders in chapter [Custom Decoders](#custom-decoders).
 >
