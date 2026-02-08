@@ -6,7 +6,7 @@ You can run it as standalone Frida agent as long as you provide one or multiple 
 
 ## Frooky Hook Configuration
 
-If you want learn about how to write effective hooks, please read the [Frooky Hook Configuration](./docs/configuration.md).
+If you want learn about how to write effective hooks, please read the [Frooky Hook Documentation](./docs/hook-documentation.md).
 
 ## How to compile the standalone frooky agent
 
