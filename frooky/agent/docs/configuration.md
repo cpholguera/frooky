@@ -563,6 +563,7 @@ For some cases you want to manually bypass the automatic decoder matching. Two e
 >       - parameters:
 >         - type: int
 >           name: flags
+>           decoder: IntentFlagsDecoder
 >  ```
 
 The parameter `flags` is bitwise OR combination of [42 integers](https://developer.android.com/reference/kotlin/android/content/Intent#flags), each meaning something different. If you want to decode the flags on the device, you must provide a custom decoder which takes each flag and does a bitwise AND operation on the `flags` Integer.
