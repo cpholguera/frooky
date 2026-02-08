@@ -4,29 +4,35 @@ import * as Frooky from 'frooky'
 // EXAMPLE 1: Simple native function with basic types
 // ============================================================================
 const openHook: Frooky.NativeHook = {
-  native: true,
   module: 'libc.so',
-  symbol: 'open',
-  args: [
-    { name: 'pathname', type: 'string' },
-    { name: 'flags', type: 'int32' },
-    { name: 'mode', type: 'int32' },
-    { name: 'fd', type: 'int32', retValue: true }
+  functions: [
+    {
+      symbol: 'open',
+      returnType: 'int',
+      parameters: [
+        { type: 'const char *', name: 'pathname' },
+        { type: 'int', name: 'flags' },
+        { type: 'mode_t', name: 'mode' }
+      ]
+    }
   ]
 }
 
 // ============================================================================
-// EXAMPLE 2: Function with pointer and length
+// EXAMPLE 2: Function with pointer and buffer
 // ============================================================================
 const readHook: Frooky.NativeHook = {
-  native: true,
   module: 'libc.so',
-  symbol: 'read',
-  args: [
-    { name: 'fd', type: 'int32' },
-    { name: 'buf', type: 'bytes', lengthInArg: 2, direction: 'out' },
-    { name: 'count', type: 'uint32' },
-    { name: 'bytesRead', type: 'int32', retValue: true }
+  functions: [
+    {
+      symbol: 'read',
+      returnType: 'ssize_t',
+      parameters: [
+        { type: 'int', name: 'fd' },
+        { type: 'void *', name: 'buf', decodeAt: 'exit' },
+        { type: 'size_t', name: 'count' }
+      ]
+    }
   ]
 }
 
@@ -34,35 +40,114 @@ const readHook: Frooky.NativeHook = {
 // EXAMPLE 3: OpenSSL encryption function
 // ============================================================================
 const encryptHook: Frooky.NativeHook = {
-  native: true,
   module: 'libcrypto.so',
-  symbol: 'EVP_EncryptInit_ex',
-  args: [
-    { name: 'ctx', type: 'pointer' },
-    { name: 'type', type: 'pointer' },
-    { name: 'impl', type: 'pointer' },
-    { name: 'key', type: 'bytes', length: 32 },
-    { name: 'iv', type: 'bytes', length: 16 },
-    { name: 'result', type: 'int32', retValue: true }
+  functions: [
+    {
+      symbol: 'EVP_EncryptInit_ex',
+      returnType: 'int',
+      parameters: [
+        { type: 'EVP_CIPHER_CTX *', name: 'ctx' },
+        { type: 'const EVP_CIPHER *', name: 'type' },
+        { type: 'ENGINE *', name: 'impl' },
+        { type: 'const unsigned char *', name: 'key' },
+        { type: 'const unsigned char *', name: 'iv' }
+      ]
+    }
   ],
   stackTraceLimit: 10
 }
 
 // ============================================================================
-// EXAMPLE 4: SSL write with dynamic buffer
+// EXAMPLE 4: SSL write with buffer
 // ============================================================================
 const sslWriteHook: Frooky.NativeHook = {
-  native: true,
   module: 'libssl.so',
-  symbol: 'SSL_write',
-  args: [
-    { name: 'ssl', type: 'pointer' },
-    { name: 'buf', type: 'bytes', lengthInArg: 2 },
-    { name: 'num', type: 'int32' },
-    { name: 'written', type: 'int32', retValue: true }
+  functions: [
+    {
+      symbol: 'SSL_write',
+      returnType: 'int',
+      parameters: [
+        { type: 'SSL *', name: 'ssl' },
+        { type: 'const void *', name: 'buf' },
+        { type: 'int', name: 'num' }
+      ]
+    }
   ],
   debug: true
 }
 
+// ============================================================================
+// EXAMPLE 5: Multiple functions in same module
+// ============================================================================
+const opensslHook: Frooky.NativeHook = {
+  module: 'libssl.so',
+  functions: [
+    {
+      symbol: 'ENGINE_load_builtin_engines'
+    },
+    {
+      symbol: 'ENGINE_cleanup'
+    },
+    {
+      symbol: 'OSSL_CMP_validate_cert_path',
+      returnType: 'int',
+      parameters: [
+        { type: 'const OSSL_CMP_CTX *', name: 'ctx' },
+        { type: 'X509_STORE *', name: 'trusted_store' },
+        { type: 'X509 *', name: 'cert' }
+      ]
+    }
+  ]
+}
 
-export { openHook, readHook, encryptHook, sslWriteHook }
+// ============================================================================
+// EXAMPLE 6: Function with custom decoder
+// ============================================================================
+const customDecoderHook: Frooky.NativeHook = {
+  module: 'libcustom.so',
+  functions: [
+    {
+      symbol: 'process_data',
+      returnType: 'int',
+      parameters: [
+        { 
+          type: 'void *', 
+          name: 'data',
+          decoder: 'CustomDataDecoder'
+        },
+        { type: 'size_t', name: 'size' }
+      ]
+    }
+  ]
+}
+
+// ============================================================================
+// EXAMPLE 7: Function with output parameter decoded at exit
+// ============================================================================
+const outputParamHook: Frooky.NativeHook = {
+  module: 'libexample.so',
+  functions: [
+    {
+      symbol: 'get_buffer',
+      returnType: 'int',
+      parameters: [
+        { 
+          type: 'unsigned char *', 
+          name: 'output',
+          decodeAt: 'exit'  // Decode after function fills the buffer
+        },
+        { type: 'size_t', name: 'size' }
+      ]
+    }
+  ]
+}
+
+export { 
+  openHook, 
+  readHook, 
+  encryptHook, 
+  sslWriteHook,
+  opensslHook,
+  customDecoderHook,
+  outputParamHook
+}

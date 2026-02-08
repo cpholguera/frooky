@@ -1,14 +1,3 @@
-/**
- * This file contains examples of frooky hooks based in the defined API spec
- * and their declaration in YAML. 
- * 
- * The point is to test them here how they
- * look and work in practice. 
- * 
- * This the examples could then be moved to 
- * the documentation or examples/ folder
- */
-
 import * as Frooky from 'frooky'
 
 // ============================================================================
@@ -44,8 +33,8 @@ const urlHook: Frooky.JavaHook = {
       name: 'openConnection',
       overloads: [
         {
-          args: [
-            { name: 'java.net.Proxy' }
+          parameters: [
+            { type: 'java.net.Proxy' }
           ]
         }
       ]
@@ -63,27 +52,27 @@ const intentHook: Frooky.JavaHook = {
       name: 'putExtra',
       overloads: [
         {
-          args: [
-            { name: 'java.lang.String' },
-            { name: 'java.lang.String' }
+          parameters: [
+            { type: 'java.lang.String', name: 'name' },
+            { type: 'java.lang.String', name: 'value' }
           ]
         },
         {
-          args: [
-            { name: 'java.lang.String' },
-            { name: 'int' }
+          parameters: [
+            { type: 'java.lang.String', name: 'name' },
+            { type: 'int', name: 'value' }
           ]
         },
         {
-          args: [
-            { name: 'java.lang.String' },
-            { name: 'boolean' }
+          parameters: [
+            { type: 'java.lang.String', name: 'name' },
+            { type: 'boolean', name: 'value' }
           ]
         },
         {
-          args: [
-            { name: 'java.lang.String' },
-            { name: '[B' }  // byte array
+          parameters: [
+            { type: 'java.lang.String', name: 'name' },
+            { type: '[B', name: 'value' }
           ]
         }
       ]
@@ -92,7 +81,7 @@ const intentHook: Frooky.JavaHook = {
 }
 
 // ============================================================================
-// EXAMPLE 5: Custom decoder for Java method
+// EXAMPLE 5: Custom decoder for Java method argument
 // ============================================================================
 const intentFlagsHook: Frooky.JavaHook = {
   javaClass: 'android.content.Intent',
@@ -101,15 +90,15 @@ const intentFlagsHook: Frooky.JavaHook = {
       name: 'setFlags',
       overloads: [
         {
-          args: [
+          parameters: [
             {
-              name: 'int',
+              type: 'int',
+              name: 'flags',
               decoder: 'IntentFlagsDecoder'
             }
           ]
         }
-      ],
-      decoder: 'IntentFlagsDecoder'
+      ]
     }
   ],
   debug: true
@@ -125,8 +114,8 @@ const activityHook: Frooky.JavaHook = {
       name: 'startActivity',
       overloads: [
         {
-          args: [
-            { name: 'android.content.Intent' }
+          parameters: [
+            { type: 'android.content.Intent', name: 'intent' }
           ]
         }
       ]
@@ -144,14 +133,14 @@ const sqliteHook: Frooky.JavaHook = {
       name: 'query',
       overloads: [
         {
-          args: [
-            { name: 'java.lang.String' },      // table
-            { name: '[Ljava.lang.String;' },   // columns
-            { name: 'java.lang.String' },      // selection
-            { name: '[Ljava.lang.String;' },   // selectionArgs
-            { name: 'java.lang.String' },      // groupBy
-            { name: 'java.lang.String' },      // having
-            { name: 'java.lang.String' }       // orderBy
+          parameters: [
+            { type: 'java.lang.String', name: 'table' },
+            { type: '[Ljava.lang.String', name: 'columns' },
+            { type: 'java.lang.String', name: 'selection' },
+            { type: '[Ljava.lang.String', name: 'selectionArgs' },
+            { type: 'java.lang.String', name: 'groupBy' },
+            { type: 'java.lang.String', name: 'having' },
+            { type: 'java.lang.String', name: 'orderBy' }
           ]
         }
       ]
@@ -161,6 +150,66 @@ const sqliteHook: Frooky.JavaHook = {
   stackTraceFilter: ['^java\\.', '^android\\.']
 }
 
+// ============================================================================
+// EXAMPLE 8: Decode parameter at exit (data passed by reference)
+// ============================================================================
+const cipherHook: Frooky.JavaHook = {
+  javaClass: 'javax.crypto.Cipher',
+  methods: [
+    {
+      name: 'doFinal',
+      overloads: [
+        {
+          parameters: [
+            { 
+              type: '[B', 
+              name: 'output',
+              decodeAt: 'exit'
+            },
+            { 
+              type: 'int', 
+              name: 'outputOffset' 
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+// ============================================================================
+// EXAMPLE 9: Decode parameter at both entry and exit
+// ============================================================================
+const bufferHook: Frooky.JavaHook = {
+  javaClass: 'java.nio.ByteBuffer',
+  methods: [
+    {
+      name: 'put',
+      overloads: [
+        {
+          parameters: [
+            { 
+              type: '[B', 
+              name: 'src',
+              decodeAt: 'both'
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+// ============================================================================
+// EXAMPLE 10: Hook constructor
+// ============================================================================
+const webViewHook: Frooky.JavaHook = {
+  javaClass: 'android.webkit.WebView',
+  methods: [
+    { name: '$init' },  // Constructor
+    { name: 'loadUrl' }
+  ]
+}
 
 export {
   wifiHook,
@@ -169,5 +218,8 @@ export {
   intentHook,
   intentFlagsHook,
   activityHook,
-  sqliteHook
+  sqliteHook,
+  cipherHook,
+  bufferHook,
+  webViewHook
 }

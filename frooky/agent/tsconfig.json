@@ -21,6 +21,7 @@
     "ios/**/*",
     "android/**/*",
     "shared/**/*",
-    "types/**/*"
+    "types/**/*",
+    "docs/**/*"
   ]
 }

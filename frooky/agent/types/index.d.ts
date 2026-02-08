@@ -15,158 +15,121 @@ export type MasCategory =
   | 'PRIVACY';
 
 /**
- * Frida native type mappings for function arguments.
+ * Target platform for hooks.
  */
-export type NativeArgType =
-  | 'string'       // Null-terminated C string
-  | 'int32'        // 32-bit signed integer
-  | 'uint32'       // 32-bit unsigned integer
-  | 'int64'        // 64-bit signed integer
-  | 'pointer'      // Memory address
-  | 'bytes'        // Raw bytes (requires length or lengthInArg)
-  | 'bool'         // Boolean value
-  | 'double'       // 64-bit floating point
-  | 'CFData'       // iOS CFData object
-  | 'CFDictionary'; // iOS CFDictionary object
+export type Platform = 'Android' | 'iOS';
 
 /**
- * Argument direction for pointer/buffer types.
+ * When to decode a parameter.
  */
-export type Direction = 'in' | 'out';
+export type DecodeAt = 'enter' | 'exit' | 'both';
 
 /**
  * Base configuration for all hook types.
  */
 export interface BaseHook {
-  /** Library/framework name */
+  /** Library/framework name. Mandatory for NativeHook. */
   module?: string;
-  /** Maximum number of stack frames to capture */
+  /** Maximum number of stack frames to capture (default: 10) */
   stackTraceLimit?: number;
   /** Regex patterns to filter stack traces */
   stackTraceFilter?: string[];
-  /** Enable verbose logging for troubleshooting. */
+  /** Enable verbose logging for troubleshooting */
   debug?: boolean;
 }
 
-
 /**
- * Decoder for a JavaType
- * 
- * By default, frooky will choose the appropriate decoder, but sometimes it is necessary
- * to manually set them
- * 
- * An example is `android.content.Intent.setFlags(int flags)`. If you want to decode the 
- * argument `int flags` with a custom decoder, you must set the name of the decoder here.
- * 
- * The decoders available can be found in `./android/decoders`. 
+ * Parameter declaration shared across hook types.
  */
-export type JavaDecoder = string
-
-/**
- * Java type
- * Specify exact method signatures using overloads.
- */
-export interface JavaType {
-  /** Java type descriptor such as "[B", "java.lang.string", "org.owasp.mastestapp.returnValue"*/
-  name: string;
-  /** 
-   * Optional type decoder. By default, frooky will choose a default decoder. 
-   * This can be overruled for example if an integer should be decoded as a FLAG. 
-   */
-  decoder?: JavaDecoder
+export interface ParameterDeclaration {
+  /** Type descriptor according to platform standard */
+  type: string;
+  /** Optional: Name of the parameter */
+  name?: string;
+  /** Optional: When to decode the parameter. Default: enter */
+  decodeAt?: DecodeAt;
+  /** Optional: Custom decoder name. Default: autoSelect */
+  decoder?: string;
 }
-
 
 /**
  * Java method overload signature.
- * Specify exact method signatures using overloads.
  */
 export interface JavaOverload {
-  args: JavaType[];
+  /** Parameter list of the overloaded method */
+  parameters?: ParameterDeclaration[];
 }
 
 /**
  * Java method to hook.
  */
 export interface JavaMethod {
+  /** Name of the Java method */
   name: string;
-  /** Optional overloads. If not set, the method without arguments is defined.*/
+  /** Optional: List of explicit method overloads */
   overloads?: JavaOverload[];
-  /** Optional custom decoder for the return value.*/
-  decoder?: JavaDecoder
-  // /** 
-  //  * Method which will trigger the hooking of the methods. --> TODO: Address recursion issue
-  // */
-  // prerequisites?: JavaMethod[];
 }
-
 
 /**
  * Android Java/Kotlin class hooking configuration.
  */
 export interface JavaHook extends BaseHook {
-  /** 
-   * Fully qualified class name. 
-   * Nested classes are identified with $, wildcards are supported per package level. 
-   * Example: `org.owasp.*.Http$Client`: `$Client` is an nested class within `$Http` 
-   * and `org.owasp.e.Http$Client` would be a valid match, 
-   * but `org.owasp.a.b.c.Http$Client` not.
-   * */
+  /** Fully qualified Java class name */
   javaClass: string;
+  /** List of Java methods to hook */
   methods: JavaMethod[];
 }
 
-
 /**
- * Native function argument descriptor.
- * Defines how arguments should be captured.
+ * Objective-C method declaration.
  */
-export interface NativeArgDescriptor {
+export interface ObjectiveCMethod {
+  /** Name of the Objective-C method (include - or + prefix) */
   name: string;
-  type: NativeArgType;
-  /** Fixed buffer length */
-  length?: number;
-  /** Index of argument containing buffer length */
-  lengthInArg?: number;
-  /** Argument direction: 'in' (default) or 'out' for output parameters */
-  direction?: Direction;
-  /** Set to true to capture the function's return value */
-  retValue?: boolean;
-}
-
-
-/**
- * Native C/C++ function hooking configuration.
- * Native hooks intercept C/C++ functions.
- */
-export interface NativeHook extends BaseHook {
-  /** Function symbol name or address */
-  symbol: string;
-  /** Argument descriptors defining how to capture function parameters */
-  args?: NativeArgDescriptor[];
+  /** Optional: Return type of the Objective-C method */
+  returnType?: string;
+  /** Optional: Parameter list of the Objective-C method */
+  parameters?: ParameterDeclaration[];
 }
 
 /**
  * iOS Objective-C method hooking configuration.
- * Hook Objective-C methods using objClass and symbol.
  */
 export interface ObjectiveCHook extends BaseHook {
-  /** Objective-C class name */
+  /** Fully qualified Objective-C class name */
   objClass: string;
-  /** Method selector */
+  /** List of Objective-C method declarations to be hooked */
+  methods: ObjectiveCMethod[];
+}
+
+/**
+ * Native function declaration.
+ */
+export interface NativeFunction {
+  /** Native symbol as string */
   symbol: string;
-  args?: NativeArgDescriptor[];
+  /** Optional: Return type of the function */
+  returnType?: string;
+  /** Optional: Parameter list of the function */
+  parameters?: ParameterDeclaration[];
+}
+
+/**
+ * Native C/C++ function hooking configuration.
+ */
+export interface NativeHook extends BaseHook {
+  /** Fully qualified module name (mandatory) */
+  module: string;
+  /** List of native symbol declarations to be hooked */
+  functions: NativeFunction[];
 }
 
 /**
  * iOS Swift method hooking configuration.
  */
 export interface SwiftHook extends BaseHook {
-  /** Swift class name */
-  swiftClass: string;
-  /** Mangled Swift symbol */
-  symbol: string;
-  args?: NativeArgDescriptor[];
+  /** List of mangled Swift symbols */
+  methods: string[];
 }
 
 /**
@@ -175,18 +138,29 @@ export interface SwiftHook extends BaseHook {
 export type Hook = JavaHook | NativeHook | ObjectiveCHook | SwiftHook;
 
 /**
- * Root hooks: array of categorized hooks for testing.
- * When multiple hook files are provided, their hooks arrays are merged.
+ * Metadata for the hook collection.
  */
-export interface Hooks {
-  /** 
-   * OWASP Category specified in the hook file.
-   * 
-   * TODO: DISCUSSION: I think this should be optional, as otherwise it may look like that frooky
-   * is only for security testing. But we should not limit the usage by enforcing a MAS category.
-   * 
-   */
-  category?: MasCategory;
-  /** Array of hooks to apply for this category */
+export interface HookMetadata {
+  /** Optional: Name of the hook collection */
+  name?: string;
+  /** Optional: Target platform (hooks must be platform-specific) */
+  platform?: Platform;
+  /** Optional: Description of what the hook collection does */
+  description?: string;
+  /** Optional: OWASP MAS category */
+  masCategory?: MasCategory;
+  /** Optional: Your name or organization */
+  author?: string;
+  /** Optional: Semantic version (e.g., v1) */
+  version?: string;
+}
+
+/**
+ * Root frooky configuration.
+ */
+export interface FrookyConfig {
+  /** Optional metadata about the hook collection */
+  metadata?: HookMetadata;
+  /** Collection of hook configurations */
   hooks: Hook[];
 }

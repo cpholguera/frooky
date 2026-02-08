@@ -1,27 +1,21 @@
 import * as Frooky from 'frooky'
 
 // ============================================================================
-// EXAMPLE 1: Swift UserDefaults
+// EXAMPLE 1: Swift method with mangled symbol
 // ============================================================================
 const userDefaultsHook: Frooky.SwiftHook = {
-  swiftClass: 'Foundation.UserDefaults',
-  symbol: '_TFC10Foundation12UserDefaults6setKey_forKey_',
-  args: [
-    { name: 'value', type: 'pointer' },
-    { name: 'key', type: 'string' }
+  methods: [
+    '_$s10Foundation12UserDefaultsC3set_6forKeyySo8NSObjectC_SStF'
   ],
   stackTraceLimit: 5
 }
 
 // ============================================================================
-// EXAMPLE 2: Swift FileManager with CFData
+// EXAMPLE 2: Swift FileManager method
 // ============================================================================
 const fileManagerHook: Frooky.SwiftHook = {
-  swiftClass: 'Foundation.FileManager',
-  symbol: '_TFC10Foundation11FileManager8contentsAtPath_',
-  args: [
-    { name: 'path', type: 'string' },
-    { name: 'data', type: 'CFData', retValue: true }
+  methods: [
+    '_$s10Foundation11FileManagerC8contentsAtPath_10FoundationAA4DataVSgSS_tF'
   ]
 }
 
@@ -29,15 +23,39 @@ const fileManagerHook: Frooky.SwiftHook = {
 // EXAMPLE 3: Swift Keychain wrapper
 // ============================================================================
 const keychainHook: Frooky.SwiftHook = {
-  swiftClass: 'Security.KeychainItem',
-  symbol: '_TFC8Security12KeychainItem4save_',
-  args: [
-    { name: 'password', type: 'string' },
-    { name: 'account', type: 'string' },
-    { name: 'service', type: 'string' }
+  methods: [
+    '_$s8Security12KeychainItemC4save_SbSS_SStKF'
   ],
   debug: true
 }
 
+// ============================================================================
+// EXAMPLE 4: Multiple Swift methods
+// ============================================================================
+const multipleSwiftHook: Frooky.SwiftHook = {
+  methods: [
+    '_$s5MyApp14NetworkManagerC11sendRequestyyF',
+    '_$s5MyApp14NetworkManagerC15receiveResponseySSSgAA0D0VF',
+    '_$s5MyApp14NetworkManagerC12handleErrorsyySo7NSErrorCF'
+  ],
+  stackTraceLimit: 10
+}
 
-export { userDefaultsHook, fileManagerHook, keychainHook }
+// ============================================================================
+// EXAMPLE 5: Swift method with stack trace filtering
+// ============================================================================
+const filteredSwiftHook: Frooky.SwiftHook = {
+  methods: [
+    '_$s5MyApp15CryptoUtilitiesC7encryptySS10Foundation4DataVF'
+  ],
+  stackTraceFilter: ['^Foundation\\.', '^UIKit\\.'],
+  debug: true
+}
+
+export { 
+  userDefaultsHook, 
+  fileManagerHook, 
+  keychainHook,
+  multipleSwiftHook,
+  filteredSwiftHook
+}

@@ -1,70 +1,163 @@
 import * as Frooky from 'frooky'
 
 // ============================================================================
-// EXAMPLE 1: Simple Objective-C method
+// EXAMPLE 1: Simple Objective-C instance method
 // ============================================================================
 const userDefaultsObjCHook: Frooky.ObjectiveCHook = {
   objClass: 'NSUserDefaults',
-  symbol: '- setObject:forKey:',
-  args: [
-    { name: 'value', type: 'pointer' },
-    { name: 'key', type: 'string' }
+  methods: [
+    {
+      name: '- setObject:forKey:',
+      parameters: [
+        { type: '(id)', name: 'value' },
+        { type: '(NSString *)', name: 'key' }
+      ]
+    }
   ]
 }
 
 // ============================================================================
-// EXAMPLE 2: NSData write to file
+// EXAMPLE 2: NSData write to file with return type
 // ============================================================================
 const nsDataHook: Frooky.ObjectiveCHook = {
   objClass: 'NSData',
-  symbol: '- writeToFile:atomically:',
-  args: [
-    { name: 'path', type: 'string' },
-    { name: 'useAuxiliaryFile', type: 'bool' },
-    { name: 'success', type: 'bool', retValue: true }
+  methods: [
+    {
+      name: '- writeToFile:atomically:',
+      returnType: '(BOOL)',
+      parameters: [
+        { type: '(NSString *)', name: 'path' },
+        { type: '(BOOL)', name: 'useAuxiliaryFile' }
+      ]
+    }
   ],
   stackTraceLimit: 8
 }
 
 // ============================================================================
-// EXAMPLE 3: Keychain operations
+// EXAMPLE 3: Objective-C class method
 // ============================================================================
-const secItemHook: Frooky.ObjectiveCHook = {
-  objClass: 'SecItemAdd',
-  module: 'Security',
-  symbol: 'SecItemAdd',
-  args: [
-    { name: 'attributes', type: 'CFDictionary' },
-    { name: 'result', type: 'pointer', direction: 'out' },
-    { name: 'status', type: 'int32', retValue: true }
+const urlHook: Frooky.ObjectiveCHook = {
+  objClass: 'NSURL',
+  methods: [
+    {
+      name: '+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:',
+      returnType: '(NSURL *)',
+      parameters: [
+        { type: '(const char *)', name: 'path' },
+        { type: '(BOOL)', name: 'isDir' },
+        { type: '(NSURL *)', name: 'baseURL' }
+      ]
+    }
   ]
 }
 
 // ============================================================================
-// EXAMPLE 4: Network request with multiple args
+// EXAMPLE 4: LAContext biometry method (no parameters)
+// ============================================================================
+const laContextHook: Frooky.ObjectiveCHook = {
+  objClass: 'LAContext',
+  methods: [
+    {
+      name: '- invalidate'
+    }
+  ]
+}
+
+// ============================================================================
+// EXAMPLE 5: Multiple methods in same class
+// ============================================================================
+const keychainHook: Frooky.ObjectiveCHook = {
+  objClass: 'LAPrivateKey',
+  methods: [
+    {
+      name: '- decryptData:secKeyAlgorithm:completion:',
+      parameters: [
+        { type: '(NSData *)', name: 'data' },
+        { type: '(SecKeyAlgorithm)', name: 'algorithm' },
+        { 
+          type: '(void (^)(NSData *, NSError *))', 
+          name: 'handler',
+          decoder: 'LaPlaintextDecoder'  // Custom decoder for async callback
+        }
+      ]
+    },
+    {
+      name: '- signData:secKeyAlgorithm:completion:',
+      parameters: [
+        { type: '(NSData *)', name: 'data' },
+        { type: '(SecKeyAlgorithm)', name: 'algorithm' },
+        { type: '(void (^)(NSData *, NSError *))', name: 'handler' }
+      ]
+    }
+  ]
+}
+
+// ============================================================================
+// EXAMPLE 6: CoreData save with output parameter
+// ============================================================================
+const coreDataHook: Frooky.ObjectiveCHook = {
+  objClass: 'NSManagedObjectContext',
+  methods: [
+    {
+      name: '- save:',
+      returnType: '(BOOL)',
+      parameters: [
+        { 
+          type: '(NSError **)', 
+          name: 'error',
+          decodeAt: 'exit'  // Decode error after method execution
+        }
+      ]
+    }
+  ],
+  debug: true
+}
+
+// ============================================================================
+// EXAMPLE 7: Network request with stack trace filtering
 // ============================================================================
 const urlSessionHook: Frooky.ObjectiveCHook = {
   objClass: 'NSURLSession',
-  symbol: '- dataTaskWithRequest:completionHandler:',
-  args: [
-    { name: 'request', type: 'pointer' },
-    { name: 'completionHandler', type: 'pointer' },
-    { name: 'task', type: 'pointer', retValue: true }
+  methods: [
+    {
+      name: '- dataTaskWithRequest:completionHandler:',
+      returnType: '(NSURLSessionDataTask *)',
+      parameters: [
+        { type: '(NSURLRequest *)', name: 'request' },
+        { type: '(void (^)(NSData *, NSURLResponse *, NSError *))', name: 'completionHandler' }
+      ]
+    }
   ],
   stackTraceFilter: ['^libsystem_', '^Foundation']
 }
 
 // ============================================================================
-// EXAMPLE 5: CoreData save operation
+// EXAMPLE 8: Method with both entry and exit decoding
 // ============================================================================
-const coreDataHook: Frooky.ObjectiveCHook = {
-  objClass: 'NSManagedObjectContext',
-  symbol: '- save:',
-  args: [
-    { name: 'error', type: 'pointer', direction: 'out' },
-    { name: 'success', type: 'bool', retValue: true }
-  ],
-  debug: true
+const dataProcessingHook: Frooky.ObjectiveCHook = {
+  objClass: 'NSMutableData',
+  methods: [
+    {
+      name: '- appendData:',
+      parameters: [
+        { 
+          type: '(NSData *)', 
+          name: 'data',
+          decodeAt: 'both'  // Capture data before and after
+        }
+      ]
+    }
+  ]
 }
 
-export { userDefaultsObjCHook, nsDataHook, secItemHook, urlSessionHook, coreDataHook }
+export { 
+  userDefaultsObjCHook, 
+  nsDataHook, 
+  urlHook,
+  laContextHook,
+  keychainHook,
+  coreDataHook, 
+  urlSessionHook,
+  dataProcessingHook
+}

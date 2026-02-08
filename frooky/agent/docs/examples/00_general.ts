@@ -1,48 +1,146 @@
 import * as Frooky from 'frooky'
+
 import {
     wifiHook,
     locationHook,
     urlHook,
-    intentHook
+    intentHook,
+    intentFlagsHook,
+    activityHook,
+    sqliteHook,
+    cipherHook,
+    bufferHook,
+    webViewHook
 } from "./01_android"
 import {
     openHook,
-    readHook
+    readHook,
+    encryptHook,
+    sslWriteHook,
+    opensslHook,
+    customDecoderHook,
+    outputParamHook
 } from "./02_native"
 import {
     userDefaultsHook,
     fileManagerHook,
+    keychainHook,
+    multipleSwiftHook,
+    filteredSwiftHook
 } from "./03_swift"
 import {
     userDefaultsObjCHook,
-    nsDataHook
+    nsDataHook,
+    urlHook as urlObjCHook,
+    laContextHook,
+    keychainHook as keychainObjCHook,
+    coreDataHook,
+    urlSessionHook,
+    dataProcessingHook
 } from "./04_objc"
 
 
 // ============================================================================
-// Complete configuration with multiple hooks
+// Android test configuration with all Java and native hooks
 // ============================================================================
-const androidHooks: Frooky.Hooks = {
-    category: 'NETWORK',
+const androidHooks: Frooky.FrookyConfig = {
+    metadata: {
+        name: 'Android Hook Type Tests',
+        platform: 'Android',
+        description: 'Test suite for Java and native hook configurations on Android',
+        author: 'Frooky Development Team',
+        version: 'v1'
+    },
     hooks: [
+        // Java hooks
         wifiHook,
         locationHook,
         urlHook,
         intentHook,
+        intentFlagsHook,
+        activityHook,
+        sqliteHook,
+        cipherHook,
+        bufferHook,
+        webViewHook,
+        // Native hooks (Android)
         openHook,
-        readHook
+        readHook,
+        encryptHook,
+        sslWriteHook,
+        opensslHook,
+        customDecoderHook,
+        outputParamHook
     ]
 }
 
-const iosHooks: Frooky.Hooks = {
-    category: 'STORAGE',
+// ============================================================================
+// iOS test configuration with all Swift and Objective-C hooks
+// ============================================================================
+const iosHooks: Frooky.FrookyConfig = {
+    metadata: {
+        name: 'iOS Hook Type Tests',
+        platform: 'iOS',
+        description: 'Test suite for Swift and Objective-C hook configurations on iOS',
+        author: 'Frooky Development Team',
+        version: 'v1'
+    },
     hooks: [
+        // Swift hooks
         userDefaultsHook,
         fileManagerHook,
+        keychainHook,
+        multipleSwiftHook,
+        filteredSwiftHook,
+        // Objective-C hooks
         userDefaultsObjCHook,
-        nsDataHook
+        nsDataHook,
+        urlObjCHook,
+        laContextHook,
+        keychainObjCHook,
+        coreDataHook,
+        urlSessionHook,
+        dataProcessingHook
+    ]
+}
+
+// ============================================================================
+// Minimal configuration without metadata (testing optional fields)
+// ============================================================================
+const minimalAndroidHooks: Frooky.FrookyConfig = {
+    hooks: [
+        wifiHook,
+        intentHook
+    ]
+}
+
+const minimalIosHooks: Frooky.FrookyConfig = {
+    hooks: [
+        userDefaultsObjCHook,
+        laContextHook
+    ]
+}
+
+// ============================================================================
+// Configuration with partial metadata
+// ============================================================================
+const partialMetadataHooks: Frooky.FrookyConfig = {
+    metadata: {
+        name: 'Partial Metadata Test',
+        platform: 'Android'
+        // Other fields intentionally omitted to test optional properties
+    },
+    hooks: [
+        wifiHook,
+        openHook
     ]
 }
 
 // Export for use in Frida agent
-export { androidHooks, iosHooks }
+export { 
+    androidHooks, 
+    iosHooks,
+    minimalAndroidHooks,
+    minimalIosHooks,
+    partialMetadataHooks
+}
