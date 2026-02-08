@@ -29,6 +29,7 @@ This documentation describes the structure of a hook file and provides examples 
     - [Basic Syntax](#basic-syntax-3)
   - [Advanced Features](#advanced-features)
     - [Time of Decoding](#time-of-decoding)
+    - [Custom Decoder](#custom-decoder)
 
 For each of the feature described here, there are examples in the [examples folder](../docs/examples/).
 
@@ -103,8 +104,7 @@ The following properties can be used for all types:
 
 ## Terminology, and Declaration Overview
 
-frooky can be used to declare hooks for different targets and programming languages. It is therefor important to be clear about the different conventions  and terminology. In order to avoid confusion, we therefore want to list the most important words with examples from the different platforms:
-
+frooky can be used to declare hooks for different targets and programming languages. It is therefor important to be clear about the different conventions and terminology. In order to avoid confusion, we therefore want to list the most important terminology here:
 
 1. **Method**  
   A function associated with a class or object.
@@ -116,15 +116,13 @@ frooky can be used to declare hooks for different targets and programming langua
   A unique identifier for a native function.
 
 1. **Type Declaration**  
-  Description of the type according to the platform specific references:
-
-  [Android](https://docs.oracle.com/en/java/javase/25/docs/specs/jni/types.html), [iOS](https://developer.apple.com/documentation/objectivec?language=objc) and [Native](https://en.cppreference.com/w/c/language/declarations.html)
+  Description of the type according to the platform specific references: [Android](https://docs.oracle.com/en/java/javase/25/docs/specs/jni/types.html), [iOS](https://developer.apple.com/documentation/objectivec?language=objc) and [Native](https://en.cppreference.com/w/c/language/declarations.html)
 
 1. **Parameter List**  
-  List of type declaration and their optional name.
+  List of type declaration and their optional name used in method and function declarations.
 
-1. **Overloading in Java**  
-  In Java/Kotlin methods can be overloaded. A `<java_method_declaration>` is therefore structurally different than `objc_method_declaration` and `<native_function_declaration>`.
+1. **Overloading**  
+  In Java/Kotlin methods can be overloaded. An overload of a method has the same name, but a different parameter list. The return typ can be different, but we do not care about that in a `<hook_configuration>`, since frooky can lookup the type at runtime. 
 
 
 ### Shared Declaration
@@ -508,18 +506,39 @@ However, datastrucutres are often passed by reference. The function then changes
 > [!NOTE]
 > **Example on Android:**
 >
+>```yaml
+> javaClass: android.content.Intent
+> methods:
+>   - name: putExtra
+>     overloads:
+>       - parameters:
+>         - type: java.lang.String
+>           name: name
+>         - type: java.lang.String
+>           name: value
+>       - parameters:
+>         - type: java.lang.String
+>           name: name
+>         - type: "[Z"
+>           name: value
+>  ```
+>
 > ```yaml
 > javaClass: javax.crypto.Cipher 
 > methods:
 >   - name: doFinal
 >     overloads:
->       - - name: output
->           type: "[B"
->         - name: outputOffset
->           type: int
+>       - parameters:
+>         - type: output
+>           name: "[B"
+>         - type: int
+>           name: outputOffset
 >  ```
 >
 > This method decrypts data form the current instance and writes it into the byte array `output`. If we decode the array at the beginning, the data we might be interested in is not yet written.
+
+
+
 
 If we want to decode the argument at at different time, we need to specify that using the `decodeAt` property of the `<parameter>`:
 
@@ -536,7 +555,11 @@ type:                    # List of types which describe the overloads
 
 
 
+### Custom Decoder
 
+One of the main feature of frooky is, that it tries to decode complex types. During runtime, frooky will therefor try to decode each `<parameter_declaration>` and each `returnType`. 
+
+frooky provides decoders for primitive types and common complex types. But for more complex types, ....
 
 
 
