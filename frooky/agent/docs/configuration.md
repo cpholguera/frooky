@@ -4,36 +4,38 @@ A frooky hook configuration describes how to hook a Java, Swift, Objective-C or 
 
 This documentation describes the structure of a hook file and provides examples for the various cases.
 
-- [Frooky Hook Documentation](#frooky-hook-documentation)
-  - [Frooky Configuration](#frooky-configuration)
-  - [Basic Hook Configuration](#basic-hook-configuration)
-    - [Hook Types](#hook-types)
-    - [Properties for All Type of Hooks](#properties-for-all-type-of-hooks)
-  - [Terminology, and Declaration Overview](#terminology-and-declaration-overview)
-    - [Shared Declaration](#shared-declaration)
-    - [`JavaHook` Declaration](#javahook-declaration)
-    - [`ObjectiveCHook` Declaration](#objectivechook-declaration)
-    - [`NativeHook` Declaration](#nativehook-declaration)
-    - [`SwiftHook` Declaration](#swifthook-declaration)
-  - [Java Hook Configuration](#java-hook-configuration)
-    - [Basic Syntax](#basic-syntax)
-    - [Method Overloads](#method-overloads)
-    - [Type Descriptors](#type-descriptors)
-  - [Objective-C Hook Configuration](#objective-c-hook-configuration)
-    - [Basic Syntax](#basic-syntax-1)
-    - [Argument and Return Types](#argument-and-return-types)
-  - [Native Hook Configuration](#native-hook-configuration)
-    - [Basic Syntax](#basic-syntax-2)
-    - [Argument and Return Types](#argument-and-return-types-1)
-  - [Swift Hook Configuration](#swift-hook-configuration)
-    - [Basic Syntax](#basic-syntax-3)
-  - [Advanced Features](#advanced-features)
-    - [Time of Decoding](#time-of-decoding)
-    - [Custom Decoder](#custom-decoder)
+<!-- no toc -->
+- [Frooky Configuration](#frooky-configuration)
+- [Basic Hook Configuration](#basic-hook-configuration)
+  - [Hook Types](#hook-types)
+  - [Properties for All Type of Hooks](#properties-for-all-type-of-hooks)
+- [Terminology, and Declaration Overview](#terminology-and-declaration-overview)
+  - [Shared Declaration](#shared-declaration)
+  - [`JavaHook` Declaration](#javahook-declaration)
+  - [`ObjectiveCHook` Declaration](#objectivechook-declaration)
+  - [`NativeHook` Declaration](#nativehook-declaration)
+  - [`SwiftHook` Declaration](#swifthook-declaration)
+- [Java Hook Configuration](#java-hook-configuration)
+  - [Basic Syntax](#basic-syntax)
+  - [Method Overloads](#method-overloads)
+  - [Type Descriptors](#type-descriptors)
+- [Objective-C Hook Configuration](#objective-c-hook-configuration)
+  - [Basic Syntax](#basic-syntax-1)
+  - [Argument and Return Types](#argument-and-return-types)
+- [Native Hook Configuration](#native-hook-configuration)
+  - [Basic Syntax](#basic-syntax-2)
+  - [Argument and Return Types](#argument-and-return-types-1)
+- [Swift Hook Configuration](#swift-hook-configuration)
+  - [Basic Syntax](#basic-syntax-3)
+- [Advanced Features](#advanced-features)
+  - [Time of Decoding](#time-of-decoding)
+  - [Custom Decoder](#custom-decoder)
+    - [Example 1: Decode an Integer as Flags](#example-1-decode-an-integer-as-flags)
+    - [Example 2: Handle Asynchronous Callback](#example-2-handle-asynchronous-callback)
 
 For each of the feature described here, there are examples in the [examples folder](../docs/examples/).
 
-You will not only find `hooks.yaml` files there but also TypeScript code which shows, how the various types can be used to develop frooky, or [custom decoders](#custom-decoders) for certain cases.
+You will not only find `hooks.yaml` files there but also TypeScript code which shows, how the various types can be used to develop frooky, or [custom decoders](#custom-decoder) for certain cases.
 
 ## Frooky Configuration
 
@@ -504,89 +506,89 @@ By default, arguments are decoded before the original code is called, and the re
 However, datastrucutres are often passed by reference. The function then changes data in the reference directly and returns a status code. If we decode them before the method or function is run, we are not able to access the data we want.
 
 > [!NOTE]
-> **Example on Android:**
->
->```yaml
-> javaClass: android.content.Intent
-> methods:
->   - name: putExtra
->     overloads:
->       - parameters:
->         - type: java.lang.String
->           name: name
->         - type: java.lang.String
->           name: value
->       - parameters:
->         - type: java.lang.String
->           name: name
->         - type: "[Z"
->           name: value
->  ```
->
+> **Default decoding at method entry on Android::**
+> 
 > ```yaml
 > javaClass: javax.crypto.Cipher 
 > methods:
 >   - name: doFinal
 >     overloads:
 >       - parameters:
->         - type: output
->           name: "[B"
+>         - type: "[B"
+>           name: output
 >         - type: int
 >           name: outputOffset
 >  ```
 >
-> This method decrypts data form the current instance and writes it into the byte array `output`. If we decode the array at the beginning, the data we might be interested in is not yet written.
+> This method decrypts data form the current instance and writes it into the byte array `output`. The return value is an `int` with the  number of bytes written into `output`. If we decode the `output` at the beginning, we won't find any decrypted data yet.
 
+If we want to decode the argument at at different time, we need to specify that using the `decodeAt` property of the `<parameter_declaration>`:
 
-
-
-If we want to decode the argument at at different time, we need to specify that using the `decodeAt` property of the `<parameter>`:
-
-
-```yaml
- <class>                # Fully qualified Java class name 
-name: <method_name>           # Name of the Java method
-type:                    # List of types which describe the overloads
-      - <type>       
-```
-
-
-
-
+> [!NOTE]
+> **Decoding at method exit on Android:**
+> 
+> ```yaml
+> javaClass: javax.crypto.Cipher 
+> methods:
+>   - name: doFinal
+>     overloads:
+>       - parameters:
+>         - type: "[B"
+>           name: output
+>           decodeAt: exit
+>         - type: int
+>           name: outputOffset
+>  ```
+>
+> Now, `output` is decoded before the method exits.
 
 
 ### Custom Decoder
 
-One of the main feature of frooky is, that it tries to decode complex types. During runtime, frooky will therefor try to decode each `<parameter_declaration>` and each `returnType`. 
+frooky provides decoders for primitive types and common complex types. By default, frooky chooses the decoder at runtime. 
 
-frooky provides decoders for primitive types and common complex types. But for more complex types, ....
+For example, an `int` will always be decoded as number and if there is no decoder available for a given type, frooky will use a fallback decoder.
 
-
-
-
+For some cases you want to manually bypass the automatic decoder matching. Two examples:
 
 
+#### Example 1: Decode an Integer as Flags
 
-`ObjectiveCHook` and `NativeHook` configurations have one 
-
-
-
-> [!IMPORTANT]
-> At the moment, frooky provides decoders for simple types. It may therefor be, that the data is not decoded in depth.
->
-> An example:
->
+> [!NOTE]
+> **Example Code:**
+> 
 > ```yaml
-> - objClass: LAPublicKey
->   methods:
->   - name: "- decrypt"
->     args:
->       - - name: data
->           type: (NSData *)
->       - - name: algorithm
->           type: (SecKeyAlgorithm)
->       - - name: handler
->           type: (void (^)(NSData * , NSError * )
+> javaClass: android.content.Intent
+> methods:
+>   - name: setFlags
+>     overloads:
+>       - parameters:
+>         - type: int
+>           name: flags
+>  ```
+
+
+The parameter `flags` is bitwise OR combination of [42 integers](https://developer.android.com/reference/kotlin/android/content/Intent#flags), each meaning something different. If you want to decode the flags on the device, you must provide a custom decoder which takes each flag and does a bitwise AND operation on the `flags` Integer. 
+
+If the result matches the value of the flag, it is set. This is a more stable way of decoding the flags compared to do that on the host, as the flags may not be the same as on the actual device.
+
+
+#### Example 2: Handle Asynchronous Callback
+
+> [!NOTE]
+> **Example Code:**
+> 
+> ```yaml
+> objClass: LAPrivateKey
+> methods:
+>   - name: "- decryptData"
+>     parameters:
+>       - type: (NSData *)
+>         name: data
+>       - type: (SecKeyAlgorithm)
+>         name: algorithm
+>       - type: (void (^)(NSData * , NSError * )
+>         name: handler
 > ```
 >
 > This `<hook_configuration>` hooks the following method:
@@ -603,12 +605,30 @@ frooky provides decoders for primitive types and common complex types. But for m
 > [self decryptData:myData 
 >  secKeyAlgorithm:kSecKeyAlgorithmRSAEncryptionOAEPSHA256 
 >        completion:^(NSData *result, NSError *error) {
->           // handle result
+>           // handle result with the decrypted data
 >       }];
->
 > ```
->
-> To access the decrypted data, we must hook the handler implementation itself, as we need to intercept its first argument `(NSData * , NSError * )` when the method calls the handler after decryption finishes.
->
-> At the moment, this feature is not yet implemented. You can find more on the topic of custom decoders in chapter [Custom Decoders](#custom-decoders).
->
+
+To access the decrypted data, we must hook the handler implementation itself, as we need to intercept its first argument `(NSData * , NSError * )` when the method calls the handler after decryption finishes. For that we need to write a custom decoder, let's call it `LaPlaintextDecoder`, and overwrite the default decoder for the `handler` argument:
+
+> ```yaml
+> objClass: LAPrivateKey
+> methods:
+>   - name: "- decryptData"
+>     parameters:
+>       - type: (NSData *)
+>         name: data
+>       - type: (SecKeyAlgorithm)
+>         name: algorithm
+>       - type: (void (^)(NSData * , NSError * )
+>         name: handler
+>         decoder: LaPlaintextDecoder
+> ```
+
+The decoder itself must do the following:
+
+1. The decoder runs at `enter`.
+2. Creates a new hook for the `handler`
+
+Once called, the hook can decode the first parameter, which contains the decrypted plaintext in the form of `NSData *`
+
