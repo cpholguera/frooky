@@ -2,6 +2,8 @@
  * Convert ArrayBuffer to hex string.
  */
 // --- Native argument decoding utilities (mirroring Android native) ---
+import { toHex } from "../shared/utils.js"
+
 function _arrayBufferToHex(buffer) {
   try{
       var bytes = new Uint8Array(buffer);
