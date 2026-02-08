@@ -1,17 +1,12 @@
 /**
  * Convert ArrayBuffer to hex string.
  */
+// --- Native argument decoding utilities (mirroring Android native) ---
 function _arrayBufferToHex(buffer) {
-  try {
-    var bytes = new Uint8Array(buffer);
-    var hex = [];
-    for (var i = 0; i < bytes.length; i++) {
-      var h = bytes[i].toString(16);
-      if (h.length < 2) h = "0" + h;
-      hex.push(h);
-    }
-    return hex.join("");
-  } catch (e) {
+  try{
+      var bytes = new Uint8Array(buffer);
+      return toHex(bytes)
+  }catch (e) {
     return "<hex-conversion-error>";
   }
 }
