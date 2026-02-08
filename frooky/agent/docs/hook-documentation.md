@@ -143,7 +143,7 @@ These declarations are used for more than only one types of hooks.
 > [!NOTE]
 > **Built-in Decoders:**
 >
-> When `decoder: default` is used, frooky automatically selects a decoder based on the type:
+> When `decoder: autoSelect` is used, frooky automatically selects a decoder based on the type:
 >
 > - Primitive types: `IntDecoder`, `BooleanDecoder`, `FloatDecoder`, etc.
 > - Common types: `StringDecoder`, `ByteArrayDecoder`, `UrlDecoder`, etc.
