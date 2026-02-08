@@ -105,9 +105,9 @@ The following properties can be used for all types:
 The minimum necessary properties are `javaClass` and `methods`:
 
 ```yaml
-javaClass: <class_name>           # Fully qualified Java class name
-methods:                          # List of methods to be hooked
-  - <java_method>
+javaClass: <class>                # Fully qualified Java class name
+methods:                          # List of Java methods to be hooked
+  - <method>
 ```
 
 For this case *all* methods from the class will be hooked.
@@ -136,21 +136,21 @@ For this case *all* methods from the class will be hooked.
 
 > [!TIP]
 >
-> Use the following syntax for dynamic `<class_name>` lookup at runtime:
+> Use the following syntax for dynamic `<class>` lookup at runtime:
 >
 > - **Exact match**: `org.owasp.mastestapp.MainActivity`
 > - **Wildcards**: `org.owasp.*.Http$Client` (per package level)
 > - **Nested classes**: Use `$` separator (e.g., `Outer$Inner`)
 
 > [!TIP]
-> It is Frida convention that `$init` is the name of the constructor of a class.
+> `$init` is the name of the constructor of a class.
 
 ### Method Overloads
 
 If you only want to hook a certain overload, specify it by adding one or more `overload`:
 
 ```yaml
-javaClass: <class_name>           # Fully qualified Java class name 
+javaClass: <class>                # Fully qualified Java class name 
 methods:
   - name: <method_name>           # Name of the Java method
     types:                        # List of types which describe the overload
@@ -188,7 +188,7 @@ Frida, and therefore frooky, uses a custom type descriptors which is based on th
 
 The following table shows the different kinds of types and their representation in Java, the JVM and Frida:
 
-| Kind of Type      | Java Type Descriptor                                                                          | JVM Type Descriptor                                          | Frida Type Descriptor                                                                                |
+| Kind of Type      | Java Type Descriptor                                                                          | JVM Type Descriptor                                          | Frida / frooky Type Descriptor                                                                       |
 |-------------------|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
 | Primitive         | `boolean`<br>`byte`<br>`char`<br>`short`<br>`int`<br>`long`<br>`float`<br>`double`<br>`void`  | `Z`<br>`B`<br>`C`<br>`S`<br>`I`<br>`J`<br>`F`<br>`D`<br>`V`  | `boolean`<br>`byte`<br>`char`<br>`short`<br>`int`<br>`long`<br>`float`<br>`double`<br>`void`         |
 | Primitive Array   | `boolean[]`<br>`byte[]`<br>...                                                                | `[Z`<br>`[B`<br>...                                          | `[Z`<br>`[B`<br>...                                                                                  |
@@ -196,21 +196,28 @@ The following table shows the different kinds of types and their representation 
 | Reference Array   | `Object[]`<br>`MyClass[]`<br>...                                                              | `[Ljava/lang/Object;`<br>`[Lorg/owasp/MyClass;`<br>...       | `[Ljava.lang.Object`<br>`[Lorg.owasp.MyClass`<br>...                                                 |
 | Multi-Dimensional | `int[][]`<br>`String[][]`<br>...                                                              | `[[I`<br>`[[Ljava/lang/String;`<br>...                       | `[[int`<br>`[[Ljava.lang.String`<br>...                                                              |
 
-> [!NOTE]
-> Frooky uses Frida type descriptors.
-
 ---------------------------
 
 ## Objective-C Hook Configuration
+
+frooky can hook Objective-C instance and type methods.
+
+> [!TIP]
+>
+> Use the following syntax to hook the two different kinds of Objective-C methods:
+>
+> - **Instance methods**: `- biometryType`
+> - **Type methods**: `+ removeProperties`
+>
 
 ### Basic Syntax
 
 The minimum necessary properties are `objcClass` and `methods`:
 
 ```yaml
-objClass: <objc_class>            # Fully qualified Objective-C class
+objClass: <class>                 # Fully qualified Objective-C class name
 methods:                          # List of Objective-C methods to be hooked
-  - <objc_method>
+  - <method>
 ```
 
 > [!NOTE]
@@ -222,28 +229,23 @@ methods:                          # List of Objective-C methods to be hooked
 >  - name: "- invalidate"
 > ```
 >
-> This `<hook_configuration>` will hook the following Objective-C method:
+> This `<hook_configuration>` will hook the following [Objective-C instance method](https://developer.apple.com/documentation/localauthentication/lacontext/invalidate()?language=objc):
 >
 > ```objectivec
 > - (void) invalidate;
 > ```
-
-> [!TIP]
 >
-> Objective-C method selectors can hook instance and class methods:
->
-> - **Instance methods**: `- biometryType`
-> - **Type methods**: `+ removeProperties`
+> frooky will capture when this function is called and generate an event. Since the function takes no arguments and returns no value, the event will only contain timing and call stack information.
 >
 
 ### Argument and Return Types
 
 If a `<objc_method>` has a return value or method arguments, frooky needs to how to decode them.
 
-This is done by declaring the types in each `<objc_method>`. The syntax the same as used in the [official documentation](https://developer.apple.com/documentation?language=objc).
+This is done by declaring the types in each `<method>`. The syntax the same as used in the [official documentation](https://developer.apple.com/documentation?language=objc).
 
 ```yaml
-objClass: <class_name>            # Fully qualified Objective-C class
+objClass: <class>                 # Fully qualified Objective-C class name
 methods:                       
   - name: <method_name>           # Name of the Objective-C method to be hooked
     types:                        # List of types which describe the positional arguments
@@ -269,176 +271,85 @@ methods:
 >     ret: (NSURL *)
 >  ```
 >
-> Frooky will try to decode the arguments and the return value based the type. This `<hook_configuration>` will hook the following [Objective-C method](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
+> Frooky will try to decode the arguments and the return value based the type. This `<hook_configuration>` will hook the following [Objective-C type method](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
 >
 > ```objectivec
 > + (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
 >                                     isDirectory:(BOOL) isDir 
 >                                   relativeToURL:(NSURL *) baseURL;
 > ```
->
-
-> [!IMPORTANT]
-> At the moment, frooky provides decoders for simple types. It may therefor be, that the data is not decoded in depth.
->
-> An example:
->
-> ```yaml
-> - objClass: LAPublicKey
->   methods:
->   - name: "- decrypt"
->     types:
->       - - name: data
->           type: (NSData *)
->       - - name: algorithm
->           type: (SecKeyAlgorithm)
->       - - name: handler
->           type: (NSData * , NSError * )
-> ```
->
-> This `<hook_configuration>` decrypts the data and invokes the handler upon completion. To access the decrypted data, we must hook the handler implementation itself, as we need to intercept its first argument `(NSData * , NSError * )` when the method calls the handler after decryption finishes.
->
-> At the moment, this feature is not yet implemented. You can find more on the topic of custom decoders in chapter [Custom Decoders](#custom-decoders).
->
 
 ## Native Hook Configuration
+
+> [!IMPORTANT]
+> In oder to hook native functions, symbols must not be stripped. However, this is done by default for release builds on both [Android](https://developer.android.com/build/include-native-symbols) and [iOS](https://developer.apple.com/documentation/xcode/build-settings-reference#Symbols-Hidden-by-Default).
+>
+> Libraries, plugins or frameworks however, must keep symbols for the public API. To find symbols, use tools like `nm`, `objdump`, `radare2` or `ghidra` to extract all symbols in a binary executable.
+>
 
 ### Basic Syntax
 
 The minimum necessary properties are `module` and `symbols`:
 
 ```yaml
-module: <native_class>          # Fully qualified Objective-C class
-symbols:                        # List of Objective-C methods to be hooked
-  - <symbol>
+module: <module>                  # Name of the module the target functions are located
+functions:                        # List of of functions to be hooked
+  - <function>
 ```
 
+> [!NOTE]
+> **Example:**
+>
+> ```yaml
+> module: libssl.so
+> functions:
+>  - symbol: ENGINE_load_builtin_engines
+>  - symbol: ENGINE_cleanup
+> ```
+>
+> This `<hook_configuration>` will hook the following two functions from the [OpenSSL Library](https://docs.openssl.org/master/man3/ENGINE_add):
+>
+> ```c
+> void ENGINE_load_builtin_engines(void);
+> void ENGINE_cleanup(void);
+> ```
+>
+> frooky will capture when this function is called and generate an event. Since the function takes no arguments and returns no value, the event will only contain timing and call stack information.
 
+### Argument and Return Types
 
+If a `<function>` has a return value or method arguments, frooky needs to how to decode them.
 
-
-
-
-
-
-
-
-
-
-
-
-
-### Basic Syntax
-
-The minimum necessary property is `symbol`:
+This is done by declaring the types in each `<function>`. The syntax the same as [C function declarations](https://en.cppreference.com/w/c/language/function_declaration.html).
 
 ```yaml
-- symbol: <symbol>
+module: <class>                   # Fully qualified Objective-C class name
+functions:                       
+  - symbol: <symbol_name>         
+    types:                        # List of types which describe the positional arguments
+      - <type>   
+    ret: <type>                   # Describes the return type
 ```
 
 > [!NOTE]
+>
 > **Example:**
 >
 > ```yaml
-> - symbol: open
->   args:
->     - name: pathname
->       type: string
->     - name: flags
->       type: int32
+> module: libssl.so
+> functions:
+>   - symbol: OSSL_CMP_validate_cert_path
+>     types:
+>       - - name: ctx
+>           type: const OSSL_CMP_CTX *
+>       - - name: trusted_store
+>           type: X509_STORE *
+>       - - name: cert
+>           type: X509 *
+>     ret: int
 > ```
 >
-> This `<hook_configuration>` will hook the native `open()` function.
-
-> [!TIP]
->
-> Native hooks work on both Android and iOS platforms for C/C++ functions.
->
-> Use `module` property to specify the library containing the symbol:
->
-> ```yaml
-> - symbol: SSL_write
->   module: libssl.so
-> ```
-
-### Argument Descriptors
-
-Native hooks require explicit argument descriptors to capture parameters:
-
-```yaml
-- symbol: <symbol>
-  args:
-    - name: <arg_name>
-      type: <native_arg_type>
-      direction: <in|out>
-```
-
-> [!NOTE]
-> **Example:**
->
-> ```yaml
-> - symbol: memcpy
->   args:
->     - name: dest
->       type: pointer
->       direction: out
->     - name: src
->       type: bytes
->       length: 256
->       direction: in
->     - name: n
->       type: uint32
-> ```
-
-### Buffer Handling
-
-For buffer arguments, specify length using one of these methods:
-
-| Property      | Description                              |
-|---------------|------------------------------------------|
-| `length`      | Fixed buffer length in bytes             |
-| `lengthInArg` | Index of argument containing the length  |
-
-> [!NOTE]
-> **Example:**
->
-> ```yaml
-> - symbol: read
->   args:
->     - name: fd
->       type: int32
->     - name: buf
->       type: bytes
->       lengthInArg: 2
->       direction: out
->     - name: count
->       type: uint32
-> ```
-
-### Capturing Return Values
-
-To capture the function's return value, add a descriptor with `retValue: true`:
-
-```yaml
-- symbol: <symbol>
-  args:
-    - name: <return_name>
-      type: <native_arg_type>
-      retValue: true
-```
-
-> [!NOTE]
-> **Example:**
->
-> ```yaml
-> - symbol: malloc
->   args:
->     - name: size
->       type: uint32
->     - name: result
->       type: pointer
->       retValue: true
-> ```
+> Frooky will try to decode the arguments and the return value based the type. This `<hook_configuration>` will hook the function `OSSL_CMP_validate_cert_path` from the [OpenSSL Library](https://docs.openssl.org/master/man3/OSSL_CMP_validate_msg/).
 
 ## Swift Hook Configuration
 
@@ -466,3 +377,49 @@ The minimum necessary properties for a `SwiftHook` are `swiftClass` and `mangled
 > ```
 >
 > This `<hook_configuration>` will hook the mangled Swift method symbol.
+
+## Data Decoders
+
+Objective-C and native hooks.
+
+> [!IMPORTANT]
+> At the moment, frooky provides decoders for simple types. It may therefor be, that the data is not decoded in depth.
+>
+> An example:
+>
+> ```yaml
+> - objClass: LAPublicKey
+>   methods:
+>   - name: "- decrypt"
+>     types:
+>       - - name: data
+>           type: (NSData *)
+>       - - name: algorithm
+>           type: (SecKeyAlgorithm)
+>       - - name: handler
+>           type: (void (^)(NSData * , NSError * )
+> ```
+>
+> This `<hook_configuration>` hooks the following method:
+>
+> ```objectivec
+> - (void) decryptData:(NSData *) data 
+>      secKeyAlgorithm:(SecKeyAlgorithm) algorithm 
+>           completion:(void (^)(NSData * , NSError * )) handler;
+> ```
+>
+> It decrypts the data and invokes the handler upon completion. The method would for example be called like that:
+>
+> ```objectivec
+> [self decryptData:myData 
+>  secKeyAlgorithm:kSecKeyAlgorithmRSAEncryptionOAEPSHA256 
+>        completion:^(NSData *result, NSError *error) {
+>           // handle result
+>       }];
+>
+> ```
+>
+> To access the decrypted data, we must hook the handler implementation itself, as we need to intercept its first argument `(NSData * , NSError * )` when the method calls the handler after decryption finishes.
+>
+> At the moment, this feature is not yet implemented. You can find more on the topic of custom decoders in chapter [Custom Decoders](#custom-decoders).
+>
