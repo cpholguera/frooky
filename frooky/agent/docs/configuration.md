@@ -106,7 +106,7 @@ The following properties can be used for all types:
 
 ## Terminology, and Declaration Overview
 
-frooky can be used to declare hooks for different targets and programming languages. It is therefor important to be clear about the different conventions and terminology. In order to avoid confusion, we therefore want to list the most important terminology here:
+frooky can be used to declare hooks for different targets and programming languages. In order to avoid confusion, we list the most important terminology here:
 
 1. **Method**  
   A function associated with a class or object.
