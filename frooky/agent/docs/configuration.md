@@ -4,26 +4,31 @@ A frooky hook configuration describes how to hook a Java, Swift, Objective-C or 
 
 This documentation describes the structure of a hook file and provides examples for the various cases.
 
-<!-- no toc -->
-- [Frooky Configuration](#frooky-configuration)
-- [Basic Hook Configuration](#basic-hook-configuration)
-  - [Hook Types](#hook-types)
-  - [Properties for All Type of Hooks](#properties-for-all-type-of-hooks)
-- [Java Hook Configuration](#java-hook-configuration)
-  - [Basic Syntax](#basic-syntax)
-  - [Method Overloads](#method-overloads)
-  - [Java Type Signatures](#java-type-signatures)
-- [Objective-C Hook Configuration](#objective-c-hook-configuration)
-  - [Basic Syntax](#basic-syntax-1)
-  - [Argument and Return Types](#argument-and-return-types)
-- [Native Hook Configuration](#native-hook-configuration)
-  - [Basic Syntax](#basic-syntax-2)
-  - [Argument Descriptors](#argument-descriptors)
-  - [Buffer Handling](#buffer-handling)
-  - [Capturing Return Values](#capturing-return-values)
-- [Swift Hook Configuration](#swift-hook-configuration)
-  - [Basic Syntax](#basic-syntax-3)
-- [Custom Decoders](#custom-decoders)
+- [Frooky Hook Documentation](#frooky-hook-documentation)
+  - [Frooky Configuration](#frooky-configuration)
+  - [Basic Hook Configuration](#basic-hook-configuration)
+    - [Hook Types](#hook-types)
+    - [Properties for All Type of Hooks](#properties-for-all-type-of-hooks)
+  - [Terminology, and Declaration Overview](#terminology-and-declaration-overview)
+    - [Shared Declaration](#shared-declaration)
+    - [`JavaHook` Declaration](#javahook-declaration)
+    - [`ObjectiveCHook` Declaration](#objectivechook-declaration)
+    - [`NativeHook` Declaration](#nativehook-declaration)
+    - [`SwiftHook` Declaration](#swifthook-declaration)
+  - [Java Hook Configuration](#java-hook-configuration)
+    - [Basic Syntax](#basic-syntax)
+    - [Method Overloads](#method-overloads)
+    - [Type Descriptors](#type-descriptors)
+  - [Objective-C Hook Configuration](#objective-c-hook-configuration)
+    - [Basic Syntax](#basic-syntax-1)
+    - [Argument and Return Types](#argument-and-return-types)
+  - [Native Hook Configuration](#native-hook-configuration)
+    - [Basic Syntax](#basic-syntax-2)
+    - [Argument and Return Types](#argument-and-return-types-1)
+  - [Swift Hook Configuration](#swift-hook-configuration)
+    - [Basic Syntax](#basic-syntax-3)
+  - [Advanced Features](#advanced-features)
+    - [Time of Decoding](#time-of-decoding)
 
 For each of the feature described here, there are examples in the [examples folder](../docs/examples/).
 
@@ -73,12 +78,12 @@ What kind of a type the `<hook_configuration>` is, is determined by a unique pro
 
 Frooky supports four types of hooks:
 
-| Hook Type        | Unique Properties | Platform    | Description                                 |
-| ---------------- | ---------------   | ----------- | ------------------------------------------- |
-| `JavaHook`       | `javaClass`       | Android     | Hook for Java/Kotlin methods                |
-| `ObjectiveCHook` | `objClass`        | iOS         | Hook for Objective-C methods                |
-| `NativeHook`     | `module`          | Android/iOS | Hook for native functions (C/C++/Rust etc.) |
-| `SwiftHook`      | `swiftClass`      | iOS         | Hook for Swift methods                      |
+| Hook Type        | Platform    | Description                                 |
+| ---------------- | ------------| ------------------------------------------- |
+| `JavaHook`       | Android     | Hook for Java/Kotlin methods                |
+| `ObjectiveCHook` | iOS         | Hook for Objective-C methods                |
+| `NativeHook`     | Android/iOS | Hook for native functions (C/C++/Rust etc.) |
+| `SwiftHook`      | iOS         | Hook for Swift methods                      |
 
 > [!IMPORTANT]
 > When loading a `<hook_configuration>`, frooky will validate it against a JSON schema in order to detect invalid configuration. This makes sure, that the `<hook_configuration>` does not contain hooks for different platforms for example.
@@ -89,12 +94,115 @@ There are differences between Android, iOS or native hooks. Nevertheless, they s
 
 The following properties can be used for all types:
 
-| Property           | Type     | Description                                            |
-| ------------------ | -------- | -------------------------------------------------------|
-| `module`           | string   | Library/framework name. Mandatory for `NativeHook`.    |
-| `stackTraceLimit`  | number   | Maximum stack frames to capture                        |
-| `stackTraceFilter` | string[] | Regex patterns to filter stack traces                  |
-| `debug`            | boolean  | Enable verbose logging                                 |
+| Property           | Type     | Description                                         |
+| ------------------ | -------- | --------------------------------------------------- |
+| `module`           | string   | Library/framework name. Mandatory for `NativeHook`. |
+| `stackTraceLimit`  | number   | Maximum stack frames to capture                     |
+| `stackTraceFilter` | string[] | Regex patterns to filter stack traces               |
+| `debug`            | boolean  | Enable verbose logging                              |
+
+## Terminology, and Declaration Overview
+
+frooky can be used to declare hooks for different targets and programming languages. It is therefor important to be clear about the different conventions  and terminology. In order to avoid confusion, we therefore want to list the most important words with examples from the different platforms:
+
+
+1. **Method**  
+  A function associated with a class or object.
+
+1. **Function**  
+  A native function without an associated class or object.
+
+1. **Symbol**  
+  A unique identifier for a native function.
+
+1. **Type Declaration**  
+  Description of the type according to the platform specific references:
+
+  [Android](https://docs.oracle.com/en/java/javase/25/docs/specs/jni/types.html), [iOS](https://developer.apple.com/documentation/objectivec?language=objc) and [Native](https://en.cppreference.com/w/c/language/declarations.html)
+
+1. **Parameter List**  
+  List of type declaration and their optional name.
+
+1. **Overloading in Java**  
+  In Java/Kotlin methods can be overloaded. A `<java_method_declaration>` is therefore structurally different than `objc_method_declaration` and `<native_symbol_declaration>`.
+
+
+### Shared Declaration
+
+These declarations are used for more than only one types of hooks.
+
+```yaml
+<parameter_declaration>:
+  type: <String>                       # Type declaration according to platform standard
+  name: <String>                       # Optional: Name of the parameter as string
+  decodeAt: enter|exit|both            # Optional: Determines at what time the parameter's argument is decoded, Default: enter
+  decoder: <String>|default            # Optional: Overwrites the default decoded based on the type. Default: default
+```
+
+### `JavaHook` Declaration
+
+```yaml
+javaClass: <String>                    # Fully qualified Java class name
+methods:                               # List of Java methods to hook
+  - <java_method_declaration>
+```
+
+```yaml
+<java_method_declaration>:
+javaClass: <String>                    # Fully qualified Java class name
+methods:                               # List of Java methods to hook
+  - name: <String>                     # Name of the Java method
+    overloads:                         # Optional: List of explicit method overloads
+      - <overloads_declaration>
+```
+
+```yaml
+<overloads_declaration>:
+  - parameters:                        # Parameter list of the overloaded method
+    - <parameter_declaration>
+```
+
+### `ObjectiveCHook` Declaration
+
+```yaml
+objClass: <String>                     # Fully qualified Objective-C class name
+methods:                               # List of Objective-C method declarations to be hooked
+  - <objc_method_declaration>
+```
+
+```yaml
+<objc_method_declaration>:
+  symbol: <String>                     # Native symbol as string
+  returnType: <String>                 # Optional: Return type of the callable
+  parameters:                          # Optional: Parameter list of the callable
+    - <parameter_declaration>
+```
+
+### `NativeHook` Declaration
+
+```yaml
+module: <String>                       # Fully qualified module name
+functions:                             # List of native symbol declaration to be hooked
+  - <native_symbol_declaration>
+```
+
+```yaml
+<native_symbol_declaration>:
+  symbol: <String>                     # Native symbol as string
+  returnType: <String>                 # Optional: Return type of the callable
+  parameters:                          # Optional: Parameter list of the callable
+    - <parameter_declaration>
+```
+
+### `SwiftHook` Declaration
+
+```yaml
+methods:                               # List of mangled Swift symbols
+  - <String> 
+```
+
+> [!NOTE]
+> At the moment, frooky can only hook Swift methods based on their mangled symbol. The symbol contains all information required and is therefore sufficient. For more information about Swift go to [Swift Hook Configuration](#swift-hook-configuration)
 
 ---------------------------
 
@@ -105,9 +213,9 @@ The following properties can be used for all types:
 The minimum necessary properties are `javaClass` and `methods`:
 
 ```yaml
-javaClass: <class>                # Fully qualified Java class name
-methods:                          # List of Java methods to be hooked
-  - <method>
+javaClass: string                      # Fully qualified Java class name
+methods:                               # List of Java methods to hook
+  - name: string                       # Name of the Java method
 ```
 
 For this case *all* methods from the class will be hooked.
@@ -150,11 +258,12 @@ For this case *all* methods from the class will be hooked.
 If you only want to hook a certain overload, specify it by adding one or more `overload`:
 
 ```yaml
-javaClass: <class>                # Fully qualified Java class name 
-methods:
-  - name: <method_name>           # Name of the Java method
-    overloads:                    # List of types which describe the overloads
-      - <type>       
+javaClass: string                      # Fully qualified Java class name
+methods:                               # List of Java methods to hook
+  - name: string                       # Name of the Java method
+    overloads:                         # List of explicit method overloads
+      - parameters:                    # List of parameter declarations for a one overloads
+        - <parameter_declaration>
 ```
 
 > [!NOTE]
@@ -165,16 +274,17 @@ methods:
 > methods:
 >   - name: putExtra
 >     overloads:
->       - - name: name
->           type: java.lang.String
->         - name: value
->           type: java.lang.String
->       - - name: name
->           type: java.lang.String
->         - name: value
->           type: "[Z"
+>       - parameters:
+>         - type: java.lang.String
+>           name: name
+>         - type: java.lang.String
+>           name: value
+>       - parameters:
+>         - type: java.lang.String
+>           name: name
+>         - type: "[Z"
+>           name: value
 >  ```
->
 > This will *only* hook the following methods:
 >
 > ```kotlin
@@ -188,13 +298,13 @@ Frida, and therefore frooky, uses a custom type descriptors which is based on th
 
 The following table shows the different kinds of types and their representation in Java, the JVM and Frida:
 
-| Kind of Type      | Java Type Descriptor                                                                          | JVM Type Descriptor                                          | Frida / frooky Type Descriptor                                                                       |
-|-------------------|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
-| Primitive         | `boolean`<br>`byte`<br>`char`<br>`short`<br>`int`<br>`long`<br>`float`<br>`double`<br>`void`  | `Z`<br>`B`<br>`C`<br>`S`<br>`I`<br>`J`<br>`F`<br>`D`<br>`V`  | `boolean`<br>`byte`<br>`char`<br>`short`<br>`int`<br>`long`<br>`float`<br>`double`<br>`void`         |
-| Primitive Array   | `boolean[]`<br>`byte[]`<br>...                                                                | `[Z`<br>`[B`<br>...                                          | `[Z`<br>`[B`<br>...                                                                                  |
-| Reference         | `java.lang.Object`<br>`org.owasp.MyClass`<br>...                                              | `Ljava/lang/Object;`<br>`Lorg/owasp/MyClass;`<br>...         | `java.lang.Object`<br>`org.owasp.MyClass`<br>...                                                     |
-| Reference Array   | `Object[]`<br>`MyClass[]`<br>...                                                              | `[Ljava/lang/Object;`<br>`[Lorg/owasp/MyClass;`<br>...       | `[Ljava.lang.Object`<br>`[Lorg.owasp.MyClass`<br>...                                                 |
-| Multi-Dimensional | `int[][]`<br>`String[][]`<br>...                                                              | `[[I`<br>`[[Ljava/lang/String;`<br>...                       | `[[int`<br>`[[Ljava.lang.String`<br>...                                                              |
+| Kind of Type      | Java Type Descriptor                                                                         | JVM Type Descriptor                                         | Frida / frooky Type Descriptor                                                               |
+| ----------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Primitive         | `boolean`<br>`byte`<br>`char`<br>`short`<br>`int`<br>`long`<br>`float`<br>`double`<br>`void` | `Z`<br>`B`<br>`C`<br>`S`<br>`I`<br>`J`<br>`F`<br>`D`<br>`V` | `boolean`<br>`byte`<br>`char`<br>`short`<br>`int`<br>`long`<br>`float`<br>`double`<br>`void` |
+| Primitive Array   | `boolean[]`<br>`byte[]`<br>...                                                               | `[Z`<br>`[B`<br>...                                         | `[Z`<br>`[B`<br>...                                                                          |
+| Reference         | `java.lang.Object`<br>`org.owasp.MyClass`<br>...                                             | `Ljava/lang/Object;`<br>`Lorg/owasp/MyClass;`<br>...        | `java.lang.Object`<br>`org.owasp.MyClass`<br>...                                             |
+| Reference Array   | `Object[]`<br>`MyClass[]`<br>...                                                             | `[Ljava/lang/Object;`<br>`[Lorg/owasp/MyClass;`<br>...      | `[Ljava.lang.Object`<br>`[Lorg.owasp.MyClass`<br>...                                         |
+| Multi-Dimensional | `int[][]`<br>`String[][]`<br>...                                                             | `[[I`<br>`[[Ljava/lang/String;`<br>...                      | `[[int`<br>`[[Ljava.lang.String`<br>...                                                      |
 
 ---------------------------
 
@@ -215,9 +325,9 @@ frooky can hook Objective-C instance and type methods.
 The minimum necessary properties are `objcClass` and `methods`:
 
 ```yaml
-objClass: <class>                 # Fully qualified Objective-C class name
-methods:                          # List of Objective-C methods to be hooked
-  - <method>
+objClass: string                       # Fully qualified Objective-C class name
+methods:                               # List of Objective-C method declarations to be hooked
+  - <callable_declaration>
 ```
 
 > [!NOTE]
@@ -248,9 +358,9 @@ This is done by declaring the types in each `<method>`. The syntax the same as u
 objClass: <class>                 # Fully qualified Objective-C class name
 methods:                       
   - name: <method_name>           # Name of the Objective-C method to be hooked
-    args:                         # List of types which describe the positional arguments
-      - <type>   
-    ret: <type>                   # Describes the return type
+    parameters:                   # List of parameters declarations which describe the positional arguments
+      - <parameter_declaration>
+    return: <type>                # Describes the return type
 ```
 
 > [!NOTE]
@@ -363,26 +473,75 @@ functions:
 
 ### Basic Syntax
 
-The minimum necessary properties for a `SwiftHook` are `swiftClass` and `mangledSymbol`:
+The minimum necessary properties for a `SwiftHook` is `methods`:
 
 ```yaml
-- swiftClass: <swift_class>
-  mangledSymbol: <mangled_symbol>
+methods:                          # List of mangled Swift symbol
+  - <method>
 ```
 
 > [!NOTE]
 > **Example:**
 >
 > ```yaml
-> - swiftClass: MyApp.NetworkManager
->   mangledSymbol: _$s5MyApp14NetworkManagerC11sendRequestyyF
+> methods: 
+>   - "_$s5MyApp14NetworkManagerC11sendRequestyyF"
 > ```
 >
-> This `<hook_configuration>` will hook the mangled Swift method symbol.
+> This `<hook_configuration>` will hook the Swift method `MyApp.NetworkManager.sendRequest() -> ()`.
 
-## Data Decoders
+## Advanced Features
 
-Objective-C and native hooks.
+The previous Chapters described how basic method and function hooking. However, some use cases require more advanced configuration. These are discussed in this chapter.
+
+### Time of Decoding
+
+By default, arguments are decoded before the original code is called, and the return value after.
+
+However, datastrucutres are often passed by reference. The function then changes data in the reference directly and returns a status code. If we decode them before the method or function is run, we are not able to access the data we want.
+
+> [!NOTE]
+> **Example on Android:**
+>
+> ```yaml
+> javaClass: javax.crypto.Cipher 
+> methods:
+>   - name: doFinal
+>     overloads:
+>       - - name: output
+>           type: "[B"
+>         - name: outputOffset
+>           type: int
+>  ```
+>
+> This method decrypts data form the current instance and writes it into the byte array `output`. If we decode the array at the beginning, the data we might be interested in is not yet written.
+
+If we want to decode the argument at at different time, we need to specify that using the `decodeAt` property of the `<parameter>`:
+
+
+```yaml
+ <class>                # Fully qualified Java class name 
+name: <method_name>           # Name of the Java method
+type:                    # List of types which describe the overloads
+      - <type>       
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+`ObjectiveCHook` and `NativeHook` configurations have one 
+
+
 
 > [!IMPORTANT]
 > At the moment, frooky provides decoders for simple types. It may therefor be, that the data is not decoded in depth.
