@@ -153,7 +153,7 @@ If you only want to hook a certain overload, specify it by adding one or more `o
 javaClass: <class>                # Fully qualified Java class name 
 methods:
   - name: <method_name>           # Name of the Java method
-    types:                        # List of types which describe the overload
+    overloads:                    # List of types which describe the overloads
       - <type>       
 ```
 
@@ -164,7 +164,7 @@ methods:
 > javaClass: android.content.Intent
 > methods:
 >   - name: putExtra
->     types:
+>     overloads:
 >       - - name: name
 >           type: java.lang.String
 >         - name: value
@@ -248,7 +248,7 @@ This is done by declaring the types in each `<method>`. The syntax the same as u
 objClass: <class>                 # Fully qualified Objective-C class name
 methods:                       
   - name: <method_name>           # Name of the Objective-C method to be hooked
-    types:                        # List of types which describe the positional arguments
+    args:                         # List of types which describe the positional arguments
       - <type>   
     ret: <type>                   # Describes the return type
 ```
@@ -261,7 +261,7 @@ methods:
 > objClass: NSUrl
 > methods:
 >   - name: "+ fileURLWithFileSystemRepresentation"
->     types:
+>     args:
 >       - - name: path
 >           type: (const char *)
 >       - - name: isDir
@@ -328,7 +328,7 @@ This is done by declaring the types in each `<function>`. The syntax the same as
 module: <class>                   # Fully qualified Objective-C class name
 functions:                       
   - symbol: <symbol_name>         
-    types:                        # List of types which describe the positional arguments
+    args:                        # List of types which describe the positional arguments
       - <type>   
     ret: <type>                   # Describes the return type
 ```
@@ -341,7 +341,7 @@ functions:
 > module: libssl.so
 > functions:
 >   - symbol: OSSL_CMP_validate_cert_path
->     types:
+>     args:
 >       - - name: ctx
 >           type: const OSSL_CMP_CTX *
 >       - - name: trusted_store
@@ -393,7 +393,7 @@ Objective-C and native hooks.
 > - objClass: LAPublicKey
 >   methods:
 >   - name: "- decrypt"
->     types:
+>     args:
 >       - - name: data
 >           type: (NSData *)
 >       - - name: algorithm
