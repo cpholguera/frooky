@@ -585,7 +585,7 @@ methods:
           decoder: IntentFlagsDecoder
  ```
 
-The parameter `flags` is a bitwise OR combination of [42 integers](https://developer.android.com/reference/kotlin/android/content/Intent#flags), each meaning something different. If you want to decode the flags on the device, you must provide a custom decoder which takes each flag and does a bitwise AND operation on the `flags` Integer.
+The parameter `flags` is a bitwise OR combination of [37 integers](https://developer.android.com/reference/kotlin/android/content/Intent#flags), each meaning something different. If you want to decode the flags on the device, you must provide a custom decoder which takes each flag and does a bitwise AND operation on the `flags` Integer.
 
 If the result matches the value of the flag, it is set. This is a more stable way of decoding the flags compared to doing that on the host, as the flags may not be the same as on the actual device.
 
