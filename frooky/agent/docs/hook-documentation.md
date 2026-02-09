@@ -12,20 +12,20 @@ This documentation describes the structure of a hook file and provides examples 
 - [Terminology, and Declaration Overview](#terminology-and-declaration-overview)
   - [Shared Declaration](#shared-declaration)
   - [`JavaHook` Declaration](#javahook-declaration)
-  - [`ObjectiveCHook` Declaration](#objectivechook-declaration)
+  - [`ObjcHook` Declaration](#objchook-declaration)
   - [`NativeHook` Declaration](#nativehook-declaration)
   - [`SwiftHook` Declaration](#swifthook-declaration)
-- [Java Hook Configuration](#java-hook-configuration)
+- [`JavaHook` Usage and Examples](#javahook-usage-and-examples)
   - [Basic Syntax](#basic-syntax)
   - [Method Overloads](#method-overloads)
   - [Type Descriptors](#type-descriptors)
-- [Objective-C Hook Configuration](#objective-c-hook-configuration)
+- [`ObjcHook` Usage and Examples](#objchook-usage-and-examples)
   - [Basic Syntax](#basic-syntax-1)
   - [Argument and Return Types](#argument-and-return-types)
-- [Native Hook Configuration](#native-hook-configuration)
+- [`NativeHook` Usage and Examples](#nativehook-usage-and-examples)
   - [Basic Syntax](#basic-syntax-2)
   - [Argument and Return Types](#argument-and-return-types-1)
-- [Swift Hook Configuration](#swift-hook-configuration)
+- [`SwiftHook` Usage and Examples](#swifthook-usage-and-examples)
   - [Basic Syntax](#basic-syntax-3)
 - [Advanced Features](#advanced-features)
   - [Time of Decoding](#time-of-decoding)
@@ -119,8 +119,8 @@ frooky can be used to declare hooks for different targets and programming langua
 1. **Symbol**  
   A unique identifier for a native function in a compiled binary.
 
-1. **Type Descriptor**  
-  Description of the type according to the platform specific references: [Android](https://docs.oracle.com/en/java/javase/25/docs/specs/jni/types.html), [iOS](https://developer.apple.com/documentation/objectivec?language=objc) and [Native](https://en.cppreference.com/w/c/language/declarations.html)
+1. **Type, Function and Method Descriptors**  
+   String representations describing types, functions, or methods according to platform-specific conventions: [Android](https://docs.oracle.com/en/java/javase/25/docs/specs/jni/types.html), [iOS](https://developer.apple.com/documentation/objectivec?language=objc) and [Native](https://en.cppreference.com/w/c/language/declarations.html)
 
 1. **Parameter Declaration**  
   A combination of type descriptor and optional parameter name used in method and function declarations.
@@ -134,7 +134,7 @@ These declarations are used for more than only one types of hooks.
 
 ```yaml
 <parameter_declaration>:
-  type: <string>                       # Type descriptor according to platform standard
+  type: <string>                       # Type notation according to platform standard
   name: <string>                       # Optional: Name of the parameter
   decodeAt: enter|exit|both            # Optional: When to decode the parameter. Default: enter
   decoder: <string>|autoSelect         # Optional: Custom decoder name. Default: autoSelect
@@ -172,10 +172,10 @@ methods:                               # List of Java methods to hook
     - <parameter_declaration>
 ```
 
-## `ObjectiveCHook` Declaration
+## `ObjcHook` Declaration
 
 ```yaml
-objClass: <string>                     # Fully qualified Objective-C class name
+objcClass: <string>                     # Fully qualified Objective-C class name
 methods:                               # List of Objective-C method declarations to be hooked
   - <objc_method_declaration>
 ```
@@ -216,7 +216,7 @@ methods:                               # List of mangled Swift symbols
 
 ---------------------------
 
-# Java Hook Configuration
+# `JavaHook` Usage and Examples
 
 ## Basic Syntax
 
@@ -322,7 +322,7 @@ The following table shows the different kinds of types and their representation 
 
 ---------------------------
 
-# Objective-C Hook Configuration
+# `ObjcHook` Usage and Examples
 
 frooky can hook Objective-C instance and class methods.
 
@@ -336,10 +336,10 @@ frooky can hook Objective-C instance and class methods.
 
 ## Basic Syntax
 
-The minimum necessary properties are `objClass` and `methods`:
+The minimum necessary properties are `objcClass` and `methods`:
 
 ```yaml
-objClass: <string>                     # Fully qualified Objective-C class name
+objcClass: <string>                     # Fully qualified Objective-C class name
 methods:                               # List of Objective-C method declarations to be hooked
   - <objc_method_declaration>
 ```
@@ -348,7 +348,7 @@ methods:                               # List of Objective-C method declarations
 > **Example:**
 >
 > ```yaml
-> objClass: LAContext
+> objcClass: LAContext
 > methods:
 >  - name: "- invalidate"
 > ```
@@ -369,7 +369,7 @@ If a method has a return value or method arguments, frooky needs to know how to 
 This is done by declaring the types in each `<method>`. The syntax is the same as used in the [official documentation](https://developer.apple.com/documentation?language=objc).
 
 ```yaml
-objClass: <string>                     # Fully qualified Objective-C class name
+objcClass: <string>                     # Fully qualified Objective-C class name
 methods:                       
   - name: <string>                     # Name of the Objective-C method (include - or + prefix)
     returnType: <string>               # Return type of the Objective-C method
@@ -382,7 +382,7 @@ methods:
 > **Example:**
 >
 > ```yaml
-> objClass: NSURL
+> objcClass: NSURL
 > methods:
 >   - name: "+ fileURLWithFileSystemRepresentation"
 >     returnType: (NSURL *)
@@ -403,7 +403,7 @@ methods:
 >                                   relativeToURL:(NSURL *) baseURL;
 > ```
 
-# Native Hook Configuration
+# `NativeHook` Usage and Examples
 
 > [!IMPORTANT]
 > In order to hook native functions, symbols must not be stripped. However, this is done by default for release builds on both [Android](https://developer.android.com/build/include-native-symbols) and [iOS](https://developer.apple.com/documentation/xcode/build-settings-reference#Symbols-Hidden-by-Default).
@@ -484,7 +484,7 @@ functions:                             # List of native symbol declarations to b
 >                                X509_STORE *trusted_store, X509 *cert);
 > ```
 
-# Swift Hook Configuration
+# `SwiftHook` Usage and Examples
 
 > [!IMPORTANT]
 > At the moment, frooky only supports `SwiftHook` if the mangled symbols have not been stripped. These are required to lookup the location of the method during runtime. Usually, production builds are stripped of them.
@@ -600,7 +600,7 @@ If the result matches the value of the flag, it is set. This is a more stable wa
 > **Example Code:**
 >
 > ```yaml
-> objClass: LAPrivateKey
+> objcClass: LAPrivateKey
 > methods:
 >   - name: "- decryptData"
 >     parameters:
@@ -633,7 +633,7 @@ If the result matches the value of the flag, it is set. This is a more stable wa
 To access the decrypted data, we must hook the handler implementation itself, as we need to intercept its first argument `(NSData *, NSError *)` when the method calls the handler after decryption finishes. For that we can write a custom decoder, let's call it `LaPlaintextDecoder`, and overwrite the default decoder for the `handler` argument:
 
 ```yaml
-objClass: LAPrivateKey
+objcClass: LAPrivateKey
 methods:
   - name: "- decryptData"
     parameters:
