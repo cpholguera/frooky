@@ -1,11 +1,11 @@
-# Frooky Hook Documentation
+# frooky Hook Documentation
 
 A frooky hook configuration describes how to hook a Java, Swift, Objective-C or native process.
 
 This documentation describes the structure of a hook file and provides examples for the various cases.
 
-- [Frooky Hook Documentation](#frooky-hook-documentation)
-- [Frooky Configuration](#frooky-configuration)
+- [frooky Hook Documentation](#frooky-hook-documentation)
+- [frooky Configuration](#frooky-configuration)
 - [Basic Hook Configuration](#basic-hook-configuration)
   - [Hook Types](#hook-types)
   - [Properties for All Type of Hooks](#properties-for-all-type-of-hooks)
@@ -21,21 +21,21 @@ This documentation describes the structure of a hook file and provides examples 
   - [Type Descriptors](#type-descriptors)
 - [`ObjcHook` Usage and Examples](#objchook-usage-and-examples)
   - [Basic Syntax](#basic-syntax-1)
-  - [Argument and Return Types](#argument-and-return-types)
+  - [Parameter and Return Types](#parameter-and-return-types)
 - [`NativeHook` Usage and Examples](#nativehook-usage-and-examples)
   - [Basic Syntax](#basic-syntax-2)
-  - [Argument and Return Types](#argument-and-return-types-1)
+  - [Parameter and Return Types](#parameter-and-return-types-1)
 - [`SwiftHook` Usage and Examples](#swifthook-usage-and-examples)
   - [Basic Syntax](#basic-syntax-3)
 - [Advanced Features](#advanced-features)
   - [Time of Decoding](#time-of-decoding)
   - [Custom Decoders](#custom-decoders)
-    - [Example 1: Decode an Integer as Flags](#example-1-decode-an-integer-as-flags)
-    - [Example 2: Handle Asynchronous Callback](#example-2-handle-asynchronous-callback)
-  
-For each of the feature described here, there are examples in the [examples folder](../docs/examples/).
+  - [Event Filters](#event-filters)
 
-# Frooky Configuration
+  
+For each of the feature described here, there are [YAML](../docs/examples/yaml/) and [TypeScript](../docs/examples/typeScript/) examples available.
+
+# frooky Configuration
 
 A frooky configuration contains optional metadata about the hook collection, and a set of `<hook_configuration>`.
 
@@ -81,7 +81,7 @@ A `<hook_configuration>` consists of one or more of the following hook types:
 
 What kind of a type the `<hook_configuration>` is, is determined by a unique property.
 
-Frooky supports four types of hooks:
+frooky supports four types of hooks:
 
 | Hook Type        | Platform    | Description                                 |
 | ---------------- | ----------- | ------------------------------------------- |
@@ -99,12 +99,12 @@ There are differences between Android, iOS or native hooks. Nevertheless, they s
 
 The following properties can be used for all types:
 
-| Property           | Type     | Description                                                                    |
-| ------------------ | -------- | ------------------------------------------------------------------------------ |
-| `module`           | string   | Library/framework name. Mandatory for `NativeHook`.                            |
-| `stackTraceLimit`  | number   | Maximum stack frames to capture (default: 10)                                  |
-| `stackTraceFilter` | string[] | Regex patterns to filter stack traces (see examples below)                     |
-| `debug`            | boolean  | Enable verbose logging                                                         |
+| Property           | Type     | Description                                                |
+| ------------------ | -------- | ---------------------------------------------------------- |
+| `module`           | string   | Library/framework name. Mandatory for `NativeHook`.        |
+| `stackTraceLimit`  | number   | Maximum stack frames to capture (default: 10)              |
+| `stackTraceFilter` | string[] | Regex patterns to filter stack traces (see examples below) |
+| `debug`            | boolean  | Enable verbose logging                                     |
 
 # Terminology, and Declaration Overview
 
@@ -212,7 +212,7 @@ methods:                               # List of mangled Swift symbols
 ```
 
 > [!NOTE]
-> At the moment, frooky can only hook Swift methods based on their mangled symbol. The symbol contains all information required and is therefore sufficient. For more information about Swift go to [Swift Hook Configuration](#swift-hook-configuration)
+> At the moment, frooky can only hook Swift methods based on their mangled symbol. The symbol contains all information required and is therefore sufficient. For more information about Swift go to [`SwiftHook` Usage and Examples](#swifthook-usage-and-examples).
 
 ---------------------------
 
@@ -362,9 +362,9 @@ methods:                               # List of Objective-C method declarations
 > frooky will capture when this function is called and generate an event. Since the function takes no arguments and returns no value, the event will only contain timing and call stack information.
 >
 
-## Argument and Return Types
+## Parameter and Return Types
 
-If a method has a return value or method arguments, frooky needs to know how to decode them.
+When a method accepts parameters or returns a value, frooky needs to know how to decode them.
 
 This is done by declaring the types in each `<method>`. The syntax is the same as used in the [official documentation](https://developer.apple.com/documentation?language=objc).
 
@@ -395,7 +395,7 @@ methods:
 >         name: baseURL
 >  ```
 >
-> Frooky will try to decode the arguments and the return value based on the type. This `<hook_configuration>` will hook the following [Objective-C class method](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
+> frooky will try to decode the arguments and the return value based on the type. This `<hook_configuration>` will hook the following [Objective-C class method](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
 >
 > ```objectivec
 > + (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
@@ -442,9 +442,9 @@ functions:                             # List of native symbol declarations to b
 >
 > frooky will capture when these functions are called and generate events. Since the functions take no arguments and return no value, the events will only contain timing and call stack information.
 
-## Argument and Return Types
+## Parameter and Return Types
 
-If a native function has a return value or arguments, frooky needs to know how to decode them.
+When a method accepts parameters or returns a value, frooky needs to know how to decode them.
 
 This is done by declaring the types in each `<function>`. The syntax is the same as [C function declarations](https://en.cppreference.com/w/c/language/function_declaration.html).
 
@@ -475,7 +475,7 @@ functions:                             # List of native symbol declarations to b
 >         name: cert
 > ```
 >
-> Frooky will try to decode the arguments and the return value based on the type.
+> frooky will try to decode the arguments and the return value based on the parameter type.
 >
 > This `<hook_configuration>` will hook the following function from the [OpenSSL Library](https://docs.openssl.org/master/man3/OSSL_CMP_validate_msg/):
 >
@@ -526,42 +526,40 @@ By default, arguments are decoded before the original code is called (`enter`), 
 
 However, data structures are often passed by reference. The function then changes data in the reference directly and returns a status code. If we decode them before the method or function is run, we are not able to access the data we want.
 
-> [!NOTE]
-> **Default decoding at method entry on Android:**
->
-> ```yaml
-> javaClass: javax.crypto.Cipher 
-> methods:
->   - name: doFinal
->     overloads:
->       - parameters:
->         - type: "[B"
->           name: output
->         - type: int
->           name: outputOffset
->  ```
->
-> This method decrypts data from the current instance and writes it into the byte array `output`. The return value is an `int` with the number of bytes written into `output`. If we decode the `output` at the beginning, we won't find any decrypted data yet.
+**Default decoding at method entry on Android:**
+
+```yaml
+javaClass: javax.crypto.Cipher 
+methods:
+  - name: doFinal
+    overloads:
+      - parameters:
+        - type: "[B"
+          name: output
+        - type: int
+          name: outputOffset
+```
+
+This method decrypts data from the current instance and writes it into the byte array `output`. The return value is an `int` with the number of bytes written into `output`. If we decode the `output` at the beginning, we won't find any decrypted data yet.
 
 If we want to decode the argument at a different time, we need to specify that using the `decodeAt` property of the `<parameter_declaration>`:
 
-> [!NOTE]
-> **Decoding at method exit on Android:**
->
-> ```yaml
-> javaClass: javax.crypto.Cipher 
-> methods:
->   - name: doFinal
->     overloads:
->       - parameters:
->         - type: "[B"
->           name: output
->           decodeAt: exit
->         - type: int
->           name: outputOffset
->  ```
->
-> Now, `output` is decoded before the method exits, capturing the decrypted data.
+**Decoding at method exit on Android:**
+
+```yaml
+javaClass: javax.crypto.Cipher 
+methods:
+  - name: doFinal
+    overloads:
+      - parameters:
+        - type: "[B"
+          name: output
+          decodeAt: exit
+        - type: int
+          name: outputOffset
+ ```
+
+Now, `output` is decoded before the method exits, capturing the decrypted data.
 
 > [!TIP]
 > Use `decodeAt: both` to capture the value at both entry and exit, useful for comparing before/after states.
@@ -574,61 +572,55 @@ For example, an `int` will always be decoded as a number and if there is no deco
 
 For some cases you want to manually bypass the automatic decoder matching. Two examples:
 
-### Example 1: Decode an Integer as Flags
+**Example 1: Decode an Integer as Flags**
 
-> [!NOTE]
-> **Example Code:**
->
-> ```yaml
-> javaClass: android.content.Intent
-> methods:
->   - name: setFlags
->     overloads:
->       - parameters:
->         - type: int
->           name: flags
->           decoder: IntentFlagsDecoder
->  ```
+```yaml
+javaClass: android.content.Intent
+methods:
+  - name: setFlags
+    overloads:
+      - parameters:
+        - type: int
+          name: flags
+          decoder: IntentFlagsDecoder
+ ```
 
 The parameter `flags` is a bitwise OR combination of [42 integers](https://developer.android.com/reference/kotlin/android/content/Intent#flags), each meaning something different. If you want to decode the flags on the device, you must provide a custom decoder which takes each flag and does a bitwise AND operation on the `flags` Integer.
 
 If the result matches the value of the flag, it is set. This is a more stable way of decoding the flags compared to doing that on the host, as the flags may not be the same as on the actual device.
 
-### Example 2: Handle Asynchronous Callback
+**Example 2: Handle Asynchronous Callback**
 
-> [!NOTE]
-> **Example Code:**
+```yaml
+objcClass: LAPrivateKey
+methods:
+  - name: "- decryptData"
+    parameters:
+      - type: (NSData *)
+        name: data
+      - type: (SecKeyAlgorithm)
+        name: algorithm
+      - type: (void (^)(NSData *, NSError *))
+        name: handler
+```
 >
-> ```yaml
-> objcClass: LAPrivateKey
-> methods:
->   - name: "- decryptData"
->     parameters:
->       - type: (NSData *)
->         name: data
->       - type: (SecKeyAlgorithm)
->         name: algorithm
->       - type: (void (^)(NSData *, NSError *))
->         name: handler
-> ```
+This `<hook_configuration>` hooks the following method:
 >
-> This `<hook_configuration>` hooks the following method:
->
-> ```objectivec
-> - (void) decryptData:(NSData *) data 
->      secKeyAlgorithm:(SecKeyAlgorithm) algorithm 
->           completion:(void (^)(NSData *, NSError *)) handler;
-> ```
->
-> It decrypts the data and invokes the handler upon completion. The method would for example be called like that:
->
-> ```objectivec
-> [self decryptData:myData 
->  secKeyAlgorithm:kSecKeyAlgorithmRSAEncryptionOAEPSHA256 
->        completion:^(NSData *result, NSError *error) {
->           // handle result with the decrypted data
->       }];
-> ```
+```objectivec
+- (void) decryptData:(NSData *) data 
+     secKeyAlgorithm:(SecKeyAlgorithm) algorithm 
+          completion:(void (^)(NSData *, NSError *)) handler;
+```
+
+It decrypts the data and invokes the handler upon completion. The method would for example be called like that:
+
+```objectivec
+[self decryptData:myData 
+ secKeyAlgorithm:kSecKeyAlgorithmRSAEncryptionOAEPSHA256 
+       completion:^(NSData *result, NSError *error) {
+          // handle result with the decrypted data
+      }];
+```
 
 To access the decrypted data, we must hook the handler implementation itself, as we need to intercept its first argument `(NSData *, NSError *)` when the method calls the handler after decryption finishes. For that we can write a custom decoder, let's call it `LaPlaintextDecoder`, and overwrite the default decoder for the `handler` argument:
 
@@ -653,3 +645,59 @@ The decoder must:
 3. Intercept the callback when it's invoked
 
 Once the handler is called by the decryption method, the hook intercepts the first parameter containing the decrypted plaintext as `NSData *`.
+
+## Event Filters
+
+If you hook a method which is used widely, it may be that you capture may events you are not interested in. This makes the analysis more difficult.
+
+An example is `SharedPreferences` on Android. Let's assume, you want to know, if the target app uses them to store sensitive data on the device:
+
+```yaml
+javaClass: android.app.SharedPreferencesImpl$EditorImpl
+methods:
+  - name: putString
+```
+
+frooky will capture the events you are looking for, but also many more, like the following one:
+
+```json
+{
+  "id": "169a35b1-da19-492f-a90c-74d7cc5bdb3a",
+  "type": "hook",
+  "category": "STORAGE",
+  "time": "2026-02-09T09:08:32.125Z",
+  "class": "android.app.SharedPreferencesImpl$EditorImpl",
+  "method": "putString",
+  "instanceId": 175301911,
+  "stackTrace": [
+    "android.app.SharedPreferencesImpl$EditorImpl.putString(Native Method)",
+    "com.google.crypto.tink.integration.android.SharedPrefKeysetWriter.write(SharedPrefKeysetWriter.java:70)",
+    "com.google.crypto.tink.KeysetHandle.writeWithAssociatedData(KeysetHandle.java:869)",
+    "com.google.crypto.tink.KeysetHandle.write(KeysetHandle.java:858)",
+    "com.google.crypto.tink.integration.android.AndroidKeysetManager$Builder.generateKeysetAndWriteToPrefs(AndroidKeysetManager.java:353)",
+    "com.google.crypto.tink.integration.android.AndroidKeysetManager$Builder.build(AndroidKeysetManager.java:292)",
+    "androidx.security.crypto.EncryptedSharedPreferences.create(EncryptedSharedPreferences.java:169)",
+    "androidx.security.crypto.EncryptedSharedPreferences.create(EncryptedSharedPreferences.java:131)"
+  ],
+  "inputParameters": [
+    {
+      "declaredType": "java.lang.String",
+      "value": "__androidx_security_crypto_encrypted_prefs_key_keyset__"
+    },
+[...]
+```
+
+This method call is initiated by Android when `EncryptedSharedPreferences` are initiated. This library uses `SharedPreferences` to store an encryption key.
+
+Usually, these events are not of interest to security testers, as they want to test the actual target app and not OS libraries.
+
+To filter out events which are not originating from the target app, frooky can filter events based on the stack trace. The following `<hook_configuration>` will only capture events where the target package name matches the stack trace:
+
+```yaml
+javaClass: android.app.SharedPreferencesImpl$EditorImpl
+methods:
+  - name: putString
+  - stackTraceFilter: "^org\.owasp\.mastestapp"
+```
+
+With this filter, the noise can be reduced.
