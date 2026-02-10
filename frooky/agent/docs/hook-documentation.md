@@ -139,6 +139,8 @@ These declarations are used for more than only one types of hooks.
   name: <string>                       # Optional: Name of the parameter
   decodeAt: enter|exit|both            # Optional: When to decode the parameter. Default: enter
   decoder: <string>|autoSelect         # Optional: Custom decoder name. Default: autoSelect
+  decoderParameters:                   # Optional: List of YAML aliases to parameter anchors
+    - <decoder_parameter>
 ```
 
 > [!NOTE]
@@ -593,13 +595,13 @@ functions:
         name: ctx
       - type: unsigned char *
         name: out
-        decoderArguments:
+        decoderParameters:
           - *outl                      # Resolves to "outl"
       - type: int *
         name: &outl outl               # Creates an anchor to "outl"
       - type: const unsigned char *
         name: in
-        decoderArguments:
+        decoderParameters:
           - *inl                       # Resolves to "inl"
       - type: int
         name: &inl inl                 # Creates an anchor to "inl"
