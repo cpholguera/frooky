@@ -29,6 +29,7 @@ This documentation describes the structure of a hook file and provides examples 
   - [Basic Syntax](#basic-syntax-3)
 - [Advanced Features](#advanced-features)
   - [Time of Decoding](#time-of-decoding)
+  - [Decoders with Parameters](#decoders-with-parameters)
   - [Custom Decoders](#custom-decoders)
   - [Event Filters](#event-filters)
 
@@ -563,6 +564,48 @@ Now, `output` is decoded before the method exits, capturing the decrypted data.
 
 > [!TIP]
 > Use `decodeAt: both` to capture the value at both entry and exit, useful for comparing before/after states.
+
+## Decoders with Parameters
+
+In native functions, primitive arrays are passed by reference. In some cases, the length is determined by a conventional terminating character, such as `\n` in a string. For generic byte array however, the length must be explicitly stated.
+
+Method and functions therefore declare parameters which are used to determine the length of another parameter.
+
+> [!NOTE]
+> **Example:**
+>
+> ```c
+> int EVP_EncryptUpdate(EVP_CIPHER_CTX *ctx, unsigned char *out,
+>                      int *outl, const unsigned char *in, int inl);
+> ```
+>
+> This function encrypts `inl` bytes from the buffer `in` and writes the encrypted version to `out`.
+
+Hence, the a native array decoder must be parameterized. You can pass any argument from the parameter list to the decoder using the following syntax:
+
+```yaml
+module: libssl.so
+functions:
+  - symbol: EVP_EncryptUpdate
+    returnType: int
+    parameters:
+      - type: EVP_CIPHER_CTX *
+        name: ctx
+      - type: unsigned char *
+        name: out
+        decoderArguments:
+          - *outl_ref outl
+      - type: int *
+        name: *outl_ref
+      - type: const unsigned char *
+        name: in
+        decoderArguments:
+          - &inl_ref inl
+      - type: int
+        name: *inl_ref
+```
+
+Now, the decoder for the type `unsigned char *` is able to decode the array with a length of `int * outl` byes, and the value from the parameter `int intl`  is passed to the  decoder for the type `const unsigned char *`.
 
 ## Custom Decoders
 
