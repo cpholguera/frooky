@@ -579,9 +579,9 @@ Method and functions therefore declare parameters which are used to determine th
 >                      int *outl, const unsigned char *in, int inl);
 > ```
 >
-> This function encrypts `inl` bytes from the buffer `in` and writes the encrypted version to `out`.
+> This function encrypts `inl` bytes from the buffer `in` and writes the encrypted version to `out`. Depending on the type of encryption algorithm used, it is unclear how many bytes will be written at the time the function is called. The actual number of bytes written, is placed in  `outl`.
 
-Hence, the a native array decoder must be parameterized. You can pass any argument from the parameter list to the decoder using the following syntax:
+Hence, the a native array decoder must be parameterized. You can pass any argument from the parameter list to the decoder using YAML anchors (`&`) and aliases (`*`):
 
 ```yaml
 module: libssl.so
