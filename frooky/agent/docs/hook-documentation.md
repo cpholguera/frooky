@@ -607,7 +607,7 @@ functions:
         name: &inl inl                 # Creates an anchor to "inl"
 ```
 
-Now, the decoder for the type `unsigned char *` is able to decode the array with a length of `int * outl` bytes, and the value from the parameter `int intl`  is passed to the  decoder for the type `const unsigned char *`.
+Now, the decoder for the type `unsigned char *` is able to decode the array with a length of `int * outl` bytes, and the value from the parameter `int intl` is passed to the  decoder for the type `const unsigned char *`.
 
 ## Custom Decoders
 
