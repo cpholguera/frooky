@@ -594,18 +594,18 @@ functions:
       - type: unsigned char *
         name: out
         decoderArguments:
-          - &outl_ref outl
+          - *outl                      # Resolves to "outl"
       - type: int *
-        name: *outl_ref
+        name: &outl outl               # Creates an anchor to "outl"
       - type: const unsigned char *
         name: in
         decoderArguments:
-          - &inl_ref inl
+          - *inl                       # Resolves to "inl"
       - type: int
-        name: *inl_ref
+        name: &inl inl                 # Creates an anchor to "inl"
 ```
 
-Now, the decoder for the type `unsigned char *` is able to decode the array with a length of `int * outl` byes, and the value from the parameter `int intl`  is passed to the  decoder for the type `const unsigned char *`.
+Now, the decoder for the type `unsigned char *` is able to decode the array with a length of `int * outl` bytes, and the value from the parameter `int intl`  is passed to the  decoder for the type `const unsigned char *`.
 
 ## Custom Decoders
 
