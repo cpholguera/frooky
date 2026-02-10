@@ -594,7 +594,7 @@ functions:
       - type: unsigned char *
         name: out
         decoderArguments:
-          - *outl_ref outl
+          - &outl_ref outl
       - type: int *
         name: *outl_ref
       - type: const unsigned char *
