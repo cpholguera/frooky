@@ -33,7 +33,6 @@ This documentation describes the structure of a hook file and provides examples 
   - [Custom Decoders](#custom-decoders)
   - [Event Filters](#event-filters)
 
-  
 For each of the feature described here, there are [YAML](../docs/examples/yaml/) and [TypeScript](../docs/examples/typeScript/) examples available.
 
 # frooky Configuration
