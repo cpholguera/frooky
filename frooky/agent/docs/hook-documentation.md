@@ -596,15 +596,15 @@ functions:
       - type: unsigned char *
         name: out
         decoderParameters:
-          - *outl                      # Resolves to "outl"
+          - outl                       # We pass 'int *outl' to the decoder for 'unsigned char *'
       - type: int *
-        name: &outl outl               # Creates an anchor to "outl"
+        name: outl
       - type: const unsigned char *
         name: in
         decoderParameters:
-          - *inl                       # Resolves to "inl"
+          - inl                        # We pass 'int inl' to the decoder for 'const unsigned char *'
       - type: int
-        name: &inl inl                 # Creates an anchor to "inl"
+        name: inl
 ```
 
 Now, the decoder for the type `unsigned char *` is able to decode the array with a length of `int * outl` bytes, and the value from the parameter `int intl` is passed to the  decoder for the type `const unsigned char *`.
