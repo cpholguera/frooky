@@ -2,6 +2,12 @@
 
 This documentation will tell you everything you need to know about the frooky agent and its features.
 
+- [What is the frooky Agent?](#what-is-the-frooky-agent)
+- [Declaring Hooks](#declaring-hooks)
+- [How to Compile the Standalone Frooky Agent](#how-to-compile-the-standalone-frooky-agent)
+  - [Install packages](#install-packages)
+- [Development workflow](#development-workflow)
+
 ## What is the frooky Agent?
 
 The frooky agent is the part of frooky which is executed on the target device (Android or iOS). It is written in TypeScript and does all the heavy lifting like:
