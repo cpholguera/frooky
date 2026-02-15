@@ -237,7 +237,6 @@ For this case *all* overloads of the specified methods from the class will be ho
 >
 > ```yaml
 > javaClass: android.webkit.WebView 
-> methods:
 >   - name: $init
 >   - name: loadUrl
 > ```

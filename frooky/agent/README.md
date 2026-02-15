@@ -51,12 +51,17 @@ hooks:                            # Collection of hook configurations
 >   - <hook_configuration> 
 > ```
 
+Before writing hook configuration, we recommended reading the following documentation:
+
+- [Decoder Configuration](docs/decoder-configuration.md)
+- [Parameter Declaration](docs/parameter-configuration.md)
+- [Return Type Declaration](docs/return-type-configuration.md)
+
 For more on writing hook configurations please read:
 
-- [Java Hooks](docs/java-hooks.md)
-- [Objective-C Hook](docs/objective-c-hooks.md)
-- [Swift Hooks](docs/swift-hooks.md)
-- [Native Hooks](docs/native-hooks.md)
+- [Java Hook Configuration](docs/java-hook-configuration.md)
+- [Objective-C Hook Configuration](docs/objective-c-hook-configuration.md)
+- [Native Hook Configuration](docs/native-hook-configuration.md)
 
 ## How to Compile the Standalone Frooky Agent
 
