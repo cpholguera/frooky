@@ -35,6 +35,14 @@ This is the most simple way of defining a parameter solely based on its type. fr
 
 ### 1.1. Unnamed Java Parameters
 
+> [!NOTE]
+> This example hooks the following constructors from the [Android Java Library](https://developer.android.com/reference/kotlin/android/webkit/WebView#public-constructors):
+>
+> ```kotlin
+> WebView(context: Context)
+> WebView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, privateBrowsing: Boolean)
+> ```
+
 ```yaml
 javaClass: android.webkit.WebView
 methods:
@@ -44,14 +52,16 @@ methods:
       - params: [ android.content.Context, android.util.AttributeSet, int, boolean ]
 ```
 
-This `<hook_configuration>` will hook the following method:
-
-```kotlin
-WebView(context: Context)
-WebView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, privateBrowsing: Boolean)
-```
-
 ### 1.2. Unnamed Objective-C Parameters
+
+> [!NOTE]
+> This example hooks the following class method from  [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
+>
+> ```objectivec
+> + (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
+>                                     isDirectory:(BOOL) isDir 
+>                                   relativeToURL:(NSURL *) baseURL;
+> ```
 
 ```yaml
 objcClass: NSURL
@@ -61,15 +71,20 @@ methods:
     params: [ "(const char *)", "(BOOL)", "(NSURL *)" ]
 ```
 
-This `<hook_configuration>` will hook the following [Objective-C class method](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
-
-```objectivec
-+ (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
-                                    isDirectory:(BOOL) isDir 
-                                  relativeToURL:(NSURL *) baseURL;
-```
-
 ### 1.3. Unnamed Native Parameters
+
+> [!NOTE]
+> This example hooks the following method from the [SQLite function](https://sqlite.org/c3ref/exec.html):
+>
+> ```c
+> int sqlite3_exec(
+>   sqlite3*,                                  /* An open database */
+>   const char *sql,                           /* SQL to be evaluated */
+>   int (*callback)(void*,int,char**,char**),  /* Callback function */
+>   void *,                                    /* 1st argument to callback */
+>   char **errmsg                              /* Error msg written here */
+> );
+> ```
 
 ```yaml
 module: sqlite3.so
@@ -79,24 +94,9 @@ functions:
     params: [ "sqlite3*", "const char *", "void *", "void *", "char **" ]
 ```
 
-This `<hook_configuration>` will hook the following [SQLite function](https://sqlite.org/c3ref/exec.html):
-
-```c
-int sqlite3_exec(
-  sqlite3*,                                  /* An open database */
-  const char *sql,                           /* SQL to be evaluated */
-  int (*callback)(void*,int,char**,char**),  /* Callback function */
-  void *,                                    /* 1st argument to callback */
-  char **errmsg                              /* Error msg written here */
-);
-```
-
-> [!IMPORTANT]
-> The 3rd parameter is a pointer to the callback function. Please see also [Decoders](#31-decoder-option-custom-decoder) for more information, about how to handle a fallback function.
-
 ## 2. Named Parameters
 
-If you want declare the name of the parameter, you have must use an array for the type an name pair.
+If you want declare the name of the parameter, you must use an array for the type an name pair.
 
 > [!IMPORTANT]
 > The first element is the type of the parameter, the second the name.
