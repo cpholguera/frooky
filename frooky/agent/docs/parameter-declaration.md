@@ -1,6 +1,6 @@
-# Parameter Configuration
+# Parameter Declaration
 
-frooky needs to know a function or method's signature in order to hook it correctly. Part of this signature is the parameter list which is a set of types and names for the arguments passed to the function or method.
+frooky needs to know a function or method's signature in order to hook it correctly. Part of this signature is the parameter list which is a set of types and names for the arguments passed to the function or method. This documentation explains how to declare parameters.
 
 - [1. Unnamed Parameters](#1-unnamed-parameters)
   - [1.1. Unnamed Java Parameters](#11-unnamed-java-parameters)
@@ -27,11 +27,11 @@ frooky needs to know a function or method's signature in order to hook it correc
 > [!TIP]
 > Technically, the name of an argument is not required, but it is recommended declaring the name as well, as this makes a declaration easier to read and provides more context information in the output of frooky.
 
-There are different accepted ways defining a parameter. The following chapters explain them.
+There are different accepted ways declaring a parameter. The following chapters explain them.
 
 ## 1. Unnamed Parameters
 
-This is the most simple way of defining a parameter solely based on its type. frooky will try to decode the arguments based on the automatically selected decoder.
+This is the most simple declaration, solely based on its type. frooky will try to decode the arguments based on the automatically selected decoder.
 
 ### 1.1. Unnamed Java Parameters
 
@@ -219,10 +219,10 @@ methods:
   - name: setFlags
     overloads:
       - params:
-        - [ int, flags, { decoder: IntentFlagsDecoder } ]
+        - [ int, flags, { decoder: intentFlagsDecoder } ]
 ```
 
-The parameter `flags` is a bitwise OR combination of [special flags](https://developer.android.com/reference/kotlin/android/content/Intent#flags), each controlling how this intent is handled. The custom decoder `IntentFlagsDecoder` extracts the information again by doing a bitwise AND operation on the `flags` Integer with each flag.
+The parameter `flags` is a bitwise OR combination of [special flags](https://developer.android.com/reference/kotlin/android/content/Intent#flags), each controlling how this intent is handled. The custom decoder `intentFlagsDecoder` extracts the information again by doing a bitwise AND operation on the `flags` Integer with each flag.
 
 If the result matches the value of the flag, it is set. This is a more stable way of decoding the flags compared to doing that on the frooky host, as the flags may not be the same as on the actual device.
 

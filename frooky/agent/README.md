@@ -59,9 +59,8 @@ hooks:                            # Collection of hook configurations
 
 Before writing hook configuration, we recommended reading the following documentation:
 
-- [Decoder Configuration](docs/decoder-configuration.md)
-- [Parameter Declaration](docs/parameter-configuration.md)
-- [Return Type Declaration](docs/return-type-configuration.md)
+- [Parameter Declaration](docs/parameter-declaration.md)
+- [Return Type Declaration](docs/return-type-declaration.md)
 
 For more on writing hook configurations please read:
 
