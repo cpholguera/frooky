@@ -13,9 +13,7 @@ The return type declaration is a simpler variant of a [parameter declaration](./
     - [3.1.2. Custom Decoder in Objective-C](#312-custom-decoder-in-objective-c)
     - [3.1.3. Custom Decoder in Native](#313-custom-decoder-in-native)
   - [3.2. `decoderArgs`-Option: Pass Arguments to Decoder](#32-decoderargs-option-pass-arguments-to-decoder)
-    - [3.2.1. Pass Arguments to Decoder in Java](#321-pass-arguments-to-decoder-in-java)
     - [3.2.2. Pass Arguments to Decoder in Objective-C](#322-pass-arguments-to-decoder-in-objective-c)
-    - [3.2.3. Pass Arguments to Decoder in Native](#323-pass-arguments-to-decoder-in-native)
 
 ## 1. Differences to Parameter Declaration
 
@@ -152,35 +150,12 @@ The return value is the number identifying the cipher suite. The custom decoder 
 
 ### 3.2. `decoderArgs`-Option: Pass Arguments to Decoder
 
-#### 3.2.1. Pass Arguments to Decoder in Java
-
-<!-- > [!NOTE]
-> This example hooks the following constructors from the [Android Java Library](https://developer.android.com/reference/kotlin/android/webkit/WebView#public-constructors):
->
-> ```java
-> public byte[] getBytes(String charsetName)
-> ```
-
-```yaml
-javaClass: java.lang.String
-methods:
-  - name: getBytes
-    returnType:
-      type: byte[]
-      decoder: customByteArrayDecoder
-      decoderArgs:
-        - maxLength: 100
-        - encoding: $params.charsetName
-    params:
-      - [ String, charsetName ]
-```
-
-The return value is a byte array. The custom decoder receives `maxLength` to limit output and `encoding` from the method parameter to properly interpret the bytes. -->
+While the use case for `decoderArgs` is less common, you can use it in the same way as with [parameters](./parameter-declaration.md#33-decoderargs-option-pass-arguments-to-decoder). They must reference the name of a parameter.
 
 #### 3.2.2. Pass Arguments to Decoder in Objective-C
 
-<!-- > [!NOTE]
-> This example hooks the following instance method from [NSString](https://developer.apple.com/documentation/foundation/nsstring):
+> [!NOTE]
+> This example hooks the following instance method from [NSString](https://developer.apple.com/documentation/foundation/nsstring/data(using:)?language=objc):
 >
 > ```objectivec
 > - (NSData *) dataUsingEncoding:(NSStringEncoding) encoding;
@@ -190,37 +165,8 @@ The return value is a byte array. The custom decoder receives `maxLength` to lim
 objcClass: NSString
 methods:
   - name: "- dataUsingEncoding"
-    returnType:
-      type: (NSData *)
-      decoder: customDataDecoder
-      decoderArgs:
-        - encoding: $params[0]
-        - maxBytes: 512
-    params: [ "(NSStringEncoding)" ]
-``` 
-
-The return value is an `NSData` object. The decoder receives the encoding parameter to properly interpret the data and `maxBytes` to limit the decoded output size.-->
-
-#### 3.2.3. Pass Arguments to Decoder in Native
-
-<!-- > [!NOTE]
-> This example hooks the following function from [OpenSSL](https://docs.openssl.org/master/man3/EVP_DigestFinal):
->
-> ```c
-> int EVP_DigestFinal_ex(EVP_MD_CTX *ctx,
->                        unsigned char *md,
->                        unsigned int *s);
-> ```
-
-```yaml
-module: libssl.so
-functions:
-  - symbol: EVP_DigestFinal_ex
-    returnType: [int, { decoderArgs: [ md, s ] } ]
-    params:
-      - [ "EVP_MD_CTX *", ctx ]
-      - [ "unsigned char *", md ]
-      - [ "unsigned int *", s ]
+    returnType: [ "(NSData *)", { decoderArgs: encoding }  ]
+    params: [ ["(NSStringEncoding)", encoding ] ]
 ```
 
-The return value indicates success (1) or failure (0). The decoder receives pointers to the digest buffer and size to provide context about what was computed, enabling meaningful logging of both the result code and the actual digest data. -->
+The return value is an `NSData` object. The decoder receives the `encoding` parameter to properly interpret the data.
