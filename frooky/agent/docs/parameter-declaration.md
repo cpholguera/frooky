@@ -374,7 +374,7 @@ Like with the [previous example](#312-custom-decoder-in-objective-c), we can als
 
 ### 3.2. `decodeAt`-Option: Declare the Time of Decoding
 
-By default, arguments are decoded when the function or method is called. Larger datastrucutres, such as arrays are often passed by reference with the intention to manipulate them within the function or method like the following example shows:
+By default, arguments are decoded when the function or method is called. Larger data structures, such as arrays, are often passed by reference with the intention to manipulate them within the function or method, like the following example shows:
 
 ```java
 public final int doFinal(byte[] output, 
