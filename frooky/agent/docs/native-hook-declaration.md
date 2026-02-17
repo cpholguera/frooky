@@ -13,6 +13,15 @@ functions:                             # List of native symbol declarations to b
   - <native_function_declaration>
 ```
 
+`<native_function_declaration>` can be shortened, but arguments and return values are not decoded now:
+
+```yaml
+<native_function_declaration>:
+  - <string>                           # Name of the native function
+```
+
+`<native_function_declaration>` with valued decoding must be declared like that:
+
 ```yaml
 <native_function_declaration>:
   symbol: <string>                     # Native symbol as string

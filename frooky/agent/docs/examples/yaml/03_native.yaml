@@ -7,7 +7,20 @@ metadata:
   version: v1
 
 hooks:
-  # EXAMPLE 1: Simple native function with basic types
+  # Only alert when the function is called, no decoding
+  - module: libc.so
+    functions:
+      - name: open
+      - name: close
+
+
+  # Only alert when the function is called, no decoding, shortened
+  - module: libc.so
+    functions:
+      - open
+      - close
+
+  # Simple native function with basic types
   - module: libc.so
     functions:
       - symbol: open
@@ -17,18 +30,18 @@ hooks:
           - [ int, flags ]
           - [ mode_t, mode ]
 
-  # EXAMPLE 2: Function with pointer and buffer
+  # Function with pointer and buffer
   - module: libc.so
     functions:
       - symbol: read
         returnType: ssize_t
         params:
           - [ int, fd ]
-          - [ "void *", buf, { decodeAt: exit } ]
+          - [ "void *", buf, { decodeAt: exit, decoderArgs: [ count ] } ]
           - [ size_t, count ]
 
-  # EXAMPLE 3: OpenSSL encryption function
-  - module: libcrypto.so
+  # OpenSSL encryption function, ctx contains information about the used algorithms
+  - module: libssl.so
     functions:
       - symbol: EVP_EncryptInit_ex
         returnType: int
@@ -36,11 +49,11 @@ hooks:
           - [ "EVP_CIPHER_CTX *", ctx ]
           - [ "const EVP_CIPHER *", type ]
           - [ "ENGINE *", impl ]
-          - [ "const unsigned char *", key, { decoderArgs: [ ctx]  } ]
+          - [ "const unsigned char *", key, { decoderArgs: [ ctx ]  } ]
           - [ "const unsigned char *", iv, { decoderArgs: [ ctx ] } ]
     stackTraceLimit: 10
 
-  # EXAMPLE 4: SSL write with buffer
+  # SSL write with buffer
   - module: libssl.so
     functions:
       - symbol: SSL_write
@@ -51,7 +64,7 @@ hooks:
           - [ int, num ]
     debug: true
 
-  # EXAMPLE 5: Multiple functions in same module
+  # Multiple functions in same module
   - module: libssl.so
     functions:
       - symbol: ENGINE_load_builtin_engines
@@ -63,7 +76,7 @@ hooks:
           - [ "X509_STORE *", trusted_store ]
           - [ "X509 *", cert ]
 
-  # EXAMPLE 6: Function with custom decoder
+  # Function with custom decoder
   - module: libcustom.so
     functions:
       - symbol: process_data
@@ -72,8 +85,8 @@ hooks:
           - [ "void *", data, { decoder: CustomDataDecoder, decoderArgs: [ size ] } ]
           - [ size_t, size ]
 
-  # EXAMPLE 7: Function with output parameter decoded at exit
-  - module: libexample.so
+  # Function with output parameter decoded at exit
+  - module: libcustom.so
     functions:
       - symbol: get_buffer
         returnType: int

@@ -7,20 +7,31 @@ metadata:
   version: v1
 
 hooks:
-  # EXAMPLE 1: Single Java method (no arguments)
+
+  # Single Java method
   - javaClass: android.net.wifi.WifiManager
     methods:
       - name: getConnectionInfo
 
-  # EXAMPLE 2: Multiple Java methods
+  # Single Java method, shortened
+  - javaClass: android.net.wifi.WifiManager
+    methods:
+      - getConnectionInfo
+
+  # Hook constructor
+  - javaClass: android.webkit.WebView
+    methods:
+      - $init
+
+  # Multiple Java methods, shortened
   - javaClass: android.location.LocationManager
     methods:
-      - name: getLastKnownLocation
-      - name: isProviderEnabled
-      - name: requestLocationUpdates
+      - getLastKnownLocation
+      - isProviderEnabled
+      - requestLocationUpdates
     stackTraceLimit: 10
 
-  # EXAMPLE 3: Single overload
+  # Single overload
   - javaClass: java.net.URL
     methods:
       - name: openConnection
@@ -28,7 +39,7 @@ hooks:
           - params:
               - java.net.Proxy
 
-  # EXAMPLE 4: Multiple overloads
+  # Multiple overloads
   - javaClass: android.content.Intent
     methods:
       - name: putExtra
@@ -46,7 +57,7 @@ hooks:
               - [ "java.lang.String", name ]
               - [ "[B", value ]
 
-  # EXAMPLE 5: Custom decoder for Java method argument
+  # Custom decoder for Java method argument
   - javaClass: android.content.Intent
     methods:
       - name: setFlags
@@ -55,7 +66,7 @@ hooks:
               - [ int, flags, { decoder: IntentFlagsDecoder } ]
     debug: true
 
-  # EXAMPLE 6: Single Java Type as argument
+  # Single Java Type as argument
   - javaClass: android.app.Activity
     methods:
       - name: startActivity
@@ -63,7 +74,7 @@ hooks:
           - params:
               - [ "android.content.Intent", intent ]
 
-  # EXAMPLE 7: Multiple Java Types as arguments
+  # Multiple Java Types as arguments
   - javaClass: android.database.sqlite.SQLiteDatabase
     methods:
       - name: query
@@ -81,7 +92,7 @@ hooks:
       - "^java\\."
       - "^android\\."
 
-  # EXAMPLE 8: Decode parameter at exit (data passed by reference)
+  # Decode parameter at exit (data passed by reference)
   - javaClass: javax.crypto.Cipher
     methods:
       - name: doFinal
@@ -90,16 +101,10 @@ hooks:
               - [ "[B", output, { decodeAt: exit } ]
               - [ int, outputOffset ]
 
-  # EXAMPLE 9: Decode parameter at both entry and exit
+  # Decode parameter at both entry and exit
   - javaClass: java.nio.ByteBuffer
     methods:
       - name: put
         overloads:
           - params:
               - [ "[B", src, { decodeAt: both } ]
-
-  # EXAMPLE 10: Hook constructor
-  - javaClass: android.webkit.WebView
-    methods:
-      - name: $init
-      - name: loadUrl

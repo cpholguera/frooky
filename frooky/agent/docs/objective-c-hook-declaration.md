@@ -13,6 +13,15 @@ methods:                               # List of Objective-C method declarations
   - <objc_method_declaration>
 ```
 
+`<objc_method_declaration>` can be shortened, but arguments and return values are not decoded now:
+
+```yaml
+<objc_method_declaration>:
+  - <string>                           # Name of the native function
+```
+
+`<objc_method_declaration>` with value decoding must be declared like that:
+
 ```yaml
 <objc_method_declaration>:
   name: <string>                       # Name of the Objective-C method (include - or + prefix)

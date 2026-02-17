@@ -15,6 +15,15 @@ methods:                               # List of Java methods to hook
   - <java_method_declaration>
 ```
 
+`<java_method_declaration>` without overloads can be shortened:
+
+```yaml
+<java_method_declaration>:
+  - <string>                           # Name of the Java method
+```
+
+`<java_method_declaration>` with overloads must be declared like that:
+
 ```yaml
 <java_method_declaration>:
   name: <string>                       # Name of the Java method

@@ -7,7 +7,17 @@ metadata:
   version: v1
 
 hooks:
-  # EXAMPLE 1: Simple Objective-C instance method
+  # LAContext biometry method (no param decoding)
+  - objcClass: LAContext
+    methods:
+      - name: "- invalidate"
+  
+  # LAContext biometry method (shortened, no param decoding)
+  - objcClass: LAContext
+    methods:
+      - "- invalidate"
+
+  # Simple Objective-C instance method
   - objcClass: NSUserDefaults
     methods:
       - name: "- setObject:forKey:"
@@ -15,7 +25,7 @@ hooks:
           - [ "(id)", value ]
           - [ "(NSString *)", key ]
 
-  # EXAMPLE 2: NSData write to file with return type
+  # NSData write to file with return type
   - objcClass: NSData
     methods:
       - name: "- writeToFile:atomically:"
@@ -25,7 +35,7 @@ hooks:
           - [ "(BOOL)", useAuxiliaryFile ]
     stackTraceLimit: 8
 
-  # EXAMPLE 3: Objective-C class method
+  # Objective-C class method
   - objcClass: NSURL
     methods:
       - name: "+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:"
@@ -34,11 +44,6 @@ hooks:
           - [ "(const char *)", path ]
           - [ "(BOOL)", isDir ]
           - [ "(NSURL *)", baseURL ]
-
-  # EXAMPLE 4: LAContext biometry method (no params)
-  - objcClass: LAContext
-    methods:
-      - name: "- invalidate"
 
   # EXAMPLE 5: Multiple methods in same class
   - objcClass: LAPrivateKey
