@@ -12,6 +12,7 @@ frooky needs to know a function or method's signature in order to hook it correc
   - [2.3. Named Native Parameters](#23-named-native-parameters)
 - [3. Decoders](#3-decoders)
   - [3.1. `decoder`-Option: Custom Decoder](#31-decoder-option-custom-decoder)
+    - [Asynchronous Callback Decoders](#asynchronous-callback-decoders)
     - [3.1.1. Custom Decoder in Java](#311-custom-decoder-in-java)
     - [3.1.2. Custom Decoder in Objective-C](#312-custom-decoder-in-objective-c)
     - [3.1.3. Custom Decoder in Native](#313-custom-decoder-in-native)
@@ -31,17 +32,13 @@ There are different accepted ways declaring a parameter. The following chapters 
 
 ## 1. Unnamed Parameters
 
-This is the most simple declaration, solely based on its type. frooky will try to decode the arguments based on the automatically selected decoder.
+This is the most simple declaration, solely based on its type. frooky will try to decode the arguments based on the automatically selected decoder:
+
+```yaml
+params: [ <type> ]
+```
 
 ### 1.1. Unnamed Java Parameters
-
-> [!NOTE]
-> This example hooks the following constructors from the [Android Java Library](https://developer.android.com/reference/kotlin/android/webkit/WebView#public-constructors):
->
-> ```kotlin
-> WebView(context: Context)
-> WebView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, privateBrowsing: Boolean)
-> ```
 
 ```yaml
 javaClass: android.webkit.WebView
@@ -52,7 +49,23 @@ methods:
       - params: [ android.content.Context, android.util.AttributeSet, int, boolean ]
 ```
 
+> [!NOTE]
+> This example hooks the following constructors from the [Android Java Library](https://developer.android.com/reference/kotlin/android/webkit/WebView#public-constructors):
+>
+> ```kotlin
+> WebView(context: Context)
+> WebView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, privateBrowsing: Boolean)
+> ```
+
 ### 1.2. Unnamed Objective-C Parameters
+
+```yaml
+objcClass: NSURL
+methods:
+  - name: "+ fileURLWithFileSystemRepresentation"
+    returnType: (NSURL *)
+    params: [ "(const char *)", "(BOOL)", "(NSURL *)" ]
+```
 
 > [!NOTE]
 > This example hooks the following class method from  [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
@@ -63,15 +76,15 @@ methods:
 >                                   relativeToURL:(NSURL *) baseURL;
 > ```
 
-```yaml
-objcClass: NSURL
-methods:
-  - name: "+ fileURLWithFileSystemRepresentation"
-    returnType: (NSURL *)
-    params: [ "(const char *)", "(BOOL)", "(NSURL *)" ]
-```
-
 ### 1.3. Unnamed Native Parameters
+
+```yaml
+module: sqlite3.so
+functions:
+  - symbol: sqlite3_exec
+    returnType: int
+    params: [ "sqlite3*", "const char *", "void *", "void *", "char **" ]
+```
 
 > [!NOTE]
 > This example hooks the following method from the [SQLite function](https://sqlite.org/c3ref/exec.html):
@@ -86,17 +99,14 @@ methods:
 > );
 > ```
 
-```yaml
-module: sqlite3.so
-functions:
-  - symbol: sqlite3_exec
-    returnType: int
-    params: [ "sqlite3*", "const char *", "void *", "void *", "char **" ]
-```
-
 ## 2. Named Parameters
 
 If you want declare the name of the parameter, you must use an array for the type an name pair.
+
+```yaml
+params:
+  - [ <type>, <name> ]
+```
 
 > [!IMPORTANT]
 > The first element is the type of the parameter, the second the name.
@@ -117,11 +127,12 @@ methods:
         - [ boolean, privateBrowsing ]
 ```
 
-This `<hook_configuration>` will hook the following method:
-
-```kotlin
-WebView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, privateBrowsing: Boolean)
-```
+> [!NOTE]
+> This example hooks the following constructors from the [Android Java Library](https://developer.android.com/reference/kotlin/android/webkit/WebView#public-constructors):
+>
+> ```kotlin
+> WebView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, privateBrowsing: Boolean)
+> ```
 
 ### 2.2. Named Objective-C Parameters
 
@@ -136,13 +147,14 @@ methods:
       - [ "(NSURL *)",  baseURL ]
 ```
 
-This `<hook_configuration>` will hook the following [Objective-C class method](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
-
-```objectivec
-+ (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
-                                    isDirectory:(BOOL) isDir 
-                                  relativeToURL:(NSURL *) baseURL;
-```
+> [!NOTE]
+> This example hooks the following class method from  [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
+>
+> ```objectivec
+> + (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
+>                                     isDirectory:(BOOL) isDir 
+>                                   relativeToURL:(NSURL *) baseURL;
+> ```
 
 ### 2.3. Named Native Parameters
 
@@ -159,20 +171,18 @@ functions:
       - [ "char **", "errmsg" ]
 ```
 
-This `<hook_configuration>` will hook the following [SQLite function](https://sqlite.org/c3ref/exec.html):
-
-```c
-int sqlite3_exec(
-  sqlite3*,                                  /* An open database */
-  const char *sql,                           /* SQL to be evaluated */
-  int (*callback)(void*,int,char**,char**),  /* Callback function */
-  void *,                                    /* 1st argument to callback */
-  char **errmsg                              /* Error msg written here */
-);
-```
-
 > [!NOTE]
-> Not all parameters have a name in this example. The ones without name can be declared as [unnamed parameter](#1-unnamed-parameters).
+> This example hooks the following method from the [SQLite function](https://sqlite.org/c3ref/exec.html):
+>
+> ```c
+> int sqlite3_exec(
+>   sqlite3*,                                  /* An open database */
+>   const char *sql,                           /* SQL to be evaluated */
+>   int (*callback)(void*,int,char**,char**),  /* Callback function */
+>   void *,                                    /* 1st argument to callback */
+>   char **errmsg                              /* Error msg written here */
+> );
+> ```
 
 ## 3. Decoders
 
@@ -190,6 +200,18 @@ This is done using the a decoder configuration. This is an object which can cont
 - `decodeAt`
 - `decodeParams`
 
+```yaml
+params:
+  - [ <type>,                                    # Parameter type
+      <name>,                                    # Parameter name
+      {                                          # Decoder configuration
+        decoder: <decoder>,                      # Custom decoder name. Default: autoSelect
+        decodeAt: <enter|exit|both>,             # When to decode the parameter. Default: enter
+        decoderArgs: [<param_name>]              # List of arguments passed to the decoder. Must be a valid parameter name
+      }
+    ]
+```
+
 The following chapters will explain the concepts using practical example.
 
 ### 3.1. `decoder`-Option: Custom Decoder
@@ -204,14 +226,69 @@ For some cases you want to manually bypass the automatic decoder matching. Custo
 
 You'll find more information about them in their documentation. You are also welcome to develop your own decoders and contribute them to frooky.
 
-#### 3.1.1. Custom Decoder in Java
+#### Asynchronous Callback Decoders
+
+Asynchronous computing adds decoding complexity in frooky. This chapter explains how we can use the frooky hook declaration to decode asynchronous callbacks.
+
+Let's take the following Objective-C method as example:
+
+```yaml
+objcClass: LAPrivateKey
+methods:
+  - name: "- decryptData"
+    params:
+      - [ "(NSData *)",  data ]
+      - [ "(SecKeyAlgorithm)",  algorithm ]
+      - [ "(void (^)(NSData *, NSError *))",  handler ]
+      - [ "(NSData *)",  data ]
+```
 
 > [!NOTE]
-> This example hooks the following method from the [Android Java Library](https://developer.android.com/reference/kotlin/android/content/Intent#setflags):
+> This `<hook_configuration>` will hook the following [Objective-C instance method](https://developer.apple.com/documentation/localauthentication/laprivatekey/decrypt(_:algorithm:completion:)?language=objc):
 >
-> ```kotlin
-> open fun setFlags(flags: Int): Intent
+> ```objectivec
+> - (void) decryptData:(NSData *) data 
+>      secKeyAlgorithm:(SecKeyAlgorithm) algorithm 
+>           completion:(void (^)(NSData *, NSError *)) handler;
 > ```
+
+It decrypts the data and invokes the handler upon completion. The method would for example be called like that:
+
+```objectivec
+[self decryptData:myData 
+ secKeyAlgorithm:kSecKeyAlgorithmRSAEncryptionOAEPSHA256 
+       completion:^(NSData *result, NSError *error) {
+          // handle result with the decrypted data
+      }];
+```
+
+To access the decrypted data, we must hook the handler implementation itself, as we need to intercept its first argument `(NSData *, NSError *)` when the method calls the handler after decryption finishes. For that we can write a custom decoder, let's call it `LaPlaintextDecoder`, and overwrite the default decoder for the `handler` argument:
+
+```yaml
+objcClass: LAPrivateKey
+methods:
+  - name: "- decryptData"
+    parameters:
+      - type: (NSData *)
+        name: data
+      - type: (SecKeyAlgorithm)
+        name: algorithm
+      - type: (void (^)(NSData *, NSError *))
+        name: handler
+        decoder: LaPlaintextDecoder
+```
+
+The decoder must:
+
+1. Run at `enter` (default)
+2. Create a new hook for the `handler` block
+3. Intercept the callback when it's invoked
+
+Once the handler is called by the decryption method, the hook intercepts the first parameter containing the decrypted plaintext as `NSData *`.
+
+<!-- TODO: Reference frooky callback decoders when we implement them. -->
+
+#### 3.1.1. Custom Decoder in Java
 
 ```yaml
 javaClass: android.content.Intent
@@ -222,20 +299,18 @@ methods:
         - [ int, flags, { decoder: intentFlagsDecoder } ]
 ```
 
+> [!NOTE]
+> This example hooks the following method from the [Android Java Library](https://developer.android.com/reference/kotlin/android/content/Intent#setflags):
+>
+> ```kotlin
+> open fun setFlags(flags: Int): Intent
+> ```
+
 The parameter `flags` is a bitwise OR combination of [special flags](https://developer.android.com/reference/kotlin/android/content/Intent#flags), each controlling how this intent is handled. The custom decoder `intentFlagsDecoder` extracts the information again by doing a bitwise AND operation on the `flags` Integer with each flag.
 
 If the result matches the value of the flag, it is set. This is a more stable way of decoding the flags compared to doing that on the frooky host, as the flags may not be the same as on the actual device.
 
 #### 3.1.2. Custom Decoder in Objective-C
-
-> [!NOTE]
-> This example hooks the following method from [LAPrivateKey](https://developer.apple.com/documentation/localauthentication/laprivatekey/decrypt(_:algorithm:completion:)?language=objc):
->
-> ```objectivec
-> - (void) decryptData:(NSData *) data 
->      secKeyAlgorithm:(SecKeyAlgorithm) algorithm 
->           completion:(void (^)(NSData * , NSError * )) handler;
-> ```
 
 ```yaml
 objcClass: LAPrivateKey
@@ -247,6 +322,15 @@ methods:
       - [ "(void (^)(NSData *, NSError *))", handler, { decoder: LAPrivateKey_decryptData_callbackDecoder } ]
 ```
 
+> [!NOTE]
+> This example hooks the following method from [LAPrivateKey](https://developer.apple.com/documentation/localauthentication/laprivatekey/decrypt(_:algorithm:completion:)?language=objc):
+>
+> ```objectivec
+> - (void) decryptData:(NSData *) data 
+>      secKeyAlgorithm:(SecKeyAlgorithm) algorithm 
+>           completion:(void (^)(NSData * , NSError * )) handler;
+> ```
+
 The parameter `(void (^)(NSData *, NSError *)) handler` is a callback function, called once the data is decrypted. Using the `decoder` option, we can implement a decoder which instead of just printing then value (which is just a `pointer`), adds a new hook to the callback method.
 
 To do that, the custom decoder `LAPrivateKey_decryptData_callbackDecoder` must:
@@ -257,19 +341,6 @@ To do that, the custom decoder `LAPrivateKey_decryptData_callbackDecoder` must:
 Once the handler is called by the `decryptData` instance method, the hook intercepts the first parameter containing the decrypted plaintext as `NSData *`.
 
 #### 3.1.3. Custom Decoder in Native
-
-> [!NOTE]
-> This example hooks the following method from the [SQLite](https://sqlite.org/c3ref/exec.html):
->
-> ```c
-> int sqlite3_exec(
->   sqlite3*,                                  /* An open database */
->   const char *sql,                           /* SQL to be evaluated */
->   int (*callback)(void*,int,char**,char**),  /* Callback function */
->   void *,                                    /* 1st argument to callback */
->   char **errmsg                              /* Error msg written here */
-> );
-> ```
 
 ```yaml
 module: sqlite3.so
@@ -283,6 +354,19 @@ functions:
       - "void *"
       - [ "char **", errmsg ]
 ```
+
+> [!NOTE]
+> This example hooks the following method from the [SQLite](https://sqlite.org/c3ref/exec.html):
+>
+> ```c
+> int sqlite3_exec(
+>   sqlite3*,                                  /* An open database */
+>   const char *sql,                           /* SQL to be evaluated */
+>   int (*callback)(void*,int,char**,char**),  /* Callback function */
+>   void *,                                    /* 1st argument to callback */
+>   char **errmsg                              /* Error msg written here */
+> );
+> ```
 
 The 3rd parameter is a pointer to a callback function. The custom decoder `sqlite3_exec_callbackDecoder` handles the function pointer appropriately, potentially hooking the callback to intercept its invocations.
 
@@ -306,14 +390,6 @@ To accommodate for these cases, you can specify the time of decoding using the f
 
 #### 3.2.1. Explicit Time of Decoding in Java
 
-> [!NOTE]
-> This example hooks the following method from the [Android Java Library](https://developer.android.com/reference/javax/crypto/Cipher?hl=en#doFinal(byte[],%20int)):
->
-> ```java
-> public final int doFinal (byte[] output, 
->                           int outputOffset)
-> ```
-
 ```yaml
 javaClass: javax.crypto.Cipher 
 methods:
@@ -324,17 +400,17 @@ methods:
         - [ int, outputOffset ]
  ```
 
+> [!NOTE]
+> This example hooks the following method from the [Android Java Library](https://developer.android.com/reference/javax/crypto/Cipher?hl=en#doFinal(byte[],%20int)):
+>
+> ```java
+> public final int doFinal (byte[] output, 
+>                           int outputOffset)
+> ```
+
 In order to access the decrypted data, the parameter `output` parameter must be decoded at exit.
 
 #### 3.2.2. Explicit Time of Decoding in Objective-C
-
-> [!NOTE]
-> This example hooks the following method from [NSFileManager](https://developer.apple.com/documentation/foundation/filemanager/contentsofdirectory(atpath:)?language=objc):
->
-> ```objectivec
-> - (NSArray<NSString *> *) contentsOfDirectoryAtPath:(NSString *) path 
->                                               error:(NSError * *) error;
-> ```
 
 ```yaml
 objcClass:  NSFileManager
@@ -346,17 +422,17 @@ methods:
       - [ "(NSError * *)", error, { decodeAt: exit } ]
 ```
 
+> [!NOTE]
+> This example hooks the following method from [NSFileManager](https://developer.apple.com/documentation/foundation/filemanager/contentsofdirectory(atpath:)?language=objc):
+>
+> ```objectivec
+> - (NSArray<NSString *> *) contentsOfDirectoryAtPath:(NSString *) path 
+>                                               error:(NSError * *) error;
+> ```
+
 The `error` parameter must decoded at exit because it only contains meaningful data if an error occurred during the operation.
 
 #### 3.2.3. Explicit Time of Decoding in Native
-
-> [!NOTE]
-> This example hooks the following method from the [C standard library on iOS](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/realpath.3.html):
->
-> ```c
-> char *realpath(const char *restrict file_name, 
->                char *restrict resolved_name);
-> ```
 
 ```yaml
 module: libsystem_c.dylib
@@ -365,6 +441,14 @@ params:
   - [ "const char *restrict", file_name ]
   - [ "char *restrict", resolved_name, { decodeAt: exit } ]
 ```
+
+> [!NOTE]
+> This example hooks the following method from the [C standard library on iOS](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/realpath.3.html):
+>
+> ```c
+> char *realpath(const char *restrict file_name, 
+>                char *restrict resolved_name);
+> ```
 
 The `resolved_name` parameter must be decoded at exit, because it contains absolute pathname after resolution.
 
@@ -393,15 +477,6 @@ If we want to decode the `out` buffer, we must pass its length argument (`outl`)
 
 #### 3.3.1. Pass Arguments to Decoder in Java
 
-> [!NOTE]
-> This example hooks the following method from [Android Java Library](https://developer.android.com/reference/java/io/FileInputStream#read(byte[],%20int,%20int)):
->
-> ```java
-> public int read (byte[] b, 
->                  int off, 
->                  int len)
-> ```
-
 ```yaml
 javaClass: java.io.FileInputStream
 methods:
@@ -413,17 +488,18 @@ methods:
         - [ int, len ]
 ```
 
+> [!NOTE]
+> This example hooks the following method from [Android Java Library](https://developer.android.com/reference/java/io/FileInputStream#read(byte[],%20int,%20int)):
+>
+> ```java
+> public int read (byte[] b, 
+>                  int off, 
+>                  int len)
+> ```
+
 The decoder for `buffer` receives `len` to know how many bytes were actually read.
 
 #### 3.3.2. Pass Arguments to Decoder in Objective-C
-
-> [!NOTE]
-> This example hooks the following method from  [NSData](https://developer.apple.com/documentation/foundation/nsdata/getbytes(_:range:)?language=objc):
->
-> ```objectivec
-> - (void) getBytes:(void *) buffer 
->                    range:(NSRange) range;
-> ```
 
 ```yaml
 objcClass: NSData
@@ -434,18 +510,17 @@ methods:
       - [ "(NSUInteger)", length ]
 ```
 
+> [!NOTE]
+> This example hooks the following method from  [NSData](https://developer.apple.com/documentation/foundation/nsdata/getbytes(_:range:)?language=objc):
+>
+> ```objectivec
+> - (void) getBytes:(void *) buffer 
+>                    range:(NSRange) range;
+> ```
+
 The `buffer` decoder uses the `length` parameter to determine how many bytes to decode.
 
 #### 3.3.3. Pass Arguments to Decoder in Native
-
-> [!NOTE]
-> This example hooks the following method from [OpenSSL](https://docs.openssl.org/1.0.2/man3/EVP_DigestInit):
->
-> ```c
-> int EVP_DigestFinal_ex(EVP_MD_CTX *ctx,
->                        unsigned char *md,
->                        unsigned int *s);
-> ```
 
 ```yaml
 module: libssl.so
@@ -457,5 +532,14 @@ functions:
       - [ "unsigned char *", md, { decodeAt: exit, decoderArgs: [ ctx, s ] } ]
       - [ "unsigned int *", s ]
 ```
+
+> [!NOTE]
+> This example hooks the following method from [OpenSSL](https://docs.openssl.org/1.0.2/man3/EVP_DigestInit):
+>
+> ```c
+> int EVP_DigestFinal_ex(EVP_MD_CTX *ctx,
+>                        unsigned char *md,
+>                        unsigned int *s);
+> ```
 
 The digest buffer `md` decoder uses the `ctx` to determine what kind of hash algorithm was used, and the length `s` to decode the buffer.
