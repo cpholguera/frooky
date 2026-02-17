@@ -25,7 +25,7 @@ hooks:
     methods:
       - name: openConnection
         overloads:
-          - parameters:
+          - params:
               - type: java.net.Proxy
 
   # EXAMPLE 4: Multiple overloads
@@ -33,22 +33,22 @@ hooks:
     methods:
       - name: putExtra
         overloads:
-          - parameters:
+          - params:
               - type: java.lang.String
                 name: name
               - type: java.lang.String
                 name: value
-          - parameters:
+          - params:
               - type: java.lang.String
                 name: name
               - type: int
                 name: value
-          - parameters:
+          - params:
               - type: java.lang.String
                 name: name
               - type: boolean
                 name: value
-          - parameters:
+          - params:
               - type: java.lang.String
                 name: name
               - type: "[B"
@@ -59,7 +59,7 @@ hooks:
     methods:
       - name: setFlags
         overloads:
-          - parameters:
+          - params:
               - type: int
                 name: flags
                 decoder: IntentFlagsDecoder
@@ -70,7 +70,7 @@ hooks:
     methods:
       - name: startActivity
         overloads:
-          - parameters:
+          - params:
               - type: android.content.Intent
                 name: intent
 
@@ -79,7 +79,7 @@ hooks:
     methods:
       - name: query
         overloads:
-          - parameters:
+          - params:
               - type: java.lang.String
                 name: table
               - type: "[Ljava.lang.String"
@@ -104,7 +104,7 @@ hooks:
     methods:
       - name: doFinal
         overloads:
-          - parameters:
+          - params:
               - type: "[B"
                 name: output
                 decodeAt: exit
@@ -116,7 +116,7 @@ hooks:
     methods:
       - name: put
         overloads:
-          - parameters:
+          - params:
               - type: "[B"
                 name: src
                 decodeAt: both

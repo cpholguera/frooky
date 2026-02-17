@@ -57,7 +57,7 @@ export interface ParameterDeclaration {
  */
 export interface JavaOverload {
   /** Parameter list of the overloaded method */
-  parameters?: ParameterDeclaration[];
+  params?: ParameterDeclaration[];
 }
 
 /**
@@ -89,7 +89,7 @@ export interface ObjectiveCMethod {
   /** Optional: Return type of the Objective-C method */
   returnType?: string;
   /** Optional: Parameter list of the Objective-C method */
-  parameters?: ParameterDeclaration[];
+  params?: ParameterDeclaration[];
 }
 
 /**
@@ -111,7 +111,7 @@ export interface NativeFunction {
   /** Optional: Return type of the function */
   returnType?: string;
   /** Optional: Parameter list of the function */
-  parameters?: ParameterDeclaration[];
+  params?: ParameterDeclaration[];
 }
 
 /**

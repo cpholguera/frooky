@@ -222,7 +222,7 @@ For some cases you want to manually bypass the automatic decoder matching. Custo
 
 - [./android/decoders](../android/decoders)
 - [./ios/decoders](../ios/decoders)
-- [./native/decoders](../ios/decoders)
+- [./native/decoders](../native/decoders)
 
 You'll find more information about them in their documentation. You are also welcome to develop your own decoders and contribute them to frooky.
 

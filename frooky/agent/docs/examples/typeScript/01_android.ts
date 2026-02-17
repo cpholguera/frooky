@@ -33,7 +33,7 @@ const urlHook: Frooky.JavaHook = {
       name: 'openConnection',
       overloads: [
         {
-          parameters: [
+          params: [
             { type: 'java.net.Proxy' }
           ]
         }
@@ -52,25 +52,25 @@ const intentHook: Frooky.JavaHook = {
       name: 'putExtra',
       overloads: [
         {
-          parameters: [
+          params: [
             { type: 'java.lang.String', name: 'name' },
             { type: 'java.lang.String', name: 'value' }
           ]
         },
         {
-          parameters: [
+          params: [
             { type: 'java.lang.String', name: 'name' },
             { type: 'int', name: 'value' }
           ]
         },
         {
-          parameters: [
+          params: [
             { type: 'java.lang.String', name: 'name' },
             { type: 'boolean', name: 'value' }
           ]
         },
         {
-          parameters: [
+          params: [
             { type: 'java.lang.String', name: 'name' },
             { type: '[B', name: 'value' }
           ]
@@ -90,7 +90,7 @@ const intentFlagsHook: Frooky.JavaHook = {
       name: 'setFlags',
       overloads: [
         {
-          parameters: [
+          params: [
             {
               type: 'int',
               name: 'flags',
@@ -114,7 +114,7 @@ const activityHook: Frooky.JavaHook = {
       name: 'startActivity',
       overloads: [
         {
-          parameters: [
+          params: [
             { type: 'android.content.Intent', name: 'intent' }
           ]
         }
@@ -133,7 +133,7 @@ const sqliteHook: Frooky.JavaHook = {
       name: 'query',
       overloads: [
         {
-          parameters: [
+          params: [
             { type: 'java.lang.String', name: 'table' },
             { type: '[Ljava.lang.String', name: 'columns' },
             { type: 'java.lang.String', name: 'selection' },
@@ -160,7 +160,7 @@ const cipherHook: Frooky.JavaHook = {
       name: 'doFinal',
       overloads: [
         {
-          parameters: [
+          params: [
             { 
               type: '[B', 
               name: 'output',
@@ -187,7 +187,7 @@ const bufferHook: Frooky.JavaHook = {
       name: 'put',
       overloads: [
         {
-          parameters: [
+          params: [
             { 
               type: '[B', 
               name: 'src',

@@ -35,11 +35,13 @@ If you want to use the frooky agent without the Python host, or if you want to d
 - **Compile the development standalone client:**
 
   ```sh
-  npm run build:watch:android <hook*.yaml>
-  npm run build:watch:ios <hook*.yaml>
+  npm run build:watch:android hook.yaml
+  npm run build:watch:ios hook.yaml
   ```
 
-  This will compile a development build of the frooky agent, watch for changes in its source code as well as all `hook*.yaml` files and keep the compiled agents in the folder `./dist` fresh.
+  You can specify one or more `hook.yaml`. Pattern expansion (`glob`) is supported.
+
+  This will compile a development build of the frooky agent, watch for changes in its source code as well as all `hook.yaml` files and keep the compiled agents in the folder `./dist` fresh.
 
 - **Start Frida with the compiled agent:**
 

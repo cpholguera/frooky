@@ -20,14 +20,7 @@ import {
     opensslHook,
     customDecoderHook,
     outputParamHook
-} from "../typeScript/02_native"
-import {
-    userDefaultsHook,
-    fileManagerHook,
-    keychainHook,
-    multipleSwiftHook,
-    filteredSwiftHook
-} from "../typeScript/03_swift"
+} from "./03_native"
 import {
     userDefaultsObjCHook,
     nsDataHook,
@@ -37,7 +30,7 @@ import {
     coreDataHook,
     urlSessionHook,
     dataProcessingHook
-} from "../typeScript/04_objc"
+} from "./02_objc"
 
 
 // ============================================================================
@@ -86,12 +79,6 @@ const iosHooks: Frooky.FrookyConfig = {
         version: 'v1'
     },
     hooks: [
-        // Swift hooks
-        userDefaultsHook,
-        fileManagerHook,
-        keychainHook,
-        multipleSwiftHook,
-        filteredSwiftHook,
         // Objective-C hooks
         userDefaultsObjCHook,
         nsDataHook,

@@ -11,7 +11,7 @@ hooks:
   - objClass: NSUserDefaults
     methods:
       - name: "- setObject:forKey:"
-        parameters:
+        params:
           - type: (id)
             name: value
           - type: (NSString *)
@@ -22,7 +22,7 @@ hooks:
     methods:
       - name: "- writeToFile:atomically:"
         returnType: (BOOL)
-        parameters:
+        params:
           - type: (NSString *)
             name: path
           - type: (BOOL)
@@ -34,7 +34,7 @@ hooks:
     methods:
       - name: "+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:"
         returnType: (NSURL *)
-        parameters:
+        params:
           - type: (const char *)
             name: path
           - type: (BOOL)
@@ -42,7 +42,7 @@ hooks:
           - type: (NSURL *)
             name: baseURL
 
-  # EXAMPLE 4: LAContext biometry method (no parameters)
+  # EXAMPLE 4: LAContext biometry method (no params)
   - objClass: LAContext
     methods:
       - name: "- invalidate"
@@ -51,7 +51,7 @@ hooks:
   - objClass: LAPrivateKey
     methods:
       - name: "- decryptData:secKeyAlgorithm:completion:"
-        parameters:
+        params:
           - type: (NSData *)
             name: data
           - type: (SecKeyAlgorithm)
@@ -60,7 +60,7 @@ hooks:
             name: handler
             decoder: LaPlaintextDecoder
       - name: "- signData:secKeyAlgorithm:completion:"
-        parameters:
+        params:
           - type: (NSData *)
             name: data
           - type: (SecKeyAlgorithm)
@@ -73,7 +73,7 @@ hooks:
     methods:
       - name: "- save:"
         returnType: (BOOL)
-        parameters:
+        params:
           - type: (NSError **)
             name: error
             decodeAt: exit
@@ -84,7 +84,7 @@ hooks:
     methods:
       - name: "- dataTaskWithRequest:completionHandler:"
         returnType: (NSURLSessionDataTask *)
-        parameters:
+        params:
           - type: (NSURLRequest *)
             name: request
           - type: (void (^)(NSData *, NSURLResponse *, NSError *))
@@ -97,7 +97,7 @@ hooks:
   - objClass: NSMutableData
     methods:
       - name: "- appendData:"
-        parameters:
+        params:
           - type: (NSData *)
             name: data
             decodeAt: both

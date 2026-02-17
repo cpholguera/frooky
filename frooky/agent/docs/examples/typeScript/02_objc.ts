@@ -8,7 +8,7 @@ const userDefaultsObjCHook: Frooky.ObjectiveCHook = {
   methods: [
     {
       name: '- setObject:forKey:',
-      parameters: [
+      params: [
         { type: '(id)', name: 'value' },
         { type: '(NSString *)', name: 'key' }
       ]
@@ -25,7 +25,7 @@ const nsDataHook: Frooky.ObjectiveCHook = {
     {
       name: '- writeToFile:atomically:',
       returnType: '(BOOL)',
-      parameters: [
+      params: [
         { type: '(NSString *)', name: 'path' },
         { type: '(BOOL)', name: 'useAuxiliaryFile' }
       ]
@@ -43,7 +43,7 @@ const urlHook: Frooky.ObjectiveCHook = {
     {
       name: '+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:',
       returnType: '(NSURL *)',
-      parameters: [
+      params: [
         { type: '(const char *)', name: 'path' },
         { type: '(BOOL)', name: 'isDir' },
         { type: '(NSURL *)', name: 'baseURL' }
@@ -53,7 +53,7 @@ const urlHook: Frooky.ObjectiveCHook = {
 }
 
 // ============================================================================
-// EXAMPLE 4: LAContext biometry method (no parameters)
+// EXAMPLE 4: LAContext biometry method (no params)
 // ============================================================================
 const laContextHook: Frooky.ObjectiveCHook = {
   objClass: 'LAContext',
@@ -72,7 +72,7 @@ const keychainHook: Frooky.ObjectiveCHook = {
   methods: [
     {
       name: '- decryptData:secKeyAlgorithm:completion:',
-      parameters: [
+      params: [
         { type: '(NSData *)', name: 'data' },
         { type: '(SecKeyAlgorithm)', name: 'algorithm' },
         { 
@@ -84,7 +84,7 @@ const keychainHook: Frooky.ObjectiveCHook = {
     },
     {
       name: '- signData:secKeyAlgorithm:completion:',
-      parameters: [
+      params: [
         { type: '(NSData *)', name: 'data' },
         { type: '(SecKeyAlgorithm)', name: 'algorithm' },
         { type: '(void (^)(NSData *, NSError *))', name: 'handler' }
@@ -102,7 +102,7 @@ const coreDataHook: Frooky.ObjectiveCHook = {
     {
       name: '- save:',
       returnType: '(BOOL)',
-      parameters: [
+      params: [
         { 
           type: '(NSError **)', 
           name: 'error',
@@ -123,7 +123,7 @@ const urlSessionHook: Frooky.ObjectiveCHook = {
     {
       name: '- dataTaskWithRequest:completionHandler:',
       returnType: '(NSURLSessionDataTask *)',
-      parameters: [
+      params: [
         { type: '(NSURLRequest *)', name: 'request' },
         { type: '(void (^)(NSData *, NSURLResponse *, NSError *))', name: 'completionHandler' }
       ]
@@ -140,7 +140,7 @@ const dataProcessingHook: Frooky.ObjectiveCHook = {
   methods: [
     {
       name: '- appendData:',
-      parameters: [
+      params: [
         { 
           type: '(NSData *)', 
           name: 'data',

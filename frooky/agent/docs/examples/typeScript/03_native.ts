@@ -9,7 +9,7 @@ const openHook: Frooky.NativeHook = {
     {
       symbol: 'open',
       returnType: 'int',
-      parameters: [
+      params: [
         { type: 'const char *', name: 'pathname' },
         { type: 'int', name: 'flags' },
         { type: 'mode_t', name: 'mode' }
@@ -27,7 +27,7 @@ const readHook: Frooky.NativeHook = {
     {
       symbol: 'read',
       returnType: 'ssize_t',
-      parameters: [
+      params: [
         { type: 'int', name: 'fd' },
         { type: 'void *', name: 'buf', decodeAt: 'exit' },
         { type: 'size_t', name: 'count' }
@@ -45,7 +45,7 @@ const encryptHook: Frooky.NativeHook = {
     {
       symbol: 'EVP_EncryptInit_ex',
       returnType: 'int',
-      parameters: [
+      params: [
         { type: 'EVP_CIPHER_CTX *', name: 'ctx' },
         { type: 'const EVP_CIPHER *', name: 'type' },
         { type: 'ENGINE *', name: 'impl' },
@@ -66,7 +66,7 @@ const sslWriteHook: Frooky.NativeHook = {
     {
       symbol: 'SSL_write',
       returnType: 'int',
-      parameters: [
+      params: [
         { type: 'SSL *', name: 'ssl' },
         { type: 'const void *', name: 'buf' },
         { type: 'int', name: 'num' }
@@ -91,7 +91,7 @@ const opensslHook: Frooky.NativeHook = {
     {
       symbol: 'OSSL_CMP_validate_cert_path',
       returnType: 'int',
-      parameters: [
+      params: [
         { type: 'const OSSL_CMP_CTX *', name: 'ctx' },
         { type: 'X509_STORE *', name: 'trusted_store' },
         { type: 'X509 *', name: 'cert' }
@@ -109,7 +109,7 @@ const customDecoderHook: Frooky.NativeHook = {
     {
       symbol: 'process_data',
       returnType: 'int',
-      parameters: [
+      params: [
         { 
           type: 'void *', 
           name: 'data',
@@ -130,7 +130,7 @@ const outputParamHook: Frooky.NativeHook = {
     {
       symbol: 'get_buffer',
       returnType: 'int',
-      parameters: [
+      params: [
         { 
           type: 'unsigned char *', 
           name: 'output',
