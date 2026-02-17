@@ -36,8 +36,8 @@ hooks:
           - [ "EVP_CIPHER_CTX *", ctx ]
           - [ "const EVP_CIPHER *", type ]
           - [ "ENGINE *", impl ]
-          - [ "const unsigned char *", key ]
-          - [ "const unsigned char *", iv ]
+          - [ "const unsigned char *", key, { decoderArgs: [ ctx]  } ]
+          - [ "const unsigned char *", iv, { decoderArgs: [ ctx ] } ]
     stackTraceLimit: 10
 
   # EXAMPLE 4: SSL write with buffer
@@ -69,7 +69,7 @@ hooks:
       - symbol: process_data
         returnType: int
         params:
-          - [ "void *", data, { decoder: CustomDataDecoder } ]
+          - [ "void *", data, { decoder: CustomDataDecoder, decoderArgs: [ size ] } ]
           - [ size_t, size ]
 
   # EXAMPLE 7: Function with output parameter decoded at exit
