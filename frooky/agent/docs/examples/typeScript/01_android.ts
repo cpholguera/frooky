@@ -33,9 +33,7 @@ const urlHook: Frooky.JavaHook = {
       name: 'openConnection',
       overloads: [
         {
-          params: [
-            { type: 'java.net.Proxy' }
-          ]
+          params: [ 'java.net.Proxy' ]
         }
       ]
     }
@@ -53,26 +51,26 @@ const intentHook: Frooky.JavaHook = {
       overloads: [
         {
           params: [
-            { type: 'java.lang.String', name: 'name' },
-            { type: 'java.lang.String', name: 'value' }
+            [ 'java.lang.String', 'name' ],
+            [ 'java.lang.String', 'value' ]
           ]
         },
         {
           params: [
-            { type: 'java.lang.String', name: 'name' },
-            { type: 'int', name: 'value' }
+            [ 'java.lang.String', 'name' ],
+            [ 'int', 'value' ]
           ]
         },
         {
           params: [
-            { type: 'java.lang.String', name: 'name' },
-            { type: 'boolean', name: 'value' }
+            [ 'java.lang.String', 'name' ],
+            [ 'boolean', 'value' ]
           ]
         },
         {
           params: [
-            { type: 'java.lang.String', name: 'name' },
-            { type: '[B', name: 'value' }
+            [ 'java.lang.String', 'name' ],
+            [ '[B', 'value' ]
           ]
         }
       ]
@@ -91,11 +89,7 @@ const intentFlagsHook: Frooky.JavaHook = {
       overloads: [
         {
           params: [
-            {
-              type: 'int',
-              name: 'flags',
-              decoder: 'IntentFlagsDecoder'
-            }
+            [ 'int', 'flags', { decoder: 'IntentFlagsDecoder' } ]
           ]
         }
       ]
@@ -115,7 +109,7 @@ const activityHook: Frooky.JavaHook = {
       overloads: [
         {
           params: [
-            { type: 'android.content.Intent', name: 'intent' }
+            [ 'android.content.Intent', 'intent' ]
           ]
         }
       ]
@@ -134,13 +128,13 @@ const sqliteHook: Frooky.JavaHook = {
       overloads: [
         {
           params: [
-            { type: 'java.lang.String', name: 'table' },
-            { type: '[Ljava.lang.String', name: 'columns' },
-            { type: 'java.lang.String', name: 'selection' },
-            { type: '[Ljava.lang.String', name: 'selectionArgs' },
-            { type: 'java.lang.String', name: 'groupBy' },
-            { type: 'java.lang.String', name: 'having' },
-            { type: 'java.lang.String', name: 'orderBy' }
+            [ 'java.lang.String', 'table' ],
+            [ '[Ljava.lang.String', 'columns' ],
+            [ 'java.lang.String', 'selection' ],
+            [ '[Ljava.lang.String', 'selectionArgs' ],
+            [ 'java.lang.String', 'groupBy' ],
+            [ 'java.lang.String', 'having' ],
+            [ 'java.lang.String', 'orderBy' ]
           ]
         }
       ]
@@ -161,15 +155,8 @@ const cipherHook: Frooky.JavaHook = {
       overloads: [
         {
           params: [
-            { 
-              type: '[B', 
-              name: 'output',
-              decodeAt: 'exit'
-            },
-            { 
-              type: 'int', 
-              name: 'outputOffset' 
-            }
+            [ '[B', 'output', { decodeAt: 'exit' } ],
+            [ 'int', 'outputOffset' ]
           ]
         }
       ]
@@ -188,11 +175,7 @@ const bufferHook: Frooky.JavaHook = {
       overloads: [
         {
           params: [
-            { 
-              type: '[B', 
-              name: 'src',
-              decodeAt: 'both'
-            }
+            [ '[B', 'src', { decodeAt: 'both' } ]
           ]
         }
       ]
@@ -206,7 +189,7 @@ const bufferHook: Frooky.JavaHook = {
 const webViewHook: Frooky.JavaHook = {
   javaClass: 'android.webkit.WebView',
   methods: [
-    { name: '$init' },  // Constructor
+    { name: '$init' },
     { name: 'loadUrl' }
   ]
 }

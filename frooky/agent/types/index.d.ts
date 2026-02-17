@@ -20,124 +20,6 @@ export type MasCategory =
 export type Platform = 'Android' | 'iOS';
 
 /**
- * When to decode a parameter.
- */
-export type DecodeAt = 'enter' | 'exit' | 'both';
-
-/**
- * Base configuration for all hook types.
- */
-export interface BaseHook {
-  /** Library/framework name. Mandatory for NativeHook. */
-  module?: string;
-  /** Maximum number of stack frames to capture (default: 10) */
-  stackTraceLimit?: number;
-  /** Regex patterns to filter stack traces */
-  stackTraceFilter?: string[];
-  /** Enable verbose logging for troubleshooting */
-  debug?: boolean;
-}
-
-/**
- * Parameter declaration shared across hook types.
- */
-export interface ParameterDeclaration {
-  /** Type descriptor according to platform standard */
-  type: string;
-  /** Optional: Name of the parameter */
-  name?: string;
-  /** Optional: When to decode the parameter. Default: enter */
-  decodeAt?: DecodeAt;
-  /** Optional: Custom decoder name. Default: autoSelect */
-  decoder?: string;
-}
-
-/**
- * Java method overload signature.
- */
-export interface JavaOverload {
-  /** Parameter list of the overloaded method */
-  params?: ParameterDeclaration[];
-}
-
-/**
- * Java method to hook.
- */
-export interface JavaMethod {
-  /** Name of the Java method */
-  name: string;
-  /** Optional: List of explicit method overloads */
-  overloads?: JavaOverload[];
-}
-
-/**
- * Android Java/Kotlin class hooking configuration.
- */
-export interface JavaHook extends BaseHook {
-  /** Fully qualified Java class name */
-  javaClass: string;
-  /** List of Java methods to hook */
-  methods: JavaMethod[];
-}
-
-/**
- * Objective-C method declaration.
- */
-export interface ObjectiveCMethod {
-  /** Name of the Objective-C method (include - or + prefix) */
-  name: string;
-  /** Optional: Return type of the Objective-C method */
-  returnType?: string;
-  /** Optional: Parameter list of the Objective-C method */
-  params?: ParameterDeclaration[];
-}
-
-/**
- * iOS Objective-C method hooking configuration.
- */
-export interface ObjectiveCHook extends BaseHook {
-  /** Fully qualified Objective-C class name */
-  objClass: string;
-  /** List of Objective-C method declarations to be hooked */
-  methods: ObjectiveCMethod[];
-}
-
-/**
- * Native function declaration.
- */
-export interface NativeFunction {
-  /** Native symbol as string */
-  symbol: string;
-  /** Optional: Return type of the function */
-  returnType?: string;
-  /** Optional: Parameter list of the function */
-  params?: ParameterDeclaration[];
-}
-
-/**
- * Native C/C++ function hooking configuration.
- */
-export interface NativeHook extends BaseHook {
-  /** Fully qualified module name (mandatory) */
-  module: string;
-  /** List of native symbol declarations to be hooked */
-  functions: NativeFunction[];
-}
-
-/**
- * iOS Swift method hooking configuration.
- */
-export interface SwiftHook extends BaseHook {
-  /** List of mangled Swift symbols */
-  methods: string[];
-}
-
-/**
- * Union type for all supported hook configurations.
- */
-export type Hook = JavaHook | NativeHook | ObjectiveCHook | SwiftHook;
-
-/**
  * Metadata for the hook collection.
  */
 export interface HookMetadata {
@@ -154,6 +36,79 @@ export interface HookMetadata {
   /** Optional: Semantic version (e.g., v1) */
   version?: string;
 }
+
+
+export type DecodeAt = 'entry' | 'exit' | 'both'
+
+export type ParameterOptions = {
+  decoder?: string
+  decodeAt?: DecodeAt
+  decoderArgs?: string[]
+}
+
+export type Parameter =
+  | string
+  | [string, string]
+  | [string, string, ParameterOptions]
+
+// ============================================================================
+// Java / Android
+// ============================================================================
+export interface JavaOverload {
+  params: Parameter[]
+}
+
+export interface JavaMethod {
+  name: string
+  overloads?: JavaOverload[]
+}
+
+export interface JavaHook {
+  javaClass: string
+  methods: JavaMethod[]
+  stackTraceLimit?: number
+  stackTraceFilter?: string[]
+  debug?: boolean
+}
+
+// ============================================================================
+// Objective-C / iOS
+// ============================================================================
+export interface ObjectiveCMethod {
+  name: string
+  returnType?: string
+  params?: Parameter[]
+}
+
+export interface ObjectiveCHook {
+  objcClass: string
+  methods: ObjectiveCMethod[]
+  stackTraceLimit?: number
+  stackTraceFilter?: string[]
+  debug?: boolean
+}
+
+// ============================================================================
+// Native
+// ============================================================================
+export interface NativeFunction {
+  symbol: string
+  returnType?: string
+  params?: Parameter[]
+}
+
+export interface NativeHook {
+  module: string
+  functions: NativeFunction[]
+  stackTraceLimit?: number
+  stackTraceFilter?: string[]
+  debug?: boolean
+}
+
+// ============================================================================
+// Union
+// ============================================================================
+export type Hook = JavaHook | ObjectiveCHook | NativeHook
 
 /**
  * Root frooky configuration.

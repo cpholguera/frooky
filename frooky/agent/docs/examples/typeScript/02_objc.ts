@@ -4,13 +4,13 @@ import * as Frooky from 'frooky'
 // EXAMPLE 1: Simple Objective-C instance method
 // ============================================================================
 const userDefaultsObjCHook: Frooky.ObjectiveCHook = {
-  objClass: 'NSUserDefaults',
+  objcClass: 'NSUserDefaults',
   methods: [
     {
       name: '- setObject:forKey:',
       params: [
-        { type: '(id)', name: 'value' },
-        { type: '(NSString *)', name: 'key' }
+        [ '(id)', 'value' ],
+        [ '(NSString *)', 'key' ]
       ]
     }
   ]
@@ -20,14 +20,14 @@ const userDefaultsObjCHook: Frooky.ObjectiveCHook = {
 // EXAMPLE 2: NSData write to file with return type
 // ============================================================================
 const nsDataHook: Frooky.ObjectiveCHook = {
-  objClass: 'NSData',
+  objcClass: 'NSData',
   methods: [
     {
       name: '- writeToFile:atomically:',
       returnType: '(BOOL)',
       params: [
-        { type: '(NSString *)', name: 'path' },
-        { type: '(BOOL)', name: 'useAuxiliaryFile' }
+        [ '(NSString *)', 'path' ],
+        [ '(BOOL)', 'useAuxiliaryFile' ]
       ]
     }
   ],
@@ -38,15 +38,15 @@ const nsDataHook: Frooky.ObjectiveCHook = {
 // EXAMPLE 3: Objective-C class method
 // ============================================================================
 const urlHook: Frooky.ObjectiveCHook = {
-  objClass: 'NSURL',
+  objcClass: 'NSURL',
   methods: [
     {
       name: '+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:',
       returnType: '(NSURL *)',
       params: [
-        { type: '(const char *)', name: 'path' },
-        { type: '(BOOL)', name: 'isDir' },
-        { type: '(NSURL *)', name: 'baseURL' }
+        [ '(const char *)', 'path' ],
+        [ '(BOOL)', 'isDir' ],
+        [ '(NSURL *)', 'baseURL' ]
       ]
     }
   ]
@@ -56,7 +56,7 @@ const urlHook: Frooky.ObjectiveCHook = {
 // EXAMPLE 4: LAContext biometry method (no params)
 // ============================================================================
 const laContextHook: Frooky.ObjectiveCHook = {
-  objClass: 'LAContext',
+  objcClass: 'LAContext',
   methods: [
     {
       name: '- invalidate'
@@ -68,26 +68,22 @@ const laContextHook: Frooky.ObjectiveCHook = {
 // EXAMPLE 5: Multiple methods in same class
 // ============================================================================
 const keychainHook: Frooky.ObjectiveCHook = {
-  objClass: 'LAPrivateKey',
+  objcClass: 'LAPrivateKey',
   methods: [
     {
       name: '- decryptData:secKeyAlgorithm:completion:',
       params: [
-        { type: '(NSData *)', name: 'data' },
-        { type: '(SecKeyAlgorithm)', name: 'algorithm' },
-        { 
-          type: '(void (^)(NSData *, NSError *))', 
-          name: 'handler',
-          decoder: 'LaPlaintextDecoder'  // Custom decoder for async callback
-        }
+        [ '(NSData *)', 'data' ],
+        [ '(SecKeyAlgorithm)', 'algorithm' ],
+        [ '(void (^)(NSData *, NSError *))', 'handler', { decoder: 'LaPlaintextDecoder' } ]
       ]
     },
     {
       name: '- signData:secKeyAlgorithm:completion:',
       params: [
-        { type: '(NSData *)', name: 'data' },
-        { type: '(SecKeyAlgorithm)', name: 'algorithm' },
-        { type: '(void (^)(NSData *, NSError *))', name: 'handler' }
+        [ '(NSData *)', 'data' ],
+        [ '(SecKeyAlgorithm)', 'algorithm' ],
+        [ '(void (^)(NSData *, NSError *))', 'handler' ]
       ]
     }
   ]
@@ -97,17 +93,13 @@ const keychainHook: Frooky.ObjectiveCHook = {
 // EXAMPLE 6: CoreData save with output parameter
 // ============================================================================
 const coreDataHook: Frooky.ObjectiveCHook = {
-  objClass: 'NSManagedObjectContext',
+  objcClass: 'NSManagedObjectContext',
   methods: [
     {
       name: '- save:',
       returnType: '(BOOL)',
       params: [
-        { 
-          type: '(NSError **)', 
-          name: 'error',
-          decodeAt: 'exit'  // Decode error after method execution
-        }
+        [ '(NSError **)', 'error', { decodeAt: 'exit' } ]
       ]
     }
   ],
@@ -118,14 +110,14 @@ const coreDataHook: Frooky.ObjectiveCHook = {
 // EXAMPLE 7: Network request with stack trace filtering
 // ============================================================================
 const urlSessionHook: Frooky.ObjectiveCHook = {
-  objClass: 'NSURLSession',
+  objcClass: 'NSURLSession',
   methods: [
     {
       name: '- dataTaskWithRequest:completionHandler:',
       returnType: '(NSURLSessionDataTask *)',
       params: [
-        { type: '(NSURLRequest *)', name: 'request' },
-        { type: '(void (^)(NSData *, NSURLResponse *, NSError *))', name: 'completionHandler' }
+        [ '(NSURLRequest *)', 'request' ],
+        [ '(void (^)(NSData *, NSURLResponse *, NSError *))', 'completionHandler' ]
       ]
     }
   ],
@@ -136,28 +128,24 @@ const urlSessionHook: Frooky.ObjectiveCHook = {
 // EXAMPLE 8: Method with both entry and exit decoding
 // ============================================================================
 const dataProcessingHook: Frooky.ObjectiveCHook = {
-  objClass: 'NSMutableData',
+  objcClass: 'NSMutableData',
   methods: [
     {
       name: '- appendData:',
       params: [
-        { 
-          type: '(NSData *)', 
-          name: 'data',
-          decodeAt: 'both'  // Capture data before and after
-        }
+        [ '(NSData *)', 'data', { decodeAt: 'both' } ]
       ]
     }
   ]
 }
 
-export { 
-  userDefaultsObjCHook, 
-  nsDataHook, 
+export {
+  userDefaultsObjCHook,
+  nsDataHook,
   urlHook,
   laContextHook,
   keychainHook,
-  coreDataHook, 
+  coreDataHook,
   urlSessionHook,
   dataProcessingHook
 }
