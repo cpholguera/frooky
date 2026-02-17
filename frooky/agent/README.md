@@ -3,8 +3,8 @@
 This documentation will tell you everything you need to know about the frooky agent and its features.
 
 - [What is the frooky Agent?](#what-is-the-frooky-agent)
+- [Quickstart](#quickstart)
 - [Compile And Run Standalone Client](#compile-and-run-standalone-client)
-- [Hook Declaration Quickstart](#hook-declaration-quickstart)
 - [Structure of a Hook File](#structure-of-a-hook-file)
 - [Parameter- and Return-Type Declaration](#parameter--and-return-type-declaration)
 - [Platform-Dependent Hook Declaration](#platform-dependent-hook-declaration)
@@ -17,10 +17,27 @@ First things first: The frooky agent is the part of frooky which is executed on 
 - Resolving the methods and functions which will be hooked
 - Hooking said methods and functions
 - Decoding the input arguments and return values
-- Compiling the gathered data into events
+- Processing the gathered data
+- Generating events based on the processed data
 - Sending the events back to the host
 
-It can be run standalone, but usually it is used with the frooky _host_ written in Python.
+It can be run standalone, but usually it is used with the frooky host written in Python.
+
+## Quickstart
+
+If you want to start writing frooky hooks files, we recommend reading at the platform documentation:
+
+<!-- no toc -->
+- [Compile And Run Standalone Client](#compile-and-run-standalone-client)
+- [Java Hook Declaration](docs/java-hook-declaration.md)
+- [Objective-C Hook Declaration](docs/objective-c-hook-declaration.md)
+- [Native Hook Declaration](docs/native-hook-declaration.md)
+
+Also have a look at the [examples](./docs/examples/) and the TypeScript [type declaration](./types/index.d.ts).
+
+They will give you all necessary information to write hook files for majority of use cases.
+
+For more advanced features and use cases continue reading this documentation. It will guide you through all frooky agent features.
 
 ## Compile And Run Standalone Client
 
@@ -56,20 +73,6 @@ If you want to use the frooky agent without the Python host, or if you want to d
   ```sh
   frida -U -f org.owasp.mytargetapp dist/agent-io.js
   ```
-
-## Hook Declaration Quickstart
-
-If you want to start writing frooky hooks files, we recommend reading at the platform documentation:
-
-- [Java Hook Declaration](docs/java-hook-declaration.md)
-- [Objective-C Hook Declaration](docs/objective-c-hook-declaration.md)
-- [Native Hook Declaration](docs/native-hook-declaration.md)
-
-Also have a look at the [examples](./docs/examples/) and the TypeScript [type declaration](./types/index.d.ts).
-
-They will give you all necessary information to write hook files for majority of use cases.
-
-For more advanced features and use cases continue reading this documentation. It will guide you through all frooky agent features.
 
 ## Structure of a Hook File
 
