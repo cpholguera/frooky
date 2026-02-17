@@ -58,10 +58,12 @@ export interface JavaOverload {
   params: Parameter[]
 }
 
-export interface JavaMethod {
-  name: string
-  overloads?: JavaOverload[]
-}
+export type JavaMethod =
+  | string
+  | {
+      name: string
+      overloads?: JavaOverload[]
+  }
 
 export interface JavaHook {
   javaClass: string
@@ -74,11 +76,14 @@ export interface JavaHook {
 // ============================================================================
 // Objective-C / iOS
 // ============================================================================
-export interface ObjectiveCMethod {
-  name: string
-  returnType?: string
-  params?: Parameter[]
-}
+
+export type ObjectiveCMethod =
+  | string
+  | {
+      name: string
+      returnType?: string
+      params?: Parameter[]
+  }
 
 export interface ObjectiveCHook {
   objcClass: string

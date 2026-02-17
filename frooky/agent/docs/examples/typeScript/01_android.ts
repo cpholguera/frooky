@@ -6,7 +6,7 @@ import * as Frooky from 'frooky'
 const wifiHook: Frooky.JavaHook = {
   javaClass: 'android.net.wifi.WifiManager',
   methods: [
-    { name: 'getConnectionInfo' }
+    'getConnectionInfo'
   ]
 }
 
@@ -16,9 +16,9 @@ const wifiHook: Frooky.JavaHook = {
 const locationHook: Frooky.JavaHook = {
   javaClass: 'android.location.LocationManager',
   methods: [
-    { name: 'getLastKnownLocation' },
-    { name: 'isProviderEnabled' },
-    { name: 'requestLocationUpdates' }
+    'getLastKnownLocation',
+    'isProviderEnabled',
+    'requestLocationUpdates'
   ],
   stackTraceLimit: 10
 }

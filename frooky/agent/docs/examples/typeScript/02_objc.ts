@@ -58,9 +58,7 @@ const urlHook: Frooky.ObjectiveCHook = {
 const laContextHook: Frooky.ObjectiveCHook = {
   objcClass: 'LAContext',
   methods: [
-    {
-      name: '- invalidate'
-    }
+    '- invalidate'
   ]
 }
 
