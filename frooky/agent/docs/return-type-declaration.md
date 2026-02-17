@@ -104,10 +104,10 @@ The following chapters will explain the concepts using practical example.
 javaClass: android.content.Intent
 methods:
   - name: getFlags
-    returnType: [ java.lang.String, { decoder: intentFlagsDecoder } ]
+    returnType: [ int, { decoder: intentFlagsDecoder } ]
 ```
 
-The return value is a `java.lang.String` representing the set flags for this intent. Instead of using the default integer decoder, frooky will use `intentFlagsDecoder` to process the return value and decode the set flags instead of just the integer.
+The return value is a integer representing the set flags for this intent. Instead of using the default integer decoder, frooky will use `intentFlagsDecoder` to process the return value and decode the set flags instead of just the integer.
 
 #### 3.1.2. Custom Decoder in Objective-C
 
