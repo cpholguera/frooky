@@ -1,6 +1,6 @@
 # Parameter Declaration
 
-frooky needs to know a function or method's signature in order to hook it correctly. Part of this signature is the parameter list which is a set of types and names for the arguments passed to the function or method. This documentation explains how to declare parameters.
+frooky needs to know a function or method's signature to hook it correctly. Part of this signature is the parameter list, which consists of the types and names of the arguments passed to the function or method. This documentation explains how to declare parameters.
 
 - [1. Unnamed Parameters](#1-unnamed-parameters)
   - [1.1. Unnamed Java Parameters](#11-unnamed-java-parameters)
