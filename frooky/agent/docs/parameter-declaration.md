@@ -190,7 +190,7 @@ Whenever the Frooky agent hooks a method, it decodes the return value from its r
 
 Depending on the type, this can be fairly simple. Primitives, such as Integers, Floats, or Shorts, can always be decoded by the frooky agent. However, some values require more complex decoders.
 
-They are required, if the either the time of decoding varies, or if more context information is required. The following two chapters explain these cases.
+They are required if either the decoding time varies or more context information is required. The following two chapters explain these cases.
 
 You can add a decoder configuration object to any [unnamed parameter](#1-unnamed-parameters) and [named](#2-named-parameters) parameter.
 
