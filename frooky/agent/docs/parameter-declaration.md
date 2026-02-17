@@ -186,9 +186,9 @@ functions:
 
 ## 3. Decoders
 
-When ever the frooky agent hooks a function on method, it tries to decode the arguments passed to it as well as the value returned to the caller.
+Whenever the Frooky agent hooks a method, it decodes the return value from its raw runtime representation, based on the arguments passed to its configuration, into the value returned to the caller.
 
-Depending on the type this can be fairly simle. Primitives, such as Integers, Floats or Shorts can be always be decoded by the frooky agent. However, some values required more complex decoders.
+Depending on the type, this can be fairly simple. Primitives, such as Integers, Floats, or Shorts, can always be decoded by the frooky agent. However, some values require more complex decoders.
 
 They are required, if the either the time of decoding varies, or if more context information is required. The following two chapters explain these cases.
 
