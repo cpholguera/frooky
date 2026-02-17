@@ -8,96 +8,76 @@ metadata:
 
 hooks:
   # EXAMPLE 1: Simple Objective-C instance method
-  - objClass: NSUserDefaults
+  - objcClass: NSUserDefaults
     methods:
       - name: "- setObject:forKey:"
         params:
-          - type: (id)
-            name: value
-          - type: (NSString *)
-            name: key
+          - [ "(id)", value ]
+          - [ "(NSString *)", key ]
 
   # EXAMPLE 2: NSData write to file with return type
-  - objClass: NSData
+  - objcClass: NSData
     methods:
       - name: "- writeToFile:atomically:"
-        returnType: (BOOL)
+        returnType: "(BOOL)"
         params:
-          - type: (NSString *)
-            name: path
-          - type: (BOOL)
-            name: useAuxiliaryFile
+          - [ "(NSString *)", path ]
+          - [ "(BOOL)", useAuxiliaryFile ]
     stackTraceLimit: 8
 
   # EXAMPLE 3: Objective-C class method
-  - objClass: NSURL
+  - objcClass: NSURL
     methods:
       - name: "+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:"
-        returnType: (NSURL *)
+        returnType: "(NSURL *)"
         params:
-          - type: (const char *)
-            name: path
-          - type: (BOOL)
-            name: isDir
-          - type: (NSURL *)
-            name: baseURL
+          - [ "(const char *)", path ]
+          - [ "(BOOL)", isDir ]
+          - [ "(NSURL *)", baseURL ]
 
   # EXAMPLE 4: LAContext biometry method (no params)
-  - objClass: LAContext
+  - objcClass: LAContext
     methods:
       - name: "- invalidate"
 
   # EXAMPLE 5: Multiple methods in same class
-  - objClass: LAPrivateKey
+  - objcClass: LAPrivateKey
     methods:
       - name: "- decryptData:secKeyAlgorithm:completion:"
         params:
-          - type: (NSData *)
-            name: data
-          - type: (SecKeyAlgorithm)
-            name: algorithm
-          - type: (void (^)(NSData *, NSError *))
-            name: handler
-            decoder: LaPlaintextDecoder
+          - [ "(NSData *)", data ]
+          - [ "(SecKeyAlgorithm)", algorithm ]
+          - [ "(void (^)(NSData *, NSError *))", handler, { decoder: LaPlaintextDecoder } ]
       - name: "- signData:secKeyAlgorithm:completion:"
         params:
-          - type: (NSData *)
-            name: data
-          - type: (SecKeyAlgorithm)
-            name: algorithm
-          - type: (void (^)(NSData *, NSError *))
-            name: handler
+          - [ "(NSData *)", data ]
+          - [ "(SecKeyAlgorithm)", algorithm ]
+          - [ "(void (^)(NSData *, NSError *))", handler ]
 
   # EXAMPLE 6: CoreData save with output parameter
-  - objClass: NSManagedObjectContext
+  - objcClass: NSManagedObjectContext
     methods:
       - name: "- save:"
-        returnType: (BOOL)
+        returnType: "(BOOL)"
         params:
-          - type: (NSError **)
-            name: error
-            decodeAt: exit
+          - [ "(NSError **)", error, { decodeAt: exit } ]
     debug: true
 
   # EXAMPLE 7: Network request with stack trace filtering
-  - objClass: NSURLSession
+  - objcClass: NSURLSession
     methods:
       - name: "- dataTaskWithRequest:completionHandler:"
-        returnType: (NSURLSessionDataTask *)
+        returnType: "(NSURLSessionDataTask *)"
         params:
-          - type: (NSURLRequest *)
-            name: request
-          - type: (void (^)(NSData *, NSURLResponse *, NSError *))
-            name: completionHandler
+          - [ "(NSURLRequest *)", request ]
+          - [ "(void (^)(NSData *, NSURLResponse *, NSError *))", completionHandler ]
     stackTraceFilter:
       - "^libsystem_"
       - "^Foundation"
 
   # EXAMPLE 8: Method with both entry and exit decoding
-  - objClass: NSMutableData
+  - objcClass: NSMutableData
     methods:
       - name: "- appendData:"
         params:
-          - type: (NSData *)
-            name: data
-            decodeAt: both
+          - [ "(NSData *)", data, { decodeAt: both } ]

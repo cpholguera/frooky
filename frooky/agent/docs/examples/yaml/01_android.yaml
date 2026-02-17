@@ -26,7 +26,7 @@ hooks:
       - name: openConnection
         overloads:
           - params:
-              - type: java.net.Proxy
+              - java.net.Proxy
 
   # EXAMPLE 4: Multiple overloads
   - javaClass: android.content.Intent
@@ -34,25 +34,17 @@ hooks:
       - name: putExtra
         overloads:
           - params:
-              - type: java.lang.String
-                name: name
-              - type: java.lang.String
-                name: value
+              - [ "java.lang.String", name ]
+              - [ "java.lang.String", value ]
           - params:
-              - type: java.lang.String
-                name: name
-              - type: int
-                name: value
+              - [ "java.lang.String", name ]
+              - [ int, value ]
           - params:
-              - type: java.lang.String
-                name: name
-              - type: boolean
-                name: value
+              - [ "java.lang.String", name ]
+              - [ boolean, value ]
           - params:
-              - type: java.lang.String
-                name: name
-              - type: "[B"
-                name: value
+              - [ "java.lang.String", name ]
+              - [ "[B", value ]
 
   # EXAMPLE 5: Custom decoder for Java method argument
   - javaClass: android.content.Intent
@@ -60,9 +52,7 @@ hooks:
       - name: setFlags
         overloads:
           - params:
-              - type: int
-                name: flags
-                decoder: IntentFlagsDecoder
+              - [ int, flags, { decoder: IntentFlagsDecoder } ]
     debug: true
 
   # EXAMPLE 6: Single Java Type as argument
@@ -71,8 +61,7 @@ hooks:
       - name: startActivity
         overloads:
           - params:
-              - type: android.content.Intent
-                name: intent
+              - [ "android.content.Intent", intent ]
 
   # EXAMPLE 7: Multiple Java Types as arguments
   - javaClass: android.database.sqlite.SQLiteDatabase
@@ -80,20 +69,13 @@ hooks:
       - name: query
         overloads:
           - params:
-              - type: java.lang.String
-                name: table
-              - type: "[Ljava.lang.String"
-                name: columns
-              - type: java.lang.String
-                name: selection
-              - type: "[Ljava.lang.String"
-                name: selectionArgs
-              - type: java.lang.String
-                name: groupBy
-              - type: java.lang.String
-                name: having
-              - type: java.lang.String
-                name: orderBy
+              - [ "java.lang.String", table ]
+              - [ "[Ljava.lang.String", columns ]
+              - [ "java.lang.String", selection ]
+              - [ "[Ljava.lang.String", selectionArgs ]
+              - [ "java.lang.String", groupBy ]
+              - [ "java.lang.String", having ]
+              - [ "java.lang.String", orderBy ]
     stackTraceLimit: 15
     stackTraceFilter:
       - "^java\\."
@@ -105,11 +87,8 @@ hooks:
       - name: doFinal
         overloads:
           - params:
-              - type: "[B"
-                name: output
-                decodeAt: exit
-              - type: int
-                name: outputOffset
+              - [ "[B", output, { decodeAt: exit } ]
+              - [ int, outputOffset ]
 
   # EXAMPLE 9: Decode parameter at both entry and exit
   - javaClass: java.nio.ByteBuffer
@@ -117,9 +96,7 @@ hooks:
       - name: put
         overloads:
           - params:
-              - type: "[B"
-                name: src
-                decodeAt: both
+              - [ "[B", src, { decodeAt: both } ]
 
   # EXAMPLE 10: Hook constructor
   - javaClass: android.webkit.WebView
