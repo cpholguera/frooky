@@ -124,8 +124,8 @@ const partialMetadataHooks: Frooky.FrookyConfig = {
 }
 
 // Export for use in Frida agent
-export { 
-    androidHooks, 
+export {
+    androidHooks,
     iosHooks,
     minimalAndroidHooks,
     minimalIosHooks,

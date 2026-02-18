@@ -23,10 +23,10 @@ export type Platform = 'Android' | 'iOS';
  * Metadata for the hook collection.
  */
 export interface HookMetadata {
+  /** Target platform (hooks must be platform-specific) */
+  platform: Platform;
   /** Optional: Name of the hook collection */
   name?: string;
-  /** Optional: Target platform (hooks must be platform-specific) */
-  platform?: Platform;
   /** Optional: Description of what the hook collection does */
   description?: string;
   /** Optional: OWASP MAS category */
@@ -36,7 +36,6 @@ export interface HookMetadata {
   /** Optional: Semantic version (e.g., v1) */
   version?: string;
 }
-
 
 export type DecodeAt = 'entry' | 'exit' | 'both'
 
@@ -61,8 +60,8 @@ export interface JavaOverload {
 export type JavaMethod =
   | string
   | {
-      name: string
-      overloads?: JavaOverload[]
+    name: string
+    overloads?: JavaOverload[]
   }
 
 export interface JavaHook {
@@ -80,9 +79,9 @@ export interface JavaHook {
 export type ObjectiveCMethod =
   | string
   | {
-      name: string
-      returnType?: string
-      params?: Parameter[]
+    name: string
+    returnType?: string
+    params?: Parameter[]
   }
 
 export interface ObjectiveCHook {

@@ -7,7 +7,6 @@ metadata:
   version: v1
 
 hooks:
-
   # Single Java method
   - javaClass: android.net.wifi.WifiManager
     methods:
@@ -45,17 +44,17 @@ hooks:
       - name: putExtra
         overloads:
           - params:
-              - [ "java.lang.String", name ]
-              - [ "java.lang.String", value ]
+              - ["java.lang.String", name]
+              - ["java.lang.String", value]
           - params:
-              - [ "java.lang.String", name ]
-              - [ int, value ]
+              - ["java.lang.String", name]
+              - [int, value]
           - params:
-              - [ "java.lang.String", name ]
-              - [ boolean, value ]
+              - ["java.lang.String", name]
+              - [boolean, value]
           - params:
-              - [ "java.lang.String", name ]
-              - [ "[B", value ]
+              - ["java.lang.String", name]
+              - ["[B", value]
 
   # Custom decoder for Java method argument
   - javaClass: android.content.Intent
@@ -63,7 +62,7 @@ hooks:
       - name: setFlags
         overloads:
           - params:
-              - [ int, flags, { decoder: IntentFlagsDecoder } ]
+              - [int, flags, { decoder: IntentFlagsDecoder }]
     debug: true
 
   # Single Java Type as argument
@@ -72,7 +71,7 @@ hooks:
       - name: startActivity
         overloads:
           - params:
-              - [ "android.content.Intent", intent ]
+              - ["android.content.Intent", intent]
 
   # Multiple Java Types as arguments
   - javaClass: android.database.sqlite.SQLiteDatabase
@@ -80,13 +79,13 @@ hooks:
       - name: query
         overloads:
           - params:
-              - [ "java.lang.String", table ]
-              - [ "[Ljava.lang.String", columns ]
-              - [ "java.lang.String", selection ]
-              - [ "[Ljava.lang.String", selectionArgs ]
-              - [ "java.lang.String", groupBy ]
-              - [ "java.lang.String", having ]
-              - [ "java.lang.String", orderBy ]
+              - ["java.lang.String", table]
+              - ["[Ljava.lang.String", columns]
+              - ["java.lang.String", selection]
+              - ["[Ljava.lang.String", selectionArgs]
+              - ["java.lang.String", groupBy]
+              - ["java.lang.String", having]
+              - ["java.lang.String", orderBy]
     stackTraceLimit: 15
     stackTraceFilter:
       - "^java\\."
@@ -98,8 +97,8 @@ hooks:
       - name: doFinal
         overloads:
           - params:
-              - [ "[B", output, { decodeAt: exit } ]
-              - [ int, outputOffset ]
+              - ["[B", output, { decodeAt: exit }]
+              - [int, outputOffset]
 
   # Decode parameter at both entry and exit
   - javaClass: java.nio.ByteBuffer
@@ -107,4 +106,4 @@ hooks:
       - name: put
         overloads:
           - params:
-              - [ "[B", src, { decodeAt: both } ]
+              - ["[B", src, { decodeAt: both }]

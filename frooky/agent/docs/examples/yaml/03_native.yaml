@@ -13,7 +13,6 @@ hooks:
       - name: open
       - name: close
 
-
   # Only alert when the function is called, no decoding, shortened
   - module: libc.so
     functions:
@@ -26,9 +25,9 @@ hooks:
       - symbol: open
         returnType: int
         params:
-          - [ "const char *", pathname ]
-          - [ int, flags ]
-          - [ mode_t, mode ]
+          - ["const char *", pathname]
+          - [int, flags]
+          - [mode_t, mode]
 
   # Function with pointer and buffer
   - module: libc.so
@@ -36,9 +35,9 @@ hooks:
       - symbol: read
         returnType: ssize_t
         params:
-          - [ int, fd ]
-          - [ "void *", buf, { decodeAt: exit, decoderArgs: [ count ] } ]
-          - [ size_t, count ]
+          - [int, fd]
+          - ["void *", buf, { decodeAt: exit, decoderArgs: [count] }]
+          - [size_t, count]
 
   # OpenSSL encryption function, ctx contains information about the used algorithms
   - module: libssl.so
@@ -46,11 +45,11 @@ hooks:
       - symbol: EVP_EncryptInit_ex
         returnType: int
         params:
-          - [ "EVP_CIPHER_CTX *", ctx ]
-          - [ "const EVP_CIPHER *", type ]
-          - [ "ENGINE *", impl ]
-          - [ "const unsigned char *", key, { decoderArgs: [ ctx ]  } ]
-          - [ "const unsigned char *", iv, { decoderArgs: [ ctx ] } ]
+          - ["EVP_CIPHER_CTX *", ctx]
+          - ["const EVP_CIPHER *", type]
+          - ["ENGINE *", impl]
+          - ["const unsigned char *", key, { decoderArgs: [ctx] }]
+          - ["const unsigned char *", iv, { decoderArgs: [ctx] }]
     stackTraceLimit: 10
 
   # SSL write with buffer
@@ -59,9 +58,9 @@ hooks:
       - symbol: SSL_write
         returnType: int
         params:
-          - [ "SSL *", ssl ]
-          - [ "const void *", buf ]
-          - [ int, num ]
+          - ["SSL *", ssl]
+          - ["const void *", buf]
+          - [int, num]
     debug: true
 
   # Multiple functions in same module
@@ -72,9 +71,9 @@ hooks:
       - symbol: OSSL_CMP_validate_cert_path
         returnType: int
         params:
-          - [ "const OSSL_CMP_CTX *", ctx ]
-          - [ "X509_STORE *", trusted_store ]
-          - [ "X509 *", cert ]
+          - ["const OSSL_CMP_CTX *", ctx]
+          - ["X509_STORE *", trusted_store]
+          - ["X509 *", cert]
 
   # Function with custom decoder
   - module: libcustom.so
@@ -82,8 +81,12 @@ hooks:
       - symbol: process_data
         returnType: int
         params:
-          - [ "void *", data, { decoder: CustomDataDecoder, decoderArgs: [ size ] } ]
-          - [ size_t, size ]
+          - [
+              "void *",
+              data,
+              { decoder: CustomDataDecoder, decoderArgs: [size] },
+            ]
+          - [size_t, size]
 
   # Function with output parameter decoded at exit
   - module: libcustom.so
@@ -91,5 +94,5 @@ hooks:
       - symbol: get_buffer
         returnType: int
         params:
-          - [ "unsigned char *", output, { decodeAt: exit } ]
-          - [ size_t, size ]
+          - ["unsigned char *", output, { decodeAt: exit }]
+          - [size_t, size]

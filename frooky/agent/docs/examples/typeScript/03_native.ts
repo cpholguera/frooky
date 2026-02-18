@@ -10,9 +10,9 @@ const openHook: Frooky.NativeHook = {
       symbol: 'open',
       returnType: 'int',
       params: [
-        [ 'const char *', 'pathname' ],
-        [ 'int', 'flags' ],
-        [ 'mode_t', 'mode' ]
+        ['const char *', 'pathname'],
+        ['int', 'flags'],
+        ['mode_t', 'mode']
       ]
     }
   ]
@@ -28,9 +28,9 @@ const readHook: Frooky.NativeHook = {
       symbol: 'read',
       returnType: 'ssize_t',
       params: [
-        [ 'int', 'fd' ],
-        [ 'void *', 'buf', { decodeAt: 'exit' } ],
-        [ 'size_t', 'count' ]
+        ['int', 'fd'],
+        ['void *', 'buf', { decodeAt: 'exit' }],
+        ['size_t', 'count']
       ]
     }
   ]
@@ -46,11 +46,11 @@ const encryptHook: Frooky.NativeHook = {
       symbol: 'EVP_EncryptInit_ex',
       returnType: 'int',
       params: [
-        [ 'EVP_CIPHER_CTX *', 'ctx' ],
-        [ 'const EVP_CIPHER *', 'type' ],
-        [ 'ENGINE *', 'impl' ],
-        [ 'const unsigned char *', 'key' ],
-        [ 'const unsigned char *', 'iv' ]
+        ['EVP_CIPHER_CTX *', 'ctx'],
+        ['const EVP_CIPHER *', 'type'],
+        ['ENGINE *', 'impl'],
+        ['const unsigned char *', 'key'],
+        ['const unsigned char *', 'iv']
       ]
     }
   ],
@@ -67,9 +67,9 @@ const sslWriteHook: Frooky.NativeHook = {
       symbol: 'SSL_write',
       returnType: 'int',
       params: [
-        [ 'SSL *', 'ssl' ],
-        [ 'const void *', 'buf' ],
-        [ 'int', 'num' ]
+        ['SSL *', 'ssl'],
+        ['const void *', 'buf'],
+        ['int', 'num']
       ]
     }
   ],
@@ -88,9 +88,9 @@ const opensslHook: Frooky.NativeHook = {
       symbol: 'OSSL_CMP_validate_cert_path',
       returnType: 'int',
       params: [
-        [ 'const OSSL_CMP_CTX *', 'ctx' ],
-        [ 'X509_STORE *', 'trusted_store' ],
-        [ 'X509 *', 'cert' ]
+        ['const OSSL_CMP_CTX *', 'ctx'],
+        ['X509_STORE *', 'trusted_store'],
+        ['X509 *', 'cert']
       ]
     }
   ]
@@ -106,8 +106,8 @@ const customDecoderHook: Frooky.NativeHook = {
       symbol: 'process_data',
       returnType: 'int',
       params: [
-        [ 'void *', 'data', { decoder: 'CustomDataDecoder' } ],
-        [ 'size_t', 'size' ]
+        ['void *', 'data', { decoder: 'CustomDataDecoder' }],
+        ['size_t', 'size']
       ]
     }
   ]
@@ -123,8 +123,8 @@ const outputParamHook: Frooky.NativeHook = {
       symbol: 'get_buffer',
       returnType: 'int',
       params: [
-        [ 'unsigned char *', 'output', { decodeAt: 'exit' } ],
-        [ 'size_t', 'size' ]
+        ['unsigned char *', 'output', { decodeAt: 'exit' }],
+        ['size_t', 'size']
       ]
     }
   ]

@@ -9,8 +9,8 @@ const userDefaultsObjCHook: Frooky.ObjectiveCHook = {
     {
       name: '- setObject:forKey:',
       params: [
-        [ '(id)', 'value' ],
-        [ '(NSString *)', 'key' ]
+        ['(id)', 'value'],
+        ['(NSString *)', 'key']
       ]
     }
   ]
@@ -26,8 +26,8 @@ const nsDataHook: Frooky.ObjectiveCHook = {
       name: '- writeToFile:atomically:',
       returnType: '(BOOL)',
       params: [
-        [ '(NSString *)', 'path' ],
-        [ '(BOOL)', 'useAuxiliaryFile' ]
+        ['(NSString *)', 'path'],
+        ['(BOOL)', 'useAuxiliaryFile']
       ]
     }
   ],
@@ -44,9 +44,9 @@ const urlHook: Frooky.ObjectiveCHook = {
       name: '+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:',
       returnType: '(NSURL *)',
       params: [
-        [ '(const char *)', 'path' ],
-        [ '(BOOL)', 'isDir' ],
-        [ '(NSURL *)', 'baseURL' ]
+        ['(const char *)', 'path'],
+        ['(BOOL)', 'isDir'],
+        ['(NSURL *)', 'baseURL']
       ]
     }
   ]
@@ -71,17 +71,17 @@ const keychainHook: Frooky.ObjectiveCHook = {
     {
       name: '- decryptData:secKeyAlgorithm:completion:',
       params: [
-        [ '(NSData *)', 'data' ],
-        [ '(SecKeyAlgorithm)', 'algorithm' ],
-        [ '(void (^)(NSData *, NSError *))', 'handler', { decoder: 'LaPlaintextDecoder' } ]
+        ['(NSData *)', 'data'],
+        ['(SecKeyAlgorithm)', 'algorithm'],
+        ['(void (^)(NSData *, NSError *))', 'handler', { decoder: 'LaPlaintextDecoder' }]
       ]
     },
     {
       name: '- signData:secKeyAlgorithm:completion:',
       params: [
-        [ '(NSData *)', 'data' ],
-        [ '(SecKeyAlgorithm)', 'algorithm' ],
-        [ '(void (^)(NSData *, NSError *))', 'handler' ]
+        ['(NSData *)', 'data'],
+        ['(SecKeyAlgorithm)', 'algorithm'],
+        ['(void (^)(NSData *, NSError *))', 'handler']
       ]
     }
   ]
@@ -97,7 +97,7 @@ const coreDataHook: Frooky.ObjectiveCHook = {
       name: '- save:',
       returnType: '(BOOL)',
       params: [
-        [ '(NSError **)', 'error', { decodeAt: 'exit' } ]
+        ['(NSError **)', 'error', { decodeAt: 'exit' }]
       ]
     }
   ],
@@ -114,8 +114,8 @@ const urlSessionHook: Frooky.ObjectiveCHook = {
       name: '- dataTaskWithRequest:completionHandler:',
       returnType: '(NSURLSessionDataTask *)',
       params: [
-        [ '(NSURLRequest *)', 'request' ],
-        [ '(void (^)(NSData *, NSURLResponse *, NSError *))', 'completionHandler' ]
+        ['(NSURLRequest *)', 'request'],
+        ['(void (^)(NSData *, NSURLResponse *, NSError *))', 'completionHandler']
       ]
     }
   ],
@@ -131,7 +131,7 @@ const dataProcessingHook: Frooky.ObjectiveCHook = {
     {
       name: '- appendData:',
       params: [
-        [ '(NSData *)', 'data', { decodeAt: 'both' } ]
+        ['(NSData *)', 'data', { decodeAt: 'both' }]
       ]
     }
   ]

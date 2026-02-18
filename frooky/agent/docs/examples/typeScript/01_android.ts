@@ -33,7 +33,7 @@ const urlHook: Frooky.JavaHook = {
       name: 'openConnection',
       overloads: [
         {
-          params: [ 'java.net.Proxy' ]
+          params: ['java.net.Proxy']
         }
       ]
     }
@@ -51,26 +51,26 @@ const intentHook: Frooky.JavaHook = {
       overloads: [
         {
           params: [
-            [ 'java.lang.String', 'name' ],
-            [ 'java.lang.String', 'value' ]
+            ['java.lang.String', 'name'],
+            ['java.lang.String', 'value']
           ]
         },
         {
           params: [
-            [ 'java.lang.String', 'name' ],
-            [ 'int', 'value' ]
+            ['java.lang.String', 'name'],
+            ['int', 'value']
           ]
         },
         {
           params: [
-            [ 'java.lang.String', 'name' ],
-            [ 'boolean', 'value' ]
+            ['java.lang.String', 'name'],
+            ['boolean', 'value']
           ]
         },
         {
           params: [
-            [ 'java.lang.String', 'name' ],
-            [ '[B', 'value' ]
+            ['java.lang.String', 'name'],
+            ['[B', 'value']
           ]
         }
       ]
@@ -89,7 +89,7 @@ const intentFlagsHook: Frooky.JavaHook = {
       overloads: [
         {
           params: [
-            [ 'int', 'flags', { decoder: 'IntentFlagsDecoder' } ]
+            ['int', 'flags', { decoder: 'IntentFlagsDecoder' }]
           ]
         }
       ]
@@ -109,7 +109,7 @@ const activityHook: Frooky.JavaHook = {
       overloads: [
         {
           params: [
-            [ 'android.content.Intent', 'intent' ]
+            ['android.content.Intent', 'intent']
           ]
         }
       ]
@@ -128,13 +128,13 @@ const sqliteHook: Frooky.JavaHook = {
       overloads: [
         {
           params: [
-            [ 'java.lang.String', 'table' ],
-            [ '[Ljava.lang.String', 'columns' ],
-            [ 'java.lang.String', 'selection' ],
-            [ '[Ljava.lang.String', 'selectionArgs' ],
-            [ 'java.lang.String', 'groupBy' ],
-            [ 'java.lang.String', 'having' ],
-            [ 'java.lang.String', 'orderBy' ]
+            ['java.lang.String', 'table'],
+            ['[Ljava.lang.String', 'columns'],
+            ['java.lang.String', 'selection'],
+            ['[Ljava.lang.String', 'selectionArgs'],
+            ['java.lang.String', 'groupBy'],
+            ['java.lang.String', 'having'],
+            ['java.lang.String', 'orderBy']
           ]
         }
       ]
@@ -155,8 +155,8 @@ const cipherHook: Frooky.JavaHook = {
       overloads: [
         {
           params: [
-            [ '[B', 'output', { decodeAt: 'exit' } ],
-            [ 'int', 'outputOffset' ]
+            ['[B', 'output', { decodeAt: 'exit' }],
+            ['int', 'outputOffset']
           ]
         }
       ]
@@ -175,7 +175,7 @@ const bufferHook: Frooky.JavaHook = {
       overloads: [
         {
           params: [
-            [ '[B', 'src', { decodeAt: 'both' } ]
+            ['[B', 'src', { decodeAt: 'both' }]
           ]
         }
       ]
