@@ -25,11 +25,17 @@ frooky/
 │       ├── build.js                # Custom build script
 │       ├── android/                # Android-specific agent code
 │       ├── ios/                    # iOS-specific agent code
-│       └── dist/                   # Compiled agent artifacts (git-ignored)
-│           ├── agent-android.js    # Built Android agent
-│           ├── agent-ios.js        # Built iOS agent
-│           └── version.json        # Version metadata
-├── docs/                            # Documentation
+│       ├── types/                  # TypeScript declarations for the public hook file API
+│       ├── README.md               # Documentation of the frooky agent
+│       ├── dist/                   # Compiled agent artifacts (git-ignored)
+│       │   ├── agent-android.js    # Built Android agent
+│       │   ├── agent-ios.js        # Built iOS agent
+│       │   └── version.json        # Version metadata
+│       └── docs/                   # Additional documentation of the frooky agent
+│           └── examples/           # Example hook configurations
+│               ├── typeScript/     # TypeScript examples
+│               └── yaml/           # YAML hook file examples
+├── docs/                           # Documentation
 │   ├── develop.md                  # Development setup guide
 │   ├── usage.md                    # Usage documentation
 │   └── examples/                   # Example hook configurations
