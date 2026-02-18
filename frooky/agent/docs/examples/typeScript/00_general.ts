@@ -74,7 +74,7 @@ const iosHooks: Frooky.FrookyConfig = {
     metadata: {
         name: 'iOS Hook Type Tests',
         platform: 'iOS',
-        description: 'Test suite for Swift and Objective-C hook configurations on iOS',
+        description: 'Test suite for Objective-C hook configurations on iOS',
         author: 'Frooky Development Team',
         version: 'v1'
     },
