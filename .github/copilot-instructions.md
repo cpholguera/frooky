@@ -15,7 +15,7 @@
 
 ```bash
 frooky/
-├── frooky/                          # Main Python package
+├── frooky/                         # Main Python package
 │   ├── __init__.py                 # Package initialization
 │   ├── cli.py                      # Command-line interface entry point
 │   ├── frida_runner.py             # Core Frida execution logic
