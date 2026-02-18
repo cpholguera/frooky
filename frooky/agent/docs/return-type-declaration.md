@@ -2,7 +2,7 @@
 
 The return type declaration is a simpler variant of a [parameter declaration](./parameter-declaration.md).
 
-- [1. Differences to Parameter Declaration](#1-differences-to-parameter-declaration)
+- [1. Differences from Parameter Declaration](#1-differences-from-parameter-declaration)
 - [2. Basic Usage](#2-basic-usage)
   - [2.1. 2.1 Java Return Types](#21-21-java-return-types)
   - [2.2. 2.2 Objective-C Return Types](#22-22-objective-c-return-types)
@@ -15,30 +15,30 @@ The return type declaration is a simpler variant of a [parameter declaration](./
   - [3.2. `decoderArgs`-Option: Pass Arguments to Decoder](#32-decoderargs-option-pass-arguments-to-decoder)
     - [3.2.2. Pass Arguments to Decoder in Objective-C](#322-pass-arguments-to-decoder-in-objective-c)
 
-## 1. Differences to Parameter Declaration
+## 1. Differences from Parameter Declaration
 
-Compared to a parameter declaration, the return type declaration differs in the following ways:
+Compared with a parameter declaration, a return type declaration differs in the following ways:
 
-- It is only declared once per function or method
+- It is declared only once per function or method
 - It cannot be named
 - It is always decoded after the function or method completes
 
-The following chapter explains how to declare the return type based on examples.
+The following chapter explains how to declare the return type with examples.
 
 ## 2. Basic Usage
 
-The return type is declared only by it's type. The following chapters will use examples to illustrate this.
+The return type is declared only by its type. The following chapters will use examples to illustrate this.
 
 ### 2.1. 2.1 Java Return Types
 
-In Java, the method signature can be retrieved during runtime. In fact, this is always done by frooky in order to overload the right target method.
+In Java, the method signature can be retrieved at runtime. In fact, this is always done by frooky to overload the correct target method.
 
-Because of that, the return type is always known. The developer therefore must not declare a return type.
+Because of that, the return type is always known. The developer, therefore, must not declare a return type.
 
 ### 2.2. 2.2 Objective-C Return Types
 
 > [!NOTE]
-> This example hooks the following class method from  [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
+> This example hooks the following class method from [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
 >
 > ```objectivec
 > + (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
@@ -54,7 +54,7 @@ methods:
     params: [ "(const char *)", "(BOOL)", "(NSURL *)" ]
 ```
 
-The return value is of the type. frooky will decode it using the default `(NSURL *)` decoder.
+The return value is of type `(NSURL *)`. frooky will decode it using the default `(NSURL *)` decoder.
 
 ### 2.3. 2.3 Native Return Types
 
@@ -78,16 +78,16 @@ functions:
       - [ "unsigned int *", s ]
 ```
 
-The return value is an integer. The function returns 1 for success and 0 for failure.
+The function returns an integer. It returns 1 on success and 0 on failure.
 
 ## 3. Decoders
 
-If you want to configure the decoder of the return value, you can use the following two options:
+If you want to configure the decoder for the return value, you can use the following two options:
 
 - `decoder`
 - `decodeParams`
 
-The following chapters will explain the concepts using practical example.
+The following chapters will explain the concepts with a practical example.
 
 ### 3.1. `decoder`-Option: Custom Decoder
 
@@ -107,7 +107,7 @@ methods:
     returnType: [ int, { decoder: intentFlagsDecoder } ]
 ```
 
-The return value is a integer representing the set flags for this intent. Instead of using the default integer decoder, frooky will use `intentFlagsDecoder` to process the return value and decode the set flags instead of just the integer.
+The return value is an integer representing the set flags for this intent. Instead of using the default integer decoder, frooky will use `intentFlagsDecoder` to process the return value and decode the set flags rather than just the integer.
 
 #### 3.1.2. Custom Decoder in Objective-C
 
@@ -126,7 +126,7 @@ methods:
     params: [ "(NSDataBase64EncodingOptions)" ]
 ```
 
-The return value is a base64-encoded string. The custom decoder `base64Decoder` can for example decode the base 64 string in order to get the original data.
+The return value is a base64-encoded string. The custom decoder `base64Decoder` can decode the base64 string to recover the original data.
 
 #### 3.1.3. Custom Decoder in Native
 
@@ -146,11 +146,11 @@ functions:
       - [ "const SSL *", int ]
 ```
 
-The return value is the number identifying the cipher suite. The custom decoder `openSslCipherDecoder` can decode the number and return the a string representation of the cipher suite.
+The return value is the number identifying the cipher suite. The custom decoder `openSslCipherDecoder` can decode the number and return a string representation of the cipher suite.
 
 ### 3.2. `decoderArgs`-Option: Pass Arguments to Decoder
 
-While the use case for `decoderArgs` is less common, you can use it in the same way as with [parameters](./parameter-declaration.md#33-decoderargs-option-pass-arguments-to-decoder). They must reference the name of a parameter.
+While the use case for `decoderArgs` is less common, you can use it the same way as [parameters](./parameter-declaration.md#33-decoderargs-option-pass-arguments-to-decoder). It must reference the name of a parameter.
 
 #### 3.2.2. Pass Arguments to Decoder in Objective-C
 
@@ -169,4 +169,4 @@ methods:
     params: [ ["(NSStringEncoding)", encoding ] ]
 ```
 
-The return value is an `NSData` object. The decoder receives the `encoding` parameter to properly interpret the data.
+The return value is an `NSData` object. The decoder receives the `encoding` parameter to interpret the data correctly.

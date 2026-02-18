@@ -1,6 +1,6 @@
 # `JavaHook` Declaration
 
-This documentation explains how you write Java hook declaration.
+This documentation explains how to write a Java hook declaration.
 
 - [Structure of a `JavaHook` Declaration](#structure-of-a-javahook-declaration)
 - [Basic Usage](#basic-usage)
@@ -38,13 +38,13 @@ methods:                               # List of Java methods to hook
 ```
 
 > [!IMPORTANT]
-> Please read the documentation about [parameter](./parameter-declaration.md)- and [return type](./return-type-declaration.md) declaration if you want to know more about how to declare and configure them properly.
+> Please read the documentation on [parameter](./parameter-declaration.md) and [return type](./return-type-declaration.md) declaration to learn how to declare and configure them properly.
 >
-> There are multiple ways of declaring a parameter. In this document, we always used [named parameters](./parameter-declaration.md#11-unnamed-java-parameters).
+> There are multiple ways to declare a parameter. In this document, we always use [named parameters](./parameter-declaration.md#11-unnamed-java-parameters).
 
 ## Basic Usage
 
-The minimum necessary properties are `javaClass` and `methods`:
+The minimum required properties are `javaClass` and `methods`:
 
 ```yaml
 javaClass: <string>                    # Fully qualified Java class name
@@ -52,7 +52,7 @@ methods:                               # List of Java methods to hook
   - name: <java_method_name>
 ```
 
-For this case *all* overloads of the specified methods from the class will be hooked.
+In this case, *all* overloads of the specified methods from the class will be hooked.
 
 **Example:**
 
@@ -83,12 +83,12 @@ WebView.loadUrl(url: String, additionalHttpHeaders: MutableMap<String!, String!>
 > Use the following syntax for dynamic `<class>` lookup at runtime:
 >
 > - **Exact match**: `org.owasp.mastestapp.MainActivity`
-> - **Wildcards**: `org.owasp.*.HttpClient` (per package level)
-> - **Nested classes**: Use `$` separator (e.g., `Outer$Inner`)
+> - **Wildcards**: `org.owasp.*.HttpClient` (at the package level)
+> - **Nested classes**: Use the `$` separator (e.g., `Outer$Inner`)
 
 ## Method Overloads
 
-If you only want to hook a certain overload, specify it by adding one or more overload to `overloads`:
+If you only want to hook a specific overload, specify it by adding one or more overloads to `overloads`:
 
 ```yaml
 javaClass: <string>                    # Fully qualified Java class name
@@ -123,9 +123,9 @@ Intent.putExtra(name: String!, value: BooleanArray?): Intent
 
 ## Type Descriptors
 
-Frida, and therefore frooky, uses custom type descriptors which are based on the internal [JVM field type descriptor](https://docs.oracle.com/javase/specs/jvms/se19/html/jvms-4.html#jvms-4.3.2).
+Frida, and therefore frooky, uses custom type descriptors based on the internal [JVM field type descriptor](https://docs.oracle.com/javase/specs/jvms/se19/html/jvms-4.html#jvms-4.3.2).
 
-The following table shows the different kinds of types and their representation in Java, the JVM and Frida:
+The following table shows the different kinds of types and their representations in Java, the JVM, and Frida:
 
 | Kind of Type      | Java Type Descriptor                                                                         | JVM Type Descriptor                                         | Frida / frooky Type Descriptor                                                               |
 | ----------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
@@ -136,4 +136,4 @@ The following table shows the different kinds of types and their representation 
 | Multi-Dimensional | `int[][]`<br>`String[][]`<br>...                                                             | `[[I`<br>`[[Ljava/lang/String;`<br>...                      | `[[int`<br>`[[Ljava.lang.String`<br>...                                                      |
 
 > [!NOTE]
-> Frida uses a hybrid notation that combines JVM-style array prefixes (`[`) with Java-style class names (dot-separated instead of slash-separated, without the `L` prefix and `;` suffix).
+> Frida uses a hybrid notation that combines JVM-style array prefixes (`[`) with Java-style class names (dot-separated rather than slash-separated, without the `L` prefix and `;` suffix).

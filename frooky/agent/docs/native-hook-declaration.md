@@ -1,6 +1,6 @@
 # `NativeHook` Declaration
 
-This documentation explains how you write native hook declarations.
+This documentation explains how to write native hook declarations.
 
 - [Structure of a `NativeHook` Declaration](#structure-of-a-nativehook-declaration)
 - [Basic Usage](#basic-usage)
@@ -20,7 +20,7 @@ functions:                             # List of native symbol declarations to b
   - <string>                           # Name of the native function
 ```
 
-`<native_function_declaration>` with valued decoding must be declared like that:
+`<native_function_declaration>` with valued decoding must be declared as follows:
 
 ```yaml
 <native_function_declaration>:
@@ -31,13 +31,13 @@ functions:                             # List of native symbol declarations to b
 ```
 
 > [!IMPORTANT]
-> Please read the documentation about [parameter](./parameter-declaration.md)- and [return type](./return-type-declaration.md) declaration if you want to know more about how to declare and configure them properly.
+> Please read the documentation on [parameter](./parameter-declaration.md) and [return type](./return-type-declaration.md) declaration if you want to learn how to declare and configure them properly.
 >
-> There are multiple ways of declaring a parameter. In this document, we always used [named parameters](./parameter-declaration.md#22-named-objective-c-parameters).
+> There are multiple ways to declare a parameter. In this document, we always use [named parameters](./parameter-declaration.md#22-named-objective-c-parameters).
 
 ## Basic Usage
 
-The minimum necessary properties are `module` and `functions`:
+The minimum required properties are `module` and `functions`:
 
 ```yaml
 module: <string>                       # Fully qualified module name (mandatory)
@@ -55,14 +55,14 @@ functions:
 ```
 
 > [!NOTE]
-> This `<hook_configuration>` will hook the following two functions from the [OpenSSL Library](https://docs.openssl.org/master/man3/ENGINE_add):
+> This `<hook_configuration>` hooks the following two functions from the [OpenSSL Library](https://docs.openssl.org/master/man3/ENGINE_add):
 >
 > ```c
 > void ENGINE_load_builtin_engines(void);
 > void ENGINE_cleanup(void);
 > ```
 
-frooky will capture when these functions are called and generate events. Since the functions take no arguments and return no value, the events will only contain timing and call stack information.
+frooky will capture when these functions are called and generate events. Since the functions take no arguments and return no value, the events will contain only timing and call stack information.
 
 When a method accepts parameters or returns a value, frooky needs to know how to decode them.
 
@@ -100,4 +100,4 @@ functions:
 >                                X509_STORE *trusted_store, X509 *cert);
 > ```
 
-frooky will try to decode the arguments and the return value based on the parameter type.
+frooky will attempt to decode the arguments and the return value based on the parameter types.

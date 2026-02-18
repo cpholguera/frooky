@@ -1,6 +1,6 @@
 # Parameter Declaration
 
-frooky needs to know a function or method's signature to hook it correctly. Part of this signature is the parameter list, which consists of the types and names of the arguments passed to the function or method. This documentation explains how to declare parameters.
+frooky needs to know a function or method's signature to hook it correctly. Part of this signature is the parameter list, which includes the types and names of the arguments passed to the function or method. This documentation explains how to declare parameters.
 
 - [1. Unnamed Parameters](#1-unnamed-parameters)
   - [1.1. Unnamed Java Parameters](#11-unnamed-java-parameters)
@@ -26,13 +26,13 @@ frooky needs to know a function or method's signature to hook it correctly. Part
     - [3.3.3. Pass Arguments to Decoder in Native](#333-pass-arguments-to-decoder-in-native)
 
 > [!TIP]
-> Technically, the name of an argument is not required, but it is recommended declaring the name as well, as this makes a declaration easier to read and provides more context information in the output of frooky.
+> Technically, the name of an argument is not required, but it is recommended to declare the name as well, as this makes a declaration easier to read and provides more context in the output of frooky.
 
-There are different accepted ways declaring a parameter. The following chapters explain them.
+There are different accepted ways to declare a parameter. The following chapters explain them.
 
 ## 1. Unnamed Parameters
 
-This is the most simple declaration, solely based on its type. frooky will try to decode the arguments based on the automatically selected decoder:
+This is the simplest declaration, based solely on its type. frooky will try to decode the arguments using the automatically selected decoder:
 
 ```yaml
 params: [ <type> ]
@@ -101,7 +101,7 @@ functions:
 
 ## 2. Named Parameters
 
-If you want declare the name of the parameter, you must use an array for the type an name pair.
+If you want to declare the name of the parameter, you must use an array for the type and name pair.
 
 ```yaml
 params:
@@ -109,9 +109,9 @@ params:
 ```
 
 > [!IMPORTANT]
-> The first element is the type of the parameter, the second the name.
+> The first element is the parameter's type, the second its name.
 
-The following chapters use the same examples described in [Unnamed Parameters](#1-unnamed-parameters), but add parameters names.
+The following chapters use the same examples described in [Unnamed Parameters](#1-unnamed-parameters) but add parameter names.
 
 ### 2.1. Named Java Parameters
 
@@ -148,7 +148,7 @@ methods:
 ```
 
 > [!NOTE]
-> This example hooks the following class method from  [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
+> This example hooks the following class method from [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
 >
 > ```objectivec
 > + (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
@@ -190,11 +190,11 @@ Whenever the Frooky agent hooks a method, it decodes the return value from its r
 
 Depending on the type, this can be fairly simple. Primitives, such as Integers, Floats, or Shorts, can always be decoded by the frooky agent. However, some values require more complex decoders.
 
-They are required if either the decoding time varies or more context information is required. The following two chapters explain these cases.
+These are required when decoding time varies or when more context information is needed. The following two chapters explain these cases.
 
 You can add a decoder configuration object to any [unnamed parameter](#1-unnamed-parameters) and [named](#2-named-parameters) parameter.
 
-This is done using the a decoder configuration. This is an object which can contain the following options:
+This is done using a decoder configuration. This is an object that can contain the following options:
 
 - `decoder`
 - `decodeAt`
@@ -212,13 +212,13 @@ params:
     ]
 ```
 
-The following chapters will explain the concepts using practical example.
+The following chapters will explain the concepts through practical examples.
 
 ### 3.1. `decoder`-Option: Custom Decoder
 
-By default, frooky chooses the decoder for an argument based on the type declared in the hook configuration. For example, an `int` will always be decoded as a number and if there is no decoder available for a given type, frooky will use a fallback decoder.
+By default, frooky selects the decoder for an argument based on the type declared in the hook configuration. For example, an `int` is always decoded as a number, and if no decoder is available for a given type, frooky uses a fallback decoder.
 
-For some cases you want to manually bypass the automatic decoder matching. Custom decoders are located in the following folders:
+In some cases, you want to manually bypass the automatic decoder matching. Custom decoders are located in the following folders:
 
 - [./android/decoders](../android/decoders)
 - [./ios/decoders](../ios/decoders)
@@ -230,7 +230,7 @@ You'll find more information about them in their documentation. You are also wel
 
 Asynchronous computing adds decoding complexity in frooky. This chapter explains how we can use the frooky hook declaration to decode asynchronous callbacks.
 
-Let's take the following Objective-C method as example:
+Let's take the following Objective-C method as an example:
 
 ```yaml
 objcClass: LAPrivateKey
@@ -252,7 +252,7 @@ methods:
 >           completion:(void (^)(NSData *, NSError *)) handler;
 > ```
 
-It decrypts the data and invokes the handler upon completion. The method would for example be called like that:
+It decrypts the data and invokes the handler upon completion. For example, the method would be called like this:
 
 ```objectivec
 [self decryptData:myData 
@@ -262,7 +262,7 @@ It decrypts the data and invokes the handler upon completion. The method would f
       }];
 ```
 
-To access the decrypted data, we must hook the handler implementation itself, as we need to intercept its first argument `(NSData *, NSError *)` when the method calls the handler after decryption finishes. For that we can write a custom decoder, let's call it `LaPlaintextDecoder`, and overwrite the default decoder for the `handler` argument:
+To access the decrypted data, we must hook the handler implementation itself because we need to intercept its first argument `(NSData *, NSError *)` when the method calls the handler after decryption completes. To do this, we can write a custom decoder, let's call it `LaPlaintextDecoder`, and overwrite the default decoder for the `handler` argument:
 
 ```yaml
 objcClass: LAPrivateKey
@@ -284,7 +284,7 @@ The decoder must:
 2. Create a new hook for the `handler` block
 3. Intercept the callback when it's invoked
 
-Once the handler is called by the decryption method, the hook intercepts the first parameter containing the decrypted plaintext as `NSData *`.
+Once the decryption method calls the handler, the hook intercepts the first parameter, which contains the decrypted plaintext as `NSData *`.
 
 <!-- TODO: Reference frooky callback decoders when we implement them. -->
 
@@ -306,9 +306,9 @@ methods:
 > open fun setFlags(flags: Int): Intent
 > ```
 
-The parameter `flags` is a bitwise OR combination of [special flags](https://developer.android.com/reference/kotlin/android/content/Intent#flags), each controlling how this intent is handled. The custom decoder `intentFlagsDecoder` extracts the information again by doing a bitwise AND operation on the `flags` Integer with each flag.
+The parameter `flags` is a bitwise OR combination of [special flags](https://developer.android.com/reference/kotlin/android/content/Intent#flags), each controlling how this intent is handled. The custom decoder `intentFlagsDecoder` extracts the information by performing a bitwise AND operation between the `flags` Integer and each flag.
 
-If the result matches the value of the flag, it is set. This is a more stable way of decoding the flags compared to doing that on the frooky host, as the flags may not be the same as on the actual device.
+If the result matches the value of the flag, it is set. This is a more stable way of decoding the flags than doing it on the frooky host, as the flags may not be the same as on the actual device.
 
 #### 3.1.2. Custom Decoder in Objective-C
 
@@ -331,14 +331,14 @@ methods:
 >           completion:(void (^)(NSData * , NSError * )) handler;
 > ```
 
-The parameter `(void (^)(NSData *, NSError *)) handler` is a callback function, called once the data is decrypted. Using the `decoder` option, we can implement a decoder which instead of just printing then value (which is just a `pointer`), adds a new hook to the callback method.
+The parameter `(void (^)(NSData *, NSError *)) handler` is a callback function that is called once the data is decrypted. Using the `decoder` option, we can implement a decoder that, instead of just printing the value (which is just a `pointer`), adds a new hook to the callback method.
 
 To do that, the custom decoder `LAPrivateKey_decryptData_callbackDecoder` must:
 
 1. Create a new hook for the `handler` block
 2. Intercept the callback when it's invoked
 
-Once the handler is called by the `decryptData` instance method, the hook intercepts the first parameter containing the decrypted plaintext as `NSData *`.
+Once the handler is called by the `decryptData` instance method, the hook intercepts the first parameter, which contains the decrypted plaintext as `NSData *`.
 
 #### 3.1.3. Custom Decoder in Native
 
@@ -356,7 +356,7 @@ functions:
 ```
 
 > [!NOTE]
-> This example hooks the following method from the [SQLite](https://sqlite.org/c3ref/exec.html):
+> This example hooks the following method from [SQLite](https://sqlite.org/c3ref/exec.html):
 >
 > ```c
 > int sqlite3_exec(
@@ -370,20 +370,20 @@ functions:
 
 The 3rd parameter is a pointer to a callback function. The custom decoder `sqlite3_exec_callbackDecoder` handles the function pointer appropriately, potentially hooking the callback to intercept its invocations.
 
-Like with the [previous example](#312-custom-decoder-in-objective-c), we can also use the `sqlite3_exec_callbackDecoder` to dynamically hook the callback method and decode the arguments passed to it. In this case, the data would be one retrieved row.
+As in the [previous example](#312-custom-decoder-in-objective-c), we can also use the `sqlite3_exec_callbackDecoder` to dynamically hook the callback method and decode the arguments passed to it. In this case, the data would be the retrieved row.
 
 ### 3.2. `decodeAt`-Option: Declare the Time of Decoding
 
-By default, arguments are decoded when the function or method is called. Larger data structures, such as arrays, are often passed by reference with the intention to manipulate them within the function or method, like the following example shows:
+By default, arguments are decoded when the function or method is called. Larger data structures, such as arrays, are often passed by reference to allow manipulation within the function or method, as the following example shows:
 
 ```java
 public final int doFinal(byte[] output, 
                          int outputOffset)
 ```
 
-This Java method form the class `javax.crypto.Cipher` de- or encrypts the data stored in the current object and writes the output into the byte array `output`.  If we want to access the de- or encrypted `output`, we must decode the value after the method completes.
+This Java method from the class `javax.crypto.Cipher` encrypts or decrypts the data stored in the current object and writes the output to the byte array `output`. To access the encrypted or decrypted `output`, you must decode the value after the method completes.
 
-To accommodate for these cases, you can specify the time of decoding using the following decoder options:
+To accommodate these cases, you can specify the timing of decoding using the following decoder options:
 
 - After the function or method completes (`decodeAt: exit`)
 - Both at the beginning and after the function or method completes (`decodeAt: both`)
@@ -408,7 +408,7 @@ methods:
 >                           int outputOffset)
 > ```
 
-In order to access the decrypted data, the parameter `output` parameter must be decoded at exit.
+In order to access the decrypted data, the `output` parameter must be decoded at exit.
 
 #### 3.2.2. Explicit Time of Decoding in Objective-C
 
@@ -430,7 +430,7 @@ methods:
 >                                               error:(NSError * *) error;
 > ```
 
-The `error` parameter must decoded at exit because it only contains meaningful data if an error occurred during the operation.
+The `error` parameter must be decoded at exit because it contains meaningful data only if an error occurred during the operation.
 
 #### 3.2.3. Explicit Time of Decoding in Native
 
@@ -450,13 +450,13 @@ params:
 >                char *restrict resolved_name);
 > ```
 
-The `resolved_name` parameter must be decoded at exit, because it contains absolute pathname after resolution.
+The `resolved_name` parameter must be decoded at exit because it contains an absolute pathname after resolution.
 
 ### 3.3. `decoderArgs`-Option: Pass Arguments to Decoder
 
-In native functions, primitive arrays are passed by reference. In some cases we need more context information in order to decode the parameter.
+In native functions, primitive arrays are passed by reference. In some cases, we need additional context to decode the parameter.
 
-A very common example is the length of an buffer. If the buffer is not limited by a terminating symbol such as `\0` for C strings, the decoder must know the length at runtime. Usually, the information is passed to the function or method. The following example illustrates this pattern with an example form the [OpenSSL library](https://docs.openssl.org/3.0/man3/EVP_EncryptInit/):
+A common example is the length of a buffer. If the buffer is not terminated by a symbol such as `\0` for C strings, the decoder must know the length at runtime. Usually, this information is passed to the function or method. The following example illustrates this pattern from the [OpenSSL library](https://docs.openssl.org/3.0/man3/EVP_EncryptInit/):
 
 ```c
 int EVP_EncryptUpdate(EVP_CIPHER_CTX *ctx,       // Cipher context
@@ -466,14 +466,14 @@ int EVP_EncryptUpdate(EVP_CIPHER_CTX *ctx,       // Cipher context
                       int inl);                  // Length of the input bugger
 ```
 
-This function encrypts `inl` bytes from the `in` buffer and writes the encrypted version to the `out` buffer. Depending on the type of encryption algorithm used, it is unclear how many bytes will be written at the time the function is called.
+This function encrypts `inl` bytes from the `in` buffer and writes the encrypted result to the `out` buffer. Depending on the encryption algorithm used, it is unclear how many bytes will be written when the function is called.
 
-If we want to decode the `out` buffer, we must pass its length argument (`outl`) to the buffer decoder.
+If we want to decode the `out` buffer, we must pass its length (`outl`) to the buffer decoder.
 
 > [!TIP]
-> In general, this is not good coding practice, but sometimes we need context information which is not passed to the function or method by its parameters. For example when we need to access as a global variable.
+> In general, this is not good coding practice, but sometimes we need context information that is not passed to the function or method through its parameters. For example, when we need to access it as a global variable.
 >
-> In this case, you should write a [custom decoder](#31-decoder-option-custom-decoder) and use it to fetch the data and decode the value. 
+> In this case, you should write a [custom decoder](#31-decoder-option-custom-decoder) and use it to fetch and decode the data.
 
 #### 3.3.1. Pass Arguments to Decoder in Java
 
@@ -489,7 +489,7 @@ methods:
 ```
 
 > [!NOTE]
-> This example hooks the following method from [Android Java Library](https://developer.android.com/reference/java/io/FileInputStream#read(byte[],%20int,%20int)):
+> This example hooks the following method from the [Android Java Library](https://developer.android.com/reference/java/io/FileInputStream#read(byte[],%20int,%20int)):
 >
 > ```java
 > public int read (byte[] b, 
@@ -497,7 +497,7 @@ methods:
 >                  int len)
 > ```
 
-The decoder for `buffer` receives `len` to know how many bytes were actually read.
+The decoder for `buffer` receives `len` to indicate how many bytes were actually read.
 
 #### 3.3.2. Pass Arguments to Decoder in Objective-C
 
@@ -511,14 +511,14 @@ methods:
 ```
 
 > [!NOTE]
-> This example hooks the following method from  [NSData](https://developer.apple.com/documentation/foundation/nsdata/getbytes(_:range:)?language=objc):
+> This example hooks the following method from [NSData](https://developer.apple.com/documentation/foundation/nsdata/getbytes(_:range:)?language=objc):
 >
 > ```objectivec
 > - (void) getBytes:(void *) buffer 
 >                    range:(NSRange) range;
 > ```
 
-The `buffer` decoder uses the `length` parameter to determine how many bytes to decode.
+The `buffer` decoder uses the `length` parameter to specify how many bytes to decode.
 
 #### 3.3.3. Pass Arguments to Decoder in Native
 
@@ -542,4 +542,4 @@ functions:
 >                        unsigned int *s);
 > ```
 
-The digest buffer `md` decoder uses the `ctx` to determine what kind of hash algorithm was used, and the length `s` to decode the buffer.
+The digest buffer `md` decoder uses the `ctx` to determine which hash algorithm was used and the length `s` to decode the buffer.

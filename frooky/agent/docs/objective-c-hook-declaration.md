@@ -1,11 +1,11 @@
 # `ObjcHook` Declaration
 
-This documentation explains how you write Objective-C hook declarations.
+This documentation explains how to write Objective-C hook declarations.
 
 - [Structure of a `ObjcHook` Declaration](#structure-of-a-objchook-declaration)
 - [Basic Usage](#basic-usage)
 
-## Structure of a `ObjcHook` Declaration
+## Structure of an `ObjcHook` Declaration
 
 ```yaml
 objcClass: <string>                     # Fully qualified Objective-C class name
@@ -20,7 +20,7 @@ methods:                               # List of Objective-C method declarations
   - <string>                           # Name of the native function
 ```
 
-`<objc_method_declaration>` with value decoding must be declared like that:
+`<objc_method_declaration>` with value decoding must be declared as follows:
 
 ```yaml
 <objc_method_declaration>:
@@ -31,13 +31,13 @@ methods:                               # List of Objective-C method declarations
 ```
 
 > [!IMPORTANT]
-> Please read the documentation about [parameter](./parameter-declaration.md)- and [return type](./return-type-declaration.md) declaration if you want to know more about how to declare and configure them properly.
+> Please read the documentation on [parameter](./parameter-declaration.md) and [return type](./return-type-declaration.md) declaration if you want to learn how to declare and configure them properly.
 >
-> There are multiple ways of declaring a parameter. In this document, we always used [named parameters](./parameter-declaration.md#22-named-objective-c-parameters).
+> There are multiple ways to declare a parameter. In this document, we always use [named parameters](./parameter-declaration.md#22-named-objective-c-parameters).
 
 ## Basic Usage
 
-The minimum necessary properties are `objcClass` and `methods`:
+The minimum required properties are `objcClass` and `methods`:
 
 ```yaml
 objcClass: <string>                    # Fully qualified Objective-C class name
@@ -47,11 +47,10 @@ methods:                               # List of Objective-C method declarations
 
 > [!TIP]
 >
-> Use the following syntax to hook the two different kinds of Objective-C methods:
+> Use the following syntax to hook two kinds of Objective-C methods:
 >
 > - **Instance methods**: `- biometryType`
 > - **Class methods**: `+ removeProperties`
->
 
 **Example:**
 
@@ -68,9 +67,9 @@ methods:
 > - (void) invalidate;
 > ```
 
-frooky will capture when this function is called and generate an event. Since the function takes no arguments and returns no value, the event will only contain timing and call stack information.
+frooky will capture when this function is called and generate an event. Because the function takes no arguments and returns no value, the event will contain only timing and call stack information.
 
-When a method accepts parameters or returns a value, frooky needs to know the their types in order to decode them properly:
+When a method accepts parameters or returns a value, frooky needs to know their types to decode them properly:
 
 ```yaml
 objcClass: <string>                    # Fully qualified Objective-C class name
@@ -95,7 +94,7 @@ methods:
 ```
 
 > [!NOTE]
-> This example hooks the following class method from  [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
+> This example hooks the following class method from [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
 >
 > ```objectivec
 > + (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
