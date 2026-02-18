@@ -12,7 +12,7 @@ This documentation will tell you everything you need to know about the frooky ag
 
 ## What is the frooky Agent?
 
-First things first: The frooky agent is the part of frooky which is executed on the target device (Android or iOS). It is written in TypeScript and does all the heavy lifting like:
+First things first: The frooky agent is the part of frooky which is executed on the target device (Android or iOS). It is written in TypeScript and does lots of the heavy lifting like:
 
 - Resolving the methods and functions which will be hooked
 - Hooking said methods and functions
@@ -137,11 +137,11 @@ Depending on the platform, the hooks declaration may look different. Please read
 
 frooky currently supports three types of hooks:
 
-| Hook Type        | Platform    | Description                                 | Documentation                                                     |
-| ---------------- | ----------- | ------------------------------------------- |-------------------------------------------------------------------|
-| `JavaHook`       | Android     | Hook for Java/Kotlin methods                |[`JavaHook`-Declaration](./docs/java-hook-declaration.md)          |
-| `ObjectiveCHook` | iOS         | Hook for Objective-C methods                |[`ObjectiveCHook`-Declaration](./docs/java-hook-declaration.md)    |
-| `NativeHook`     | Android/iOS | Hook for native functions (C/C++/Rust etc.) |[`NativeHook`-Declaration](./docs/java-hook-declaration.md)        |
+| Hook Type        | Platform    | Description                                 | Documentation                                                   |
+| ---------------- | ----------- | ------------------------------------------- | --------------------------------------------------------------- |
+| `JavaHook`       | Android     | Hook for Java/Kotlin methods                | [`JavaHook`-Declaration](./docs/java-hook-declaration.md)       |
+| `ObjectiveCHook` | iOS         | Hook for Objective-C methods                | [`ObjectiveCHook`-Declaration](./docs/java-hook-declaration.md) |
+| `NativeHook`     | Android/iOS | Hook for native functions (C/C++/Rust etc.) | [`NativeHook`-Declaration](./docs/java-hook-declaration.md)     |
 
 > [!IMPORTANT]
 > When loading a hook declaration, frooky will validate it against a JSON schema in order to detect invalid declaration. This makes sure, that the declaration does not contain hooks for different platforms for example.
