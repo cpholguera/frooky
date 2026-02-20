@@ -25,6 +25,7 @@ class RunnerOptions:
     attach_identifier: Optional[str] = None
     attach_pid: Optional[int] = None
     spawn: Optional[str] = None
+    verbose: int = 0
 
 
 class FrookyRunner:
@@ -81,7 +82,9 @@ class FrookyRunner:
                 with open(output_path, "a", encoding="utf-8") as f:
                     json.dump(payload, f)
                     f.write("\n")
-                
+                if self.options.verbose >= 3:
+                    print(json.dumps(payload, indent=2))
+
                 # Check if this is a summary event
                 if isinstance(payload, dict):
                     event_type = payload.get("type")
