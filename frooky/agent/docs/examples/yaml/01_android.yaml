@@ -56,7 +56,7 @@ hooks:
               - ["java.lang.String", name]
               - ["[B", value]
 
-  # Custom decoder for Java method argument
+  # Custom decoder for Java method argument and debug flag enabled for debug logs
   - javaClass: android.content.Intent
     methods:
       - name: setFlags
