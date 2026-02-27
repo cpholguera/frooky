@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { spawnSync, spawn } from 'child_process';
 import path from 'path';
+import * as yaml from 'js-yaml';
 import chokidar from 'chokidar';
 import minimist from 'minimist';
 import { fileURLToPath } from 'url';
@@ -116,16 +117,18 @@ function generateHooksFile() {
     hooksFilePaths.forEach(file => {
         try {
             const content = fs.readFileSync(file, 'utf8');
-            const json = JSON.parse(content);
+            const ext = path.extname(file).toLowerCase();
 
-            // Use the first category found
-            if (!mergedHooks.category && json.category) {
-                mergedHooks.category = json.category;
+            const parsed = (ext === '.yaml' || ext === '.yml')
+                ? yaml.load(content)
+                : JSON.parse(content);
+
+            if (!mergedHooks.category && parsed.category) {
+                mergedHooks.category = parsed.category;
             }
 
-            // Merge hooks arrays
-            if (json.hooks && Array.isArray(json.hooks)) {
-                mergedHooks.hooks = mergedHooks.hooks.concat(json.hooks);
+            if (parsed.hooks && Array.isArray(parsed.hooks)) {
+                mergedHooks.hooks = mergedHooks.hooks.concat(parsed.hooks);
             }
         } catch (error) {
             console.error(`Error reading ${file}:`, error.message);
@@ -181,7 +184,7 @@ function validateInput() {
     // validate hooks files
     if (targetOption === 'frida') {
         if (hooksFilePaths.length == 0) {
-            console.error(`No hook files provided. Provide one or more hook.json files.`);
+            console.error(`No hook files provided. Provide one or more hook files.`);
             process.exit(1);
         }
         hooksFilePaths.forEach(file => {
@@ -189,8 +192,9 @@ function validateInput() {
                 console.error(`Hook file not found: ${file}`);
                 process.exit(1);
             }
-            if (path.extname(file).toLowerCase() !== '.json') {
-                console.error(`Invalid file type: ${file}. Only .json files are allowed.`);
+            const ext = path.extname(file).toLowerCase();
+            if (ext !== '.json' && ext !== '.yaml' && ext !== '.yml') {
+                console.error(`Invalid file type: ${file}. Only .yaml/yml and .json files are allowed.`);
                 process.exit(1);
             }
         });
