@@ -1,7 +1,7 @@
 import * as Frooky from 'frooky'
 
 // ============================================================================
-// EXAMPLE 1: Simple Objective-C instance method
+// Simple Objective-C instance method
 // ============================================================================
 const userDefaultsObjCHook: Frooky.ObjectiveCHook = {
   objcClass: 'NSUserDefaults',
@@ -17,7 +17,7 @@ const userDefaultsObjCHook: Frooky.ObjectiveCHook = {
 }
 
 // ============================================================================
-// EXAMPLE 2: NSData write to file with return type
+// NSData write to file with return type
 // ============================================================================
 const nsDataHook: Frooky.ObjectiveCHook = {
   objcClass: 'NSData',
@@ -35,7 +35,7 @@ const nsDataHook: Frooky.ObjectiveCHook = {
 }
 
 // ============================================================================
-// EXAMPLE 3: Objective-C class method
+// Objective-C class method
 // ============================================================================
 const urlHook: Frooky.ObjectiveCHook = {
   objcClass: 'NSURL',
@@ -53,7 +53,7 @@ const urlHook: Frooky.ObjectiveCHook = {
 }
 
 // ============================================================================
-// EXAMPLE 4: LAContext biometry method (no params)
+// LAContext biometry method (no params)
 // ============================================================================
 const laContextHook: Frooky.ObjectiveCHook = {
   objcClass: 'LAContext',
@@ -63,7 +63,7 @@ const laContextHook: Frooky.ObjectiveCHook = {
 }
 
 // ============================================================================
-// EXAMPLE 5: Multiple methods in same class
+// Multiple methods in same class
 // ============================================================================
 const keychainHook: Frooky.ObjectiveCHook = {
   objcClass: 'LAPrivateKey',
@@ -88,7 +88,7 @@ const keychainHook: Frooky.ObjectiveCHook = {
 }
 
 // ============================================================================
-// EXAMPLE 6: CoreData save with output parameter
+// CoreData save with output parameter
 // ============================================================================
 const coreDataHook: Frooky.ObjectiveCHook = {
   objcClass: 'NSManagedObjectContext',
@@ -105,7 +105,7 @@ const coreDataHook: Frooky.ObjectiveCHook = {
 }
 
 // ============================================================================
-// EXAMPLE 7: Network request with stack trace filtering
+// Network request with stack trace filtering
 // ============================================================================
 const urlSessionHook: Frooky.ObjectiveCHook = {
   objcClass: 'NSURLSession',
@@ -123,7 +123,7 @@ const urlSessionHook: Frooky.ObjectiveCHook = {
 }
 
 // ============================================================================
-// EXAMPLE 8: Method with both entry and exit decoding
+//  Method with both entry and exit decoding
 // ============================================================================
 const dataProcessingHook: Frooky.ObjectiveCHook = {
   objcClass: 'NSMutableData',

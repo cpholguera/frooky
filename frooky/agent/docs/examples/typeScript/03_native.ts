@@ -1,7 +1,7 @@
 import * as Frooky from 'frooky'
 
 // ============================================================================
-// EXAMPLE 1: Simple native function with basic types
+// Simple native function with basic types
 // ============================================================================
 const openHook: Frooky.NativeHook = {
   module: 'libc.so',
@@ -19,7 +19,7 @@ const openHook: Frooky.NativeHook = {
 }
 
 // ============================================================================
-// EXAMPLE 2: Function with pointer and buffer
+// Function with pointer and buffer
 // ============================================================================
 const readHook: Frooky.NativeHook = {
   module: 'libc.so',
@@ -37,7 +37,7 @@ const readHook: Frooky.NativeHook = {
 }
 
 // ============================================================================
-// EXAMPLE 3: OpenSSL encryption function
+// OpenSSL encryption function
 // ============================================================================
 const encryptHook: Frooky.NativeHook = {
   module: 'libcrypto.so',
@@ -58,7 +58,7 @@ const encryptHook: Frooky.NativeHook = {
 }
 
 // ============================================================================
-// EXAMPLE 4: SSL write with buffer
+// SSL write with buffer
 // ============================================================================
 const sslWriteHook: Frooky.NativeHook = {
   module: 'libssl.so',
@@ -77,7 +77,7 @@ const sslWriteHook: Frooky.NativeHook = {
 }
 
 // ============================================================================
-// EXAMPLE 5: Multiple functions in same module
+// Multiple functions in same module
 // ============================================================================
 const opensslHook: Frooky.NativeHook = {
   module: 'libssl.so',
@@ -97,7 +97,7 @@ const opensslHook: Frooky.NativeHook = {
 }
 
 // ============================================================================
-// EXAMPLE 6: Function with custom decoder
+// Function with custom decoder
 // ============================================================================
 const customDecoderHook: Frooky.NativeHook = {
   module: 'libcustom.so',
@@ -114,7 +114,7 @@ const customDecoderHook: Frooky.NativeHook = {
 }
 
 // ============================================================================
-// EXAMPLE 7: Function with output parameter decoded at exit
+// Function with output parameter decoded at exit
 // ============================================================================
 const outputParamHook: Frooky.NativeHook = {
   module: 'libexample.so',

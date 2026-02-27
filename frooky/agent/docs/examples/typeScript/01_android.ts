@@ -1,7 +1,7 @@
 import * as Frooky from 'frooky'
 
 // ============================================================================
-// EXAMPLE 1: Single Java method (no arguments)
+// Single Java method (no arguments)
 // ============================================================================
 const wifiHook: Frooky.JavaHook = {
   javaClass: 'android.net.wifi.WifiManager',
@@ -11,7 +11,7 @@ const wifiHook: Frooky.JavaHook = {
 }
 
 // ============================================================================
-// EXAMPLE 2: Multiple Java methods
+// Multiple Java methods
 // ============================================================================
 const locationHook: Frooky.JavaHook = {
   javaClass: 'android.location.LocationManager',
@@ -24,7 +24,7 @@ const locationHook: Frooky.JavaHook = {
 }
 
 // ============================================================================
-// EXAMPLE 3: Single overload
+// Single overload
 // ============================================================================
 const urlHook: Frooky.JavaHook = {
   javaClass: 'java.net.URL',
@@ -41,7 +41,7 @@ const urlHook: Frooky.JavaHook = {
 }
 
 // ============================================================================
-// EXAMPLE 4: Multiple overloads
+// Multiple overloads
 // ============================================================================
 const intentHook: Frooky.JavaHook = {
   javaClass: 'android.content.Intent',
@@ -79,7 +79,7 @@ const intentHook: Frooky.JavaHook = {
 }
 
 // ============================================================================
-// EXAMPLE 5: Custom decoder for Java method argument
+// Custom decoder for Java method argument
 // ============================================================================
 const intentFlagsHook: Frooky.JavaHook = {
   javaClass: 'android.content.Intent',
@@ -99,7 +99,7 @@ const intentFlagsHook: Frooky.JavaHook = {
 }
 
 // ============================================================================
-// EXAMPLE 6: Single Java Type as argument
+// Single Java Type as argument
 // ============================================================================
 const activityHook: Frooky.JavaHook = {
   javaClass: 'android.app.Activity',
@@ -118,7 +118,7 @@ const activityHook: Frooky.JavaHook = {
 }
 
 // ============================================================================
-// EXAMPLE 7: Multiple Java Types as arguments
+// Multiple Java Types as arguments
 // ============================================================================
 const sqliteHook: Frooky.JavaHook = {
   javaClass: 'android.database.sqlite.SQLiteDatabase',
@@ -145,7 +145,7 @@ const sqliteHook: Frooky.JavaHook = {
 }
 
 // ============================================================================
-// EXAMPLE 8: Decode parameter at exit (data passed by reference)
+// Decode parameter at exit (data passed by reference)
 // ============================================================================
 const cipherHook: Frooky.JavaHook = {
   javaClass: 'javax.crypto.Cipher',
@@ -165,7 +165,7 @@ const cipherHook: Frooky.JavaHook = {
 }
 
 // ============================================================================
-// EXAMPLE 9: Decode parameter at both entry and exit
+// Decode parameter at both entry and exit
 // ============================================================================
 const bufferHook: Frooky.JavaHook = {
   javaClass: 'java.nio.ByteBuffer',
@@ -184,7 +184,7 @@ const bufferHook: Frooky.JavaHook = {
 }
 
 // ============================================================================
-// EXAMPLE 10: Hook constructor
+// Hook constructor
 // ============================================================================
 const webViewHook: Frooky.JavaHook = {
   javaClass: 'android.webkit.WebView',
