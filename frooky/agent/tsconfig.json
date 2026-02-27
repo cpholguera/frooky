@@ -11,7 +11,7 @@
       "frida-gum",
       "frida-java-bridge",
       "frida-objc-bridge",
-      "frida-swift-bridge",
+      "frida-swift-bridge"
     ],
     "baseUrl": ".",
     "paths": {
