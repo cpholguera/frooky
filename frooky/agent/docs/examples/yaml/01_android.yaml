@@ -22,7 +22,7 @@ hooks:
     methods:
       - $init
 
-  # Multiple Java methods, shortened
+  # Multiple Java methods, shortened, and a stacktrace limit to 10 entries
   - javaClass: android.location.LocationManager
     methods:
       - getLastKnownLocation
