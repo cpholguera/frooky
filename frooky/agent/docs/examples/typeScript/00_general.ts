@@ -114,7 +114,7 @@ const minimalIosHooks: Frooky.FrookyConfig = {
 const partialMetadataHooks: Frooky.FrookyConfig = {
     metadata: {
         name: 'Partial Metadata Test',
-        platform: 'Android'
+        platform: 'Android',
         // Other fields intentionally omitted to test optional properties
     },
     hooks: [
