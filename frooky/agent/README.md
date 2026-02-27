@@ -2,13 +2,14 @@
 
 This documentation covers everything you need to know about the frooky agent and its features.
 
-- [What is the frooky Agent?](#what-is-the-frooky-agent)
-- [Quickstart](#quickstart)
-- [Compile And Run Standalone Client](#compile-and-run-standalone-client)
-- [Structure of a Hook File](#structure-of-a-hook-file)
-- [Parameter- and Return-Type Declaration](#parameter--and-return-type-declaration)
-- [Platform-Dependent Hook Declaration](#platform-dependent-hook-declaration)
-- [Event Filters](#event-filters)
+- [frooky Agent Documentation](#frooky-agent-documentation)
+  - [What is the frooky Agent?](#what-is-the-frooky-agent)
+  - [Quickstart](#quickstart)
+  - [Compile And Run Standalone Client](#compile-and-run-standalone-client)
+  - [Structure of a Hook File](#structure-of-a-hook-file)
+  - [Parameter- and Return-Type Declaration](#parameter--and-return-type-declaration)
+  - [Platform-Dependent Hook Declaration](#platform-dependent-hook-declaration)
+  - [Event Filters](#event-filters)
 
 ## What is the frooky Agent?
 
@@ -52,8 +53,8 @@ If you want to use the frooky agent without the Python host, or to develop the a
 - **Compile the development standalone client:**
 
   ```sh
-  npm run build:watch:android hook.yaml
-  npm run build:watch:ios hook.yaml
+  npm run watch-android hook.yaml
+  npm run watch-ios hook.yaml
   ```
 
   You can specify one or more `hook.yaml` files. Pattern expansion (`glob`) is supported.
