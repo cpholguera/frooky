@@ -45,7 +45,7 @@ hooks:
           - ["(BOOL)", isDir]
           - ["(NSURL *)", baseURL]
 
-  # EXAMPLE 5: Multiple methods in same class
+  # Multiple methods in same class
   - objcClass: LAPrivateKey
     methods:
       - name: "- decryptData:secKeyAlgorithm:completion:"
@@ -63,7 +63,7 @@ hooks:
           - ["(SecKeyAlgorithm)", algorithm]
           - ["(void (^)(NSData *, NSError *))", handler]
 
-  # EXAMPLE 6: CoreData save with output parameter
+  # CoreData save with output parameter
   - objcClass: NSManagedObjectContext
     methods:
       - name: "- save:"
@@ -72,7 +72,7 @@ hooks:
           - ["(NSError **)", error, { decodeAt: exit }]
     debug: true
 
-  # EXAMPLE 7: Network request with stack trace filtering
+  # Network request with stack trace filtering
   - objcClass: NSURLSession
     methods:
       - name: "- dataTaskWithRequest:completionHandler:"
@@ -87,7 +87,7 @@ hooks:
       - "^libsystem_"
       - "^Foundation"
 
-  # EXAMPLE 8: Method with both entry and exit decoding
+  # Method with both entry and exit decoding
   - objcClass: NSMutableData
     methods:
       - name: "- appendData:"
