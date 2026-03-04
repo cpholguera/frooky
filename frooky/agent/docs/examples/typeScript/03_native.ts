@@ -1,7 +1,17 @@
 import * as Frooky from 'frooky'
 
 // ============================================================================
-// Simple native function with basic types
+// Simple native function with basic types, no param / return value decoding
+// ============================================================================
+const openHookSimple: Frooky.NativeHook = {
+  module: 'libc.so',
+  functions: [
+    "open"
+  ]
+}
+
+// ============================================================================
+//  Native function with basic types
 // ============================================================================
 const openHook: Frooky.NativeHook = {
   module: 'libc.so',

@@ -40,7 +40,7 @@ methods:                               # List of Java methods to hook
 > [!IMPORTANT]
 > Please read the documentation on [parameter](./parameter-declaration.md) and [return type](./return-type-declaration.md) declaration to learn how to declare and configure them properly.
 >
-> There are multiple ways to declare a parameter. In this document, we always use [named parameters](./parameter-declaration.md#11-unnamed-java-parameters).
+> There are multiple ways to declare a parameter. In this document, we always use [named parameters](./parameter-declaration.md#21-named-java-parameters).
 
 ## Basic Usage
 

@@ -2,14 +2,13 @@
 
 This documentation covers everything you need to know about the frooky agent and its features.
 
-- [frooky Agent Documentation](#frooky-agent-documentation)
-  - [What is the frooky Agent?](#what-is-the-frooky-agent)
-  - [Quickstart](#quickstart)
-  - [Compile And Run Standalone Client](#compile-and-run-standalone-client)
-  - [Structure of a Hook File](#structure-of-a-hook-file)
-  - [Parameter- and Return-Type Declaration](#parameter--and-return-type-declaration)
-  - [Platform-Dependent Hook Declaration](#platform-dependent-hook-declaration)
-  - [Event Filters](#event-filters)
+- [What is the frooky Agent?](#what-is-the-frooky-agent)
+- [Quickstart](#quickstart)
+- [Compile And Run Standalone Client](#compile-and-run-standalone-client)
+- [Structure of a Hook File](#structure-of-a-hook-file)
+- [Parameter- and Return-Type Declaration](#parameter--and-return-type-declaration)
+- [Platform-Dependent Hook Declaration](#platform-dependent-hook-declaration)
+- [Event Filters](#event-filters)
 
 ## What is the frooky Agent?
 
@@ -72,7 +71,7 @@ This will compile a development build of the frooky agent, watch for changes in 
   For iOS:
 
   ```sh
-  frida -U -f org.owasp.mytargetapp dist/agent-io.js
+  frida -U -f org.owasp.mytargetapp dist/agent-ios.js
   ```
 
 ## Structure of a Hook File
@@ -138,11 +137,11 @@ Depending on the platform, the hook declaration may look different. Please read 
 
 frooky currently supports three types of hooks:
 
-| Hook Type        | Platform    | Description                                 | Documentation                                                   |
-| ---------------- | ----------- | ------------------------------------------- | --------------------------------------------------------------- |
-| `JavaHook`       | Android     | Hook for Java/Kotlin methods                | [`JavaHook`-Declaration](./docs/java-hook-declaration.md)       |
-| `ObjectiveCHook` | iOS         | Hook for Objective-C methods                | [`ObjectiveCHook`-Declaration](./docs/java-hook-declaration.md) |
-| `NativeHook`     | Android/iOS | Hook for native functions (C/C++/Rust etc.) | [`NativeHook`-Declaration](./docs/java-hook-declaration.md)     |
+| Hook Type        | Platform    | Description                                 | Documentation                                                          |
+| ---------------- | ----------- | ------------------------------------------- | ---------------------------------------------------------------------- |
+| `JavaHook`       | Android     | Hook for Java/Kotlin methods                | [`JavaHook`-Declaration](./docs/java-hook-declaration.md)              |
+| `ObjectiveCHook` | iOS         | Hook for Objective-C methods                | [`ObjectiveCHook`-Declaration](./docs/objective-c-hook-declaration.md) |
+| `NativeHook`     | Android/iOS | Hook for native functions (C/C++/Rust etc.) | [`NativeHook`-Declaration](./docs/native-hook-declaration.md)          |
 
 > [!IMPORTANT]
 > When loading a hook declaration, frooky will validate it against a JSON schema to detect invalid declarations. This ensures that the declaration does not contain hooks for different platforms, for example.
@@ -198,7 +197,7 @@ To filter out events that do not originate from the target app, frooky can filte
 javaClass: android.app.SharedPreferencesImpl$EditorImpl
 methods:
   - name: putString
-  - stackTraceFilter: "^org\.owasp\.mastestapp"
+  - stackTraceFilter: ["^org\.owasp\.mastestapp"]
 ```
 
 With this filter, noise can be reduced.

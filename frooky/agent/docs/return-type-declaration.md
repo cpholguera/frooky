@@ -4,9 +4,9 @@ The return type declaration is a simpler variant of a [parameter declaration](./
 
 - [1. Differences from Parameter Declaration](#1-differences-from-parameter-declaration)
 - [2. Basic Usage](#2-basic-usage)
-  - [2.1. 2.1 Java Return Types](#21-21-java-return-types)
-  - [2.2. 2.2 Objective-C Return Types](#22-22-objective-c-return-types)
-  - [2.3. 2.3 Native Return Types](#23-23-native-return-types)
+  - [2.1. Java Return Types](#21-java-return-types)
+  - [2.2. Objective-C Return Types](#22-objective-c-return-types)
+  - [2.3. Native Return Types](#23-native-return-types)
 - [3. Decoders](#3-decoders)
   - [3.1. `decoder`-Option: Custom Decoder](#31-decoder-option-custom-decoder)
     - [3.1.1. Custom Decoder in Java](#311-custom-decoder-in-java)
@@ -29,13 +29,11 @@ The following chapter explains how to declare the return type with examples.
 
 The return type is declared only by its type. The following chapters will use examples to illustrate this.
 
-### 2.1. 2.1 Java Return Types
+### 2.1. Java Return Types
 
-In Java, the method signature can be retrieved at runtime. In fact, this is always done by frooky to overload the correct target method.
+In Java, the method signature can be retrieved at runtime. Unless you want to override the [default decoder](#3-decoders), you don't need to provide an explicit return type.
 
-Because of that, the return type is always known. The developer, therefore, must not declare a return type.
-
-### 2.2. 2.2 Objective-C Return Types
+### 2.2. Objective-C Return Types
 
 > [!NOTE]
 > This example hooks the following class method from [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
@@ -56,7 +54,7 @@ methods:
 
 The return value is of type `(NSURL *)`. frooky will decode it using the default `(NSURL *)` decoder.
 
-### 2.3. 2.3 Native Return Types
+### 2.3. Native Return Types
 
 > [!NOTE]
 > This example hooks the following method from [OpenSSL](https://docs.openssl.org/1.0.2/man3/EVP_DigestInit):
@@ -85,7 +83,7 @@ The function returns an integer. It returns 1 on success and 0 on failure.
 If you want to configure the decoder for the return value, you can use the following two options:
 
 - `decoder`
-- `decodeParams`
+- `decoderArgs`
 
 The following chapters will explain the concepts with a practical example.
 
@@ -165,7 +163,7 @@ While the use case for `decoderArgs` is less common, you can use it the same way
 objcClass: NSString
 methods:
   - name: "- dataUsingEncoding"
-    returnType: [ "(NSData *)", { decoderArgs: encoding }  ]
+    returnType: [ "(NSData *)", { decoderArgs: [ encoding ] }  ]
     params: [ ["(NSStringEncoding)", encoding ] ]
 ```
 

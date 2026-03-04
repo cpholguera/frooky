@@ -268,7 +268,7 @@ To access the decrypted data, we must hook the handler implementation itself bec
 objcClass: LAPrivateKey
 methods:
   - name: "- decryptData"
-    parameters:
+    params:
       - type: (NSData *)
         name: data
       - type: (SecKeyAlgorithm)

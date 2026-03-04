@@ -2,13 +2,13 @@
 
 This documentation explains how to write Objective-C hook declarations.
 
-- [Structure of a `ObjcHook` Declaration](#structure-of-a-objchook-declaration)
+- [Structure of an `ObjcHook` Declaration](#structure-of-an-objchook-declaration)
 - [Basic Usage](#basic-usage)
 
 ## Structure of an `ObjcHook` Declaration
 
 ```yaml
-objcClass: <string>                     # Fully qualified Objective-C class name
+objcClass: <string>                    # Fully qualified Objective-C class name
 methods:                               # List of Objective-C method declarations to be hooked
   - <objc_method_declaration>
 ```
@@ -17,7 +17,7 @@ methods:                               # List of Objective-C method declarations
 
 ```yaml
 <objc_method_declaration>:
-  - <string>                           # Name of the native function
+  - <string>                           # Name of the Objective-C method 
 ```
 
 `<objc_method_declaration>` with value decoding must be declared as follows:

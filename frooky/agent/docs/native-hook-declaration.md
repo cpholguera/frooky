@@ -8,7 +8,7 @@ This documentation explains how to write native hook declarations.
 ## Structure of a `NativeHook` Declaration
 
 ```yaml
-module: <string>                       # Fully qualified module name (mandatory)
+module: <string>                       # Fully qualified module name
 functions:                             # List of native symbol declarations to be hooked
   - <native_function_declaration>
 ```
@@ -26,7 +26,7 @@ functions:                             # List of native symbol declarations to b
 <native_function_declaration>:
   symbol: <string>                     # Native symbol as string
   returnType: <string>                 # Optional: Return type of the function
-  parameters:                          # Optional: Parameter list of the function
+  params:                              # Optional: Parameter list of the function
     - <parameter_declaration>
 ```
 
@@ -77,8 +77,6 @@ functions:                             # List of native symbol declarations to b
       - <parameter_declaration>
 ```
 
-[!NOTE]
-
 **Example:**
 
 ```yaml
@@ -86,7 +84,7 @@ module: libssl.so
 functions:
   - symbol: OSSL_CMP_validate_cert_path
     returnType: int
-    parameters:
+    params:
       - [ "const OSSL_CMP_CTX *", ctx ]
       - [ "X509_STORE *", trusted_store ]
       - [ "X509 *", cert ]
