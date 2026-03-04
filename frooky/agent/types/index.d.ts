@@ -39,22 +39,25 @@ export interface HookMetadata {
 
 export type DecodeAt = 'entry' | 'exit' | 'both'
 
-export type ParameterOptions = {
+export type ParamOptions = {
   decoder?: string
   decodeAt?: DecodeAt
   decoderArgs?: string[]
 }
 
-export type Parameter =
-  | string
-  | [string, string]
-  | [string, string, ParameterOptions]
+export type ParamType = string
+export type ParamName = string
+
+export type Param =
+  | ParamType
+  | [ParamType, ParamName]
+  | [ParamType, ParamName, ParamOptions]
 
 // ============================================================================
 // Java / Android
 // ============================================================================
 export interface JavaOverload {
-  params: Parameter[]
+  params: Param[]
 }
 
 export type JavaMethod =
@@ -81,7 +84,7 @@ export type ObjectiveCMethod =
   | {
     name: string
     returnType?: string
-    params?: Parameter[]
+    params?: Param[]
   }
 
 export interface ObjectiveCHook {
@@ -98,7 +101,7 @@ export interface ObjectiveCHook {
 export interface NativeFunction {
   symbol: string
   returnType?: string
-  params?: Parameter[]
+  params?: Param[]
 }
 
 export interface NativeHook {
