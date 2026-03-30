@@ -35,7 +35,7 @@ jobs:
         run: |
           npm run build:prod:android
           npm run build:prod:ios
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         id: upload
         with:
           name: agent-dist
