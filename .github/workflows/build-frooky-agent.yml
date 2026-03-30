@@ -29,10 +29,12 @@ jobs:
           node-version: "24"
           cache: 'npm'
           cache-dependency-path: './frooky/agent/package-lock.json'
-      - run: chmod +x compileAgent.sh
-      - run: ./compileAgent.sh --prod
+      - working-directory: frooky/agent
+        run: |
+          npm run build:prod:android
+          npm run build:prod:ios
       - uses: actions/upload-artifact@v4
         id: upload
         with:
           name: agent-dist
-          path: dist/*
+          path: frooky/agent/dist/*
