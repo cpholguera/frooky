@@ -1,11 +1,17 @@
-name: Build frooky agent
+name: Build frooky Agent
 
 on:
+  push:
+    paths:
+      - 'frooky/agent/**'
   workflow_call:
     outputs:
       artifact-name:
         description: "frooky agent (JavaScript)"
-        value: ${{ jobs.build-agent.outputs.artifact-name }}
+        value: ${{ jobs.build-frooky-agent.outputs.artifact-name }}
+
+permissions:
+  contents: read
 
 jobs:
   build-frooky-agent:
