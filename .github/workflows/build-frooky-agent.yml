@@ -30,6 +30,8 @@ jobs:
           cache: 'npm'
           cache-dependency-path: './frooky/agent/package-lock.json'
       - working-directory: frooky/agent
+        run: npm ci
+      - working-directory: frooky/agent
         run: |
           npm run build:prod:android
           npm run build:prod:ios
