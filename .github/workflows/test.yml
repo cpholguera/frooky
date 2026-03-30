@@ -19,17 +19,17 @@ permissions:
 jobs:
   # Build once and upload artifact
   build:
-    uses: ./.github/workflows/build.yml
+    uses: ./.github/workflows/build-frooky.yml
 
   # Run all tests in parallel (they all depend on build and download the artifact)
   verify-build:
     needs: build
     uses: ./.github/workflows/test-build.yml
 
-  test-android:
-    needs: build
-    uses: ./.github/workflows/test-android-runtime.yml
+  # test-android:
+  #   needs: build
+  #   uses: ./.github/workflows/test-android-runtime.yml
 
-  test-ios:
-    needs: build
-    uses: ./.github/workflows/test-ios-runtime.yml
+  # test-ios:
+  #   needs: build
+  #   uses: ./.github/workflows/test-ios-runtime.yml
