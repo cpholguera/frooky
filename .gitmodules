@@ -1,0 +1,6 @@
+ [submodule "test-apps/mas-app-android"]
+	path = test-apps/mas-app-android
+	url = https://github.com/cpholguera/mas-app-android
+ [submodule "test-apps/mas-app-ios"]
+	path = test-apps/mas-app-android
+	url = https://github.com/cpholguera/mas-app-ios

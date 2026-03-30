@@ -7,22 +7,23 @@ on:
         description: "frooky host (python)"
         value: ${{ jobs.build-python.outputs.artifact-name }}
 
+permissions:
+  contents: read
+
 jobs:
   build-agent:
     uses: ./.github/workflows/build-agent.yml
 
   build-python:
     needs: build-agent
-    permissions:
-      contents: read
     runs-on: ubuntu-latest
     outputs:
       artifact-name: ${{ steps.upload.outputs.artifact-name }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: ${{ needs.build-agent.outputs.artifact-name }}
           path: dist/
@@ -31,7 +32,7 @@ jobs:
           python-version: "3.x"
       - run: python -m pip install --upgrade build
       - run: python -m build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         id: upload
         with:
           name: dist
