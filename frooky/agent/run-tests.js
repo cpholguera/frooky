@@ -17,6 +17,8 @@ const argv = minimist(process.argv.slice(2), {
     }
 });
 
+validateInput();
+
 const helpOption = argv.help;
 const usbOption = argv.usb;
 const platformOption = argv.platform;
@@ -28,33 +30,21 @@ const appIdentifier = Number.isFinite(Number(argv.appIdentifier))
 if (helpOption) {
     showHelp();
 }
-validateInput();
-
 
 async function runTests() {
 
     let session;
     let device;
+    let pid;
 
     if (usbOption) {
-        console.log('[*] Getting USB device...');
         device = await frida.getUsbDevice();
-        console.log('[*] USB device:', device);
-
-        console.log('[*] Spawning:', appIdentifier);
-        const pid = await device.spawn(appIdentifier);
-        console.log('[*] Spawned PID:', pid);
-
+        pid = await device.spawn(appIdentifier);
         session = await device.attach(pid);
-        console.log('[*] Attached to PID:', pid);
     } else {
-        console.log('[*] Getting Local device (emulator)...');
+        pid = appIdentifier
         device = await frida.getLocalDevice();
-        console.log('[*] Device:', device);
-
-        console.log('[*] Attaching to:', appIdentifier);
-        session = await device.attach(appIdentifier);
-        console.log('[*] Attached to:', appIdentifier);
+        session = await device.attach(pid);
     }
 
 
@@ -141,6 +131,10 @@ function validateInput() {
     }
     if (!argv.appIdentifier) {
         console.error('App Identifier (--appIdentifier) is required');
+        process.exit(1);
+    }
+    if (!argv.usb && isNaN(argv.appIdentifier)) {
+        console.error('App identifier (--appIdentifier) must be a numeric PID if used locally');
         process.exit(1);
     }
 }
