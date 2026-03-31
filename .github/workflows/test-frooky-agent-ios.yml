@@ -7,9 +7,6 @@ permissions:
   contents: read
 
 jobs:
-  build-frooky-agent:
-    uses: ./.github/workflows/build-frooky-agent.yml
-
   build-mas-app-iOS:
     uses: ./.github/workflows/build-mas-app-ios.yml
 
