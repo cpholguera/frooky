@@ -6,10 +6,10 @@ on:
       - "v*"
 
 jobs:
-  build:
+  build-frooky-host:
     permissions:
       contents: read
-    uses: ./.github/workflows/build.yml
+    uses: ./.github/workflows/build-frooky-host.yml
 
   verify-build:
     needs: [build]
@@ -19,12 +19,12 @@ jobs:
 
   publish:
     runs-on: ubuntu-latest
-    needs: [build, verify-build]
+    needs: build-frooky-host
     permissions:
       id-token: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
-          name: ${{ needs.build.outputs.artifact-name }}
-          path: .
+          name: frooky-host
+          path: dist/*
       - uses: pypa/gh-action-pypi-publish@release/v1

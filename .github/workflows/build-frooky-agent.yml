@@ -30,7 +30,7 @@ jobs:
         run: |
           npm run build:prod:android
           npm run build:prod:ios
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: frooky-agent
           path: frooky/agent/dist/*
