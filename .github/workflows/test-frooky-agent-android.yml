@@ -15,6 +15,9 @@ jobs:
 
   test-frooky-agent-android:
     runs-on: ubuntu-latest
+    needs: 
+      - build-frooky-agent
+      - build-mas-app-android
     steps:
       - uses: actions/checkout@v6
         with:
@@ -52,14 +55,20 @@ jobs:
           emulator-options: -wipe-data -no-snapshot-save -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: |
-            // install frida
+
             chmod +x .github/scripts/android/prep-device.sh
-            .github/scripts/android/prep-device.sh
             chmod +x .github/scripts/android/install-frida-server.sh
+            chmod +x .github/scripts/android/install-apk.sh
+            chmod +x .github/scripts/android/run-tests.sh
+
+            echo "Starting adb as root"
+            .github/scripts/android/prep-device.sh
+
+            echo "Installing frida server"
             .github/scripts/android/install-frida-server.sh
 
-            // install apk
+            echo "Installing MAS app Android"
             adb install test-apps/mas-app-android/app-debug.apk
 
-            // run tests
-            cd frooky/agent && npm run test:android
+            echo "Running frooky agent tests"
+            npm --prefix ./frooky/agent run test:android
