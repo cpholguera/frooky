@@ -123,9 +123,7 @@ function showHelp() {
     process.exit(0);
 }
 
-function validateInput(argv) {
-    console.log(argv)
-    
+function validateInput(argv) {   
     const validPlatforms = ['android', 'ios'];
     if (!validPlatforms.includes(argv.platform)) {
         console.error(`Platform must be one of: ${validPlatforms.join(', ')}`);
