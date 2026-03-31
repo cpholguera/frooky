@@ -4,10 +4,6 @@ on:
   push:
     paths:
       - 'frooky/agent/**'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'frooky/agent/**'
   
 permissions:
   contents: read
