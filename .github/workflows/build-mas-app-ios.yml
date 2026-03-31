@@ -21,7 +21,7 @@ jobs:
         with:
           repository: cpholguera/mas-app-ios
           path: mas-app-ios
-          
+
       - name: Download frooky agent artifact
         uses: actions/download-artifact@v8
         with:
@@ -64,5 +64,5 @@ jobs:
       - name: Upload MAS app iOS artifact
         uses: actions/upload-artifact@v7
         with:
-          name: mas-app-ios
+          name: mas-app-ios/build
           path: ${{ github.workspace }}/DerivedData/Build/Products/Debug-iphonesimulator/*.app
