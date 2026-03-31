@@ -20,7 +20,9 @@ const argv = minimist(process.argv.slice(2), {
 const helpOption = argv.help;
 const usbOption = argv.usb;
 const platformOption = argv.platform;
-const appIdentifier = argv.appIdentifier;
+const appIdentifier = Number.isFinite(Number(argv.appIdentifier))
+  ? Number(argv.appIdentifier)
+  : argv.appIdentifier;
 
 
 if (helpOption) {
@@ -36,7 +38,7 @@ async function runTests() {
 
     if (usbOption){
         device = await frida.getUsbDevice();
-        const pid = await device.spawn([appIdentifier]);
+        const pid = await device.spawn(appIdentifier);
         session = await device.attach(pid);
     } else {
         // app is already running locally (e.g. GitHub Workflow / iOS Simulator)
