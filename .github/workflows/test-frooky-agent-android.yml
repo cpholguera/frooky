@@ -58,8 +58,7 @@ jobs:
 
             chmod +x .github/scripts/android/prep-device.sh
             chmod +x .github/scripts/android/install-frida-server.sh
-            chmod +x .github/scripts/android/install-apk.sh
-            chmod +x .github/scripts/android/run-tests.sh
+
 
             echo "Starting adb as root"
             .github/scripts/android/prep-device.sh
