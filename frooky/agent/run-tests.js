@@ -34,7 +34,7 @@ async function runTests() {
     let device = usbOption ? await frida.getUsbDevice() : await frida.getLocalDevice();
 
     const pid = await device.spawn([appIdentifier]);
-    const session = await device.attach(appIdentifier);
+    const session = await device.attach(pid);
 
     const distDir = path.join(__dirname, 'dist');
     const agentPath = path.join(distDir, `agent-test-${platformOption}.js`)
