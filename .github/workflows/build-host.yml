@@ -10,7 +10,7 @@ jobs:
   build-agent:
     uses: ./.github/workflows/build-agent.yml
 
-  build-frooky-host:
+  build-host:
     name: Build frooky host
     needs: build-agent
     runs-on: ubuntu-latest
@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Download frooky agent artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: frooky-agent
           path: frooky/agent/dist
