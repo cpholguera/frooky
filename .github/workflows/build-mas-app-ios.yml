@@ -21,7 +21,12 @@ jobs:
         with:
           repository: cpholguera/mas-app-ios
           path: mas-app-ios
-
+          
+      - name: Download frooky agent artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: frooky-agent
+          path: frooky/agent/dist
 
     # TODO: Add the possibiltiy to build a custom target app for the frooky unit tests
 
@@ -56,7 +61,7 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
         
-      - name: Upload IPA artifact
+      - name: Upload MAS app iOS artifact
         uses: actions/upload-artifact@v7
         with:
           name: mas-app-ios

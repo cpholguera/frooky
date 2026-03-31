@@ -21,12 +21,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download frooky agent artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: frooky-agent
-          path: frooky/agent/dist
-
       - name: Download MAS app Android artifact
         uses: actions/download-artifact@v8
         with:
