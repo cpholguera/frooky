@@ -31,10 +31,18 @@ validateInput();
 
 async function runTests() {
 
-    let device = usbOption ? await frida.getUsbDevice() : await frida.getLocalDevice();
+    let session;
+    let device;
 
-    const pid = await device.spawn([appIdentifier]);
-    const session = await device.attach(pid);
+    if (usbOption){
+        device = await frida.getUsbDevice();
+        const pid = await device.spawn([appIdentifier]);
+        session = await device.attach(pid);
+    } else {
+        // app is already running locally (e.g. GitHub Workflow / iOS Simulator)
+        device = await frida.getLocalDevice()
+        session = await device.attach(pid);
+    }
 
     const distDir = path.join(__dirname, 'dist');
     const agentPath = path.join(distDir, `agent-test-${platformOption}.js`)
