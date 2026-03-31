@@ -70,8 +70,11 @@ jobs:
           echo "Installing app $APP_PATH on iPhone 17"
           xcrun simctl install "iPhone 17" "$APP_PATH"
 
-      - name: Start app
+      - name: Run tests
+        shell: bash
         run: |
+          set -o pipefail
+
           APP_ID="org.owasp.mastestapp.MASTestApp-iOS"
 
           PID=$(xcrun simctl launch booted "$APP_ID" | awk '{print $2}')
@@ -89,12 +92,9 @@ jobs:
           echo "App did not start within the timeout."
           exit 1
 
-
-      - name: Run tests
-        shell: bash
-        run: |
-          set -o pipefail
-          npm --prefix frooky/agent run test:ios:local | tee test-results-ios.txt
+          echo "Running frooky agent tests"
+          npm --prefix frooky/agent run test:ios:local --appIdentifier $PID | tee test-results-ios.txt
+         
 
       - name: Upload test results
         if: always()

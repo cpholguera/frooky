@@ -91,7 +91,7 @@ jobs:
           disable-animations: true
           script: |
             #!/bin/bash
-            
+
             set -o pipefail
 
             chmod +x .github/scripts/android/prep-device.sh
@@ -107,7 +107,7 @@ jobs:
             adb install mas-app-android/app-debug.apk
 
             echo "Running frooky agent tests"
-            npm --prefix frooky/agent run test:android | tee test-results-android.txt
+            npm --prefix frooky/agent run test:android --appIdentifier org.owasp.mastestapp | tee test-results-android.txt
             cat test-results-android.txt >> $GITHUB_STEP_SUMMARY
 
       - name: Upload test results
