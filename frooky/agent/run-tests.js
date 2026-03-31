@@ -126,7 +126,7 @@ function validateInput() {
         process.exit(1);
     }
     if (!argv.appIdentifier) {
-        console.error('App Identifier (-appIdentifier) is required');
+        console.error('App Identifier (--appIdentifier) is required');
         process.exit(1);
     }
 }

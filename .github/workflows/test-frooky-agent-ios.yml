@@ -85,7 +85,7 @@ jobs:
               echo "App is running (PID $PID)."
 
               echo "Running frooky agent tests"
-              npm --prefix frooky/agent run test:ios:local --appIdentifier $PID | tee test-results-ios.txt
+              npm --prefix frooky/agent run test:ios:local -- --appIdentifier $PID | tee test-results-ios.txt
 
               exit 0
             fi
