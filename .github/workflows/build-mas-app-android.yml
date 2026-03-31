@@ -1,19 +1,13 @@
 name: Build MAS App Android
 
-on: [push]
-
-# on:
-#   push:
-#     paths:
-#       - 'test-apps/mas-app-android/**'
-#   pull_request:
-#     paths:
-#       - 'test-apps/mas-app-android/**'
-#   workflow_call:
-#     outputs:
-#       artifact-name:
-#         description: "Name of the uploaded APK artifact"
-#         value: ${{ jobs.build.outputs.artifact-name }}
+on:
+  push:
+    paths:
+      - 'test-apps/mas-app-android/**'
+  pull_request:
+    paths:
+      - 'test-apps/mas-app-android/**'
+  workflow_call:
 
 jobs:
   build:
@@ -43,5 +37,5 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v6
         with:
-          name: app-debug
+          name: mas-app-android
           path: test-apps/mas-app-android/app/build/outputs/apk/debug/app-debug.apk
