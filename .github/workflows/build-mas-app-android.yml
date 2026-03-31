@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: read
-  actions: write
 
 jobs:
   build-mas-app-android:
@@ -26,6 +25,9 @@ jobs:
           distribution: 'temurin'
           
       - uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: wrapper
+          build-root-directory: test-apps/mas-app-android
 
       - working-directory: test-apps/mas-app-android
         run: ./gradlew assembleDebug
