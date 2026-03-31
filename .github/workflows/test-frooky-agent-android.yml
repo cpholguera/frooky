@@ -7,11 +7,11 @@ permissions:
   contents: read
 
 jobs:
-  build-mas-app-android:
-    uses: ./.github/workflows/build-mas-app-android.yml
-
   build-frooky-agent:
     uses: ./.github/workflows/build-frooky-agent.yml
+
+  build-mas-app-android:
+    uses: ./.github/workflows/build-mas-app-android.yml
 
   test-frooky-agent-android:
     name: Test frooky agent Android

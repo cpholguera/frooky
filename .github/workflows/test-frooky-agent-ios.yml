@@ -7,18 +7,18 @@ permissions:
   contents: read
 
 jobs:
-  build-mas-app-iOS:
-    uses: ./.github/workflows/build-mas-app-ios.yml
-
   build-frooky-agent:
     uses: ./.github/workflows/build-frooky-agent.yml
+
+  build-mas-app-ios:
+    uses: ./.github/workflows/build-mas-app-ios.yml
 
   test-frooky-agent-android:
     name: Test frooky agent iOS
     runs-on: ubuntu-latest
     needs: 
       - build-frooky-agent
-      - build-mas-app-iOS
+      - build-mas-app-ios
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
