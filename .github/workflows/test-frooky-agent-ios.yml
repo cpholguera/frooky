@@ -74,14 +74,12 @@ jobs:
         run: |
           APP_ID="org.owasp.mastestapp.MASTestApp-iOS"
 
-          xcrun simctl launch booted "$APP_ID" || true
+          PID=$(xcrun simctl launch booted "$APP_ID" | awk '{print $2}')
+          echo "Launched with PID $PID"
 
-          echo "Waiting for app to be running..."
           for i in $(seq 1 10); do
-            PS_OUT="$(frida-ps -ai 2>/dev/null || true)"
-            printf '%s\n' "$PS_OUT"
-            if printf '%s\n' "$PS_OUT" | grep -q "$APP_ID"; then
-              echo "App is running."
+            if kill -0 "$PID" 2>/dev/null; then
+              echo "App is running (PID $PID)."
               exit 0
             fi
             echo "Attempt $i: app not running yet, retrying in 2s..."
@@ -91,9 +89,10 @@ jobs:
           echo "App did not start within the timeout."
           exit 1
 
+
       - name: Run tests
+        shell: bash
         run: |
-          #!/bin/bash
           set -o pipefail
           npm --prefix frooky/agent run test:ios:local | tee test-results-ios.txt
 
