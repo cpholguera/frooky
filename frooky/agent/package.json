@@ -16,7 +16,6 @@
     "test:android": "npm run build:test:android && node run-tests.js -p android",
     "test:ios:usb": "npm run build:test:ios && node run-tests.js -p ios -usb",
     "test:ios:local": "npm run build:test:ios && node run-tests.js -p ios"
-
   },
   "devDependencies": {
     "@types/frida-gum": "^19.0.1",
