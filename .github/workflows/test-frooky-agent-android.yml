@@ -106,7 +106,8 @@ jobs:
             adb install mas-app-android/app-debug.apk
 
             echo "Running frooky agent tests"
-            npm --prefix frooky/agent run test:android --appIdentifier org.owasp.mastestapp | tee test-results-android.txt
+            npm --prefix frooky/agent run test:android -- --appIdentifier org.owasp.mastestapp > test-results-android.txt
+            cat test-results-android.txt
             cat test-results-android.txt >> $GITHUB_STEP_SUMMARY
 
       - name: Upload test results
