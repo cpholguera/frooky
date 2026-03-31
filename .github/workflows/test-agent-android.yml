@@ -13,18 +13,13 @@ permissions:
   contents: read
 
 jobs:
-  build-agent:
-    uses: ./.github/workflows/build-agent.yml
-
   build-mas-app-android:
     uses: ./.github/workflows/build-mas-app-android.yml
 
   test-agent-android:
     name: Test agent Android
     runs-on: ubuntu-latest
-    needs: 
-      - build-agent
-      - build-mas-app-android
+    needs: build-mas-app-android
     timeout-minutes: 30
 
     steps:
@@ -38,12 +33,6 @@ jobs:
         with:
           name: mas-app-android
           path: mas-app-android
-
-      - name: Download agent artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: frooky-agent
-          path: frooky/agent/dist
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
