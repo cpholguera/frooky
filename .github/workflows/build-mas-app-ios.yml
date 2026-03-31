@@ -9,7 +9,7 @@ permissions:
 jobs:
   build-mas-app-ios:
     name: Build MAS app iOS
-    runs-on: macos-latest
+    runs-on: macos-26
     timeout-minutes: 30
 
     steps:
@@ -36,6 +36,11 @@ jobs:
 
       - name: Build the app for simulator
         run: |
+
+          echo "available simulators"
+
+          xcrun simctl list devices available | grep iPhone
+
           cd mas-app-ios
           cp .github/Local.xcconfig.ci Local.xcconfig
 

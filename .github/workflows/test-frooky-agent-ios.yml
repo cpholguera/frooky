@@ -12,7 +12,7 @@ jobs:
 
   test-frooky-agent-android:
     name: Test frooky agent iOS
-    runs-on: macos-latest
+    runs-on: macos-26
     needs: build-mas-app-ios
     timeout-minutes: 30
 
