@@ -1,4 +1,4 @@
-name: Test frooky agent iOS
+name: Test agent iOS
 
 on:
   push:
