@@ -10,10 +10,14 @@ jobs:
   build-mas-app-android:
     uses: ./.github/workflows/build-mas-app-android.yml
 
+  build-frooky-agent:
+    uses: ./.github/workflows/build-frooky-agent.yml
+
   test-frooky-agent-android:
     name: Test frooky agent Android
     runs-on: ubuntu-latest
     needs: 
+      - build-frooky-agent
       - build-mas-app-android
     steps:
       - name: Checkout repository
