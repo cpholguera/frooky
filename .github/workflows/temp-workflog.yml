@@ -3,8 +3,13 @@ name: Temp workflow to trigger workflows during dev
 on: [push]
 
 jobs:
-  test-android:
-    uses: ./.github/workflows/test-frooky-agent-android.yml
+  build-frooky-agent:
+    uses: ./.github/workflows/build-frooky-agent.yml
 
   test-ios:
+    needs: build-frooky-agent
     uses: ./.github/workflows/test-frooky-agent-ios.yml
+
+  test-android:
+    needs: build-frooky-agent
+    uses: ./.github/workflows/test-frooky-agent-android.yml
