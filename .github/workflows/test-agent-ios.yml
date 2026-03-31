@@ -1,8 +1,14 @@
 name: Test frooky agent iOS
 
 on:
-  workflow_call:
-
+  push:
+    paths:
+      - 'frooky/agent/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'frooky/agent/**'
+  
 permissions:
   contents: read
 

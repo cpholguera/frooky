@@ -1,7 +1,6 @@
 name: Verify Build
 
-on:
-  workflow_call:
+on: push
 
 permissions:
   contents: read
