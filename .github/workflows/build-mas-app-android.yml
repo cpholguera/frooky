@@ -4,16 +4,13 @@ on:
   push:
     paths:
       - 'test-apps/mas-app-android/**'
-  pull_request:
-    paths:
-      - 'test-apps/mas-app-android/**'
   workflow_call:
 
 permissions:
   contents: read
 
 jobs:
-  build:
+  build-mas-app-android:
     name: Build APK
     runs-on: ubuntu-latest
     
