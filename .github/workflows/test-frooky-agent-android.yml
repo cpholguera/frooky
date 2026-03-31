@@ -42,6 +42,12 @@ jobs:
       - run: npm ci
         working-directory: frooky/agent
 
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - run: python -m pip install frida
+
       - run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
@@ -55,10 +61,8 @@ jobs:
           emulator-options: -wipe-data -no-snapshot-save -no-snapshot-load -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: |
-
             chmod +x .github/scripts/android/prep-device.sh
             chmod +x .github/scripts/android/install-frida-server.sh
-
 
             echo "Starting adb as root"
             .github/scripts/android/prep-device.sh
@@ -70,4 +74,4 @@ jobs:
             adb install test-apps/mas-app-android/app-debug.apk
 
             echo "Running frooky agent tests"
-            npm --prefix ./frooky/agent run test:android
+            npm --prefix frooky/agent run test:android
