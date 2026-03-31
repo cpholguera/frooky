@@ -14,25 +14,20 @@
     "build:test:android": "frida-compile --type-check none tests/android/agent-runner.ts -o dist/agent-test-android.js",
     "build:test:ios": "frida-compile --type-check none tests/ios/agent-runner.ts -o dist/agent-test-ios.js",
     "test:android": "npm run build:test:android && node run-tests.js -p android",
-    "test:ios:usb": "npm run build:test:ios && node run-tests.js -p ios -usb",
-    "test:ios:local": "npm run build:test:ios && node run-tests.js -p ios"
+    "test:ios:usb": "npm run build:test:ios && node run-tests.js -p ios -usb --appIdentifier org.owasp.mastestapp",
+    "test:ios:local": "npm run build:test:ios && node run-tests.js -p ios --appIdentifier MASTestApp"
 
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
     "@types/frida-gum": "^19.0.1",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.10.9",
     "chokidar": "^5.0.0",
-    "eslint": "^10.1.0",
-    "eslint-config-prettier": "^10.1.8",
     "frida-compile": "^19.0.4",
     "frida-java-bridge": "^7.0.11",
     "frida-objc-bridge": "^8.0.5",
     "frida-swift-bridge": "^3.0.2",
     "globals": "^17.4.0",
-    "minimist": "^1.2.8",
-    "prettier": "^3.8.1",
-    "typescript-eslint": "^8.58.0"
+    "minimist": "^1.2.8"
   }
 }

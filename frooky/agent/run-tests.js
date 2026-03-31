@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const argv = minimist(process.argv.slice(2), {
-    string: ['platform'],
+    string: ['platform', 'appIdentifier'],
     boolean: ['help', 'usb'],
     alias: {
         p: 'platform',
@@ -20,6 +20,7 @@ const argv = minimist(process.argv.slice(2), {
 const helpOption = argv.help;
 const usbOption = argv.usb;
 const platformOption = argv.platform;
+const appIdentifier = argv.appIdentifier;
 
 
 if (helpOption) {
@@ -34,24 +35,11 @@ async function runTests() {
 
     if (usbOption){
         const device = await frida.getUsbDevice();
-
-        // for the moment hardcoded target app
-        const pid = await device.spawn(['org.owasp.mastestapp']);
+        const pid = await device.spawn([appIdentifier]);
         session = await device.attach(pid);
-    } 
-    else
-        {
-        // app is running locally (e.g. GitHub Workflow / iOS Simulator)
-        const device = await frida.getLocalDevice();
-
-        // for the moment hardcoded target app
-        const appId = 'org.owasp.mastestapp.MASTestApp-iOS';
-        const appName = 'MASTestApp';
-
-        await device.spawn([appId]);
-
-        // attach by name, as frida-ps -ai shows the app name
-        session = await device.attach(appName);
+    } else {
+        // app is already running locally (e.g. GitHub Workflow / iOS Simulator)
+        session = await device.attach(appIdentifier);
     }
 
     const distDir = path.join(__dirname, 'dist');
@@ -130,10 +118,13 @@ function showHelp() {
 }
 
 function validateInput() {
-    // validate platforms
     const validPlatforms = ['android', 'ios'];
     if (!validPlatforms.includes(platformOption)) {
         console.error(`Platform must be one of: ${validPlatforms.join(', ')}`);
+        process.exit(1);
+    }
+    if (!argv.appIdentifier) {
+        console.error('App Identifier (-appIdentifier) is required');
         process.exit(1);
     }
 }
