@@ -1,5 +1,3 @@
-// tests/test-framework.d.ts
-
 // very simple testing framework runnable in a frida environment
 
 declare global {

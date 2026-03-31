@@ -13,25 +13,29 @@ jobs:
   build-mas-app-android:
     name: Build MAS app Android
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v6
         with:
           submodules: true
 
-      - uses: actions/setup-java@v5
+      - name: Set up Java
+        uses: actions/setup-java@v5
         with:
           java-version: '21'
           distribution: 'temurin'
-          
-      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: wrapper
 
-      - working-directory: test-apps/mas-app-android
+      - name: Build debug APK
+        working-directory: test-apps/mas-app-android
         run: ./gradlew assembleDebug
 
-      - uses: actions/upload-artifact@v7
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v7
         with:
           name: mas-app-android
           path: test-apps/mas-app-android/app/build/outputs/apk/debug/app-debug.apk

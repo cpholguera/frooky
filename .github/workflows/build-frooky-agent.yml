@@ -16,21 +16,30 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout repository
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
         with:
           node-version: "24"
           cache: 'npm'
           cache-dependency-path: './frooky/agent/package-lock.json'
-      - working-directory: frooky/agent
+
+      - name: Install dependencies
+        working-directory: frooky/agent
         run: npm ci
-      - working-directory: frooky/agent
+
+      - name: Build frooky agent
+        working-directory: frooky/agent
         run: |
           npm run build:prod:android
           npm run build:prod:ios
-      - uses: actions/upload-artifact@v7
+
+      - name: Upload frooky agent artifact
+        uses: actions/upload-artifact@v7
         with:
           name: frooky-agent
           path: frooky/agent/dist/*

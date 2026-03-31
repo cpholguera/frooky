@@ -20,42 +20,50 @@ jobs:
       - build-frooky-agent
       - build-mas-app-android
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout repository
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - uses: actions/download-artifact@v8
+      - name: Download frooky agent artifact
+        uses: actions/download-artifact@v8
         with:
           name: frooky-agent
           path: frooky/agent/dist
 
-      - uses: actions/download-artifact@v8
+      - name: Download MAS app Android artifact
+        uses: actions/download-artifact@v8
         with:
           name: mas-app-android
           path: test-apps/mas-app-android
 
-      - uses: actions/setup-node@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
         with:
           node-version: "24"
           cache: 'npm'
           cache-dependency-path: './frooky/agent/package-lock.json'
 
-      - run: npm ci
+      - name: Install Node.js dependencies
+        run: npm ci
         working-directory: frooky/agent
 
-      - uses: actions/setup-python@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
         with:
           python-version: "3.x"
 
-      - run: |
+      - name: Install Frida
+        run: |
           python -m pip install frida
           python -m pip install frida-tools
 
-      - run: |
+      - name: Enable KVM
+        run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-          
+
       - name: Cache AVD snapshot
         uses: actions/cache@v5
         id: avd-cache
@@ -98,4 +106,12 @@ jobs:
             adb install test-apps/mas-app-android/app-debug.apk
 
             echo "Running frooky agent tests"
-            npm --prefix frooky/agent run test:android
+            npm --prefix frooky/agent run test:android | tee test-results-android.txt
+            cat test-results-android.txt >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-android
+          path: test-results-android.txt

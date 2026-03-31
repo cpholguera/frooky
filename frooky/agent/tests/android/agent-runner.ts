@@ -1,4 +1,3 @@
-// tests/android/test-runner.ts
 import { runTests } from '../agent-test-framework';
 import Java from "frida-java-bridge";
 
