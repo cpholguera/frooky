@@ -48,8 +48,8 @@ async function runTests() {
         session = await device.attach(pid);
         console.log('[*] Attached to PID:', pid);
     } else {
-        console.log('[*] Getting USB device (emulator)...');
-        device = await frida.getUsbDevice();
+        console.log('[*] Getting Local device (emulator)...');
+        device = await frida.getLocalDevice();
         console.log('[*] Device:', device);
 
         console.log('[*] Attaching to:', appIdentifier);
