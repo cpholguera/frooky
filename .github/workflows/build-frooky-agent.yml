@@ -1,9 +1,6 @@
 name: Build frooky agent
 
 on:
-  push:
-    paths:
-      - 'frooky/agent/**'
   workflow_call:
 
 permissions:
