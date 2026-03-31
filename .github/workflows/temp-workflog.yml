@@ -10,6 +10,6 @@ jobs:
     needs: build-frooky-agent
     uses: ./.github/workflows/test-frooky-agent-ios.yml
 
-  test-android:
-    needs: build-frooky-agent
-    uses: ./.github/workflows/test-frooky-agent-android.yml
+  # test-android:
+  #   needs: build-frooky-agent
+  #   uses: ./.github/workflows/test-frooky-agent-android.yml

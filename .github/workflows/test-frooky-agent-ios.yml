@@ -34,6 +34,10 @@ jobs:
           name: frooky-agent
           path: frooky/agent/dist
 
+      - name: Install Node.js dependencies
+        run: npm ci
+        working-directory: frooky/agent
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
