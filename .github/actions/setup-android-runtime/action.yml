@@ -12,6 +12,32 @@ inputs:
 runs:
   using: composite
   steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - uses: actions/download-artifact@v6
+      with:
+        name: frooky-agent
+        path: frooky/agent/dist
+
+    - uses: actions/download-artifact@v6
+      with:
+        name: mas-app-android
+        path: test-apps/mas-app-android
+
+    - uses: actions/setup-node@v6
+      with:
+        node-version: "24"
+        cache: 'npm'
+        cache-dependency-path: './frooky/agent/package-lock.json'
+
+    - run: npm ci
+      working-directory: frooky/agent
+
+
+      
+
     - name: Enable KVM
       shell: bash
       run: |

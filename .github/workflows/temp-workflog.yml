@@ -4,4 +4,4 @@ on: [push]
 
 jobs:
   build:
-    uses: ./.github/workflows/test-frooky-agent.yml
+    uses: ./.github/workflows/test-frooky-agent-android.yml
