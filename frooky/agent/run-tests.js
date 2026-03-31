@@ -32,14 +32,16 @@ validateInput();
 async function runTests() {
 
     let session;
+    let device;
 
     if (usbOption){
-        const device = await frida.getUsbDevice();
+        device = await frida.getUsbDevice();
         const pid = await device.spawn([appIdentifier]);
         session = await device.attach(pid);
     } else {
         // app is already running locally (e.g. GitHub Workflow / iOS Simulator)
-        session = await device.attach(appIdentifier);
+        device = await frida.getLocalDevice()
+        session = await device(appIdentifier);
     }
 
     const distDir = path.join(__dirname, 'dist');

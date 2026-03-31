@@ -71,10 +71,10 @@ jobs:
           xcrun simctl install "iPhone 17" "$APP_PATH"
 
       - name: Run tests
+        shell: bash
         run: |
+          set -o pipefail
           npm --prefix frooky/agent run test:ios:local | tee test-results-ios.txt
-          cat test-results-ios.txt >> $GITHUB_STEP_SUMMARY
-
 
       - name: Upload test results
         if: always()
