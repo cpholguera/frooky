@@ -20,7 +20,7 @@ jobs:
     uses: ./.github/workflows/build-mas-app-ios.yml
 
   test-agent-android:
-    name: Test frooky agent iOS
+    name: Test agent iOS
     runs-on: macos-26
     needs: 
       - build-agent
@@ -39,7 +39,7 @@ jobs:
           name: mas-app-ios
           path: mas-app-ios
 
-      - name: Download frooky agent artifact
+      - name: Download agent artifact
         uses: actions/download-artifact@v8
         with:
           name: frooky-agent

@@ -20,7 +20,7 @@ jobs:
     uses: ./.github/workflows/build-mas-app-android.yml
 
   test-agent-android:
-    name: Test frooky agent Android
+    name: Test agent Android
     runs-on: ubuntu-latest
     needs: 
       - build-agent
@@ -39,7 +39,7 @@ jobs:
           name: mas-app-android
           path: mas-app-android
 
-      - name: Download frooky agent artifact
+      - name: Download agent artifact
         uses: actions/download-artifact@v8
         with:
           name: frooky-agent
@@ -113,7 +113,7 @@ jobs:
             echo "Installing MAS app Android"
             adb install mas-app-android/app-debug.apk
 
-            echo "Running frooky agent tests"
+            echo "Running agent tests"
             npm --prefix frooky/agent run test:android -- --appIdentifier org.owasp.mastestapp > test-results-android.txt
             cat test-results-android.txt
             cat test-results-android.txt >> $GITHUB_STEP_SUMMARY

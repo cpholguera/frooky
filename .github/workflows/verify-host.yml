@@ -10,6 +10,7 @@ jobs:
     uses: ./.github/workflows/build-host.yml
 
   verify-host:
+    name: Verify host
     runs-on: ubuntu-latest
     needs: build-host
     steps:
@@ -23,7 +24,7 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Download frooky agent artifact
+      - name: Download agent artifact
         uses: actions/download-artifact@v8
         with:
           name: frooky-host
