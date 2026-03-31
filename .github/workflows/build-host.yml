@@ -7,12 +7,12 @@ permissions:
   contents: read
 
 jobs:
-  build-frooky-agent:
-    uses: ./.github/workflows/build-frooky-agent.yml
+  build-agent:
+    uses: ./.github/workflows/build-agent.yml
 
   build-frooky-host:
     name: Build frooky host
-    needs: build-frooky-agent
+    needs: build-agent
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -36,6 +36,12 @@ jobs:
 
       - name: Build frooky package
         run: python -m build
+
+      - name: Check build artifacts
+        run: |
+          ls -lh dist/
+          test -f dist/*.whl
+          test -f dist/*.tar.gz
 
       - name: Upload frooky host artifact
         uses: actions/upload-artifact@v7

@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 jobs:
-  build-frooky-agent:
+  build-agent:
     name: Build frooky agent
     permissions:
       contents: read

@@ -4,22 +4,17 @@ on:
   push:
     tags:
       - "v*"
+    
+permissions:
+  contents: read
 
 jobs:
-  build-frooky-host:
-    permissions:
-      contents: read
-    uses: ./.github/workflows/build-frooky-host.yml
+  verify-host:
+    uses: ./.github/workflows/verify-host.yml
 
-  verify-build:
-    needs: [build]
-    permissions:
-      contents: read
-    uses: ./.github/workflows/test-build.yml
-
-  publish:
+  publish-host:
     runs-on: ubuntu-latest
-    needs: build-frooky-host
+    needs: verify-host
     permissions:
       id-token: write
     steps:
