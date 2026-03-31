@@ -31,3 +31,36 @@ jobs:
         with:
           name: frooky-agent
           path: frooky/agent/dist
+
+      - name: Boot iOS Simulator
+        run: |
+          # List available simulators
+          xcrun simctl list devices available
+          
+          # Boot iPhone 16 simulator
+          xcrun simctl boot "iPhone 16" || echo "Simulator already booted"
+          
+          # Wait for simulator to be ready
+          sleep 5
+
+      - name: Install app on simulator
+        run: |
+          APP_PATH=$(find "mas-app-ios" -name "*.app" -type d | head -1)
+          xcrun simctl install "iPhone 16" "$APP_PATH"
+
+          echo "Running frooky agent tests"
+          npm --prefix frooky/agent run test:ios | tee test-results-ios.txt
+          cat test-results-ios.txt >> $GITHUB_STEP_SUMMARY
+
+      - name: Run tests
+        run: |
+          npm --prefix frooky/agent run test:ios | tee test-results-ios.txt
+          cat test-results-ios.txt >> $GITHUB_STEP_SUMMARY
+
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-ios
+          path: test-results-ios.txt
