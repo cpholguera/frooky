@@ -22,12 +22,6 @@ jobs:
           repository: cpholguera/mas-app-ios
           path: mas-app-ios
 
-      - name: Download frooky agent artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: frooky-agent
-          path: frooky/agent/dist
-
     # TODO: Add the possibiltiy to build a custom target app for the frooky unit tests
 
     #   - name: Copy example files
@@ -43,19 +37,15 @@ jobs:
       - name: Build the app for simulator
         run: |
           cd mas-app-ios
-          
-          # Copy the CI config file
           cp .github/Local.xcconfig.ci Local.xcconfig
-          
-          # Get the default scheme
+
           DEFAULT_SCHEME=$(xcodebuild -list -json | jq -r '.project.targets[0]')
           echo "Using scheme: $DEFAULT_SCHEME"
-          
-          # Build for simulator
+
           xcodebuild build \
             -project "MASTestApp.xcodeproj" \
             -scheme "$DEFAULT_SCHEME" \
-            -destination "platform=iOS Simulator,name=iPhone 16" \
+            -destination "generic/platform=iOS Simulator" \
             -derivedDataPath "$GITHUB_WORKSPACE/DerivedData" \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \

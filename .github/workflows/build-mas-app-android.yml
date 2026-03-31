@@ -22,12 +22,6 @@ jobs:
           repository: cpholguera/mas-app-android
           path: mas-app-android       
           
-      - name: Download frooky agent artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: frooky-agent
-          path: frooky/agent/dist
-
       - name: Set up Java
         uses: actions/setup-java@v5
         with:
