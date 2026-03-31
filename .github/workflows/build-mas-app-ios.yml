@@ -1,7 +1,0 @@
-name: dummy
-
-on: [push]
-
-jobs:
-  run:
-    uses: ./.github/workflows/build-frooky-agent.yml
