@@ -13,8 +13,8 @@ permissions:
   contents: read
 
 jobs:
-  build-frooky-agent:
-    uses: ./.github/workflows/build-frooky-agent.yml
+  build-agent:
+    uses: ./.github/workflows/build-agent.yml
 
   build-mas-app-ios:
     uses: ./.github/workflows/build-mas-app-ios.yml
@@ -23,7 +23,7 @@ jobs:
     name: Test frooky agent iOS
     runs-on: macos-26
     needs: 
-      - build-frooky-agent
+      - build-agent
       - build-mas-app-ios
     timeout-minutes: 30
 

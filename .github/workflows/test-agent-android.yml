@@ -13,8 +13,8 @@ permissions:
   contents: read
 
 jobs:
-  build-frooky-agent:
-    uses: ./.github/workflows/build-frooky-agent.yml
+  build-agent:
+    uses: ./.github/workflows/build-agent.yml
 
   build-mas-app-android:
     uses: ./.github/workflows/build-mas-app-android.yml
@@ -23,7 +23,7 @@ jobs:
     name: Test frooky agent Android
     runs-on: ubuntu-latest
     needs: 
-      - build-frooky-agent
+      - build-agent
       - build-mas-app-android
     timeout-minutes: 30
 
