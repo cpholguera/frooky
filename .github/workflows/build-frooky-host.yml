@@ -1,4 +1,4 @@
-name: Build frooky Host
+name: Build frooky host
 
 on:
   workflow_call:

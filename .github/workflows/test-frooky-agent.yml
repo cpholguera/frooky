@@ -1,0 +1,59 @@
+name: Test frooky agent
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  build-frooky-agent:
+    uses: ./.github/workflows/build-frooky-agent.yml
+
+  build-mas-app-android:
+    uses: ./.github/workflows/build-mas-app-android.yml
+    
+
+  test-frooky-agent:
+    needs:
+      - build-frooky-agent
+      - build-mas-app-android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v6
+        with:
+          name: frooky-host
+          path: frooky/agent/dist
+
+      - uses: actions/download-artifact@v6
+        with:
+          name: mas-app-android
+          path: test-apps/mas-app-android
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: 'npm'
+          cache-dependency-path: './frooky/agent/package-lock.json'
+
+      - run: npm ci
+        working-directory: frooky/agent
+
+      - name: Run Android tests
+        uses: ./.github/actions/setup-android-runtime
+        with:
+          api-level: "34"
+          script: |
+            chmod +x .github/scripts/android/prep-device.sh
+            .github/scripts/android/prep-device.sh
+
+            chmod +x .github/scripts/android/install-frida-server.sh
+            .github/scripts/android/install-frida-server.sh
+
+            adb install test-apps/mas-app-android/app-debug.apk
+            cd frooky/agent && npm run test:android
+

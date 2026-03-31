@@ -1,4 +1,4 @@
-name: Build frooky Agent
+name: Build frooky agent
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: Build MAS App Android
+name: Build MAS app Android
 
 on:
   push:
