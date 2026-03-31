@@ -26,3 +26,9 @@ jobs:
         with:
           name: mas-app-ios
           path: mas-app-ios
+          
+      - name: Download frooky agent artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: frooky-agent
+          path: frooky/agent/dist
