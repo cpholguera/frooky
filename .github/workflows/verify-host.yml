@@ -1,4 +1,4 @@
-name: Verify Build
+name: Verify frooky host
 
 on: push
 
@@ -29,12 +29,12 @@ jobs:
           name: frooky-host
           path: dist
 
-      - name: Test install from wheel
+      - name: Install wheel
         run: |
           python -m pip install dist/*.whl
           frooky --help
 
-      - name: Verify agent artifacts in wheel
+      - name: Check agent artifacts
         run: |
           unzip -l dist/*.whl | grep "frooky/agent/dist/agent-android.js"
           unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
