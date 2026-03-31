@@ -9,14 +9,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const argv = minimist(process.argv.slice(2), {
     string: ['platform'],
-    boolean: ['help'],
+    boolean: ['help', 'usb'],
     alias: {
         p: 'platform',
         h: 'help',
+        u: 'usb',
     }
 });
 
 const helpOption = argv.help;
+const usbOption = argv.usb;
 const platformOption = argv.platform;
 
 
@@ -27,11 +29,30 @@ validateInput();
 
 
 async function runTests() {
-    const device = await frida.getUsbDevice();
 
-    // for the moment hardcoded target app
-    const pid = await device.spawn(['org.owasp.mastestapp']);
-    const session = await device.attach(pid);
+    let session;
+
+    if (usbOption){
+        const device = await frida.getUsbDevice();
+
+        // for the moment hardcoded target app
+        const pid = await device.spawn(['org.owasp.mastestapp']);
+        session = await device.attach(pid);
+    } 
+    else
+        {
+        // app is running locally (e.g. GitHub Workflow / iOS Simulator)
+        const device = await frida.getLocalDevice();
+
+        // for the moment hardcoded target app
+        const appId = 'org.owasp.mastestapp.MASTestApp-iOS';
+        const appName = 'MASTestApp';
+
+        await device.spawn([appId]);
+
+        // attach by name, as frida-ps -ai shows the app name
+        session = await device.attach(appName);
+    }
 
     const distDir = path.join(__dirname, 'dist');
     const agentPath = path.join(distDir, `agent-test-${platformOption}.js`)

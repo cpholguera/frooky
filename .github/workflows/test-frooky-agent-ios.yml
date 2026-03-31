@@ -34,26 +34,34 @@ jobs:
           name: frooky-agent
           path: frooky/agent/dist
 
-      - name: Boot iOS Simulator
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - name: Install Frida
         run: |
-          # List available simulators
-          xcrun simctl list devices available
-          
-          # Boot iPhone 17 simulator
+          python -m pip install frida
+          python -m pip install frida-tools
+
+      - name: Boot iOS Simulator
+        run: |         
+          echo "Booting iPhone 17 simulator"
           xcrun simctl boot "iPhone 17"
           
-          # Wait for simulator to be ready
+          echo "Waiting for simulator to be ready"
           xcrun simctl bootstatus "iPhone 17" -b
-
 
       - name: Install app on simulator
         run: |
           APP_PATH=$(find "mas-app-ios" -name "*.app" -type d | head -1)
+
+          echo "Installing app $APP_PATH on iPhone 17"
           xcrun simctl install "iPhone 17" "$APP_PATH"
 
       - name: Run tests
         run: |
-          npm --prefix frooky/agent run test:ios | tee test-results-ios.txt
+          npm --prefix frooky/agent run test:ios:local | tee test-results-ios.txt
           cat test-results-ios.txt >> $GITHUB_STEP_SUMMARY
 
 
