@@ -3,7 +3,5 @@ name: dummy
 on: [push]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+  run:
+    uses: ./.github/workflows/build-frooky-agent.yml

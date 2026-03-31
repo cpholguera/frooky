@@ -5,10 +5,6 @@ on:
     paths:
       - 'frooky/agent/**'
   workflow_call:
-    outputs:
-      artifact-name:
-        description: "frooky agent (JavaScript)"
-        value: ${{ jobs.build-frooky-agent.outputs.artifact-name }}
 
 permissions:
   contents: read
@@ -18,8 +14,6 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
-    outputs:
-      artifact-name: ${{ steps.upload.outputs.artifact-name }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -36,7 +30,6 @@ jobs:
           npm run build:prod:android
           npm run build:prod:ios
       - uses: actions/upload-artifact@v5
-        id: upload
         with:
-          name: agent-dist
+          name: frooky-agent
           path: frooky/agent/dist/*
