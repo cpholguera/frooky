@@ -8,25 +8,25 @@ permissions:
 
 jobs:
   build-agent:
-    uses: ./.github/workflows/build-agent.yml
+    uses: ./.github/workflows/build-frooky-agent.yml
 
   build-python:
     needs: build-agent
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: frooky-agent
           path: frooky/agent/dist
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.x"
       - run: python -m pip install --upgrade build
       - run: python -m build
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
-          name: dist
+          name: frooky-host
           path: dist/*
