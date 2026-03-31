@@ -36,15 +36,27 @@ async function runTests() {
     let session;
     let device;
 
-    if (usbOption){
+    if (usbOption) {
+        console.log('[*] Getting USB device...');
         device = await frida.getUsbDevice();
+        console.log('[*] USB device:', device);
+
+        console.log('[*] Spawning:', appIdentifier);
         const pid = await device.spawn(appIdentifier);
+        console.log('[*] Spawned PID:', pid);
+
         session = await device.attach(pid);
+        console.log('[*] Attached to PID:', pid);
     } else {
-        // app is already running locally (e.g. GitHub Workflow / iOS Simulator)
-        device = await frida.getLocalDevice()
+        console.log('[*] Getting USB device (emulator)...');
+        device = await frida.getUsbDevice();
+        console.log('[*] Device:', device);
+
+        console.log('[*] Attaching to:', appIdentifier);
         session = await device.attach(appIdentifier);
+        console.log('[*] Attached to:', appIdentifier);
     }
+
 
     const distDir = path.join(__dirname, 'dist');
     const agentPath = path.join(distDir, `agent-test-${platformOption}.js`)
