@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   build-mas-app-android:
+    name: Build MAS app Android
     runs-on: ubuntu-latest
     
     steps:

@@ -11,6 +11,7 @@ jobs:
     uses: ./.github/workflows/build-frooky-agent.yml
 
   build-frooky-host:
+    name: Build frooky host
     needs: build-frooky-agent
     runs-on: ubuntu-latest
     steps:

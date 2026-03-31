@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   build-frooky-agent:
+    name: Build frooky agent
     permissions:
       contents: read
     runs-on: ubuntu-latest
