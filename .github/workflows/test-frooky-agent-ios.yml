@@ -48,10 +48,6 @@ jobs:
           APP_PATH=$(find "mas-app-ios" -name "*.app" -type d | head -1)
           xcrun simctl install "iPhone 16" "$APP_PATH"
 
-          echo "Running frooky agent tests"
-          npm --prefix frooky/agent run test:ios | tee test-results-ios.txt
-          cat test-results-ios.txt >> $GITHUB_STEP_SUMMARY
-
       - name: Run tests
         run: |
           npm --prefix frooky/agent run test:ios | tee test-results-ios.txt
