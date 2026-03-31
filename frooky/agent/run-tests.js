@@ -19,15 +19,15 @@ const argv = minimist(process.argv.slice(2), {
 
 validateInput(argv);
 
-const helpOption = argv.help;
-const usbOption = argv.usb;
-const platformOption = argv.platform;
+const help = argv.help;
+const usb = argv.usb;
+const platform = argv.platform;
 const appIdentifier = Number.isFinite(Number(argv.appIdentifier))
   ? Number(argv.appIdentifier)
   : argv.appIdentifier;
 
 
-if (helpOption) {
+if (help) {
     showHelp();
 }
 
@@ -37,7 +37,7 @@ async function runTests() {
     let device;
     let pid;
 
-    if (usbOption) {
+    if (usb) {
         device = await frida.getUsbDevice();
         pid = await device.spawn(appIdentifier);
         session = await device.attach(pid);
@@ -49,7 +49,7 @@ async function runTests() {
 
 
     const distDir = path.join(__dirname, 'dist');
-    const agentPath = path.join(distDir, `agent-test-${platformOption}.js`)
+    const agentPath = path.join(distDir, `agent-test-${platform}.js`)
 
     const script = await session.createScript(
         fs.readFileSync(agentPath, 'utf8')
@@ -127,7 +127,7 @@ function validateInput(argv) {
     console.log(argv)
     
     const validPlatforms = ['android', 'ios'];
-    if (!validPlatforms.includes(argv.platformOption)) {
+    if (!validPlatforms.includes(argv.platform)) {
         console.error(`Platform must be one of: ${validPlatforms.join(', ')}`);
         process.exit(1);
     }
