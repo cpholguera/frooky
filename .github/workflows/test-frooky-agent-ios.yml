@@ -70,6 +70,24 @@ jobs:
           echo "Installing app $APP_PATH on iPhone 17"
           xcrun simctl install "iPhone 17" "$APP_PATH"
 
+      - name: Start app
+        run: |
+          APP_ID="org.owasp.mastestapp.MASTestApp-iOS"
+          xcrun simctl launch booted "$APP_ID"
+
+          echo "Waiting for app to be running..."
+          for i in $(seq 1 10); do
+            if xcrun simctl spawn booted launchctl print system | grep -q "$APP_ID"; then
+              echo "App is running."
+              exit 0
+            fi
+            echo "Attempt $i: app not running yet, retrying in 2s..."
+            sleep 2
+          done
+
+          echo "App did not start within the timeout."
+          exit 1
+
       - name: Run tests
         shell: bash
         run: |
