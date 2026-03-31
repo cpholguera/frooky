@@ -83,6 +83,10 @@ jobs:
           for i in $(seq 1 10); do
             if kill -0 "$PID" 2>/dev/null; then
               echo "App is running (PID $PID)."
+
+              echo "Running frooky agent tests"
+              npm --prefix frooky/agent run test:ios:local --appIdentifier $PID | tee test-results-ios.txt
+
               exit 0
             fi
             echo "Attempt $i: app not running yet, retrying in 2s..."
@@ -91,9 +95,6 @@ jobs:
 
           echo "App did not start within the timeout."
           exit 1
-
-          echo "Running frooky agent tests"
-          npm --prefix frooky/agent run test:ios:local --appIdentifier $PID | tee test-results-ios.txt
          
 
       - name: Upload test results
