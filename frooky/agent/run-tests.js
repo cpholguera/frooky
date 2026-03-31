@@ -41,7 +41,7 @@ async function runTests() {
     } else {
         // app is already running locally (e.g. GitHub Workflow / iOS Simulator)
         device = await frida.getLocalDevice()
-        session = await device.attach(pid);
+        session = await device.attach(appIdentifier);
     }
 
     const distDir = path.join(__dirname, 'dist');
