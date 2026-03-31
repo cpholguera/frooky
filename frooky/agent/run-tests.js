@@ -17,7 +17,7 @@ const argv = minimist(process.argv.slice(2), {
     }
 });
 
-validateInput();
+validateInput(argv);
 
 const helpOption = argv.help;
 const usbOption = argv.usb;
@@ -123,7 +123,9 @@ function showHelp() {
     process.exit(0);
 }
 
-function validateInput() {
+function validateInput(argv) {
+    console.log(argv)
+    
     const validPlatforms = ['android', 'ios'];
     if (!validPlatforms.includes(argv.platformOption)) {
         console.error(`Platform must be one of: ${validPlatforms.join(', ')}`);
