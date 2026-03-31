@@ -39,16 +39,17 @@ jobs:
           # List available simulators
           xcrun simctl list devices available
           
-          # Boot iPhone 16 simulator
-          xcrun simctl boot "iPhone 16" || echo "Simulator already booted"
+          # Boot iPhone 17 simulator
+          xcrun simctl boot "iPhone 17"
           
           # Wait for simulator to be ready
-          sleep 5
+          xcrun simctl bootstatus "iPhone 17" -b
+
 
       - name: Install app on simulator
         run: |
           APP_PATH=$(find "mas-app-ios" -name "*.app" -type d | head -1)
-          xcrun simctl install "iPhone 16" "$APP_PATH"
+          xcrun simctl install "iPhone 17" "$APP_PATH"
 
       - name: Run tests
         run: |

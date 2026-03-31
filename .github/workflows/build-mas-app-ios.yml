@@ -36,11 +36,6 @@ jobs:
 
       - name: Build the app for simulator
         run: |
-
-          echo "available simulators"
-
-          xcrun simctl list devices available | grep iPhone
-
           cd mas-app-ios
           cp .github/Local.xcconfig.ci Local.xcconfig
 
@@ -50,7 +45,7 @@ jobs:
           xcodebuild build \
             -project "MASTestApp.xcodeproj" \
             -scheme "$DEFAULT_SCHEME" \
-            -destination "generic/platform=iOS Simulator" \
+            -destination "platform=iOS Simulator,name=iPhone 17" \
             -derivedDataPath "$GITHUB_WORKSPACE/DerivedData" \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
