@@ -73,11 +73,14 @@ jobs:
       - name: Start app
         run: |
           APP_ID="org.owasp.mastestapp.MASTestApp-iOS"
-          xcrun simctl launch booted "$APP_ID"
+
+          xcrun simctl launch booted "$APP_ID" || true
 
           echo "Waiting for app to be running..."
           for i in $(seq 1 10); do
-            if xcrun simctl spawn booted launchctl print system | grep -q "$APP_ID"; then
+            PS_OUT="$(frida-ps -ai 2>/dev/null || true)"
+            printf '%s\n' "$PS_OUT"
+            if printf '%s\n' "$PS_OUT" | grep -q "$APP_ID"; then
               echo "App is running."
               exit 0
             fi
@@ -89,8 +92,8 @@ jobs:
           exit 1
 
       - name: Run tests
-        shell: bash
         run: |
+          #!/bin/bash
           set -o pipefail
           npm --prefix frooky/agent run test:ios:local | tee test-results-ios.txt
 
