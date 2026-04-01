@@ -2,20 +2,20 @@
 
 The return type declaration is a simpler variant of a [parameter declaration](./parameter-declaration.md).
 
-- [1. Differences from Parameter Declaration](#1-differences-from-parameter-declaration)
-- [2. Basic Usage](#2-basic-usage)
-  - [2.1. Java Return Types](#21-java-return-types)
-  - [2.2. Objective-C Return Types](#22-objective-c-return-types)
-  - [2.3. Native Return Types](#23-native-return-types)
-- [3. Decoders](#3-decoders)
-  - [3.1. `decoder`-Option: Custom Decoder](#31-decoder-option-custom-decoder)
-    - [3.1.1. Custom Decoder in Java](#311-custom-decoder-in-java)
-    - [3.1.2. Custom Decoder in Objective-C](#312-custom-decoder-in-objective-c)
-    - [3.1.3. Custom Decoder in Native](#313-custom-decoder-in-native)
-  - [3.2. `decoderArgs`-Option: Pass Arguments to Decoder](#32-decoderargs-option-pass-arguments-to-decoder)
-    - [3.2.2. Pass Arguments to Decoder in Objective-C](#322-pass-arguments-to-decoder-in-objective-c)
+- [Return Type vs. Parameter Declaration](#return-type-vs-parameter-declaration)
+- [Basic Usage](#basic-usage)
+  - [Java Return Types](#java-return-types)
+  - [Objective-C Return Types](#objective-c-return-types)
+  - [Native Return Types](#native-return-types)
+- [Decoders](#decoders)
+  - [`decoder`-Option: Custom Decoder](#decoder-option-custom-decoder)
+    - [Custom Decoder in Java](#custom-decoder-in-java)
+    - [Custom Decoder in Objective-C](#custom-decoder-in-objective-c)
+    - [Custom Decoder in Native](#custom-decoder-in-native)
+  - [`decoderArgs`-Option: Pass Arguments to Decoder](#decoderargs-option-pass-arguments-to-decoder)
+    - [Pass Arguments to Decoder in Objective-C](#pass-arguments-to-decoder-in-objective-c)
 
-## 1. Differences from Parameter Declaration
+## Return Type vs. Parameter Declaration
 
 Compared with a parameter declaration, a return type declaration differs in the following ways:
 
@@ -25,15 +25,15 @@ Compared with a parameter declaration, a return type declaration differs in the 
 
 The following chapter explains how to declare the return type with examples.
 
-## 2. Basic Usage
+## Basic Usage
 
 The return type is declared only by its type. The following chapters will use examples to illustrate this.
 
-### 2.1. Java Return Types
+### Java Return Types
 
 In Java, the method signature can be retrieved at runtime. Unless you want to override the [default decoder](#3-decoders), you don't need to provide an explicit return type.
 
-### 2.2. Objective-C Return Types
+### Objective-C Return Types
 
 > [!NOTE]
 > This example hooks the following class method from [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
@@ -54,7 +54,7 @@ methods:
 
 The return value is of type `(NSURL *)`. frooky will decode it using the default `(NSURL *)` decoder.
 
-### 2.3. Native Return Types
+### Native Return Types
 
 > [!NOTE]
 > This example hooks the following method from [OpenSSL](https://docs.openssl.org/1.0.2/man3/EVP_DigestInit):
@@ -78,7 +78,7 @@ functions:
 
 The function returns an integer. It returns 1 on success and 0 on failure.
 
-## 3. Decoders
+## Decoders
 
 If you want to configure the decoder for the return value, you can use the following two options:
 
@@ -87,9 +87,9 @@ If you want to configure the decoder for the return value, you can use the follo
 
 The following chapters will explain the concepts with a practical example.
 
-### 3.1. `decoder`-Option: Custom Decoder
+### `decoder`-Option: Custom Decoder
 
-#### 3.1.1. Custom Decoder in Java
+#### Custom Decoder in Java
 
 > [!NOTE]
 > This example hooks the following method from the [Android Java Library](https://developer.android.com/reference/kotlin/android/content/Intent#getflags):
@@ -107,7 +107,7 @@ methods:
 
 The return value is an integer representing the set flags for this intent. Instead of using the default integer decoder, frooky will use `intentFlagsDecoder` to process the return value and decode the set flags rather than just the integer.
 
-#### 3.1.2. Custom Decoder in Objective-C
+#### Custom Decoder in Objective-C
 
 > [!NOTE]
 > This example hooks the following instance method from [NSData](https://developer.apple.com/documentation/foundation/nsdata/base64encodedstring(options:)?language=objc):
@@ -126,7 +126,7 @@ methods:
 
 The return value is a base64-encoded string. The custom decoder `base64Decoder` can decode the base64 string to recover the original data.
 
-#### 3.1.3. Custom Decoder in Native
+#### Custom Decoder in Native
 
 > [!NOTE]
 > This example hooks the following function from [OpenSSL](https://docs.openssl.org/master/man3/SSL_get_cipher):
@@ -146,11 +146,11 @@ functions:
 
 The return value is the number identifying the cipher suite. The custom decoder `openSslCipherDecoder` can decode the number and return a string representation of the cipher suite.
 
-### 3.2. `decoderArgs`-Option: Pass Arguments to Decoder
+### `decoderArgs`-Option: Pass Arguments to Decoder
 
 While the use case for `decoderArgs` is less common, you can use it the same way as [parameters](./parameter-declaration.md#33-decoderargs-option-pass-arguments-to-decoder). It must reference the name of a parameter.
 
-#### 3.2.2. Pass Arguments to Decoder in Objective-C
+#### Pass Arguments to Decoder in Objective-C
 
 > [!NOTE]
 > This example hooks the following instance method from [NSString](https://developer.apple.com/documentation/foundation/nsstring/data(using:)?language=objc):

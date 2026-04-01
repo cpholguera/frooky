@@ -33,7 +33,7 @@ methods:                               # List of Java methods to hook
 
 ```yaml
 <overloads_declaration>:
-  params:                          # Parameter list of the overloaded method
+  params:                              # Parameter list of the overloaded method
     - <parameter_declaration>
 ```
 
@@ -63,7 +63,7 @@ methods:
   - name: loadUrl
 ```
 
-> [!TIP]
+> [!NOTE]
 > `$init` is the name of the constructor of a class.
 
 This `<hook_declaration>` will hook the following methods:
@@ -88,7 +88,7 @@ WebView.loadUrl(url: String, additionalHttpHeaders: MutableMap<String!, String!>
 
 ## Method Overloads
 
-If you only want to hook a specific overload, specify it by adding one or more overloads to `overloads`:
+If you only want to hook a specific overloaded method, specify it by adding a list of [parameter declarations](./parameter-declaration.md) to `overloads`:
 
 ```yaml
 javaClass: <string>                    # Fully qualified Java class name

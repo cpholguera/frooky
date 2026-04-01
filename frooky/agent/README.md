@@ -2,15 +2,15 @@
 
 This documentation covers everything you need to know about the frooky agent and its features.
 
-- [What is the frooky Agent?](#what-is-the-frooky-agent)
+- [What is frooky?](#what-is-frooky)
 - [Quickstart](#quickstart)
 - [Compile And Run Standalone Client](#compile-and-run-standalone-client)
 - [Structure of a Hook File](#structure-of-a-hook-file)
+- [Hook Declaration](#hook-declaration)
 - [Parameter- and Return-Type Declaration](#parameter--and-return-type-declaration)
-- [Platform-Dependent Hook Declaration](#platform-dependent-hook-declaration)
-- [Event Filters](#event-filters)
+- [Additional Settings and Best Practices](#additional-settings-and-best-practices)
 
-## What is the frooky Agent?
+## What is frooky?
 
 First things first: The frooky agent is the part of frooky that runs on the target device (Android or iOS). It is written in TypeScript and handles much of the heavy lifting, including:
 
@@ -23,15 +23,23 @@ First things first: The frooky agent is the part of frooky that runs on the targ
 
 It can run standalone, but it is usually used with the frooky host, which is written in Python.
 
+Use it, if you **know what you want to hook** but you don't want to write custom frooky scripts or copy and paste them together.
+
+For example you can use it to quickly hook functions or methods based on public API documentation and quickly get insight about them. 
+
+However, frooky is not a tool for tracing function calls. For that, you should use [`frida-trace`](https://frida.re/docs/frida-trace/). But you may use the insight from `frida-trace`, and use it as starting point to write a frooky hook in order to decode more complex values entering and exiting the functions.
+
+In general, the frooky hooks are designed in a way that you should be able to easily map them onto existing API documentation. 
+ 
 ## Quickstart
 
 If you want to start writing frooky hooks files, we recommend reading the platform documentation:
 
 <!-- no toc -->
 - [Compile And Run Standalone Client](#compile-and-run-standalone-client)
-- [Java Hook Declaration](docs/java-hook-declaration.md)
-- [Objective-C Hook Declaration](docs/objective-c-hook-declaration.md)
-- [Native Hook Declaration](docs/native-hook-declaration.md)
+- [`JavaHook`Declaration](docs/java-hook-declaration.md)
+- [`ObjcHook` Declaration](docs/objective-c-hook-declaration.md)
+- [`NativeHook` Declaration](docs/native-hook-declaration.md)
 
 Also take a look at the [examples](./docs/examples/) and the TypeScript [type declaration](./types/index.d.ts).
 
@@ -93,111 +101,50 @@ hooks:                            # Collection of hook declarations
   - <hook_declaration>
 ```
 
-> [!NOTE]
-> **Example:**
->
-> The following hook file hooks all RNG initialization methods and functions on an Android device, capturing their arguments, return values, and stack trace. This information can be used to detect insecure RNG.
-> 
-> ```yaml
-> metadata:
->   name: RNG initialization
->   platform: Android
->   description: Hooks all RNG initialization methods on Android (Java, kotlin, native)
->   masCategory: CRYPTOGRAPHY
->   author: mas@owasp.org
->   version: v1
->
-> hooks:
->   - <hook_declaration> 
-> ```
+**Example:**
 
-There are differences among Android, iOS, and native hooks. Nevertheless, they share the following properties.
+The following hook file hooks all RNG initialization methods and functions on an Android device, capturing their arguments, return values, and stack trace. This information can be used to detect insecure RNG.
+ 
+```yaml
+metadata:
+  name: RNG initialization
+  platform: Android
+  description: Hooks all RNG initialization methods on Android (Java, kotlin, native)
+  masCategory: CRYPTOGRAPHY
+  author: mas@owasp.org
+  version: v1
 
-| Property           | Type     | Description                                                |
-| ------------------ | -------- | ---------------------------------------------------------- |
-| `module`           | string   | Library/framework name. Mandatory for `NativeHook`.        |
-| `stackTraceLimit`  | number   | Maximum stack frames to capture (default: 10)              |
-| `stackTraceFilter` | string[] | Regex patterns to filter stack traces (see examples below) |
-| `debug`            | boolean  | Enable verbose logging                                     |
+hooks:
+  - <hook_declaration> 
+```
 
-## Parameter- and Return-Type Declaration
+## Hook Declaration
 
-An important feature of frooky is to decode data passed to functions or methods via arguments and their return values.
-
-In some cases, this is not as trivial as it seems at first. For example, if an argument or return value is simply a pointer, we need additional information to decode it properly.
-
-frooky is flexible and able to decode various datatypes. But this requires some declaration. Before writing a hook declaration, it is therefore recommended to read the following documentation:
-
-- [Parameter Declaration](docs/parameter-declaration.md)
-- [Return Type Declaration](docs/return-type-declaration.md)
-
-## Platform-Dependent Hook Declaration
-
-Depending on the platform, the hook declaration may look different. Please read the linked documentation to learn how to write hooks for the platform you are interested in.
+Now, let's look the `<hook_declaration>` itself. Depending on the platform, the hook declaration may look different. Please read the linked documentation to learn how to write hooks for the platform you are interested in.
 
 frooky currently supports three types of hooks:
 
 | Hook Type        | Platform    | Description                                 | Documentation                                                          |
 | ---------------- | ----------- | ------------------------------------------- | ---------------------------------------------------------------------- |
 | `JavaHook`       | Android     | Hook for Java/Kotlin methods                | [`JavaHook`-Declaration](./docs/java-hook-declaration.md)              |
-| `ObjectiveCHook` | iOS         | Hook for Objective-C methods                | [`ObjectiveCHook`-Declaration](./docs/objective-c-hook-declaration.md) |
+| `ObjcHook` | iOS         | Hook for Objective-C methods                | [`ObjcHook`-Declaration](./docs/objective-c-hook-declaration.md) |
 | `NativeHook`     | Android/iOS | Hook for native functions (C/C++/Rust etc.) | [`NativeHook`-Declaration](./docs/native-hook-declaration.md)          |
 
 > [!IMPORTANT]
-> When loading a hook declaration, frooky will validate it against a JSON schema to detect invalid declarations. This ensures that the declaration does not contain hooks for different platforms, for example.
+> When loading a hook declaration, frooky will validate it and to detect invalid declarations. For example, it is not possible to declare a `JavaHoook` and a `ObjectiveCHook` hook in one hook file.
 
-## Event Filters
+## Parameter- and Return-Type Declaration
 
-If you hook a method that is used widely, you may capture many events you are not interested in. This makes the analysis more difficult.
+An important feature of frooky is to decode data passed to functions or methods via arguments and their return values.
 
-An example is `SharedPreferences` on Android. Let's assume you want to know whether the target app uses them to store sensitive data on the device:
+Depending on the type of the values, this can be simple or more complex. For example, if an argument or return value is simply a pointer, we need additional information to decode it properly.
 
-```yaml
-javaClass: android.app.SharedPreferencesImpl$EditorImpl
-methods:
-  - name: putString
-```
+frooky tries to decode arguments and return values by itself if possible. But in some cases, it is necessary to provide information about the types used. Before writing a hook declaration, it is therefore recommended to read the following documentation:
 
-frooky will capture the events you are looking for, as well as many more, such as the following one:
+- [Parameter Declaration](docs/parameter-declaration.md)
+- [Return Type Declaration](docs/return-type-declaration.md)
 
-```json
-{
-  "id": "169a35b1-da19-492f-a90c-74d7cc5bdb3a",
-  "type": "hook",
-  "category": "STORAGE",
-  "time": "2026-02-09T09:08:32.125Z",
-  "class": "android.app.SharedPreferencesImpl$EditorImpl",
-  "method": "putString",
-  "instanceId": 175301911,
-  "stackTrace": [
-    "android.app.SharedPreferencesImpl$EditorImpl.putString(Native Method)",
-    "com.google.crypto.tink.integration.android.SharedPrefKeysetWriter.write(SharedPrefKeysetWriter.java:70)",
-    "com.google.crypto.tink.KeysetHandle.writeWithAssociatedData(KeysetHandle.java:869)",
-    "com.google.crypto.tink.KeysetHandle.write(KeysetHandle.java:858)",
-    "com.google.crypto.tink.integration.android.AndroidKeysetManager$Builder.generateKeysetAndWriteToPrefs(AndroidKeysetManager.java:353)",
-    "com.google.crypto.tink.integration.android.AndroidKeysetManager$Builder.build(AndroidKeysetManager.java:292)",
-    "androidx.security.crypto.EncryptedSharedPreferences.create(EncryptedSharedPreferences.java:169)",
-    "androidx.security.crypto.EncryptedSharedPreferences.create(EncryptedSharedPreferences.java:131)"
-  ],
-  "inputParameters": [
-    {
-      "declaredType": "java.lang.String",
-      "value": "__androidx_security_crypto_encrypted_prefs_key_keyset__"
-    },
-[...]
-```
 
-This method call is initiated by Android when `EncryptedSharedPreferences` are initiated. This library uses `SharedPreferences` to store an encryption key.
+## Additional Settings and Best Practices
 
-These events are usually not of interest to security testers, who want to test the target app rather than OS libraries.
-
-To filter out events that do not originate from the target app, frooky can filter events based on the stack trace. The following `<hook_configuration>` will capture only events where the target package name matches the stack trace:
-
-```yaml
-javaClass: android.app.SharedPreferencesImpl$EditorImpl
-methods:
-  - name: putString
-  - stackTraceFilter: ["^org\.owasp\.mastestapp"]
-```
-
-With this filter, noise can be reduced.
+With the information in this document, you should be ready to write a hook file. But there are additional settings and features. They are described in the document [Additional Settings and Best Practices](docs/additional-features.md)

@@ -4,6 +4,7 @@ This documentation explains how to write Objective-C hook declarations.
 
 - [Structure of an `ObjcHook` Declaration](#structure-of-an-objchook-declaration)
 - [Basic Usage](#basic-usage)
+- [Decoding Arguments and Return Values](#decoding-arguments-and-return-values)
 
 ## Structure of an `ObjcHook` Declaration
 
@@ -60,16 +61,16 @@ methods:
  - name: "- invalidate"
 ```
 
-> [!NOTE]
-> This `<hook_configuration>` will hook the following [Objective-C instance method](https://developer.apple.com/documentation/localauthentication/lacontext/invalidate()?language=objc):
->
-> ```objectivec
-> - (void) invalidate;
-> ```
+This `<hook_configuration>` will hook the following [Objective-C instance method](https://developer.apple.com/documentation/localauthentication/lacontext/invalidate()?language=objc):
 
-frooky will capture when this function is called and generate an event. Because the function takes no arguments and returns no value, the event will contain only timing and call stack information.
+```objectivec
+- (void) invalidate;
+```
+
+## Decoding Arguments and Return Values
 
 When a method accepts parameters or returns a value, frooky needs to know their types to decode them properly:
+
 
 ```yaml
 objcClass: <string>                    # Fully qualified Objective-C class name
@@ -93,11 +94,12 @@ methods:
       - [ "(NSURL *)",  baseURL ]
 ```
 
-> [!NOTE]
-> This example hooks the following class method from [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
->
-> ```objectivec
-> + (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
->                                     isDirectory:(BOOL) isDir 
->                                   relativeToURL:(NSURL *) baseURL;
-> ```
+This example hooks the following class method from [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
+
+```objectivec
++ (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
+                                    isDirectory:(BOOL) isDir 
+                                  relativeToURL:(NSURL *) baseURL;
+```
+
+Depending on the type, frooky is able to decode them using the built in decoders. If the types are more complex, you may need to [custom decoders](./parameter-declaration.md#custom-decoder-in-objective-c).

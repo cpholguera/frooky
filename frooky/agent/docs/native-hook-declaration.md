@@ -4,6 +4,7 @@ This documentation explains how to write native hook declarations.
 
 - [Structure of a `NativeHook` Declaration](#structure-of-a-nativehook-declaration)
 - [Basic Usage](#basic-usage)
+- [Decoding Arguments and Return Values](#decoding-arguments-and-return-values)
 
 ## Structure of a `NativeHook` Declaration
 
@@ -54,15 +55,15 @@ functions:
  - symbol: ENGINE_cleanup
 ```
 
-> [!NOTE]
-> This `<hook_configuration>` hooks the following two functions from the [OpenSSL Library](https://docs.openssl.org/master/man3/ENGINE_add):
->
-> ```c
-> void ENGINE_load_builtin_engines(void);
-> void ENGINE_cleanup(void);
-> ```
+This `<hook_configuration>` hooks the following two functions from the [OpenSSL Library](https://docs.openssl.org/master/man3/ENGINE_add):
 
-frooky will capture when these functions are called and generate events. Since the functions take no arguments and return no value, the events will contain only timing and call stack information.
+```c
+void ENGINE_load_builtin_engines(void);
+void ENGINE_cleanup(void);
+```
+
+
+## Decoding Arguments and Return Values
 
 When a method accepts parameters or returns a value, frooky needs to know how to decode them.
 
@@ -90,12 +91,19 @@ functions:
       - [ "X509 *", cert ]
 ```
 
-> [!NOTE]
-> This `<hook_configuration>` will hook the following function from the [OpenSSL Library](https://docs.openssl.org/master/man3/OSSL_CMP_validate_msg/):
->
-> ```c
-> int OSSL_CMP_validate_cert_path(const OSSL_CMP_CTX *ctx,
->                                X509_STORE *trusted_store, X509 *cert);
-> ```
+This `<hook_configuration>` will hook the following function from the [OpenSSL Library](https://docs.openssl.org/master/man3/OSSL_CMP_validate_msg/):
 
-frooky will attempt to decode the arguments and the return value based on the parameter types.
+```c
+int OSSL_CMP_validate_cert_path(const OSSL_CMP_CTX *ctx,
+                                X509_STORE *trusted_store, 
+                                X509 *cert);
+```
+
+Depending on the type, frooky is able to decode them using the built in decoders. If the types are more complex, you may need to [custom decoders](./parameter-declaration.md#custom-decoder-in-native).
+
+
+> [!NOTE]
+>
+> The argument types in the example above are `struct`. Compared to most Java or Objective-C data structures, native `structs` don't have information about the structure itself in memory. 
+> 
+> This means, to write a decoder, we need to have information about the content of the `struct`. If the source code is public, we can use this information to write a decoder based on the `struct` definition. 
