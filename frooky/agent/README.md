@@ -32,7 +32,7 @@ There are two modes you can use the agent:
     In this version, the hooks will be embedded into the JavaScript agent during the build process. This version can be used directly with `frida` and does not require a custom host. It is mostly intended for development purposes.
 
 
-# Compile the frooky Agent for a Custom Host
+## Compile the frooky Agent for a Custom Host
 
 1. **Install all dependencies**
 
