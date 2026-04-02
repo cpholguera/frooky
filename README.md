@@ -198,9 +198,3 @@ Please refer to the following documentation for more information about various t
 - [Development / Local Testing](./docs/develop.md)
 - [Understanding Output Format](./docs/output.md)
 
-
-## Additional Settings and Best Practices
-
-With the information in this document, you should be ready to write a hook file. But there are additional settings and features. They are described in the document [Additional Settings and Best Practices](docs/additional-features.md)
-
-
