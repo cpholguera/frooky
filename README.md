@@ -47,8 +47,7 @@ If you are already familiar with Frida and function hooking, we recommend using 
 
 For more information, read all about the structure in chapter [Structure of a Hook File](#structure-of-a-hook-file).
 
-
-After wou have your desired hook file, run `frooky` with your preferred options:
+After you created the desired hook file, run `frooky`:
 
 ```bash
 # Attach by app name
@@ -113,7 +112,7 @@ frooky currently supports three types of hooks:
 | `NativeHook`     | Android/iOS | Hook for native functions (C/C++/Rust etc.) | [`NativeHook`-Declaration](./docs/native-hook-declaration.md)          |
 
 > [!IMPORTANT]
-> When loading a hook declaration, frooky will validate it and to detect invalid declarations. For example, it is not possible to declare a `JavaHoook` and a `ObjectiveCHook` hook in one hook file.
+> When loading a hook declaration, frooky will validate it and to detect invalid declarations. For example, it is not possible to declare a `JavaHook` and a `ObjectiveCHook` hook in one hook file.
 
 ## Parameter- and Return-Type Declaration
 
@@ -150,7 +149,7 @@ hooks:
 Then run `frooky` with the hook file against your target app:
 
 ```bash
-frooky -U -n "MASTestApp" --platform android keygen.json
+frooky -U -n org.owasp.mastestapp --platform android keygen.yaml
 ```
 
 Events are written to the output file in JSON Lines format (one JSON object per line, known as NDJSON). 
