@@ -1,4 +1,4 @@
-import * as Frooky from 'frooky'
+import * as Frooky from '../types/index'
 
 import {
     wifiHook,
@@ -11,7 +11,7 @@ import {
     cipherHook,
     bufferHook,
     webViewHook
-} from "../typeScript/01_android"
+} from "./01_android"
 import {
     openHook,
     readHook,

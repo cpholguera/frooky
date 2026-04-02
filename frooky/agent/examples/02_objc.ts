@@ -1,4 +1,4 @@
-import * as Frooky from 'frooky'
+import * as Frooky from '../types/index'
 
 // ============================================================================
 // Simple Objective-C instance method

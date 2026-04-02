@@ -1,4 +1,4 @@
-import * as Frooky from 'frooky'
+import * as Frooky from '../types/index'
 
 // ============================================================================
 // Simple native function with basic types, no param / return value decoding
