@@ -112,7 +112,7 @@ frooky currently supports three types of hooks:
 | `NativeHook`     | Android/iOS | Hook for native functions (C/C++/Rust etc.) | [`NativeHook`-Declaration](./docs/native-hook-declaration.md)          |
 
 > [!IMPORTANT]
-> When loading a hook declaration, frooky will validate it and to detect invalid declarations. For example, it is not possible to declare a `JavaHook` and a `ObjectiveCHook` hook in one hook file.
+> When loading a hook declaration, frooky will validate it and to detect invalid declarations. For example, it is not possible to declare a `JavaHook` and a `ObjcHook` hook in one hook file.
 
 ## Parameter- and Return-Type Declaration
 
