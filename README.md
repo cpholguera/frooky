@@ -189,9 +189,6 @@ Output (pretty-printed for readability):
 }
 ```
 
-For the full documentation please refer to ....
-
-
 ## More Information
 
 Please refer to the following documentation for more information about various topics:
