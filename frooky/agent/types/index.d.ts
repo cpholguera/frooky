@@ -1,20 +1,6 @@
 // types/index.d.ts
 
 /**
- * OWASP MAS (Mobile Application Security) risk categories.
- * Used to classify security hooks by their testing domain.
- */
-export type MasCategory =
-  | 'STORAGE'
-  | 'CRYPTO'
-  | 'AUTH'
-  | 'NETWORK'
-  | 'PLATFORM'
-  | 'CODE'
-  | 'RESILIENCE'
-  | 'PRIVACY';
-
-/**
  * Target platform for hooks.
  */
 export type Platform = 'Android' | 'iOS';
@@ -29,8 +15,8 @@ export interface HookMetadata {
   name?: string;
   /** Optional: Description of what the hook collection does */
   description?: string;
-  /** Optional: OWASP MAS category */
-  masCategory?: MasCategory;
+  /** Optional: Category of the hook collection */
+  category?: string;
   /** Optional: Your name or organization */
   author?: string;
   /** Optional: Semantic version (e.g., v1) */

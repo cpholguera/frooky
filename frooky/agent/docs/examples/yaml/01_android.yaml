@@ -1,36 +1,31 @@
 metadata:
   name: Android Hook Examples
   platform: Android
-  description: Comprehensive examples of Java/Kotlin method hooking on Android
-  masCategory: GENERAL
+  description: Examples of Java/Kotlin method hooking on Android
+  category: GENERAL
   author: Frooky Documentation
   version: v1
 
 hooks:
-  # Single Java method
-  - javaClass: android.net.wifi.WifiManager
-    methods:
-      - name: getConnectionInfo
-
-  # Single Java method, shortened
-  - javaClass: android.net.wifi.WifiManager
-    methods:
-      - getConnectionInfo
-
-  # Hook constructor
-  - javaClass: android.webkit.WebView
+  # Simple method hooking with a list of methods to be hooked.
+  # All overloads of the methods are hooked implicitly.
+  - javaClass: android.security.AttestedKeyPair
     methods:
       - $init
+      - getKeyPair
 
-  # Multiple Java methods, shortened, and a stacktrace limit to 10 entries
-  - javaClass: android.location.LocationManager
+  # Simple method hooking.
+  # Here, methods is a list of objects, with the methods name in the name property.
+  # It is not required to use an object if there are no overloads, but possible.
+  # The stack trace is limited to 10.
+  - javaClass: android.security.AttestedKeyPair
     methods:
-      - getLastKnownLocation
-      - isProviderEnabled
-      - requestLocationUpdates
+      - name: $init
+      - name: getKeyPair
     stackTraceLimit: 10
 
-  # Single overload
+  # Explicit hooking of a single overloaded method.
+  # The parameter of the method is just a list of types.
   - javaClass: java.net.URL
     methods:
       - name: openConnection
@@ -38,7 +33,46 @@ hooks:
           - params:
               - java.net.Proxy
 
-  # Multiple overloads
+
+  # Explicit hooking of a single overloaded method.
+  # The parameters of the method is a list of type and name stored  in the list `params`.
+  # With the names of the argument, frooky is now able to add them as context
+  # information when decoding the values.
+  - javaClass: android.app.Activity
+    methods:
+      - name: startActivity
+        overloads:
+          - params:
+              - ["android.content.Intent", intent]
+
+
+  # Explicit hooking of a single overloaded method.
+  # The overloaded method has 7 parameters. 
+  # The `stackTraceFilter` excludes (`^`) events which root in a function call coming 
+  # from `java.**` or `android.**`. This can be handy if we only want to see events 
+  # originating from the package name of our target app and not by a third party lib.
+  # The stack trace is limited to 5.
+  - javaClass: android.database.sqlite.SQLiteDatabase
+    methods:
+      - name: query
+        overloads:
+          - params:
+              - ["java.lang.String", table]
+              - ["[Ljava.lang.String", columns]
+              - ["java.lang.String", selection]
+              - ["[Ljava.lang.String", selectionArgs]
+              - ["java.lang.String", groupBy]
+              - ["java.lang.String", having]
+              - ["java.lang.String", orderBy]
+    stackTraceLimit: 5
+    stackTraceFilter:
+      - "$^java\\."
+      - "$^android\\."
+      - "$^com\\.external\\.sdk\\."
+
+
+  # Explicit hooking of 4 overloaded methods.
+  # The parameters of the method is a list of type and name stored  in the list `params`.
   - javaClass: android.content.Intent
     methods:
       - name: putExtra
@@ -56,8 +90,14 @@ hooks:
               - ["java.lang.String", name]
               - ["[B", value]
 
-  # Custom decoder for Java method argument and debug flag enabled for debug logs
-  - javaClass: android.content.Intent
+
+  # Explicit hooking of a single overloaded method.
+  # The parameter `flags contains an integer which contains information about the 
+  # intent settings using bit-masking.
+  # The decoder `IntentFlagsDecoder` decodes them during runtime based on the 
+  # constants stored in `android.content.Intent`.
+  # The `debug` flag additionally adds debug messages while the method `setFlags` 
+  # is hooked and its arguments and/or return values decoded.
     methods:
       - name: setFlags
         overloads:
@@ -65,33 +105,9 @@ hooks:
               - [int, flags, { decoder: IntentFlagsDecoder }]
     debug: true
 
-  # Single Java Type as argument
-  - javaClass: android.app.Activity
-    methods:
-      - name: startActivity
-        overloads:
-          - params:
-              - ["android.content.Intent", intent]
 
-  # Multiple Java Types as arguments
-  - javaClass: android.database.sqlite.SQLiteDatabase
-    methods:
-      - name: query
-        overloads:
-          - params:
-              - ["java.lang.String", table]
-              - ["[Ljava.lang.String", columns]
-              - ["java.lang.String", selection]
-              - ["[Ljava.lang.String", selectionArgs]
-              - ["java.lang.String", groupBy]
-              - ["java.lang.String", having]
-              - ["java.lang.String", orderBy]
-    stackTraceLimit: 15
-    stackTraceFilter:
-      - "^java\\."
-      - "^android\\."
-
-  # Decode parameter at exit (data passed by reference)
+  # The decrypted plaintext is written into the byte array `output`, which is passed by reference,
+  # after the function completes. Hence, we decode it at exit.
   - javaClass: javax.crypto.Cipher
     methods:
       - name: doFinal
@@ -100,7 +116,8 @@ hooks:
               - ["[B", output, { decodeAt: exit }]
               - [int, outputOffset]
 
-  # Decode parameter at both entry and exit
+  # If we want to decode a value both before and after the method is completed, we can 
+  # use `{ decodeAt: both }`.
   - javaClass: java.nio.ByteBuffer
     methods:
       - name: put

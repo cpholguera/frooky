@@ -2,7 +2,7 @@ metadata:
   name: Objective-C Hook Examples
   platform: iOS
   description: Examples of Objective-C method hooking
-  masCategory: GENERAL
+  category: GENERAL
   author: Frooky Documentation
   version: v1
 

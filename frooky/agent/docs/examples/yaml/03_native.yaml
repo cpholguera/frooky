@@ -2,7 +2,7 @@ metadata:
   name: Native Hook Examples
   platform: Android
   description: Examples of native C/C++ function hooking
-  masCategory: GENERAL
+  category: GENERAL
   author: Frooky Documentation
   version: v1
 

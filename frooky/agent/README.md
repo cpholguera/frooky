@@ -100,7 +100,7 @@ metadata:                         # All metadata are optional
   name: <name>                    # Name of the hook collection
   platform: Android|iOS           # Target platform (hooks must be platform-specific)
   description: <description>      # Description of what the hook collection does
-  masCategory: <mas_category>     # STORAGE, CRYPTO, AUTH, NETWORK, etc
+  category: <category>            # Category of the hook collection
   author: <author>                # Your name or organization
   version: <version>              # Semantic version (e.g., v1)
 
