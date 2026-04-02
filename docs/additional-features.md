@@ -2,11 +2,11 @@
 
 This documentation explains settings which are more general:
 
-- [1. Event Filter Based on Stack Trace](#1-event-filter-based-on-stack-trace)
-- [Stack Trace Limitations](#stack-trace-limitations)
+- [Event Filter Based on Stack Trace](#event-filter-based-on-stack-trace)
+- [Stack Trace Limits](#stack-trace-limits)
 - [Debugging](#debugging)
 
-## 1. Event Filter Based on Stack Trace
+## Event Filter Based on Stack Trace
 
 If you hook a method that is used widely, you may capture many events you are not interested in. This makes the analysis more difficult.
 
@@ -62,7 +62,7 @@ methods:
 
 With this filter, noise can be reduced.
 
-## Stack Trace Limitations
+## Stack Trace Limits
 
 By default, frooky will show all function calls of a stack trace. If this is too much, you can set a limit using the `stackTraceLimit` property. 
 

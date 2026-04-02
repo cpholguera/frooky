@@ -198,7 +198,7 @@ Example Output (pretty-printed for readability):
 Please refer to the following documentation for more information about various topics:
 
 
-- [Additional Settings and Best Practices]()
+- [Additional Settings and Best Practices](./docs/additional-features.md)
 - [Development / Local Testing](./docs/develop.md)
 - [Understanding Output Format](./docs/output.md)
 
