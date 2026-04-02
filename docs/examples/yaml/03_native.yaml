@@ -81,11 +81,7 @@ hooks:
       - symbol: process_data
         returnType: int
         params:
-          - [
-              "void *",
-              data,
-              { decoder: CustomDataDecoder, decoderArgs: [size] },
-            ]
+          - [ "void *", data, { decoder: CustomDataDecoder, decoderArgs: [size] } ]
           - [size_t, size]
 
   # Function with output parameter decoded at exit
