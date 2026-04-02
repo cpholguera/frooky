@@ -43,7 +43,14 @@ pip3 install frooky
 
 ## Usage
 
-Create a hook file (e.g., `hooks.yaml`) as described in the chapter [Structure of a Hook File](#structure-of-a-hook-file), then run `frooky` with the desired options:
+Create a hook file (e.g., `hooks.yaml`) with the functions and/or methods you want to hook. 
+
+If you are already familiar with Frida and function hooking, we recommend using the documented examples as a quick starting point. You find them in the folder [docs/examples/](./docs/examples/).
+
+For more information, read all about the structure in chapter [Structure of a Hook File](#structure-of-a-hook-file).
+
+
+After wou have your desired hook file, run `frooky` with your preferred options:
 
 ```bash
 # Attach by app name
