@@ -15,7 +15,7 @@ hooks:
       - getKeyPair
 
   # Simple method hooking.
-  # Here, methods is a list of objects, with the methods name in the name property.
+  # Here, methods is a list of objects, with the methods name in the `name` property.
   # It is not required to use an object if there are no overloads, but possible.
   # The stack trace is limited to 10.
   - javaClass: android.security.AttestedKeyPair
@@ -25,7 +25,7 @@ hooks:
     stackTraceLimit: 10
 
   # Explicit hooking of a single overloaded method.
-  # The parameter of the method is just a list of types.
+  # The parameter of the method is just a list of types ("Unnamed Parameter").
   - javaClass: java.net.URL
     methods:
       - name: openConnection
@@ -35,7 +35,8 @@ hooks:
 
 
   # Explicit hooking of a single overloaded method.
-  # The parameters of the method is a list of type and name stored  in the list `params`.
+  # The parameters of the method is a list of type and name stored  
+  # in the list `params` ("Named Parameter").
   # With the names of the argument, frooky is now able to add them as context
   # information when decoding the values.
   - javaClass: android.app.Activity

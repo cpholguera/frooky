@@ -7,17 +7,31 @@ metadata:
   version: v1
 
 hooks:
-  # LAContext biometry method (no param decoding)
-  - objcClass: LAContext
-    methods:
-      - name: "- invalidate"
-
+  # Simple method hooking with a list of methods to be hooked.
   # LAContext biometry method (shortened, no param decoding)
   - objcClass: LAContext
     methods:
       - "- invalidate"
 
-  # Simple Objective-C instance method
+  # The same method hooking, but with declared as a list of objects,
+  # with the methods name in the `name` property.
+  - objcClass: LAContext
+    methods:
+      - name: "- invalidate"
+
+  # Simple Objective-C instance method,  indicated by the leading "-".
+  # The parameters are declared, but not named ("Unnamed Parameter").
+  # In order to decode the arguments, they are required.
+  - objcClass: NSUserDefaults
+    methods:
+      - name: "- setObject:forKey:"
+        params:
+          - "(id)"
+          - "(NSString *)"
+
+  # The same hook, but with named parameters.
+  # frooky can use them to produce better output, as it is now possible to
+  # describe the arguments at runtime ("Named Parameter").
   - objcClass: NSUserDefaults
     methods:
       - name: "- setObject:forKey:"
@@ -25,7 +39,7 @@ hooks:
           - ["(id)", value]
           - ["(NSString *)", key]
 
-  # NSData write to file with return type
+  # Hook with a `returnType`. frooky will decode the return value as boolean.
   - objcClass: NSData
     methods:
       - name: "- writeToFile:atomically:"
@@ -35,7 +49,7 @@ hooks:
           - ["(BOOL)", useAuxiliaryFile]
     stackTraceLimit: 8
 
-  # Objective-C class method
+  # Simple Objective-C class method, indicated by the leading "+".
   - objcClass: NSURL
     methods:
       - name: "+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:"
@@ -45,7 +59,7 @@ hooks:
           - ["(BOOL)", isDir]
           - ["(NSURL *)", baseURL]
 
-  # Multiple methods in same class
+  # Multiple methods in same class hooked.
   - objcClass: LAPrivateKey
     methods:
       - name: "- decryptData:secKeyAlgorithm:completion:"
@@ -63,7 +77,8 @@ hooks:
           - ["(SecKeyAlgorithm)", algorithm]
           - ["(void (^)(NSData *, NSError *))", handler]
 
-  # CoreData save with output parameter
+  # The argument `error` is decoded after the method terminated.
+  # Also, frooky will show debug information while running the hook.
   - objcClass: NSManagedObjectContext
     methods:
       - name: "- save:"
@@ -72,7 +87,8 @@ hooks:
           - ["(NSError **)", error, { decodeAt: exit }]
     debug: true
 
-  # Network request with stack trace filtering
+  # Network request with stack trace filtering.
+  # frooky won't keep events not originating form `libsystem_` and `Foundation*`.
   - objcClass: NSURLSession
     methods:
       - name: "- dataTaskWithRequest:completionHandler:"
@@ -84,10 +100,11 @@ hooks:
               completionHandler,
             ]
     stackTraceFilter:
-      - "^libsystem_"
-      - "^Foundation"
+      - "^(?!Foundation)"
+      - "^(?!libsystem_)"
 
-  # Method with both entry and exit decoding
+  # If we want to decode a value both before and after the method is completed, we can
+  # use `{ decodeAt: both }`.
   - objcClass: NSMutableData
     methods:
       - name: "- appendData:"
