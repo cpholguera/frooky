@@ -33,9 +33,8 @@ hooks:
           - params:
               - java.net.Proxy
 
-
   # Explicit hooking of a single overloaded method.
-  # The parameters of the method is a list of type and name stored  
+  # The parameters of the method is a list of type and name stored
   # in the list `params` ("Named Parameter").
   # With the names of the argument, frooky is now able to add them as context
   # information when decoding the values.
@@ -46,11 +45,10 @@ hooks:
           - params:
               - ["android.content.Intent", intent]
 
-
   # Explicit hooking of a single overloaded method.
-  # The overloaded method has 7 parameters. 
-  # The `stackTraceFilter` excludes (`^`) events which root in a function call coming 
-  # from `java.**` or `android.**`. This can be handy if we only want to see events 
+  # The overloaded method has 7 parameters.
+  # The `stackTraceFilter` excludes (`^`) events which root in a function call coming
+  # from `java.**` or `android.**`. This can be handy if we only want to see events
   # originating from the package name of our target app and not by a third party lib.
   # The stack trace is limited to 5.
   - javaClass: android.database.sqlite.SQLiteDatabase
@@ -71,7 +69,6 @@ hooks:
       - "$^android\\."
       - "$^com\\.external\\.sdk\\."
 
-
   # Explicit hooking of 4 overloaded methods.
   # The parameters of the method is a list of type and name stored  in the list `params`.
   - javaClass: android.content.Intent
@@ -91,21 +88,20 @@ hooks:
               - ["java.lang.String", name]
               - ["[B", value]
 
-
   # Explicit hooking of a single overloaded method.
-  # The parameter `flags contains an integer which contains information about the 
+  # The parameter `flags contains an integer which contains information about the
   # intent settings using bit-masking.
-  # The decoder `IntentFlagsDecoder` decodes them during runtime based on the 
+  # The decoder `IntentFlagsDecoder` decodes them during runtime based on the
   # constants stored in `android.content.Intent`.
-  # The `debug` flag additionally adds debug messages while the method `setFlags` 
+  # The `debug` flag additionally adds debug messages while the method `setFlags`
   # is hooked and its arguments and/or return values decoded.
+  - javaClass: android.content.Intent
     methods:
       - name: setFlags
         overloads:
           - params:
               - [int, flags, { decoder: IntentFlagsDecoder }]
     debug: true
-
 
   # The decrypted plaintext is written into the byte array `output`, which is passed by reference,
   # after the function completes. Hence, we decode it at exit.
@@ -117,7 +113,7 @@ hooks:
               - ["[B", output, { decodeAt: exit }]
               - [int, outputOffset]
 
-  # If we want to decode a value both before and after the method is completed, we can 
+  # If we want to decode a value both before and after the method is completed, we can
   # use `{ decodeAt: both }`.
   - javaClass: java.nio.ByteBuffer
     methods:

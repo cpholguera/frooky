@@ -7,29 +7,62 @@ metadata:
   version: v1
 
 hooks:
-  # Only alert when the function is called, no decoding
-  - module: libc.so
-    functions:
-      - name: open
-      - name: close
-
-  # Only alert when the function is called, no decoding, shortened
+  # Simple native function hook with a list of symbols to be hooked.
   - module: libc.so
     functions:
       - open
       - close
 
-  # Simple native function with basic types
+  # The same function hooking, but the symbols are declared explicitly
+  # as a list of objects with the symbols name in its `symbol` property.
+  - module: libc.so
+    functions:
+      - symbol: open
+      - symbol: close
+
+  # The same function hooking, but with added parameters.
+  # The parameters are declared, but not named ("Unnamed Parameter").
+  # In order to decode the arguments, they are required.
+  # The hook also contains the type of the return value.
   - module: libc.so
     functions:
       - symbol: open
         returnType: int
         params:
-          - ["const char *", pathname]
+          - "const char *"
+          - int
+          - mode_t
+
+  # The same hook, but with named parameters.
+  # frooky can use them to produce better output, as it is now possible to
+  # describe the arguments at runtime ("Named Parameter").
+  - module: libc.so
+    functions:
+      - symbol: open
+        returnType: int
+        params:
+          - ["const char *", path]
           - [int, flags]
           - [mode_t, mode]
 
-  # Function with pointer and buffer
+  # Multiple functions in same module are hooked.
+  - module: libssl.so
+    functions:
+      - symbol: ENGINE_load_builtin_engines
+      - symbol: ENGINE_cleanup
+      - symbol: OSSL_CMP_validate_cert_path
+        returnType: int
+        params:
+          - ["const OSSL_CMP_CTX *", ctx]
+          - ["X509_STORE *", trusted_store]
+          - ["X509 *", cert]
+
+  # Native hook with decoder options set for the argument `buf`.
+  # With `decodeAt` set to `exit`, frooky will decode the content of the buffer
+  # after the function terminates.
+  # Since `buf` ist just a pinter, we need to know how many bytes we have to decode.
+  # The length of the buffer is stored in the argument `count`, hence we pass it to
+  # the `void *` decoder.
   - module: libc.so
     functions:
       - symbol: read
@@ -39,7 +72,8 @@ hooks:
           - ["void *", buf, { decodeAt: exit, decoderArgs: [count] }]
           - [size_t, count]
 
-  # OpenSSL encryption function, ctx contains information about the used algorithms
+  # OpenSSL encryption function, `ctx` contains information about the used algorithms.
+  # The algorithm depended length is required to decode `key` and `iv`.
   - module: libssl.so
     functions:
       - symbol: EVP_EncryptInit_ex
@@ -52,43 +86,28 @@ hooks:
           - ["const unsigned char *", iv, { decoderArgs: [ctx] }]
     stackTraceLimit: 10
 
-  # SSL write with buffer
+  # OpenSSL write function, which writes plaintext data of length `num` to the buffer `buf`.
+  # Hence, we pass the argument `num` to the `const void *` decoder.
   - module: libssl.so
     functions:
       - symbol: SSL_write
         returnType: int
         params:
           - ["SSL *", ssl]
-          - ["const void *", buf]
+          - ["const void *", buf, { decoderArgs: [num] }]
           - [int, num]
     debug: true
 
-  # Multiple functions in same module
-  - module: libssl.so
-    functions:
-      - symbol: ENGINE_load_builtin_engines
-      - symbol: ENGINE_cleanup
-      - symbol: OSSL_CMP_validate_cert_path
-        returnType: int
-        params:
-          - ["const OSSL_CMP_CTX *", ctx]
-          - ["X509_STORE *", trusted_store]
-          - ["X509 *", cert]
-
-  # Function with custom decoder
+  # Function with custom decoder. If we know how the code or data is structured 
+  # at the pointer to `data`, we can use a custom decoder and decode the data accordingly.s
   - module: libcustom.so
     functions:
       - symbol: process_data
         returnType: int
         params:
-          - [ "void *", data, { decoder: CustomDataDecoder, decoderArgs: [size] } ]
-          - [size_t, size]
-
-  # Function with output parameter decoded at exit
-  - module: libcustom.so
-    functions:
-      - symbol: get_buffer
-        returnType: int
-        params:
-          - ["unsigned char *", output, { decodeAt: exit }]
+          - [
+              "void *",
+              data,
+              { decoder: CustomDataDecoder, decoderArgs: [size] },
+            ]
           - [size_t, size]

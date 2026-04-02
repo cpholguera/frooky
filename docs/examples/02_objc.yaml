@@ -8,7 +8,6 @@ metadata:
 
 hooks:
   # Simple method hooking with a list of methods to be hooked.
-  # LAContext biometry method (shortened, no param decoding)
   - objcClass: LAContext
     methods:
       - "- invalidate"
