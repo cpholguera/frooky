@@ -10,6 +10,13 @@ This documentation covers everything you need to know about the frooky agent and
 - [Parameter- and Return-Type Declaration](#parameter--and-return-type-declaration)
 - [Additional Settings and Best Practices](#additional-settings-and-best-practices)
 
+
+> [!WARNING]
+>
+> At the time of writing this document, not all described features may have been fully implemented. 
+>
+> Until [version 1.0](https://github.com/cpholguera/frooky/milestone/1) there may be breaking changes to the API. 
+
 ## What is frooky?
 
 First things first: The frooky agent is the part of frooky that runs on the target device (Android or iOS). It is written in TypeScript and handles much of the heavy lifting, including:
@@ -29,7 +36,7 @@ For example you can use it to quickly hook functions or methods based on public 
 
 However, frooky is not a tool for tracing function calls. For that, you should use [`frida-trace`](https://frida.re/docs/frida-trace/). But you may use the insight from `frida-trace`, and use it as starting point to write a frooky hook in order to decode more complex values entering and exiting the functions.
 
-In general, the frooky hooks are designed in a way that you should be able to easily map them onto existing API documentation. 
+In general, the frooky hooks are designed in a way that you should be able to easily map them onto existing API documentation.
  
 ## Quickstart
 

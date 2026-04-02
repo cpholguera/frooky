@@ -35,15 +35,6 @@ In Java, the method signature can be retrieved at runtime. Unless you want to ov
 
 ### Objective-C Return Types
 
-> [!NOTE]
-> This example hooks the following class method from [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
->
-> ```objectivec
-> + (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
->                                     isDirectory:(BOOL) isDir 
->                                   relativeToURL:(NSURL *) baseURL;
-> ```
-
 ```yaml
 objcClass: NSURL
 methods:
@@ -54,16 +45,16 @@ methods:
 
 The return value is of type `(NSURL *)`. frooky will decode it using the default `(NSURL *)` decoder.
 
-### Native Return Types
+This example hooks the following class method from [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
 
-> [!NOTE]
-> This example hooks the following method from [OpenSSL](https://docs.openssl.org/1.0.2/man3/EVP_DigestInit):
->
-> ```c
-> int EVP_DigestFinal_ex(EVP_MD_CTX *ctx,
->                        unsigned char *md,
->                        unsigned int *s);
-> ```
+```objectivec
++ (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
+                                    isDirectory:(BOOL) isDir 
+                                  relativeToURL:(NSURL *) baseURL;
+```
+
+
+### Native Return Types
 
 ```yaml
 module: libssl.so
@@ -75,6 +66,16 @@ functions:
       - [ "unsigned char *", md ]
       - [ "unsigned int *", s ]
 ```
+
+This example hooks the following method from [OpenSSL](https://docs.openssl.org/1.0.2/man3/EVP_DigestInit):
+
+```c
+int EVP_DigestFinal_ex(EVP_MD_CTX *ctx,
+                       unsigned char *md,
+                       unsigned int *s);
+```
+
+
 
 The function returns an integer. It returns 1 on success and 0 on failure.
 
@@ -91,13 +92,6 @@ The following chapters will explain the concepts with a practical example.
 
 #### Custom Decoder in Java
 
-> [!NOTE]
-> This example hooks the following method from the [Android Java Library](https://developer.android.com/reference/kotlin/android/content/Intent#getflags):
->
-> ```kotlin
-> open fun getFlags(): Int
-> ```
-
 ```yaml
 javaClass: android.content.Intent
 methods:
@@ -105,16 +99,17 @@ methods:
     returnType: [ int, { decoder: intentFlagsDecoder } ]
 ```
 
+This example hooks the following method from the [Android Java Library](https://developer.android.com/reference/kotlin/android/content/Intent#getflags):
+
+```kotlin
+open fun getFlags(): Int
+```
+
+
+
 The return value is an integer representing the set flags for this intent. Instead of using the default integer decoder, frooky will use `intentFlagsDecoder` to process the return value and decode the set flags rather than just the integer.
 
 #### Custom Decoder in Objective-C
-
-> [!NOTE]
-> This example hooks the following instance method from [NSData](https://developer.apple.com/documentation/foundation/nsdata/base64encodedstring(options:)?language=objc):
->
-> ```objectivec
-> - (NSString *) base64EncodedStringWithOptions:(NSDataBase64EncodingOptions) options;
-> ```
 
 ```yaml
 objcClass: NSData
@@ -124,16 +119,17 @@ methods:
     params: [ "(NSDataBase64EncodingOptions)" ]
 ```
 
+
+ This example hooks the following instance method from [NSData](https://developer.apple.com/documentation/foundation/nsdata/base64encodedstring(options:)?language=objc):
+
+```objectivec
+- (NSString *) base64EncodedStringWithOptions:(NSDataBase64EncodingOptions) options;
+```
+
+
 The return value is a base64-encoded string. The custom decoder `base64Decoder` can decode the base64 string to recover the original data.
 
 #### Custom Decoder in Native
-
-> [!NOTE]
-> This example hooks the following function from [OpenSSL](https://docs.openssl.org/master/man3/SSL_get_cipher):
->
-> ```c
-> int SSL_get_cipher_bits(const SSL *s, int *np);
-> ```
 
 ```yaml
 module: libssl.so
@@ -144,6 +140,12 @@ functions:
       - [ "const SSL *", int ]
 ```
 
+This example hooks the following function from [OpenSSL](https://docs.openssl.org/master/man3/SSL_get_cipher):
+
+```c
+int SSL_get_cipher_bits(const SSL *s, int *np);
+```
+
 The return value is the number identifying the cipher suite. The custom decoder `openSslCipherDecoder` can decode the number and return a string representation of the cipher suite.
 
 ### `decoderArgs`-Option: Pass Arguments to Decoder
@@ -152,19 +154,18 @@ While the use case for `decoderArgs` is less common, you can use it the same way
 
 #### Pass Arguments to Decoder in Objective-C
 
-> [!NOTE]
-> This example hooks the following instance method from [NSString](https://developer.apple.com/documentation/foundation/nsstring/data(using:)?language=objc):
->
-> ```objectivec
-> - (NSData *) dataUsingEncoding:(NSStringEncoding) encoding;
-> ```
-
 ```yaml
 objcClass: NSString
 methods:
   - name: "- dataUsingEncoding"
     returnType: [ "(NSData *)", { decoderArgs: [ encoding ] }  ]
     params: [ ["(NSStringEncoding)", encoding ] ]
+```
+
+This example hooks the following instance method from [NSString](https://developer.apple.com/documentation/foundation/nsstring/data(using:)?language=objc):
+
+```objectivec
+- (NSData *) dataUsingEncoding:(NSStringEncoding) encoding;
 ```
 
 The return value is an `NSData` object. The decoder receives the `encoding` parameter to interpret the data correctly.

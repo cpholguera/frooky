@@ -101,9 +101,3 @@ int OSSL_CMP_validate_cert_path(const OSSL_CMP_CTX *ctx,
 
 Depending on the type, frooky is able to decode them using the built in decoders. If the types are more complex, you may need to [custom decoders](./parameter-declaration.md#custom-decoder-in-native).
 
-
-> [!NOTE]
->
-> The argument types in the example above are `struct`. Compared to most Java or Objective-C data structures, native `structs` don't have information about the structure itself in memory. 
-> 
-> This means, to write a decoder, we need to have information about the content of the `struct`. If the source code is public, we can use this information to write a decoder based on the `struct` definition. 
