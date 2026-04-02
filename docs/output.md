@@ -69,3 +69,8 @@ Explanation of fields:
   - `runtimeType`: The actual runtime type of the return value
   - `instanceId`: Unique identifier for the return value instance
   - `instanceToString`: String representation of the return value instance
+
+
+> [!TIP]
+>  
+> If you want to be fancy, you could even visualize them on a time line using tools like [Grafana](https://grafana.com/docs/grafana/latest/visualizations/simplified-exploration/logs/) or the [Kibana](https://www.elastic.co/kibana) from the ELK-Stack. 

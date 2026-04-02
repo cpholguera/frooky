@@ -148,7 +148,9 @@ Then run `frooky` with the hook file against your target app:
 frooky -U -n "MASTestApp" --platform android keygen.json
 ```
 
-Output (pretty-printed for readability):
+Events are written to the output file in JSON Lines format (one JSON object per line, known as NDJSON). 
+
+Example Output (pretty-printed for readability):
 
 ```json
 {
@@ -186,14 +188,6 @@ Output (pretty-printed for readability):
   ]
 }
 ```
-
-> [!TIP]
-> Events are written to the output file in JSON Lines format (one JSON object per line, known as NDJSON). 
-> 
-> You can easily pretty-print it e.g. using `jq . output.json`. 
-> 
-> If you want to be fancy, you could even visualize them on a time line using tools like [Grafana](https://grafana.com/docs/grafana/latest/visualizations/simplified-exploration/logs/) or the [Kibana](https://www.elastic.co/kibana) from the ELK-Stack. 
-
 
 ## More Information
 
