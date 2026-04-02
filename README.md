@@ -25,11 +25,15 @@ Use it, if you **know what you want to hook** but you don't want to write custom
 
 However, frooky is not a tool for tracing function calls. For that, you should use [`frida-trace`](https://frida.re/docs/frida-trace/). But you may use the insight from `frida-trace`, and use it as starting point to write a frooky hook in order to decode more complex arguments.
 
-> [!WARNING]
+> [!NOTE]
 >
-> At the time of writing this document, not all described features may have been fully implemented. 
+> This documentation describes the intended feature set for [frooky 1.0](https://github.com/cpholguera/frooky/milestone/1).
+> 
+> At the time of writing this document, not all described features may have been fully implemented.
+> 
+> Also, there may be breaking changes to the hook file API until frooky 1.0. 
 >
-> Until [version 1.0](https://github.com/cpholguera/frooky/milestone/1) there may be breaking changes to the API. 
+> [Feedback](https://github.com/cpholguera/frooky/discussions) is always welcome. 
  
 
 ## Installation
