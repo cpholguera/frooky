@@ -41,37 +41,6 @@ This document describes how to set up a local development environment for the re
 
 ## Compile And Run the frooky Standalone Agent
 
-If you want to work on the frooky agent itself, you can also use [`frida`](https://frida.re/) as host.
+If you want to work on the frooky agent itself, you can also use [`frida`](https://frida.re/) as host. 
 
-Follow these steps to do that:
-
-1. **Install all dependencies**
-
-    ```sh
-    npm install
-    ```
-
-2. **Compile the development standalone client**
-
-    ```sh
-    npm run watch-android hook.yaml
-    npm run watch-ios hook.yaml
-    ```
-
-    You can specify one or more `hook.yaml` files. Pattern expansion (`glob`) is supported.
-
-    This will compile a development build of the frooky agent, watch for changes in its source code and all `hook.yaml` files, and keep the compiled agents in the `./dist` folder up to date.
-
-3. **Start Frida with the compiled agent**
-   
-    For Android:
-
-    ```sh
-    frida -U -f org.owasp.mytargetapp dist/agent-android.js
-    ```
-
-    For iOS:
-
-    ```sh
-    frida -U -f org.owasp.mytargetapp dist/agent-ios.js
-    ```
+Please refer to the [frooky agent documentation](../frooky/agent/README.md) for more information.
