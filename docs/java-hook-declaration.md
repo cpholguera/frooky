@@ -1,13 +1,13 @@
 # `JavaHook` Declaration
 
-This documentation explains how to write a Java hook declaration.
+This documentation explains how to write Java hooks.
 
 - [Structure of a `JavaHook` Declaration](#structure-of-a-javahook-declaration)
 - [Basic Usage](#basic-usage)
 - [Method Overloads](#method-overloads)
 - [Type Descriptors](#type-descriptors)
 
-## Structure of a `JavaHook` Declaration
+## Structure
 
 ```yaml
 javaClass: <string>                    # Fully qualified Java class name
