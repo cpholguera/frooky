@@ -15,7 +15,7 @@ This document describes the architecture of the frooky agent. The frooky agent i
 
 The following graph shows what happens, when we start a frooky agent:
 
-```[Mermaid]
+```mermaid
 sequenceDiagram
     participant BS as Bootstrap
     participant HFV as Hook File Validator
@@ -84,7 +84,7 @@ Here the responsibilities for the different components:
 The following graph shows what happens, once a registered hook is fired:
 
 
-```[Mermaid]
+```mermaid
 sequenceDiagram
     participant H as Hooking
     participant D as Decoder
@@ -140,7 +140,7 @@ The Event Sender periodically checks if the event cache has new events, and send
 
 The following flowchart shows this process:
 
-```[Mermaid]
+```mermaid
 flowchart TD
     A([Start]) --> B[Wait N seconds]
     B --> C{Event cache empty?}
