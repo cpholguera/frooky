@@ -3,7 +3,7 @@ metadata:
   platform: iOS
   description: Examples of Objective-C method hooking
   category: GENERAL
-  author: Frooky Documentation
+  author: frooky dev team
   version: v1
 
 hooks:

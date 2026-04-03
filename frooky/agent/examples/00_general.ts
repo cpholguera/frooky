@@ -41,7 +41,7 @@ const androidHooks: Frooky.FrookyConfig = {
         name: 'Android Hook Type Tests',
         platform: 'Android',
         description: 'Test suite for Java and native hook configurations on Android',
-        author: 'Frooky Development Team',
+        author: 'frooky dev team',
         version: 'v1'
     },
     hooks: [
@@ -75,7 +75,7 @@ const iosHooks: Frooky.FrookyConfig = {
         name: 'iOS Hook Type Tests',
         platform: 'iOS',
         description: 'Test suite for Objective-C hook configurations on iOS',
-        author: 'Frooky Development Team',
+        author: 'frooky dev team',
         version: 'v1'
     },
     hooks: [

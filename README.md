@@ -92,7 +92,7 @@ metadata:
   platform: Android
   description: Hooks all RNG initialization methods on Android (Java, kotlin, native)
   masCategory: CRYPTOGRAPHY
-  author: mas@owasp.org
+  author: frooky dev team
   version: v1
 
 hooks:
@@ -137,7 +137,7 @@ metadata:
   platform: Android
   description: Captures the initialization of a KeyGenParameterSpec Builder 
   category: CRYPTO
-  author: frooky developer
+  author: frooky dev team
   version: v1
 
 hooks:
