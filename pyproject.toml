@@ -33,6 +33,11 @@ dependencies = [
   "frida-tools>=14.5.1",
 ]
 
+[project.optional-dependencies]
+dev = [
+  "pyyaml>=6.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/cpholguera/frooky"
 Repository = "https://github.com/cpholguera/frooky"
