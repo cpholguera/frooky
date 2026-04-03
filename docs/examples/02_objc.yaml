@@ -8,19 +8,22 @@ metadata:
 
 hooks:
   # Simple method hooking with a list of methods to be hooked.
+  # Docs: https://developer.apple.com/documentation/localauthentication/lacontext/invalidate()?language=objc
   - objcClass: LAContext
     methods:
       - "- invalidate"
 
   # The same method hooking, but with declared as a list of objects,
   # with the methods name in the `name` property.
+  # Docs: https://developer.apple.com/documentation/localauthentication/lacontext/invalidate()?language=objc
   - objcClass: LAContext
     methods:
       - name: "- invalidate"
 
-  # Simple Objective-C instance method,  indicated by the leading "-".
+  # Simple Objective-C instance method, indicated by the leading "-".
   # The parameters are declared, but not named ("Unnamed Parameter").
   # In order to decode the arguments, they are required.
+  # Docs: https://developer.apple.com/documentation/foundation/userdefaults/set(_:forkey:)-8ab6d?language=objc
   - objcClass: NSUserDefaults
     methods:
       - name: "- setObject:forKey:"
@@ -31,6 +34,7 @@ hooks:
   # The same hook, but with named parameters.
   # frooky can use them to produce better output, as it is now possible to
   # describe the arguments at runtime ("Named Parameter").
+  # Docs: https://developer.apple.com/documentation/foundation/userdefaults/set(_:forkey:)-8ab6d?language=objc
   - objcClass: NSUserDefaults
     methods:
       - name: "- setObject:forKey:"
@@ -39,6 +43,7 @@ hooks:
           - ["(NSString *)", key]
 
   # Hook with a `returnType`. frooky will decode the return value as boolean.
+  # Docs: https://developer.apple.com/documentation/foundation/nsdata/write(tofile:atomically:)?language=objc
   - objcClass: NSData
     methods:
       - name: "- writeToFile:atomically:"
@@ -49,6 +54,7 @@ hooks:
     stackTraceLimit: 8
 
   # Simple Objective-C class method, indicated by the leading "+".
+  # Docs: https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc
   - objcClass: NSURL
     methods:
       - name: "+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:"
@@ -59,6 +65,8 @@ hooks:
           - ["(NSURL *)", baseURL]
 
   # Multiple methods in same class hooked.
+  # Docs: https://developer.apple.com/documentation/localauthentication/laprivatekey/decrypt(_:algorithm:completion:)?language=objc
+  # Docs: https://developer.apple.com/documentation/localauthentication/laprivatekey/sign(_:algorithm:completion:)?&language=objc
   - objcClass: LAPrivateKey
     methods:
       - name: "- decryptData:secKeyAlgorithm:completion:"
@@ -78,6 +86,7 @@ hooks:
 
   # The argument `error` is decoded after the method terminated.
   # Also, frooky will show debug information while running the hook.
+  # Docs: https://developer.apple.com/documentation/CoreData/NSManagedObjectContext/save()?language=objc
   - objcClass: NSManagedObjectContext
     methods:
       - name: "- save:"
@@ -87,7 +96,8 @@ hooks:
     debug: true
 
   # Network request with stack trace filtering.
-  # frooky won't keep events not originating form `libsystem_` and `Foundation*`.
+  # frooky won't keep events not originating from `libsystem_` and `Foundation*`.
+  # Docs: https://developer.apple.com/documentation/foundation/urlsession/datatask(with:completionhandler:)-e6xv?language=objc
   - objcClass: NSURLSession
     methods:
       - name: "- dataTaskWithRequest:completionHandler:"
@@ -104,6 +114,7 @@ hooks:
 
   # If we want to decode a value both before and after the method is completed, we can
   # use `{ decodeAt: both }`.
+  # Docs: https://developer.apple.com/documentation/foundation/nsmutabledata/append(_:)?language=objc
   - objcClass: NSMutableData
     methods:
       - name: "- appendData:"

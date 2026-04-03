@@ -9,6 +9,7 @@ metadata:
 hooks:
   # Simple method hooking with a list of methods to be hooked.
   # All overloads of the methods are hooked implicitly.
+  # Docs: https://developer.android.com/reference/android/security/AttestedKeyPair
   - javaClass: android.security.AttestedKeyPair
     methods:
       - $init
@@ -18,6 +19,7 @@ hooks:
   # Here, methods is a list of objects, with the methods name in the `name` property.
   # It is not required to use an object if there are no overloads, but possible.
   # The stack trace is limited to 10.
+  # Docs: https://developer.android.com/reference/android/security/AttestedKeyPair
   - javaClass: android.security.AttestedKeyPair
     methods:
       - name: $init
@@ -26,6 +28,7 @@ hooks:
 
   # Explicit hooking of a single overloaded method.
   # The parameter of the method is just a list of types ("Unnamed Parameter").
+  # Docs: https://developer.android.com/reference/java/net/URL#openConnection(java.net.Proxy)
   - javaClass: java.net.URL
     methods:
       - name: openConnection
@@ -38,6 +41,7 @@ hooks:
   # in the list `params` ("Named Parameter").
   # With the names of the argument, frooky is now able to add them as context
   # information when decoding the values.
+  # Docs: https://developer.android.com/reference/android/app/Activity#startActivity(android.content.Intent)
   - javaClass: android.app.Activity
     methods:
       - name: startActivity
@@ -51,6 +55,7 @@ hooks:
   # from `java.**` or `android.**`. This can be handy if we only want to see events
   # originating from the package name of our target app and not by a third party lib.
   # The stack trace is limited to 5.
+  # Docs: https://developer.android.com/reference/android/database/sqlite/SQLiteDatabase#query(java.lang.String,%20java.lang.String[],%20java.lang.String,%20java.lang.String[],%20java.lang.String,%20java.lang.String,%20java.lang.String)
   - javaClass: android.database.sqlite.SQLiteDatabase
     methods:
       - name: query
@@ -70,7 +75,8 @@ hooks:
       - "$^com\\.external\\.sdk\\."
 
   # Explicit hooking of 4 overloaded methods.
-  # The parameters of the method is a list of type and name stored  in the list `params`.
+  # The parameters of the method is a list of type and name stored in the list `params`.
+  # Docs: https://developer.android.com/reference/android/content/Intent
   - javaClass: android.content.Intent
     methods:
       - name: putExtra
@@ -89,12 +95,13 @@ hooks:
               - ["[B", value]
 
   # Explicit hooking of a single overloaded method.
-  # The parameter `flags contains an integer which contains information about the
+  # The parameter `flags` contains an integer which contains information about the
   # intent settings using bit-masking.
   # The decoder `IntentFlagsDecoder` decodes them during runtime based on the
   # constants stored in `android.content.Intent`.
   # The `debug` flag additionally adds debug messages while the method `setFlags`
   # is hooked and its arguments and/or return values decoded.
+  # Docs: https://developer.android.com/reference/android/content/Intent#setFlags(int)
   - javaClass: android.content.Intent
     methods:
       - name: setFlags
@@ -105,6 +112,7 @@ hooks:
 
   # The decrypted plaintext is written into the byte array `output`, which is passed by reference,
   # after the function completes. Hence, we decode it at exit.
+  # Docs: https://developer.android.com/reference/javax/crypto/Cipher#doFinal(byte[],%20int)
   - javaClass: javax.crypto.Cipher
     methods:
       - name: doFinal
@@ -115,6 +123,7 @@ hooks:
 
   # If we want to decode a value both before and after the method is completed, we can
   # use `{ decodeAt: both }`.
+  # Docs: https://developer.android.com/reference/java/nio/ByteBuffer#put(byte[])
   - javaClass: java.nio.ByteBuffer
     methods:
       - name: put

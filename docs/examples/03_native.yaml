@@ -8,6 +8,8 @@ metadata:
 
 hooks:
   # Simple native function hook with a list of symbols to be hooked.
+  # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
+  # Docs: https://www.man7.org/linux/man-pages/man2/close.2.html
   - module: libc.so
     functions:
       - open
@@ -15,6 +17,8 @@ hooks:
 
   # The same function hooking, but the symbols are declared explicitly
   # as a list of objects with the symbols name in its `symbol` property.
+  # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
+  # Docs: https://www.man7.org/linux/man-pages/man2/close.2.html
   - module: libc.so
     functions:
       - symbol: open
@@ -24,6 +28,7 @@ hooks:
   # The parameters are declared, but not named ("Unnamed Parameter").
   # In order to decode the arguments, they are required.
   # The hook also contains the type of the return value.
+  # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
   - module: libc.so
     functions:
       - symbol: open
@@ -36,6 +41,7 @@ hooks:
   # The same hook, but with named parameters.
   # frooky can use them to produce better output, as it is now possible to
   # describe the arguments at runtime ("Named Parameter").
+  # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
   - module: libc.so
     functions:
       - symbol: open
@@ -46,6 +52,8 @@ hooks:
           - [mode_t, mode]
 
   # Multiple functions in same module are hooked.
+  # Docs: https://docs.openssl.org/master/man3/ENGINE_add/
+  # Docs: https://docs.openssl.org/master/man3/EVP_EncryptInit/
   - module: libssl.so
     functions:
       - symbol: ENGINE_load_builtin_engines
@@ -60,9 +68,10 @@ hooks:
   # Native hook with decoder options set for the argument `buf`.
   # With `decodeAt` set to `exit`, frooky will decode the content of the buffer
   # after the function terminates.
-  # Since `buf` ist just a pinter, we need to know how many bytes we have to decode.
+  # Since `buf` is just a pointer, we need to know how many bytes we have to decode.
   # The length of the buffer is stored in the argument `count`, hence we pass it to
   # the `void *` decoder.
+  # Docs: https://www.man7.org/linux/man-pages/man2/read.2.html
   - module: libc.so
     functions:
       - symbol: read
@@ -74,6 +83,7 @@ hooks:
 
   # OpenSSL encryption function, `ctx` contains information about the used algorithms.
   # The algorithm depended length is required to decode `key` and `iv`.
+  # Docs: https://docs.openssl.org/master/man3/EVP_EncryptInit/
   - module: libssl.so
     functions:
       - symbol: EVP_EncryptInit_ex
@@ -88,6 +98,7 @@ hooks:
 
   # OpenSSL write function, which writes plaintext data of length `num` to the buffer `buf`.
   # Hence, we pass the argument `num` to the `const void *` decoder.
+  # Docs: https://docs.openssl.org/master/man3/SSL_write/
   - module: libssl.so
     functions:
       - symbol: SSL_write
@@ -98,8 +109,8 @@ hooks:
           - [int, num]
     debug: true
 
-  # Function with custom decoder. If we know how the code or data is structured 
-  # at the pointer to `data`, we can use a custom decoder and decode the data accordingly.s
+  # Function with custom decoder. If we know how the code or data is structured
+  # at the pointer to `data`, we can use a custom decoder and decode the data accordingly.
   - module: libcustom.so
     functions:
       - symbol: process_data
