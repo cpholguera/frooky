@@ -31,10 +31,6 @@ classifiers = [
 dependencies = [
   "frida>=17.6.2",
   "frida-tools>=14.5.1",
-]
-
-[project.optional-dependencies]
-dev = [
   "pyyaml>=6.0",
 ]
 
