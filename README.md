@@ -65,12 +65,12 @@ See `frooky -h` for more options.
 
 ## Structure of a Hook File
 
-frooky uses structured YAML files to declare which methods or functions will be hooked. These are called _hook files_.
+frooky uses _hook files_, which are structured YAML files including declarations of methods or functions to be hooked.
 
 A hook file consists of optional metadata and a list of _hook declarations_. The following YAML file describes the basic structure:
 
 ```yaml
-metadata:                         # All metadata are optional
+metadata:                         # All metadata is optional
   name: <name>                    # Name of the hook collection
   platform: Android|iOS           # Target platform (hooks must be platform-specific)
   description: <description>      # Description of what the hook collection does
@@ -101,9 +101,9 @@ hooks:
 
 ## Hook Declaration
 
-Now, let's look the `<hook_declaration>` itself. Depending on the platform, the hook declaration may look different. Please read the linked documentation to learn how to write hooks for the platform you are interested in.
+Depending on the platform, the `<hook_declaration>` may look different. Please read the linked platform-specific documentation for more information.
 
-frooky currently supports three types of hooks:
+frooky supports these types of hooks:
 
 | Hook Type        | Platform    | Description                                 | Documentation                                                          |
 | ---------------- | ----------- | ------------------------------------------- | ---------------------------------------------------------------------- |
@@ -116,11 +116,9 @@ frooky currently supports three types of hooks:
 
 ## Parameter- and Return-Type Declaration
 
-An important feature of frooky is to decode data passed to functions or methods via arguments and their return values.
+frooky can decode data passed to functions or methods via arguments, including their return values.
 
-Depending on the type of the values, this can be simple or more complex. For example, if an argument or return value is simply a pointer, we need additional information to decode it properly.
-
-frooky tries to decode arguments and return values by itself if possible. But in some cases, it is necessary to provide information about the types used. Before writing a hook declaration, it is therefore recommended to read the following documentation:
+Depending on the value types, this can be simple or more complex. frooky tries to decode arguments and return values by itself if possible. But in some cases, e.g. when the value is simply a pointer, it is necessary to provide information about the types used. Before writing a hook declaration, it is therefore recommended to read the following documentation:
 
 - [Parameter Declaration](docs/parameter-declaration.md)
 - [Return Type Declaration](docs/return-type-declaration.md)
