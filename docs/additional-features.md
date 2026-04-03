@@ -1,6 +1,6 @@
 # Additional Settings and Best Practices
 
-This documentation explains settings which are more general:
+frooky supports the following settings that can be used regardless of hook type:
 
 - [Event Filter Based on Stack Trace](#event-filter-based-on-stack-trace)
 - [Stack Trace Limits](#stack-trace-limits)
