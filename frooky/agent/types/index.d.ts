@@ -61,7 +61,6 @@ export interface JavaHook {
   methods: JavaMethod[]
   stackTraceLimit?: number
   stackTraceFilter?: string[]
-  debug?: boolean
 }
 
 // ============================================================================
@@ -80,7 +79,6 @@ export interface ObjectiveCHook {
   methods: ObjectiveCMethod[]
   stackTraceLimit?: number
   stackTraceFilter?: string[]
-  debug?: boolean
 }
 
 // ============================================================================
@@ -101,7 +99,6 @@ export interface NativeHook {
   functions: NativeFunction[]
   stackTraceLimit?: number
   stackTraceFilter?: string[]
-  debug?: boolean
 }
 
 // ============================================================================

@@ -99,7 +99,6 @@ hooks:
   # intent settings using bit-masking.
   # The decoder `IntentFlagsDecoder` decodes them during runtime based on the
   # constants stored in `android.content.Intent`.
-  # The `debug` flag additionally adds debug messages while the method `setFlags`
   # is hooked and its arguments and/or return values decoded.
   # Docs: https://developer.android.com/reference/android/content/Intent#setFlags(int)
   - javaClass: android.content.Intent
@@ -108,7 +107,6 @@ hooks:
         overloads:
           - params:
               - [int, flags, { decoder: IntentFlagsDecoder }]
-    debug: true
 
   # The decrypted plaintext is written into the byte array `output`, which is passed by reference,
   # after the function completes. Hence, we decode it at exit.

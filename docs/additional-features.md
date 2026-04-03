@@ -4,13 +4,26 @@ This documentation explains settings which are more general:
 
 - [Event Filter Based on Stack Trace](#event-filter-based-on-stack-trace)
 - [Stack Trace Limits](#stack-trace-limits)
-- [Debugging](#debugging)
 
 ## Event Filter Based on Stack Trace
 
-If you hook a method that is used widely, you may capture many events you are not interested in. This makes the analysis more difficult.
+If you hook a method that is used widely, you may capture many events you are not interested in. This makes the analysis more difficult. 
 
-An example is `SharedPreferences` on Android. Let's assume you want to know whether the target app uses them to store sensitive data on the device:
+To filter out events that do not originate from the target app, frooky can filter events based on the stack trace. The following `<hook_configuration>` will capture only events where the target package name matches the stack trace:
+
+```yaml
+javaClass: android.app.SharedPreferencesImpl$EditorImpl
+methods:
+  - name: putString
+  - eventFilter: ["^org\.owasp\.mastestapp"]
+```
+
+With this filter, noise can be reduced.
+
+
+**Example: `SharedPreferences` used by Android**
+
+Let's assume you want to know whether the target app uses them to store sensitive data on the device:
 
 ```yaml
 javaClass: android.app.SharedPreferencesImpl$EditorImpl
@@ -51,27 +64,10 @@ This method call is initiated by Android when `EncryptedSharedPreferences` are i
 
 These events are usually not of interest to security testers, who want to test the target app rather than OS libraries.
 
-To filter out events that do not originate from the target app, frooky can filter events based on the stack trace. The following `<hook_configuration>` will capture only events where the target package name matches the stack trace:
-
-```yaml
-javaClass: android.app.SharedPreferencesImpl$EditorImpl
-methods:
-  - name: putString
-  - stackTraceFilter: ["^org\.owasp\.mastestapp"]
-```
-
-With this filter, noise can be reduced.
 
 ## Stack Trace Limits
 
 By default, frooky will show all function calls of a stack trace. If this is too much, you can set a limit using the `stackTraceLimit` property. 
 
 This is supported by Java, Objective-C and native hooks.
-
-
-## Debugging
-
-You can enable detailed debugging information using the property `debug`. 
-
-The frooky agent will now send additional information in its event output.
 

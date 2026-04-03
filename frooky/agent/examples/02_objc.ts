@@ -100,8 +100,7 @@ const coreDataHook: Frooky.ObjectiveCHook = {
         ['(NSError **)', 'error', { decodeAt: 'exit' }]
       ]
     }
-  ],
-  debug: true
+  ]
 }
 
 // ============================================================================

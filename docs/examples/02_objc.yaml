@@ -85,7 +85,6 @@ hooks:
           - ["(void (^)(NSData *, NSError *))", handler]
 
   # The argument `error` is decoded after the method terminated.
-  # Also, frooky will show debug information while running the hook.
   # Docs: https://developer.apple.com/documentation/CoreData/NSManagedObjectContext/save()?language=objc
   - objcClass: NSManagedObjectContext
     methods:
@@ -93,7 +92,6 @@ hooks:
         returnType: "(BOOL)"
         params:
           - ["(NSError **)", error, { decodeAt: exit }]
-    debug: true
 
   # Network request with stack trace filtering.
   # frooky won't keep events not originating from `libsystem_` and `Foundation*`.
