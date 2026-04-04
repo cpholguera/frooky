@@ -56,30 +56,31 @@ In the expanded form:
 
 ## Basic Usage
 
-The minimum required properties are `module` and `functions`:
+The minimum required fields are `module` and `functions`.
 
 ```yaml
-module: <string>                       # Fully qualified module name (mandatory)
-functions:                             # List of native symbol declarations to be hooked
-  - <native_function_declaration>
+module: <module name>
+functions:
+  - <symbol name>
 ```
+
+This hooks the listed symbols from the specified native module.
 
 **Example:**
 
 ```yaml
 module: libssl.so
 functions:
- - symbol: ENGINE_load_builtin_engines
- - symbol: ENGINE_cleanup
+  - ENGINE_load_builtin_engines
+  - ENGINE_cleanup
 ```
 
-This `<hook_configuration>` hooks the following two functions from the [OpenSSL Library](https://docs.openssl.org/master/man3/ENGINE_add):
+This declaration hooks the following two functions from the [OpenSSL library](https://docs.openssl.org/master/man3/ENGINE_add):
 
 ```c
 void ENGINE_load_builtin_engines(void);
 void ENGINE_cleanup(void);
 ```
-
 
 ## Decoding Arguments and Return Values
 
