@@ -17,11 +17,9 @@
 
 # General Information
 
-At the moment, the frooky agent is not intended to be used by itself or as a library for other frida scripts. 
+At the moment, the frooky agent is not intended to be used by itself or as a library for other frida scripts. The agent is designed for Python tool also called [frooky](https://github.com/cpholguera/frooky/) which acts as the host. If you want to use the frooky agent in another programming language you can use the same build. But frooky can also be used as a standalone Frida client. 
 
-But if you would like to write your own frooky host, or embed the agent into an existing one, this chapter explains how to send and receive data from and to the agent.
-
-The frooky agent supports these modes:
+The two versions are different only in the way hook files are send to the target:
 
 1. **Host**
 
