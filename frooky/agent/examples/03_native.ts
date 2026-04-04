@@ -2,6 +2,7 @@ import * as Frooky from '../types/index'
 
 // ============================================================================
 // Simple native function with basic types, no param / return value decoding
+// Reference: https://www.man7.org/linux/man-pages/man2/open.2.html
 // ============================================================================
 const openHookSimple: Frooky.NativeHook = {
   module: 'libc.so',
@@ -11,7 +12,8 @@ const openHookSimple: Frooky.NativeHook = {
 }
 
 // ============================================================================
-//  Native function with basic types
+// Native function with basic types
+// Reference: https://www.man7.org/linux/man-pages/man2/open.2.html
 // ============================================================================
 const openHook: Frooky.NativeHook = {
   module: 'libc.so',
@@ -30,6 +32,7 @@ const openHook: Frooky.NativeHook = {
 
 // ============================================================================
 // Function with pointer and buffer
+// Reference: https://man7.org/linux/man-pages/man2/read.2.html
 // ============================================================================
 const readHook: Frooky.NativeHook = {
   module: 'libc.so',
@@ -48,6 +51,7 @@ const readHook: Frooky.NativeHook = {
 
 // ============================================================================
 // OpenSSL encryption function
+// Reference: https://docs.openssl.org/3.0/man3/EVP_EncryptInit/
 // ============================================================================
 const encryptHook: Frooky.NativeHook = {
   module: 'libcrypto.so',
@@ -69,6 +73,7 @@ const encryptHook: Frooky.NativeHook = {
 
 // ============================================================================
 // SSL write with buffer
+// Reference: https://docs.openssl.org/4.0/man3/SSL_write/
 // ============================================================================
 const sslWriteHook: Frooky.NativeHook = {
   module: 'libssl.so',
@@ -87,6 +92,7 @@ const sslWriteHook: Frooky.NativeHook = {
 
 // ============================================================================
 // Multiple functions in same module
+// Reference: https://docs.openssl.org/4.0/man3/OSSL_CMP_validate_msg/
 // ============================================================================
 const opensslHook: Frooky.NativeHook = {
   module: 'libssl.so',

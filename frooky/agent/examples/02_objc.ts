@@ -2,6 +2,7 @@ import * as Frooky from '../types/index'
 
 // ============================================================================
 // Simple Objective-C instance method
+// Reference: https://developer.apple.com/documentation/foundation/nsmutabledictionary/setobject(_:forkey:)?language=objc
 // ============================================================================
 const userDefaultsObjCHook: Frooky.ObjectiveCHook = {
   objcClass: 'NSUserDefaults',
@@ -18,6 +19,7 @@ const userDefaultsObjCHook: Frooky.ObjectiveCHook = {
 
 // ============================================================================
 // NSData write to file with return type
+// Reference: https://developer.apple.com/documentation/foundation/nsdata/write(tofile:atomically:)?language=objc
 // ============================================================================
 const nsDataHook: Frooky.ObjectiveCHook = {
   objcClass: 'NSData',
@@ -36,6 +38,7 @@ const nsDataHook: Frooky.ObjectiveCHook = {
 
 // ============================================================================
 // Objective-C class method
+// Reference: https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc
 // ============================================================================
 const urlHook: Frooky.ObjectiveCHook = {
   objcClass: 'NSURL',
@@ -54,6 +57,7 @@ const urlHook: Frooky.ObjectiveCHook = {
 
 // ============================================================================
 // LAContext biometry method (no params)
+// Reference: https://developer.apple.com/documentation/localauthentication/lacontext/invalidate()?language=objc
 // ============================================================================
 const laContextHook: Frooky.ObjectiveCHook = {
   objcClass: 'LAContext',
@@ -64,6 +68,8 @@ const laContextHook: Frooky.ObjectiveCHook = {
 
 // ============================================================================
 // Multiple methods in same class
+// Reference: https://developer.apple.com/documentation/localauthentication/laprivatekey/decrypt(_:algorithm:completion:)?language=objc
+// Reference: https://developer.apple.com/documentation/localauthentication/lapublickey/verify(_:signature:algorithm:completion:)?language=objc
 // ============================================================================
 const keychainHook: Frooky.ObjectiveCHook = {
   objcClass: 'LAPrivateKey',
@@ -89,6 +95,7 @@ const keychainHook: Frooky.ObjectiveCHook = {
 
 // ============================================================================
 // CoreData save with output parameter
+// Reference: https://developer.apple.com/documentation/coredata/nsmanagedobjectcontext/save()?language=objc
 // ============================================================================
 const coreDataHook: Frooky.ObjectiveCHook = {
   objcClass: 'NSManagedObjectContext',
@@ -105,6 +112,7 @@ const coreDataHook: Frooky.ObjectiveCHook = {
 
 // ============================================================================
 // Network request with stack trace filtering
+// Reference: https://developer.apple.com/documentation/foundation/urlsession/datatask(with:completionhandler:)-e6xv?language=objc
 // ============================================================================
 const urlSessionHook: Frooky.ObjectiveCHook = {
   objcClass: 'NSURLSession',
@@ -123,6 +131,7 @@ const urlSessionHook: Frooky.ObjectiveCHook = {
 
 // ============================================================================
 //  Method with both entry and exit decoding
+// Reference: https://developer.apple.com/documentation/foundation/nsmutabledata/append(_:)?language=objc
 // ============================================================================
 const dataProcessingHook: Frooky.ObjectiveCHook = {
   objcClass: 'NSMutableData',

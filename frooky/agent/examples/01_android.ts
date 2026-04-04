@@ -2,6 +2,7 @@ import * as Frooky from '../types/index'
 
 // ============================================================================
 // Single Java method (no arguments)
+// Reference: https://developer.android.com/reference/android/net/wifi/WifiManager#getConnectionInfo()
 // ============================================================================
 const wifiHook: Frooky.JavaHook = {
   javaClass: 'android.net.wifi.WifiManager',
@@ -12,6 +13,7 @@ const wifiHook: Frooky.JavaHook = {
 
 // ============================================================================
 // Multiple Java methods
+// Reference: https://developer.android.com/reference/android/location/LocationManager
 // ============================================================================
 const locationHook: Frooky.JavaHook = {
   javaClass: 'android.location.LocationManager',
@@ -25,6 +27,7 @@ const locationHook: Frooky.JavaHook = {
 
 // ============================================================================
 // Single overload
+// Reference: https://developer.android.com/reference/java/net/URL#openConnection(java.net.Proxy)
 // ============================================================================
 const urlHook: Frooky.JavaHook = {
   javaClass: 'java.net.URL',
@@ -42,6 +45,7 @@ const urlHook: Frooky.JavaHook = {
 
 // ============================================================================
 // Multiple overloads
+// Reference: https://developer.android.com/reference/android/content/Intent
 // ============================================================================
 const intentHook: Frooky.JavaHook = {
   javaClass: 'android.content.Intent',
@@ -80,6 +84,7 @@ const intentHook: Frooky.JavaHook = {
 
 // ============================================================================
 // Custom decoder for Java method argument
+// Reference: https://developer.android.com/reference/android/content/Intent#setFlags(int)
 // ============================================================================
 const intentFlagsHook: Frooky.JavaHook = {
   javaClass: 'android.content.Intent',
@@ -99,6 +104,7 @@ const intentFlagsHook: Frooky.JavaHook = {
 
 // ============================================================================
 // Single Java Type as argument
+// Reference: https://developer.android.com/reference/android/app/Activity#startActivity(android.content.Intent)
 // ============================================================================
 const activityHook: Frooky.JavaHook = {
   javaClass: 'android.app.Activity',
@@ -118,6 +124,7 @@ const activityHook: Frooky.JavaHook = {
 
 // ============================================================================
 // Multiple Java Types as arguments
+// Reference: https://developer.android.com/reference/android/database/sqlite/SQLiteDatabase#query(java.lang.String,%20java.lang.String[],%20java.lang.String,%20java.lang.String[],%20java.lang.String,%20java.lang.String,%20java.lang.String) <kcite ref="1"/>
 // ============================================================================
 const sqliteHook: Frooky.JavaHook = {
   javaClass: 'android.database.sqlite.SQLiteDatabase',
@@ -140,11 +147,12 @@ const sqliteHook: Frooky.JavaHook = {
     }
   ],
   stackTraceLimit: 15,
-  stackTraceFilter: ['^java\\.', '^android\\.']
+  stackTraceFilter: ['^java\.', '^android\.']
 }
 
 // ============================================================================
 // Decode parameter at exit (data passed by reference)
+// Reference: https://developer.android.com/reference/javax/crypto/Cipher#doFinal(byte[],%20int)
 // ============================================================================
 const cipherHook: Frooky.JavaHook = {
   javaClass: 'javax.crypto.Cipher',
@@ -165,6 +173,7 @@ const cipherHook: Frooky.JavaHook = {
 
 // ============================================================================
 // Decode parameter at both entry and exit
+// Reference: https://developer.android.com/reference/java/nio/ByteBuffer#put(byte[])
 // ============================================================================
 const bufferHook: Frooky.JavaHook = {
   javaClass: 'java.nio.ByteBuffer',
@@ -184,6 +193,7 @@ const bufferHook: Frooky.JavaHook = {
 
 // ============================================================================
 // Hook constructor
+// Reference: https://developer.android.com/reference/android/webkit/WebView#WebView(android.content.Context)
 // ============================================================================
 const webViewHook: Frooky.JavaHook = {
   javaClass: 'android.webkit.WebView',
