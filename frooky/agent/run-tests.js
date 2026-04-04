@@ -17,8 +17,6 @@ const argv = minimist(process.argv.slice(2), {
     }
 });
 
-validateInput(argv);
-
 const help = argv.help;
 const usb = argv.usb;
 const platform = argv.platform;
@@ -30,6 +28,8 @@ const appIdentifier = Number.isFinite(Number(argv.appIdentifier))
 if (help) {
     showHelp();
 }
+
+validateInput(argv);
 
 async function runTests() {
 
