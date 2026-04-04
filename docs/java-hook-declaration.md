@@ -125,7 +125,7 @@ Intent.putExtra(name: String!, value: BooleanArray?): Intent
 
 Frida, and therefore frooky, uses custom type descriptors based on the internal [JVM field type descriptor](https://docs.oracle.com/javase/specs/jvms/se19/html/jvms-4.html#jvms-4.3.2).
 
-The following table shows the different kinds of types and their representations in Java, the JVM, and Frida:
+The following table shows how types are represented in Java, the JVM, and Frida or frooky.
 
 | Kind of Type      | Java Type Descriptor                                                                         | JVM Type Descriptor                                         | Frida / frooky Type Descriptor                                                               |
 | ----------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
