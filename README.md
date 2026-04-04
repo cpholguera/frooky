@@ -108,7 +108,7 @@ frooky supports these types of hooks:
 | Hook Type        | Platform    | Description                                 | Documentation                                                          |
 | ---------------- | ----------- | ------------------------------------------- | ---------------------------------------------------------------------- |
 | `JavaHook`       | Android     | Hook for Java/Kotlin methods                | [`JavaHook`-Declaration](./docs/java-hook-declaration.md)              |
-| `ObjcHook` | iOS         | Hook for Objective-C methods                | [`ObjcHook`-Declaration](./docs/objective-c-hook-declaration.md) |
+| `ObjcHook`       | iOS         | Hook for Objective-C methods                | [`ObjcHook`-Declaration](./docs/objective-c-hook-declaration.md)       |
 | `NativeHook`     | Android/iOS | Hook for native functions (C/C++/Rust etc.) | [`NativeHook`-Declaration](./docs/native-hook-declaration.md)          |
 
 > [!IMPORTANT]
