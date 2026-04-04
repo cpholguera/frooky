@@ -51,9 +51,32 @@ async function runTests() {
             session = await device.attach(pid);
         }
     } else {
-        pid = appIdentifier
         device = await frida.getLocalDevice();
-        session = await device.attach(pid);
+
+        if (Number.isFinite(appIdentifier)) {
+            // Attach to an already-running local process by PID
+            pid = appIdentifier;
+            session = await device.attach(pid);
+        } else {
+            // Local string input supports both bundle identifier (spawn) and process name (attach)
+            try {
+                pid = await device.spawn(appIdentifier);
+                wasSpawned = true;
+                session = await device.attach(pid);
+            } catch {
+                const processes = await device.enumerateProcesses();
+                const target = processes.find((proc) => proc.name === appIdentifier)
+                    || processes.find((proc) => proc.name.toLowerCase() === String(appIdentifier).toLowerCase())
+                    || processes.find((proc) => proc.name.toLowerCase().includes(String(appIdentifier).toLowerCase()));
+
+                if (!target) {
+                    throw new Error(`Unable to spawn or attach to process using '${appIdentifier}'. If attaching by name, launch the app first.`);
+                }
+
+                pid = target.pid;
+                session = await device.attach(pid);
+            }
+        }
     }
 
 
@@ -150,10 +173,6 @@ function validateInput(argv) {
     }
     if (!argv.appIdentifier) {
         console.error('App Identifier (--appIdentifier) is required');
-        process.exit(1);
-    }
-    if (!argv.usb && isNaN(argv.appIdentifier)) {
-        console.error('App identifier (--appIdentifier) must be a numeric PID if used locally');
         process.exit(1);
     }
 }
