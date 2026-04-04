@@ -38,7 +38,7 @@ In Java, the method signature can be retrieved at runtime. Unless you want to ov
 ```yaml
 objcClass: NSURL
 methods:
-  - name: "+ fileURLWithFileSystemRepresentation"
+  - name: "+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:"
     returnType: (NSURL *)
     params: [ "(const char *)", "(BOOL)", "(NSURL *)" ]
 ```
@@ -104,8 +104,6 @@ This example hooks the following method from the [Android Java Library](https://
 ```kotlin
 open fun getFlags(): Int
 ```
-
-
 
 The return value is an integer representing the set flags for this intent. Instead of using the default integer decoder, frooky will use `intentFlagsDecoder` to process the return value and decode the set flags rather than just the integer.
 
