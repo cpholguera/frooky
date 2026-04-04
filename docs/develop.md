@@ -79,15 +79,26 @@ The `--appIdentifier` here is the app's **bundle identifier** (e.g. `org.owasp.m
 
 #### Option B: Local (iOS Simulator)
 
-Use this when the app is already running in an **iOS Simulator** on your Mac. Frida can attach to simulator processes directly via the local device.
+Use this when targeting an **iOS Simulator** on your Mac via the local device.
 
-The `--appIdentifier` here must be the **numeric PID** of the running process, not a bundle identifier.
+For `test:ios:local`, `--appIdentifier` supports:
+
+- numeric PID (attach)
+- bundle identifier (spawn then attach)
+- app/process name (attach by name; app must already be running)
 
 ```bash
+# Option 1: use PID
 # 1. Launch the app in the simulator first, then find its PID:
 ps aux | grep -i <app-name>
 # Or use: frida-ps -D <simulator-udid>
 npm run test:ios:local -- --appIdentifier 12345
+
+# Option 2: use bundle id (spawn)
+npm run test:ios:local -- --appIdentifier org.owasp.mastestapp.MASTestApp-iOS
+
+# Option 3: use process name (attach)
+npm run test:ios:local -- --appIdentifier MASTestApp
 ```
 
 ### Android Tests
@@ -139,10 +150,12 @@ frooky/agent/tests/
 ├── android/
 │   ├── agent-runner.ts       # Entry point injected into the Android app
 │   ├── test-decoder.ts       # Tests for the Android decoder
+│   ├── test-runtime.ts       # Runtime smoke test in Android app process
 │   └── test-util.ts          # Utility tests
 └── ios/
     ├── agent-runner.ts       # Entry point injected into the iOS app
-    └── test-method-resolver.ts  # Tests for iOS method resolution
+    ├── test-method-resolver.ts  # Stub for future iOS method resolution tests
+    └── test-runtime.ts       # Runtime smoke test in iOS app process
 ```
 
 To add a new test, create a `test-*.ts` file in the relevant platform folder and import it in `agent-runner.ts`.
