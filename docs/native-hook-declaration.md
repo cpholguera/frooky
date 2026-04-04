@@ -84,17 +84,17 @@ void ENGINE_cleanup(void);
 
 ## Decoding Arguments and Return Values
 
-When a method accepts parameters or returns a value, frooky needs to know how to decode them.
+When a function accepts parameters or returns a value, frooky needs to know how to decode them.
 
-This is done by declaring the types in each `<function>`. The syntax is the same as [C function declarations](https://en.cppreference.com/w/c/language/function_declaration.html).
+You can provide that information by declaring `returnType` and `params` for each function. The type syntax follows standard [C function declaration](https://en.cppreference.com/w/c/language/function_declaration.html) style.
 
 ```yaml
-module: <string>                       # Fully qualified module name (mandatory)
-functions:                             # List of native symbol declarations to be hooked
-  - symbol: <string>                   # Native symbol as string
-    returnType: <string>               # Optional: Return type of the function
-    params:                            # Optional: Parameter list of the function
-      - <parameter_declaration>
+module: <module name>
+functions:
+  - symbol: <symbol name>
+    returnType: <type>                # Optional
+    params:                           # Optional
+      - <parameter declaration>
 ```
 
 **Example:**
@@ -105,18 +105,20 @@ functions:
   - symbol: OSSL_CMP_validate_cert_path
     returnType: int
     params:
-      - [ "const OSSL_CMP_CTX *", ctx ]
-      - [ "X509_STORE *", trusted_store ]
-      - [ "X509 *", cert ]
+      - ["const OSSL_CMP_CTX *", ctx]
+      - ["X509_STORE *", trusted_store]
+      - ["X509 *", cert]
 ```
 
-This `<hook_configuration>` will hook the following function from the [OpenSSL Library](https://docs.openssl.org/master/man3/OSSL_CMP_validate_msg/):
+This declaration hooks the following function from the [OpenSSL library](https://docs.openssl.org/master/man3/OSSL_CMP_validate_msg/):
 
 ```c
 int OSSL_CMP_validate_cert_path(const OSSL_CMP_CTX *ctx,
-                                X509_STORE *trusted_store, 
+                                X509_STORE *trusted_store,
                                 X509 *cert);
 ```
 
-Depending on the type, frooky is able to decode them using the built in decoders. If the types are more complex, you may need to [custom decoders](./parameter-declaration.md#custom-decoder-in-native).
+When these types are declared, frooky can decode arguments and return values using its built in decoders.
+
+If a type is more complex, you may need to use [custom decoders](./parameter-declaration.md#custom-decoder-in-native).
 
