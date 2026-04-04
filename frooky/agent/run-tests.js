@@ -128,8 +128,16 @@ runTests().catch(err => {
 function showHelp() {
     console.log(`
     Options:
-    -p, --platform <name>     Platform (android, ios)
-    -h, --help                Show this help message
+    -p, --platform <name>         Platform (android, ios)
+    --appIdentifier <value>       Required: bundle/package id (spawn mode) or numeric PID (attach mode)
+    -u, --usb                     Use USB device mode
+    -h, --help                    Show this help message
+
+    Examples:
+    npm run test:android -- --appIdentifier org.owasp.mastestapp
+    npm run test:android -- --appIdentifier 4926
+    npm run test:ios:usb -- --appIdentifier org.owasp.mastestapp.MASTestApp-iOS
+    npm run test:ios:local -- --appIdentifier 39417
     `);
     process.exit(0);
 }
