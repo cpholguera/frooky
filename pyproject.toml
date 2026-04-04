@@ -69,5 +69,19 @@ python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --strict-markers"
 
-[tool.pylint.MASTER]
-load-plugins = "pylint_pytest"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 320
+indent-width = 4
+
+[tool.ruff.lint]
+# Enable error (E), pyflakes (F), warning (W), and isort (I) rule sets
+select = ["E", "F", "W", "I"]
+# Disable E501 (line too long)
+ignore = ["E501"]
+
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
