@@ -56,17 +56,17 @@ In the expanded form:
 
 ## Basic Usage
 
-The minimum required properties are `objcClass` and `methods`:
+The minimum required fields are `objcClass` and `methods`:
 
 ```yaml
-objcClass: <string>                    # Fully qualified Objective-C class name
-methods:                               # List of Objective-C method declarations to be hooked
-  - <objc_method_declaration>
+objcClass: <Objective-C class name>
+methods:
+  - <method name>
 ```
 
 > [!TIP]
 >
-> Use the following syntax to hook two kinds of Objective-C methods:
+> Use the following syntax to hook the two kinds of Objective-C methods:
 >
 > - **Instance methods**: `- biometryType`
 > - **Class methods**: `+ removeProperties`
@@ -76,10 +76,18 @@ methods:                               # List of Objective-C method declarations
 ```yaml
 objcClass: LAContext
 methods:
- - name: "- invalidate"
+  - "- invalidate"
 ```
 
-This `<hook_configuration>` will hook the following [Objective-C instance method](https://developer.apple.com/documentation/localauthentication/lacontext/invalidate()?language=objc):
+You can also write the same declaration in expanded form:
+
+```yaml
+objcClass: LAContext
+methods:
+  - name: "- invalidate"
+```
+
+This declaration hooks the following [Objective-C instance method](https://developer.apple.com/documentation/localauthentication/lacontext/invalidate%28%29?language=objc):
 
 ```objectivec
 - (void) invalidate;
