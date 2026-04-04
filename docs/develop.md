@@ -69,13 +69,15 @@ Use this when the app is running on a **physical iOS device** connected over USB
 
 ```bash
 # From frooky/agent/
-npm run test:ios:usb -- --appIdentifier <bundle-id>
+npm run test:ios:usb -- --appIdentifier <pid|bundle-id|app-name>
 
-# Example:
+# Examples:
 npm run test:ios:usb -- --appIdentifier org.owasp.mastestapp.MASTestApp-iOS
+npm run test:ios:usb -- --appIdentifier 12345
+npm run test:ios:usb -- --appIdentifier MASTestApp
 ```
 
-The `--appIdentifier` here is the app's **bundle identifier** (e.g. `org.owasp.mastestapp.MASTestApp-iOS`). Frida will spawn the app by that identifier and attach to it.
+For `test:ios:usb`, `--appIdentifier` supports PID (attach), bundle-id (spawn then attach), or app name (attach by name).
 
 #### Option B: Local (iOS Simulator)
 

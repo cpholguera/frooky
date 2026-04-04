@@ -38,44 +38,30 @@ async function runTests() {
     let pid;
     let wasSpawned = false;
 
-    if (usb) {
-        device = await frida.getUsbDevice();
-        if (Number.isFinite(appIdentifier)) {
-            // Attach to already-running process by PID (e.g. Android emulator where spawn is blocked by SELinux)
-            pid = appIdentifier;
-            session = await device.attach(pid);
-        } else {
-            // Spawn by bundle/package identifier (requires frida-server with ptrace permissions)
+    device = usb ? await frida.getUsbDevice() : await frida.getLocalDevice();
+
+    if (Number.isFinite(appIdentifier)) {
+        // Attach to an already-running process by PID
+        pid = appIdentifier;
+        session = await device.attach(pid);
+    } else {
+        // String input supports both bundle/package identifier (spawn) and process name (attach)
+        try {
             pid = await device.spawn(appIdentifier);
             wasSpawned = true;
             session = await device.attach(pid);
-        }
-    } else {
-        device = await frida.getLocalDevice();
+        } catch {
+            const processes = await device.enumerateProcesses();
+            const target = processes.find((proc) => proc.name === appIdentifier)
+                || processes.find((proc) => proc.name.toLowerCase() === String(appIdentifier).toLowerCase())
+                || processes.find((proc) => proc.name.toLowerCase().includes(String(appIdentifier).toLowerCase()));
 
-        if (Number.isFinite(appIdentifier)) {
-            // Attach to an already-running local process by PID
-            pid = appIdentifier;
-            session = await device.attach(pid);
-        } else {
-            // Local string input supports both bundle identifier (spawn) and process name (attach)
-            try {
-                pid = await device.spawn(appIdentifier);
-                wasSpawned = true;
-                session = await device.attach(pid);
-            } catch {
-                const processes = await device.enumerateProcesses();
-                const target = processes.find((proc) => proc.name === appIdentifier)
-                    || processes.find((proc) => proc.name.toLowerCase() === String(appIdentifier).toLowerCase())
-                    || processes.find((proc) => proc.name.toLowerCase().includes(String(appIdentifier).toLowerCase()));
-
-                if (!target) {
-                    throw new Error(`Unable to spawn or attach to process using '${appIdentifier}'. If attaching by name, launch the app first.`);
-                }
-
-                pid = target.pid;
-                session = await device.attach(pid);
+            if (!target) {
+                throw new Error(`Unable to spawn or attach to process using '${appIdentifier}'. If attaching by name, launch the app first.`);
             }
+
+            pid = target.pid;
+            session = await device.attach(pid);
         }
     }
 
