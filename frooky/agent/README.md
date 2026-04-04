@@ -21,7 +21,7 @@ At the moment, the frooky agent is not intended to be used by itself or as a lib
 
 But if you would like to write your own frooky host, or embed the agent into an existing one, this chapter explains how to send and receive data from and to the agent.
 
-There are two modes you can use the agent:
+The frooky agent supports these modes:
 
 1. **Host**
 
@@ -56,13 +56,13 @@ There are two modes you can use the agent:
     npm run build:dev:ios hook.yaml
     ```
 
-    This will compile the frooky agent and saves the compiled agents in `./dist/agent-android.js` and `./dist/agent-ios.js`.
+    This will compile the frooky agent and save the compiled agents in `./dist/agent-android.js` and `./dist/agent-ios.js`.
 
 
 1. **Use the frooky agent in your application**
 
 
-    After you loading the script, you have to send the hook file in the form of a JSON object in the parameter `target` to the agent using the following `rpc` call:
+    After loading the script, you have to send the hook file in the form of a JSON object in the parameter `target` to the agent using the following `rpc` call:
 
     ```javascript
     rpc.exports = {
@@ -74,9 +74,7 @@ There are two modes you can use the agent:
 
 ## Compile And Run the frooky Standalone Agent
 
-If you want to work on the frooky agent itself, you can also use [`frida`](https://frida.re/) as host.
-
-Follow these steps to do that:
+If you want to work on the frooky agent itself, you can also use the [Frida CLI](https://frida.re/docs/frida-cli/) as host:
 
 1. **Install all dependencies**
 
@@ -95,7 +93,7 @@ Follow these steps to do that:
 
     This will compile a development build of the frooky agent, watch for changes in its source code and all `hook.yaml` files, and keep the compiled agents in the `./dist` folder up to date.
 
-1. **Start Frida with the compiled agent**
+2. **Start Frida with the compiled agent**
    
     For Android:
 
