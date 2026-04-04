@@ -4,6 +4,7 @@ import Java from "frida-java-bridge";
 // Import all test files
 import './test-util';
 import './test-decoder';
+import './test-runtime';
 
 Java.perform(() => {
     setTimeout(() => {
