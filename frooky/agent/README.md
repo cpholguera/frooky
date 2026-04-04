@@ -11,7 +11,7 @@
 
 
 > [!NOTE]
-> If you want to learn how to write frooky hooks, please refer to the [documentation of form the frooky host](https://github.com/cpholguera/frooky).
+> If you want to learn how to write frooky hooks, please refer to the [main documentation](https://github.com/cpholguera/frooky).
 
 
 
