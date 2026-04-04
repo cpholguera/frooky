@@ -94,19 +94,19 @@ hooks:
               - ["java.lang.String", name]
               - ["[B", value]
 
-  # Explicit hooking of a single overloaded method.
-  # The parameter `flags` contains an integer which contains information about the
-  # intent settings using bit-masking.
-  # We apply the frooky parameter option `decoder` with the `IntentFlagsDecoder` decoder so frooky can decode the flags at runtime and return e.g. `FLAG_GRANT_READ_URI_PERMISSION`.
-  # constants stored in `android.content.Intent`.
-  # is hooked and its arguments and/or return values decoded.
-  # Docs: https://developer.android.com/reference/android/content/Intent#setFlags(int)
-  - javaClass: android.content.Intent
-    methods:
-      - name: setFlags
-        overloads:
-          - params:
-              - [int, flags, { decoder: IntentFlagsDecoder }]
+  # # Explicit hooking of a single overloaded method.
+  # # The parameter `flags` contains an integer which contains information about the
+  # # intent settings using bit-masking.
+  # # We apply the frooky parameter option `decoder` with the `IntentFlagsDecoder` decoder so frooky can decode the flags at runtime and return e.g. `FLAG_GRANT_READ_URI_PERMISSION`.
+  # # constants stored in `android.content.Intent`.
+  # # is hooked and its arguments and/or return values decoded.
+  # # Docs: https://developer.android.com/reference/android/content/Intent#setFlags(int)
+  # - javaClass: android.content.Intent
+  #   methods:
+  #     - name: setFlags
+  #       overloads:
+  #         - params:
+  #             - [int, flags, { decoder: IntentFlagsDecoder }]
 
   # The decrypted plaintext is written into the byte array `output`, which is passed by reference after the function completes. Hence, we tell frooky to decode it at exit using `{ decodeAt: exit }`.
   # Docs: https://developer.android.com/reference/javax/crypto/Cipher#doFinal(byte[],%20int)

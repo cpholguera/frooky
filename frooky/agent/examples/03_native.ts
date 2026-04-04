@@ -111,22 +111,22 @@ const opensslHook: Frooky.NativeHook = {
   ]
 }
 
-// ============================================================================
-// Function with custom decoder
-// ============================================================================
-const customDecoderHook: Frooky.NativeHook = {
-  module: 'libcustom.so',
-  functions: [
-    {
-      symbol: 'process_data',
-      returnType: 'int',
-      params: [
-        ['void *', 'data', { decoder: 'CustomDataDecoder' }],
-        ['size_t', 'size']
-      ]
-    }
-  ]
-}
+// // ============================================================================
+// // Function with custom decoder
+// // ============================================================================
+// const customDecoderHook: Frooky.NativeHook = {
+//   module: 'libcustom.so',
+//   functions: [
+//     {
+//       symbol: 'process_data',
+//       returnType: 'int',
+//       params: [
+//         ['void *', 'data', { decoder: 'CustomDataDecoder' }],
+//         ['size_t', 'size']
+//       ]
+//     }
+//   ]
+// }
 
 // ============================================================================
 // Function with output parameter decoded at exit

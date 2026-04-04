@@ -73,11 +73,7 @@ hooks:
         params:
           - ["(NSData *)", data]
           - ["(SecKeyAlgorithm)", algorithm]
-          - [
-              "(void (^)(NSData *, NSError *))",
-              handler,
-              { decoder: LaPlaintextDecoder },
-            ]
+          - ["(void (^)(NSData *, NSError *))", handler]
       - name: "- signData:secKeyAlgorithm:completion:"
         params:
           - ["(NSData *)", data]

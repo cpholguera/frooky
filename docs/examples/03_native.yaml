@@ -108,16 +108,16 @@ hooks:
           - ["const void *", buf, { decoderArgs: [num] }]
           - [int, num]
 
-  # Function with custom decoder. If we know how the code or data is structured
-  # at the pointer to `data`, we can use a custom decoder and decode the data accordingly.
-  - module: libcustom.so
-    functions:
-      - symbol: process_data
-        returnType: int
-        params:
-          - [
-              "void *",
-              data,
-              { decoder: CustomDataDecoder, decoderArgs: [size] },
-            ]
-          - [size_t, size]
+  # # Function with custom decoder. If we know how the code or data is structured
+  # # at the pointer to `data`, we can use a custom decoder and decode the data accordingly.
+  # - module: libcustom.so
+  #   functions:
+  #     - symbol: process_data
+  #       returnType: int
+  #       params:
+  #         - [
+  #             "void *",
+  #             data,
+  #             { decoder: CustomDataDecoder, decoderArgs: [size] },
+  #           ]
+  #         - [size_t, size]
