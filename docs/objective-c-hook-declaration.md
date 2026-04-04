@@ -95,16 +95,17 @@ This declaration hooks the following [Objective-C instance method](https://devel
 
 ## Decoding Arguments and Return Values
 
-When a method accepts parameters or returns a value, frooky needs to know their types to decode them properly:
+When a method accepts parameters or returns a value, frooky needs to know their types so it can decode them properly.
 
+You can provide that information by declaring `returnType` and or `params` for each method. In this form, `name` must include the Objective-C method prefix, `-` for instance methods or `+` for class methods.
 
 ```yaml
-objcClass: <string>                    # Fully qualified Objective-C class name
-methods:                       
-  - name: <string>                     # Name of the Objective-C method (include - or + prefix)
-    returnType: <string>               # Return type of the Objective-C method
-    params:                            # Parameter list of the Objective-C method
-      - <parameter_declaration>
+objcClass: <Objective-C class name>
+methods:
+  - name: <method name>               # Include - or + prefix
+    returnType: <type>                # Optional
+    params:                           # Optional
+      - <parameter declaration>
 ```
 
 **Example:**
@@ -112,20 +113,20 @@ methods:
 ```yaml
 objcClass: NSURL
 methods:
-  - name: "+ fileURLWithFileSystemRepresentation"
+  - name: "+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:"
     returnType: "(NSURL *)"
     params:
-      - [ "(const char *)",  path ]
-      - [ "(BOOL)", isDir ]
-      - [ "(NSURL *)",  baseURL ]
+      - ["(const char *)", path]
+      - ["(BOOL)", isDir]
+      - ["([NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl%28withfilesystemrepresentation:isdirectory:relativeto:%29?language=objc) *)", baseURL]
 ```
 
-This example hooks the following class method from [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
+This declaration hooks the following class method from [`NSURL`](https://developer.apple.com/documentation/foundation/nsurl/fileurl%28withfilesystemrepresentation:isdirectory:relativeto:%29?language=objc):
 
 ```objectivec
-+ (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
-                                    isDirectory:(BOOL) isDir 
-                                  relativeToURL:(NSURL *) baseURL;
++ (NSURL *) fileURLWithFileSystemRepresentation:(const char *)path
+                                    isDirectory:(BOOL)isDir
+                                  relativeToURL:(NSURL *)baseURL;
 ```
 
-Depending on the type, frooky is able to decode them using the built in decoders. If the types are more complex, you may need to [custom decoders](./parameter-declaration.md#custom-decoder-in-objective-c).
+Depending on the type, frooky can decode arguments and return values using its built in decoders. If the types are more complex, you may need to use [custom decoders](./parameter-declaration.md#custom-decoder-in-objective-c).
