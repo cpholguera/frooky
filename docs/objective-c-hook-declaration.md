@@ -6,7 +6,7 @@ This documentation explains how to write Objective-C hook declarations.
 - [Basic Usage](#basic-usage)
 - [Decoding Arguments and Return Values](#decoding-arguments-and-return-values)
 
-## Structure of an `ObjcHook` Declaration
+## Structure
 
 ```yaml
 objcClass: <string>                    # Fully qualified Objective-C class name
