@@ -36,11 +36,20 @@ async function runTests() {
     let session;
     let device;
     let pid;
+    let wasSpawned = false;
 
     if (usb) {
         device = await frida.getUsbDevice();
-        pid = await device.spawn(appIdentifier);
-        session = await device.attach(pid);
+        if (Number.isFinite(appIdentifier)) {
+            // Attach to already-running process by PID (e.g. Android emulator where spawn is blocked by SELinux)
+            pid = appIdentifier;
+            session = await device.attach(pid);
+        } else {
+            // Spawn by bundle/package identifier (requires frida-server with ptrace permissions)
+            pid = await device.spawn(appIdentifier);
+            wasSpawned = true;
+            session = await device.attach(pid);
+        }
     } else {
         pid = appIdentifier
         device = await frida.getLocalDevice();
@@ -90,7 +99,9 @@ async function runTests() {
     });
     
     await script.load();
-    await device.resume(pid);
+    if (wasSpawned) {
+        await device.resume(pid);
+    }
 
     // Wait for test completion (with timeout)
     const timeout = 30000;
