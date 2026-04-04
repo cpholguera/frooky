@@ -56,12 +56,12 @@ WebView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, privateBrowsi
 ```yaml
 objcClass: NSURL
 methods:
-  - name: "+ fileURLWithFileSystemRepresentation"
+  - name: "+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:"
     returnType: (NSURL *)
     params: [ "(const char *)", "(BOOL)", "(NSURL *)" ]
 ```
 
-This example hooks the following class method from  [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
+This example hooks the following class method from [`NSURL`](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
 
 ```objectivec
 + (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
@@ -130,7 +130,7 @@ WebView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, privateBrowsi
 ```yaml
 objcClass: NSURL
 methods:
-  - name: "+ fileURLWithFileSystemRepresentation"
+  - name: "+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:"
     returnType: (NSURL *)
     params:
       - [ "(const char *)",  path ]
@@ -138,7 +138,7 @@ methods:
       - [ "(NSURL *)",  baseURL ]
 ```
 
-This example hooks the following class method from [NSURL](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
+This example hooks the following class method from [`NSURL`](https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc):
 
 ```objectivec
 + (NSURL *) fileURLWithFileSystemRepresentation:(const char *) path 
@@ -154,13 +154,12 @@ functions:
   - symbol: sqlite3_exec
     returnType: int
     params: 
-      - "sqlite3*", 
+      - "sqlite3*"
       - [ "const char *", sql ]
-      - [ "void *", callback ] 
+      - [ "void *", callback ]
       - "void *"
       - [ "char **", "errmsg" ]
 ```
-
 
 This example hooks the following method from the [SQLite function](https://sqlite.org/c3ref/exec.html):
 
@@ -262,12 +261,12 @@ The `error` parameter must be decoded at exit because it contains meaningful dat
 
 ```yaml
 module: libsystem_c.dylib
-name: realpath
-params:
-  - [ "const char *restrict", file_name ]
-  - [ "char *restrict", resolved_name, { decodeAt: exit } ]
+functions:
+  - symbol: realpath
+    params:
+      - [ "const char *restrict", file_name ]
+      - [ "char *restrict", resolved_name, { decodeAt: exit } ]
 ```
-
 
 This example hooks the following method from the [C standard library on iOS](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/realpath.3.html):
 
@@ -289,7 +288,7 @@ int EVP_EncryptUpdate(EVP_CIPHER_CTX *ctx,       // Cipher context
                       unsigned char *out,        // Output buffer
                       int *outl,                 // Length of the output buffer
                       const unsigned char *in,   // Input buffer
-                      int inl);                  // Length of the input bugger
+                      int inl);                  // Length of the input buffer
 ```
 
 This function encrypts `inl` bytes from the `in` buffer and writes the encrypted result to the `out` buffer. Depending on the encryption algorithm used, it is unclear how many bytes will be written when the function is called.
@@ -306,7 +305,7 @@ methods:
     overloads:
       - params:
         - [ "[B", buffer, { decoderArgs: [ len ] } ]
-        - [ int, offset ]
+        - [ int, off ]
         - [ int, len ]
 ```
 
