@@ -8,33 +8,51 @@ This documentation explains how to write native hook declarations.
 
 ## Structure
 
-```yaml
-module: <string>                       # Fully qualified module name
-functions:                             # List of native symbol declarations to be hooked
-  - <native_function_declaration>
-```
-
-`<native_function_declaration>` can be shortened, but arguments and return values are not decoded now:
+A `NativeHook` declaration is a YAML object with these top level fields:
 
 ```yaml
-<native_function_declaration>:
-  - <string>                           # Name of the native function
+module: <module name>
+functions:
+  - <symbol name>
+  - symbol: <symbol name>
+    returnType: <type>                # Optional
+    params:                           # Optional
+      - <parameter declaration>
 ```
 
-`<native_function_declaration>` with valued decoding must be declared as follows:
+`module` is the name of the native module, for example a shared library such as `libssl.so`.
+
+`functions` is a list of native functions to hook. Each item in `functions` can be written in one of two forms.
+
+Use the **short form** when you only want to hook a symbol and do not need argument or return value decoding.
 
 ```yaml
-<native_function_declaration>:
-  symbol: <string>                     # Native symbol as string
-  returnType: <string>                 # Optional: Return type of the function
-  params:                              # Optional: Parameter list of the function
-    - <parameter_declaration>
+module: <module name>
+functions:
+  - <symbol name>
 ```
+
+Use the **expanded form** when you want frooky to decode arguments and or the return value.
+
+```yaml
+module: <module name>
+functions:
+  - symbol: <symbol name>
+    returnType: <type>                # Optional
+    params:                           # Optional
+      - <parameter declaration>
+```
+
+In the expanded form:
+
+- `symbol`: Native symbol name.
+- `returnType`: Optional return type of the function.
+- `params`: Optional list of parameter declarations.
 
 > [!IMPORTANT]
-> Please read the documentation on [parameter](./parameter-declaration.md) and [return type](./return-type-declaration.md) declaration if you want to learn how to declare and configure them properly.
+> Read the documentation for [parameter](./parameter-declaration.md) and [return type](./return-type-declaration.md) declarations to learn how to declare and configure them correctly.
 >
-> There are multiple ways to declare a parameter. In this document, we always use [named parameters](./parameter-declaration.md#22-named-objective-c-parameters).
+> There are multiple ways to declare a parameter. In this document, all examples use [named parameters](./parameter-declaration.md#22-named-objective-c-parameters).
 
 ## Basic Usage
 
