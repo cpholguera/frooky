@@ -4,6 +4,8 @@ import frida
 import time
 import sys
 import json
+import yaml
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -11,6 +13,7 @@ from importlib.resources import files
 
 
 from ._version import __version__ as frooky_version
+logger = logging.getLogger(__name__)
 
 @dataclass
 class RunnerOptions:
@@ -49,7 +52,15 @@ class FrookyRunner:
         
         for hook_path in self.options.hook_paths:
             with open(hook_path, "r", encoding="utf-8") as f:
-                hook_data = json.load(f)
+                if Path(hook_path).suffix in (".yaml", ".yml"):
+                    hook_data = yaml.safe_load(f)
+                else:
+                    logger.warning(
+                        "%s is in JSON format, which is deprecated. "
+                        "Please migrate to YAML.",
+                        Path(hook_path).name
+                    )
+                    hook_data = json.load(f)
             
             # Take category from first file that has one
             if category is None and "category" in hook_data:
