@@ -56,29 +56,31 @@ params:
 
 ## Basic Usage
 
-The minimum required properties are `javaClass` and `methods`:
+The minimum required fields are `javaClass` and `methods`.
 
 ```yaml
-javaClass: <string>                    # Fully qualified Java class name
-methods:                               # List of Java methods to hook
-  - name: <java_method_name>
+javaClass: <fully qualified Java class name>
+methods:
+  - <method name>
 ```
 
-In this case, *all* overloads of the specified methods from the class will be hooked.
+This hooks all overloads of each listed method in the specified class.
 
 **Example:**
 
 ```yaml
-javaClass: android.webkit.WebView 
+javaClass: android.webkit.WebView
 methods:
-  - name: $init
-  - name: loadUrl
+  - $init
+  - loadUrl
 ```
 
-> [!NOTE]
-> `$init` is the name of the constructor of a class.
+This declaration hooks all constructor overloads of `WebView`, plus all overloads of `loadUrl`.
 
-This `<hook_declaration>` will hook the following methods:
+> [!NOTE]
+> `$init` is the constructor name.
+
+This declaration hooks the following methods:
 
 ```kotlin
 WebView(context: Context)
@@ -91,12 +93,11 @@ WebView.loadUrl(url: String, additionalHttpHeaders: MutableMap<String!, String!>
 ```
 
 > [!TIP]
+> Use the following syntax for dynamic class lookup at runtime.
 >
-> Use the following syntax for dynamic `<class>` lookup at runtime:
->
-> - **Exact match**: `org.owasp.mastestapp.MainActivity`
-> - **Wildcards**: `org.owasp.*.HttpClient` (at the package level)
-> - **Nested classes**: Use the `$` separator (e.g., `Outer$Inner`)
+> - **Exact match:** `org.owasp.mastestapp.MainActivity`
+> - **Wildcards:** `org.owasp.*.HttpClient`, at the package level
+> - **Nested classes:** use the `$` separator, for example `Outer$Inner`
 
 ## Method Overloads
 
