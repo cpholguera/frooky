@@ -7,7 +7,7 @@ metadata:
   version: v1
 
 hooks:
-  # Simple native function hook with a list of symbols to be hooked.
+  # Hook multiple functions by name (all symbols in a module).
   # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
   # Docs: https://www.man7.org/linux/man-pages/man2/close.2.html
   - module: libc.so
@@ -15,8 +15,7 @@ hooks:
       - open
       - close
 
-  # The same function hooking, but the symbols are declared explicitly
-  # as a list of objects with the symbols name in its `symbol` property.
+  # Hook functions using explicit object syntax.
   # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
   # Docs: https://www.man7.org/linux/man-pages/man2/close.2.html
   - module: libc.so
@@ -24,10 +23,7 @@ hooks:
       - symbol: open
       - symbol: close
 
-  # The same function hooking, but with added parameters.
-  # The parameters are declared, but not named ("Unnamed Parameter").
-  # In order to decode the arguments, they are required.
-  # The hook also contains the type of the return value.
+  # Hook with unnamed parameter types and return type (type information required for decoding).
   # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
   - module: libc.so
     functions:
@@ -38,9 +34,7 @@ hooks:
           - int
           - mode_t
 
-  # The same hook, but with named parameters.
-  # frooky can use them to produce better output, as it is now possible to
-  # describe the arguments at runtime ("Named Parameter").
+  # Hook with named parameters (names provide context in output).
   # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
   - module: libc.so
     functions:
@@ -51,7 +45,7 @@ hooks:
           - [int, flags]
           - [mode_t, mode]
 
-  # Multiple functions in same module are hooked.
+  # Hook multiple functions from the same module with various parameter counts.
   # Docs: https://docs.openssl.org/master/man3/ENGINE_add/
   # Docs: https://docs.openssl.org/master/man3/EVP_EncryptInit/
   - module: libssl.so
@@ -65,12 +59,9 @@ hooks:
           - ["X509_STORE *", trusted_store]
           - ["X509 *", cert]
 
-  # Native hook with decoder options set for the argument `buf`.
-  # With `decodeAt` set to `exit`, frooky will decode the content of the buffer
-  # after the function terminates.
-  # Since `buf` is just a pointer, we need to know how many bytes we have to decode.
-  # The length of the buffer is stored in the argument `count`, hence we pass it to
-  # the `void *` decoder.
+  # Use `decodeAt: exit` to decode buffer contents after function execution.
+  # Since `buf` is a pointer, we need to decode it at exit using the `count` parameter for the length.
+  # Pass `decoderArgs` with the length parameter name/index.
   # Docs: https://www.man7.org/linux/man-pages/man2/read.2.html
   - module: libc.so
     functions:
@@ -81,8 +72,8 @@ hooks:
           - ["void *", buf, { decodeAt: exit, decoderArgs: [count] }]
           - [size_t, count]
 
-  # OpenSSL encryption function, `ctx` contains information about the used algorithms.
-  # The algorithm depended length is required to decode `key` and `iv`.
+  # Use `decoderArgs` to pass a related parameter for decoding context.
+  # Here, `ctx` contains cipher algorithm info needed to decode `key` and `iv` correctly.
   # Docs: https://docs.openssl.org/master/man3/EVP_EncryptInit/
   - module: libssl.so
     functions:
@@ -96,8 +87,7 @@ hooks:
           - ["const unsigned char *", iv, { decoderArgs: [ctx] }]
     stackTraceLimit: 10
 
-  # OpenSSL write function, which writes plaintext data of length `num` to the buffer `buf`.
-  # Hence, we pass the argument `num` to the `const void *` decoder.
+  # Pass decoder parameters to decode buffer contents based on related parameters.
   # Docs: https://docs.openssl.org/master/man3/SSL_write/
   - module: libssl.so
     functions:
@@ -108,8 +98,7 @@ hooks:
           - ["const void *", buf, { decoderArgs: [num] }]
           - [int, num]
 
-  # # Function with custom decoder. If we know how the code or data is structured
-  # # at the pointer to `data`, we can use a custom decoder and decode the data accordingly.
+  # # Uncomment to hook with custom decoder (requires custom decoder implementation).
   # - module: libcustom.so
   #   functions:
   #     - symbol: process_data

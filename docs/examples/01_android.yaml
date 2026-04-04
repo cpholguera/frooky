@@ -7,18 +7,14 @@ metadata:
   version: v1
 
 hooks:
-  # Simple method hooking with a list of methods to be hooked.
-  # All overloads of the methods are hooked implicitly.
+  # Hook multiple methods by name (all overloads are included).
   # Docs: https://developer.android.com/reference/android/security/AttestedKeyPair
   - javaClass: android.security.AttestedKeyPair
     methods:
       - $init
       - getKeyPair
 
-  # Simple method hooking.
-  # Here, methods is a list of objects, with the methods name in the `name` property.
-  # It is not required to use an object if there are no overloads, but possible.
-  # The stack trace is limited to 10.
+  # Hook methods using explicit object syntax with optional `stackTraceLimit`.
   # Docs: https://developer.android.com/reference/android/security/AttestedKeyPair
   - javaClass: android.security.AttestedKeyPair
     methods:
@@ -26,8 +22,7 @@ hooks:
       - name: getKeyPair
     stackTraceLimit: 10
 
-  # Explicit hooking of a single overloaded method.
-  # The parameter of the method is just a list of types ("Unnamed Parameter").
+  # Hook a specific overload by parameter types (unnamed).
   # Docs: https://developer.android.com/reference/java/net/URL#openConnection(java.net.Proxy)
   - javaClass: java.net.URL
     methods:
@@ -36,11 +31,7 @@ hooks:
           - params:
               - java.net.Proxy
 
-  # Explicit hooking of a single overloaded method.
-  # The parameters of the method is a list of type and name stored
-  # in the list `params` ("Named Parameter").
-  # With the names of the argument, frooky is now able to add them as context
-  # information when decoding the values.
+  # Hook a specific overload by parameter types with names (for better context).
   # Docs: https://developer.android.com/reference/android/app/Activity#startActivity(android.content.Intent)
   - javaClass: android.app.Activity
     methods:
@@ -49,12 +40,8 @@ hooks:
           - params:
               - ["android.content.Intent", intent]
 
-  # Explicit hooking of a single overloaded method.
-  # The overloaded method has 7 parameters.
-  # The `stackTraceFilter` excludes (`^`) events which root in a function call coming
-  # from `java.**` or `android.**`. This can be handy if we only want to see events
-  # originating from the package name of our target app and not by a third party lib.
-  # The stack trace is limited to 5.
+  # Use `stackTraceFilter` with regex patterns to exclude framework/library stack frames.
+  # This keeps only relevant app code by filtering out `java.*`, `android.*`, and external SDKs.
   # Docs: https://developer.android.com/reference/android/database/sqlite/SQLiteDatabase#query(java.lang.String,%20java.lang.String[],%20java.lang.String,%20java.lang.String[],%20java.lang.String,%20java.lang.String,%20java.lang.String)
   - javaClass: android.database.sqlite.SQLiteDatabase
     methods:
@@ -74,8 +61,7 @@ hooks:
       - "$^android\\."
       - "$^com\\.external\\.sdk\\."
 
-  # Explicit hooking of 4 overloaded methods.
-  # The parameters of the method is a list of type and name stored in the list `params`.
+  # Hook multiple overloads of the same method.
   # Docs: https://developer.android.com/reference/android/content/Intent
   - javaClass: android.content.Intent
     methods:
@@ -108,7 +94,7 @@ hooks:
   #         - params:
   #             - [int, flags, { decoder: IntentFlagsDecoder }]
 
-  # The decrypted plaintext is written into the byte array `output`, which is passed by reference after the function completes. Hence, we tell frooky to decode it at exit using `{ decodeAt: exit }`.
+  # Use `decodeAt: exit` to decode output parameters after method execution.
   # Docs: https://developer.android.com/reference/javax/crypto/Cipher#doFinal(byte[],%20int)
   - javaClass: javax.crypto.Cipher
     methods:
@@ -118,7 +104,7 @@ hooks:
               - ["[B", output, { decodeAt: exit }]
               - [int, outputOffset]
 
-  # If you want to decode a value both before and after the method is completed, you can use `{ decodeAt: both }`.
+  # Use `decodeAt: both` to decode a parameter before and after execution.
   # Docs: https://developer.android.com/reference/java/nio/ByteBuffer#put(byte[])
   - javaClass: java.nio.ByteBuffer
     methods:

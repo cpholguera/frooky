@@ -7,21 +7,19 @@ metadata:
   version: v1
 
 hooks:
-  # Simple method hooking with a list of methods to be hooked.
+  # Hook a method using simple string syntax.
   # Docs: https://developer.apple.com/documentation/localauthentication/lacontext/invalidate()?language=objc
   - objcClass: LAContext
     methods:
       - "- invalidate"
 
-  # The exact same method hooking as above, but declared as a "list of objects" instead of a "list of strings".
+  # Hook a method using explicit object syntax.
   # Docs: https://developer.apple.com/documentation/localauthentication/lacontext/invalidate()?language=objc
   - objcClass: LAContext
     methods:
       - name: "- invalidate"
 
-  # Simple Objective-C instance method, indicated by the leading "-".
-  # The parameters are declared, but not named ("Unnamed Parameter").
-  # In order to decode the arguments, they are required.
+  # Hook an instance method with unnamed parameter types (type information required for decoding).
   # Docs: https://developer.apple.com/documentation/foundation/userdefaults/set(_:forkey:)-8ab6d?language=objc
   - objcClass: NSUserDefaults
     methods:
@@ -30,9 +28,7 @@ hooks:
           - "(id)"
           - "(NSString *)"
 
-  # The same hook, but with named parameters.
-  # frooky can use them to produce better output, as it is now possible to
-  # describe the arguments at runtime ("Named Parameter").
+  # Hook an instance method with named parameters (names provide context in output).
   # Docs: https://developer.apple.com/documentation/foundation/userdefaults/set(_:forkey:)-8ab6d?language=objc
   - objcClass: NSUserDefaults
     methods:
@@ -41,8 +37,7 @@ hooks:
           - ["(id)", value]
           - ["(NSString *)", key]
 
-  # Hook with a `returnType`. frooky will decode the return value using the type `boolean`.
-  # The stack trace is limited to 8 entries using `stackTraceLimit`.
+  # Hook with `returnType` and `stackTraceLimit`.
   # Docs: https://developer.apple.com/documentation/foundation/nsdata/write(tofile:atomically:)?language=objc
   - objcClass: NSData
     methods:
@@ -53,7 +48,7 @@ hooks:
           - ["(BOOL)", useAuxiliaryFile]
     stackTraceLimit: 8
 
-  # Simple Objective-C class method, indicated by the leading "+".
+  # Hook a class method (prefixed with "+").
   # Docs: https://developer.apple.com/documentation/foundation/nsurl/fileurl(withfilesystemrepresentation:isdirectory:relativeto:)?language=objc
   - objcClass: NSURL
     methods:
@@ -64,7 +59,7 @@ hooks:
           - ["(BOOL)", isDir]
           - ["(NSURL *)", baseURL]
 
-  # Hooks 2 methods from the same class.
+  # Hook multiple methods from the same class.
   # Docs: https://developer.apple.com/documentation/localauthentication/laprivatekey/decrypt(_:algorithm:completion:)?language=objc
   # Docs: https://developer.apple.com/documentation/localauthentication/laprivatekey/sign(_:algorithm:completion:)?&language=objc
   - objcClass: LAPrivateKey
@@ -80,7 +75,7 @@ hooks:
           - ["(SecKeyAlgorithm)", algorithm]
           - ["(void (^)(NSData *, NSError *))", handler]
 
-  # The argument `error` is decoded after the method terminated.
+  # Use `decodeAt: exit` to decode output parameters after method execution.
   # Docs: https://developer.apple.com/documentation/CoreData/NSManagedObjectContext/save()?language=objc
   - objcClass: NSManagedObjectContext
     methods:
@@ -89,8 +84,7 @@ hooks:
         params:
           - ["(NSError **)", error, { decodeAt: exit }]
 
-  # Hooks a network request method and applies stack trace filtering using `stackTraceFilter`.
-  # frooky won't keep events not originating from `libsystem_` and `Foundation*`.
+  # Use `stackTraceFilter` with regex to include only relevant stack frames.
   # Docs: https://developer.apple.com/documentation/foundation/urlsession/datatask(with:completionhandler:)-e6xv?language=objc
   - objcClass: NSURLSession
     methods:
@@ -106,7 +100,7 @@ hooks:
       - "^(?!Foundation)"
       - "^(?!libsystem_)"
 
-  # Uses `{ decodeAt: both }` to decode a value both before and after the method is completed.
+  # Use `decodeAt: both` to decode a parameter before and after execution.
   # Docs: https://developer.apple.com/documentation/foundation/nsmutabledata/append(_:)?language=objc
   - objcClass: NSMutableData
     methods:
