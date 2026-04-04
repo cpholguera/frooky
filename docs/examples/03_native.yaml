@@ -1,0 +1,112 @@
+metadata:
+  name: Native Hook Examples
+  platform: Android
+  description: Examples of native C/C++ function hooking
+  category: GENERAL
+  author: frooky dev team
+  version: v1
+
+hooks:
+  # Hook multiple functions by name (all symbols in a module).
+  # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
+  # Docs: https://www.man7.org/linux/man-pages/man2/close.2.html
+  - module: libc.so
+    functions:
+      - open
+      - close
+
+  # Hook functions using explicit object syntax.
+  # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
+  # Docs: https://www.man7.org/linux/man-pages/man2/close.2.html
+  - module: libc.so
+    functions:
+      - symbol: open
+      - symbol: close
+
+  # Hook with unnamed parameter types and return type (type information required for decoding).
+  # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
+  - module: libc.so
+    functions:
+      - symbol: open
+        returnType: int
+        params:
+          - "const char *"
+          - int
+          - mode_t
+
+  # Hook with named parameters (names provide context in output).
+  # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
+  - module: libc.so
+    functions:
+      - symbol: open
+        returnType: int
+        params:
+          - ["const char *", path]
+          - [int, flags]
+          - [mode_t, mode]
+
+  # Hook multiple functions from the same module with various parameter counts.
+  # Docs: https://docs.openssl.org/master/man3/ENGINE_add/
+  # Docs: https://docs.openssl.org/master/man3/EVP_EncryptInit/
+  - module: libssl.so
+    functions:
+      - symbol: ENGINE_load_builtin_engines
+      - symbol: ENGINE_cleanup
+      - symbol: OSSL_CMP_validate_cert_path
+        returnType: int
+        params:
+          - ["const OSSL_CMP_CTX *", ctx]
+          - ["X509_STORE *", trusted_store]
+          - ["X509 *", cert]
+
+  # Use `decodeAt: exit` to decode buffer contents after function execution.
+  # Since `buf` is a pointer, we need to decode it at exit using the `count` parameter for the length.
+  # Pass `decoderArgs` with the length parameter name/index.
+  # Docs: https://www.man7.org/linux/man-pages/man2/read.2.html
+  - module: libc.so
+    functions:
+      - symbol: read
+        returnType: ssize_t
+        params:
+          - [int, fd]
+          - ["void *", buf, { decodeAt: exit, decoderArgs: [count] }]
+          - [size_t, count]
+
+  # Use `decoderArgs` to pass a related parameter for decoding context.
+  # Here, `ctx` contains cipher algorithm info needed to decode `key` and `iv` correctly.
+  # Docs: https://docs.openssl.org/master/man3/EVP_EncryptInit/
+  - module: libssl.so
+    functions:
+      - symbol: EVP_EncryptInit_ex
+        returnType: int
+        params:
+          - ["EVP_CIPHER_CTX *", ctx]
+          - ["const EVP_CIPHER *", type]
+          - ["ENGINE *", impl]
+          - ["const unsigned char *", key, { decoderArgs: [ctx] }]
+          - ["const unsigned char *", iv, { decoderArgs: [ctx] }]
+    stackTraceLimit: 10
+
+  # Pass decoder parameters to decode buffer contents based on related parameters.
+  # Docs: https://docs.openssl.org/master/man3/SSL_write/
+  - module: libssl.so
+    functions:
+      - symbol: SSL_write
+        returnType: int
+        params:
+          - ["SSL *", ssl]
+          - ["const void *", buf, { decoderArgs: [num] }]
+          - [int, num]
+
+  # # Uncomment to hook with custom decoder (requires custom decoder implementation).
+  # - module: libcustom.so
+  #   functions:
+  #     - symbol: process_data
+  #       returnType: int
+  #       params:
+  #         - [
+  #             "void *",
+  #             data,
+  #             { decoder: CustomDataDecoder, decoderArgs: [size] },
+  #           ]
+  #         - [size_t, size]

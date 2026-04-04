@@ -12,11 +12,17 @@
       "frida-java-bridge",
       "frida-objc-bridge",
       "frida-swift-bridge"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "frooky": ["./types/index.d.ts"]
+    }
   },
   "include": [
     "ios/**/*",
     "android/**/*",
-    "shared/**/*"
-  ]
+    "shared/**/*",
+    "types/**/*",
+    "docs/**/*"
+, "examples"  ]
 }

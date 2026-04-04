@@ -15,6 +15,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
     "@types/frida-gum": "^19.0.1",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.10.9",
     "chokidar": "^5.0.0",
     "frida-compile": "^19.0.4",
@@ -25,5 +26,8 @@
   },
   "overrides": {
     "@isaacs/brace-expansion": "^5.0.1"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.1"
   }
 }

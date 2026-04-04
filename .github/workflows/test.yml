@@ -1,10 +1,12 @@
 name: Test
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_call:
+  # GitHub Workflows will be re enabled when merging https://github.com/cpholguera/frooky/pull/58
+  # push:
+  #   branches: [main]
+  # pull_request:
+  #   branches: [main]
 
 # Cancel in-progress runs for the same PR/branch
 concurrency:

@@ -1,0 +1,114 @@
+metadata:
+  name: Android Hook Examples
+  platform: Android
+  description: Examples of Java/Kotlin method hooking on Android
+  category: GENERAL
+  author: frooky dev team
+  version: v1
+
+hooks:
+  # Hook multiple methods by name (all overloads are included).
+  # Docs: https://developer.android.com/reference/android/security/AttestedKeyPair
+  - javaClass: android.security.AttestedKeyPair
+    methods:
+      - $init
+      - getKeyPair
+
+  # Hook methods using explicit object syntax with optional `stackTraceLimit`.
+  # Docs: https://developer.android.com/reference/android/security/AttestedKeyPair
+  - javaClass: android.security.AttestedKeyPair
+    methods:
+      - name: $init
+      - name: getKeyPair
+    stackTraceLimit: 10
+
+  # Hook a specific overload by parameter types (unnamed).
+  # Docs: https://developer.android.com/reference/java/net/URL#openConnection(java.net.Proxy)
+  - javaClass: java.net.URL
+    methods:
+      - name: openConnection
+        overloads:
+          - params:
+              - java.net.Proxy
+
+  # Hook a specific overload by parameter types with names (for better context).
+  # Docs: https://developer.android.com/reference/android/app/Activity#startActivity(android.content.Intent)
+  - javaClass: android.app.Activity
+    methods:
+      - name: startActivity
+        overloads:
+          - params:
+              - ["android.content.Intent", intent]
+
+  # Use `stackTraceFilter` with regex patterns to exclude framework/library stack frames.
+  # This keeps only relevant app code by filtering out `java.*`, `android.*`, and external SDKs.
+  # Docs: https://developer.android.com/reference/android/database/sqlite/SQLiteDatabase#query(java.lang.String,%20java.lang.String[],%20java.lang.String,%20java.lang.String[],%20java.lang.String,%20java.lang.String,%20java.lang.String)
+  - javaClass: android.database.sqlite.SQLiteDatabase
+    methods:
+      - name: query
+        overloads:
+          - params:
+              - ["java.lang.String", table]
+              - ["[Ljava.lang.String", columns]
+              - ["java.lang.String", selection]
+              - ["[Ljava.lang.String", selectionArgs]
+              - ["java.lang.String", groupBy]
+              - ["java.lang.String", having]
+              - ["java.lang.String", orderBy]
+    stackTraceLimit: 5
+    stackTraceFilter:
+      - "$^java\\."
+      - "$^android\\."
+      - "$^com\\.external\\.sdk\\."
+
+  # Hook multiple overloads of the same method.
+  # Docs: https://developer.android.com/reference/android/content/Intent
+  - javaClass: android.content.Intent
+    methods:
+      - name: putExtra
+        overloads:
+          - params:
+              - ["java.lang.String", name]
+              - ["java.lang.String", value]
+          - params:
+              - ["java.lang.String", name]
+              - [int, value]
+          - params:
+              - ["java.lang.String", name]
+              - [boolean, value]
+          - params:
+              - ["java.lang.String", name]
+              - ["[B", value]
+
+  # # Explicit hooking of a single overloaded method.
+  # # The parameter `flags` contains an integer which contains information about the
+  # # intent settings using bit-masking.
+  # # We apply the frooky parameter option `decoder` with the `IntentFlagsDecoder` decoder so frooky can decode the flags at runtime and return e.g. `FLAG_GRANT_READ_URI_PERMISSION`.
+  # # constants stored in `android.content.Intent`.
+  # # is hooked and its arguments and/or return values decoded.
+  # # Docs: https://developer.android.com/reference/android/content/Intent#setFlags(int)
+  # - javaClass: android.content.Intent
+  #   methods:
+  #     - name: setFlags
+  #       overloads:
+  #         - params:
+  #             - [int, flags, { decoder: IntentFlagsDecoder }]
+
+  # Use `decodeAt: exit` to decode output parameters after method execution.
+  # Docs: https://developer.android.com/reference/javax/crypto/Cipher#doFinal(byte[],%20int)
+  - javaClass: javax.crypto.Cipher
+    methods:
+      - name: doFinal
+        overloads:
+          - params:
+              - ["[B", output, { decodeAt: exit }]
+              - [int, outputOffset]
+
+  # Use `decodeAt: both` to decode a parameter before and after execution.
+  # Docs: https://developer.android.com/reference/java/nio/ByteBuffer#put(byte[])
+  - javaClass: java.nio.ByteBuffer
+    methods:
+      - name: put
+        overloads:
+          - params:
+              - ["[B", src, { decodeAt: both }]
