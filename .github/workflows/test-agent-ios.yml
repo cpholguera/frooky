@@ -12,7 +12,7 @@ jobs:
   build-mas-app-ios:
     uses: ./.github/workflows/build-mas-app-ios.yml
 
-  test-agent-android:
+  test-agent-ios:
     name: Test agent iOS
     runs-on: macos-26
     needs: build-mas-app-ios
