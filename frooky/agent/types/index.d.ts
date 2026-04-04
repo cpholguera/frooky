@@ -1,117 +1,196 @@
-// types/index.d.ts
+import type { JavaHook } from './java-types';
+import type { ObjCHook } from './objc-types';
+import type { NativeHook } from './native-types';
 
 /**
  * Target platform for hooks.
+ *
+ * @public
  */
 export type Platform = 'Android' | 'iOS';
 
 /**
- * Metadata for the hook collection.
+ * Metadata that describes a hook collection.
+ *
+ * @public
  */
 export interface HookMetadata {
-  /** Target platform (hooks must be platform-specific) */
+  /**
+   * Target platform for the hook collection.
+   */
   platform: Platform;
-  /** Optional: Name of the hook collection */
+
+  /**
+   * Name of the hook collection.
+   */
   name?: string;
-  /** Optional: Description of what the hook collection does */
+
+  /**
+   * Short description of the hook collection.
+   */
   description?: string;
-  /** Optional: Category of the hook collection */
+
+  /**
+   * Category of the hook collection. Can, for example, be used to filter or group events.
+   */
   category?: string;
-  /** Optional: Your name or organization */
+
+  /**
+   * Author or organization that maintains the hook collection.
+   */
   author?: string;
-  /** Optional: Semantic version (e.g., v1) */
+
+  /**
+   * Semantic version of the hook collection.
+   *
+   * @example "1.0.0"
+   */
   version?: string;
 }
 
-export type DecodeAt = 'enter' | 'exit' | 'both'
+/**
+ * Specifies when a decoder should be applied during function execution.
+ *
+ * @example "enter" - Decode when the function/method is entered (before execution)
+ * @example "exit" - Decode when the function/method returns (after execution)
+ * @example "both" - Decode at both times
+ *
+ * @public
+ */
+export type DecodeAt = 'enter' | 'exit' | 'both';
 
-export type ParamOptions = {
-  decoder?: string
-  decodeAt?: DecodeAt
-  decoderArgs?: string[]
-}
 
-export type ParamType = string
-export type ParamName = string
-
-export type Param =
-  ParamType |
-  [ParamType, ParamName] |
-  [ParamType, ParamName, ParamOptions]
-
-// Used for Java- and Objective-C-Methods
-export type MethodName = string
-
-// ============================================================================
-// Java / Android
-// ============================================================================
-export interface JavaOverload {
-  params: Param[]
-}
-
-export type JavaMethod =
-  MethodName |
-  {
-    name: MethodName
-    overloads?: JavaOverload[]
-  }
-
-export interface JavaHook {
-  javaClass: string
-  methods: JavaMethod[]
-  stackTraceLimit?: number
-  stackTraceFilter?: string[]
-}
-
-// ============================================================================
-// Objective-C / iOS
-// ============================================================================
-export type ObjectiveCMethod =
-  MethodName |
-  {
-    name: MethodName
-    returnType?: string
-    params?: Param[]
-  }
-
-export interface ObjectiveCHook {
-  objcClass: string
-  methods: ObjectiveCMethod[]
-  stackTraceLimit?: number
-  stackTraceFilter?: string[]
-}
-
-// ============================================================================
-// Native
-// ============================================================================
-export type NativeSymbol = string
-
-export type NativeFunction = 
-  NativeSymbol |
-  {
-    symbol: NativeSymbol
-    returnType?: string
-    params?: Param[]
-  }
-
-export interface NativeHook {
-  module: string
-  functions: NativeFunction[]
-  stackTraceLimit?: number
-  stackTraceFilter?: string[]
-}
-
-// ============================================================================
-// Union
-// ============================================================================
-export type Hook = JavaHook | ObjectiveCHook | NativeHook
 
 /**
- * Root frooky configuration.
+ * Frida-compatible type of the parameter.
+ *
+ * @example "java.lang.String"
+ * @example "[Ljava.lang.Object;"
+ * @example "[Z"
+ * @example "int"
+ * 
+ * @public
+ */
+export type ParamType = string
+
+/**
+ * Parameter name.
+ *
+ * @example "username"
+ * @example "buffer"
+ * @example "url"
+ * 
+ * @public
+ */
+export type ParamName = string
+
+
+/**
+ * Decoder options for a parameter.
+ *
+ * @public
+ */
+export interface ParamOptions {
+  /**
+   * When the decoder should be applied.
+   *
+   * @defaultValue "enter"
+   * @example [ "exit" ]
+   * @example [ "both" ]
+   */
+  decodeAt?: DecodeAt;
+
+
+  /**
+   * Extra arguments passed to the decoder. They must be a valid parameter name. 
+   * 
+   * @example [ "username" ]
+   * @example [ "ctxPointer" ]
+   * @example [ "inBuffer", "bufferLength" ]
+   */
+  decoderArgs?: string[];
+}
+
+
+/**
+ * Parameter definition can be provided in multiple forms.
+ * 
+ * The following examples all describe the same parameter:
+ *
+ * 1. As a simple type name.
+ * 2. As a tuple of [type, options].
+ * 3. As a tuple of [type, name, options].
+ * 4. As a structured object with type, name, and options.
+ *
+ * @example "java.lang.String"
+ * @example ["java.lang.String", { decodeAt: "exit" }]
+ * @example ["java.lang.String", "value", { decodeAt: "exit" }]
+ * @example { type: "java.lang.String", name: "value", options: { decodeAt: "exit" } }
+ *
+ * @public
+ */
+export type Param =
+  | ParamType
+  | [ParamType, ParamOptions]
+  | [ParamType, ParamName, ParamOptions]
+  | {
+      type: ParamType;
+      name?: ParamName;
+      options?: ParamOptions;
+    };
+
+/**
+ * Name of a Java or Objective-C method.
+ *
+ * @public
+ */
+export type MethodName = string;
+
+
+/**
+ * Frida-compatible type for a return value used with Native and Objective-C hooks
+ *
+ * @example "(NSString *)"
+ * @example "int"
+ * 
+ * @public
+ */
+export type ReturnType = string;
+
+
+/**
+ * Base hook configuration.
+ *
+ * @public
+ */
+export interface BaseHook {
+  /**
+   * Maximum number of stack frames to capture.
+   */
+  stackTraceLimit?: number;
+
+  /**
+   * Stack trace filters to apply.
+   */
+  eventFilter?: string[];
+}
+
+
+/**
+ * frooky hook.
+ */
+export type Hook = JavaHook | ObjCHook | NativeHook
+
+/**
+ * frooky configuration.
  */
 export interface FrookyConfig {
-  /** Optional metadata about the hook collection */
+  /**
+   * Metadata about the hook collection
+   */
   metadata?: HookMetadata;
-  /** Collection of hook configurations */
+  /**
+   * Collection of hooks.
+   */
   hooks: Hook[];
 }
