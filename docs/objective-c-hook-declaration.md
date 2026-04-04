@@ -8,33 +8,51 @@ This documentation explains how to write Objective-C hook declarations.
 
 ## Structure
 
-```yaml
-objcClass: <string>                    # Fully qualified Objective-C class name
-methods:                               # List of Objective-C method declarations to be hooked
-  - <objc_method_declaration>
-```
-
-`<objc_method_declaration>` can be shortened, but arguments and return values are not decoded now:
+A `ObjcHook` declaration is a YAML object with these top level fields:
 
 ```yaml
-<objc_method_declaration>:
-  - <string>                           # Name of the Objective-C method 
+objcClass: <Objective-C class name>
+methods:
+  - <method name>
+  - name: <method name>
+    returnType: <type>                # Optional
+    params:                           # Optional
+      - <parameter declaration>
 ```
 
-`<objc_method_declaration>` with value decoding must be declared as follows:
+`objcClass` is the name of the Objective-C class.
+
+`methods` is a list of Objective-C methods to hook. Each item in `methods` can be written in one of two forms.
+
+Use the **short form** when you only want to hook a method and do not need argument or return value decoding.
 
 ```yaml
-<objc_method_declaration>:
-  name: <string>                       # Name of the Objective-C method (include - or + prefix)
-  returnType: <string>                 # Optional: Return type of the Objective-C method
-  params:                              # Optional: Parameter list of the Objective-C method
-    - <parameter_declaration>
+objcClass: <Objective-C class name>
+methods:
+  - <method name>
 ```
+
+Use the **expanded form** when you want frooky to decode arguments and or the return value.
+
+```yaml
+objcClass: <Objective-C class name>
+methods:
+  - name: <method name>
+    returnType: <type>                # Optional
+    params:                           # Optional
+      - <parameter declaration>
+```
+
+In the expanded form:
+
+- `name`: Objective-C method name, including the `-` or `+` prefix.
+- `returnType`: Optional return type of the Objective-C method.
+- `params`: Optional list of parameter declarations.
 
 > [!IMPORTANT]
-> Please read the documentation on [parameter](./parameter-declaration.md) and [return type](./return-type-declaration.md) declaration if you want to learn how to declare and configure them properly.
+> Read the documentation for [parameter](./parameter-declaration.md) and [return type](./return-type-declaration.md) declarations to learn how to declare and configure them correctly.
 >
-> There are multiple ways to declare a parameter. In this document, we always use [named parameters](./parameter-declaration.md#22-named-objective-c-parameters).
+> There are multiple ways to declare a parameter. In this document, all examples use [named parameters](./parameter-declaration.md#22-named-objective-c-parameters).
 
 ## Basic Usage
 
