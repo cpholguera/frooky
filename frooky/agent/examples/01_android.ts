@@ -82,26 +82,6 @@ const intentHook: Frooky.JavaHook = {
   ]
 }
 
-// // ============================================================================
-// // Custom decoder for Java method argument
-// // Reference: https://developer.android.com/reference/android/content/Intent#setFlags(int)
-// // ============================================================================
-// const intentFlagsHook: Frooky.JavaHook = {
-//   javaClass: 'android.content.Intent',
-//   methods: [
-//     {
-//       name: 'setFlags',
-//       overloads: [
-//         {
-//           params: [
-//             ['int', 'flags', { decoder: 'IntentFlagsDecoder' }]
-//           ]
-//         }
-//       ]
-//     }
-//   ]
-// }
-
 // ============================================================================
 // Single Java Type as argument
 // Reference: https://developer.android.com/reference/android/app/Activity#startActivity(android.content.Intent)
