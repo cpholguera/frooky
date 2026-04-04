@@ -11,8 +11,7 @@
       "frida-gum",
       "frida-java-bridge",
       "frida-objc-bridge",
-      "frida-swift-bridge",
-      "./tests/agent-test-framework.d.ts"
+      "frida-swift-bridge"
     ]
   },
   "include": [
