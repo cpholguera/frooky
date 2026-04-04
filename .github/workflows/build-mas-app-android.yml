@@ -28,7 +28,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      # TODO: Add the possibiltiy to build a custom target app for the frooky unit tests
+      # TODO: Add the possibility to build a custom target app for the frooky unit tests
 
       # - name: Copy example files
       #   run: |
