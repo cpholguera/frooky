@@ -10,7 +10,7 @@ This document describes how to set up a local development environment for the re
 
 ## Running the CLI locally
 
-1. Create a new Python virtual environment and activate it:
+1. **Create a new Python virtual environment and activate it**
 
     ```bash
     python3 -m venv venv
@@ -18,23 +18,29 @@ This document describes how to set up a local development environment for the re
     ```
 
 
-2. Compiling the frooky agent:
+2. **Compiling the frooky agent**
 
     ```bash
     ./compileAgent.sh --dev
     ```
 
-3. Install the CLI for development:
+3. **Install the CLI for development**
 
     ```bash
     pip install -e .
     ```
 
-4. Ensure which CLI version you're running:
+4. **Ensure which CLI version you're running**
 
     ```bash
     which frooky
     ```
    
    The output must be a path within the VENV directory, typically ending with `venv/bin/frooky`. If not, a different version might be used instead, such as a global installation.
-   
+
+
+## Compile And Run the frooky Standalone Agent
+
+If you want to work on the frooky agent itself, you can also use [`frida`](https://frida.re/) as host. 
+
+Please refer to the [frooky agent documentation](../frooky/agent/README.md) for more information.

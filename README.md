@@ -9,18 +9,26 @@
                                      |___/
 ```
 
-`frooky` is a [Frida](https://www.frida.re/)-based dynamic analysis tool for Android and iOS apps based on JSON hook files.
+`frooky` is a [Frida](https://www.frida.re/)-based dynamic analysis tool for Android and iOS apps based on YAML hook files.
 
 ![PyPI - Version](https://img.shields.io/pypi/v/frooky?color=fuchsia) [![Test](https://github.com/cpholguera/frooky/actions/workflows/test.yml/badge.svg)](https://github.com/cpholguera/frooky/actions/workflows/test.yml)
 
 - Hook Java/Kotlin methods and native C/C++ functions
-- Simple JSON hook file format
+- Simple YAML hook file format
 - Support for method overloads and stack trace capture
 - Argument capture with various data types
+- Return value capture with various data types
 - Filter hooks by argument values or stack trace patterns
 - Output events in JSON Lines format for easy processing
 
-See more in [docs/usage.md](docs/usage.md).
+Use it, if you **know what you want to hook** but you don't want to write custom Frida scripts or copy and paste them together. For example you can use it to quickly hook functions or methods based on public API documentation and quickly get insight about them. 
+
+> [!NOTE]
+>
+> This documentation describes the intended feature set for [frooky 1.0](https://github.com/cpholguera/frooky/milestone/1). At the time of writing this document, not all described features may have been fully implemented and there may be breaking changes to the hook file API until the release of frooky 1.0. 
+> 
+> [Feedback](https://github.com/cpholguera/frooky/discussions) is always welcome. 
+ 
 
 ## Installation
 
@@ -30,48 +38,121 @@ Simply install via pip to get the `frooky` CLI tool:
 pip3 install frooky
 ```
 
+
 ## Usage
 
-Create a hook file (e.g., `hooks.json`) as described in [docs/usage.md](docs/usage.md), then run `frooky` with the desired options:
+Create a hook file (e.g., `hooks.yaml`) with the functions and/or methods you want to hook. 
+
+If you are already familiar with Frida and function hooking, we recommend using the documented examples as a quick starting point. You find them in the folder [docs/examples/](./docs/examples/).
+
+For more information, read all about the structure in chapter [Structure of a Hook File](#structure-of-a-hook-file).
+
+After you created the desired hook file, run `frooky`:
 
 ```bash
 # Attach by app name
-frooky -U -n "My App" --platform android hooks.json
+frooky -U -n org.owasp.mastestapp --platform android hooks.yaml
 
 # Spawn and add multiple hook files (hooks are merged)
-frooky -U -f com.example.app --platform android storage.json crypto.json
+frooky -U -f org.owasp.mastestapp --platform android storage.yaml crypto.yaml
+
+# Spawn and add multiple hook files using globs (hooks are merged)
+frooky -U -f org.owasp.mastestapp --platform android hooks_*.yaml
 ```
 
 See `frooky -h` for more options.
+
+
+## Structure of a Hook File
+
+frooky uses _hook files_, which are structured YAML files including declarations of methods or functions to be hooked.
+
+A hook file consists of optional metadata and a list of _hook declarations_. The following YAML file describes the basic structure:
+
+```yaml
+metadata:                         # All metadata is optional
+  name: <name>                    # Name of the hook collection
+  platform: Android|iOS           # Target platform (hooks must be platform-specific)
+  description: <description>      # Description of what the hook collection does
+  category: <category>            # Category of the hook collection
+  author: <author>                # Your name or organization
+  version: <version>              # Semantic version (e.g., v1)
+
+hooks:                            # Collection of hook declarations
+  - <hook_declaration>
+```
+
+**Example:**
+
+The following hook file hooks all RNG initialization methods and functions on an Android device, capturing their arguments, return values, and stack trace. This information can be used to detect insecure RNG.
+ 
+```yaml
+metadata:
+  name: RNG initialization
+  platform: Android
+  description: Hooks all RNG initialization methods on Android (Java, kotlin, native)
+  masCategory: CRYPTOGRAPHY
+  author: frooky dev team
+  version: v1
+
+hooks:
+  - <hook_declaration> 
+```
+
+## Hook Declaration
+
+Depending on the platform, the `<hook_declaration>` may look different. Please read the linked platform-specific documentation for more information.
+
+frooky supports these types of hooks:
+
+| Hook Type        | Platform    | Description                                 | Documentation                                                          |
+| ---------------- | ----------- | ------------------------------------------- | ---------------------------------------------------------------------- |
+| `JavaHook`       | Android     | Hook for Java/Kotlin methods                | [`JavaHook`-Declaration](./docs/java-hook-declaration.md)              |
+| `ObjcHook`       | iOS         | Hook for Objective-C methods                | [`ObjcHook`-Declaration](./docs/objective-c-hook-declaration.md)       |
+| `NativeHook`     | Android/iOS | Hook for native functions (C/C++/Rust etc.) | [`NativeHook`-Declaration](./docs/native-hook-declaration.md)          |
+
+> [!IMPORTANT]
+> When loading a hook declaration, frooky will validate it and to detect invalid declarations. For example, it is not possible to declare a `JavaHook` and a `ObjcHook` hook in one hook file.
+
+## Parameter- and Return-Type Declaration
+
+frooky can decode data passed to functions or methods via arguments, including their return values.
+
+Depending on the value types, this can be simple or more complex. frooky tries to decode arguments and return values by itself if possible. But in some cases, e.g. when the value is simply a pointer, it is necessary to provide information about the types used. Before writing a hook declaration, it is therefore recommended to read the following documentation:
+
+- [Parameter Declaration](docs/parameter-declaration.md)
+- [Return Type Declaration](docs/return-type-declaration.md)
 
 ## Example
 
 We'll use the OWASP MAS [MASTG-DEMO-0072](https://mas.owasp.org/MASTG/demos/android/MASVS-CRYPTO/MASTG-DEMO-0072/MASTG-DEMO-0072/) app to demonstrate hooking a cryptographic key generation method.
 
-First you need to create a hook file, e.g., `crypto.json`:
+First you need to create a hook file, e.g., `keygen.yaml`:
 
-```json
-{
-  "category": "CRYPTO",
-  "hooks": [
-    {
-      "class": "android.security.keystore.KeyGenParameterSpec$Builder",
-      "method": "$init",
-      "maxFrames": 10
-    }
-  ]
-}
+```yaml
+metadata:
+  name: Android Key Generator Specifications
+  platform: Android
+  description: Captures the initialization of a KeyGenParameterSpec Builder 
+  category: CRYPTO
+  author: frooky dev team
+  version: v1
+
+hooks:
+  - javaClass: android.security.keystore.KeyGenParameterSpec$Builder
+    methods:
+      - $init
 ```
 
 Then run `frooky` with the hook file against your target app:
 
 ```bash
-frooky -U -n "MASTestApp" --platform android crypto.json
+frooky -U -n org.owasp.mastestapp --platform android keygen.yaml
 ```
 
-Output (pretty-printed for readability):
+Events are written to the output file in JSON Lines format (one JSON object per line, known as NDJSON). 
 
-> Events are written to the output file in JSON Lines format (one JSON object per line, known as NDJSON). You can easily pretty-print it e.g. using `jq . output.json`.
+Example Output (pretty-printed for readability):
 
 ```json
 {
@@ -110,6 +191,12 @@ Output (pretty-printed for readability):
 }
 ```
 
-See more in [docs/usage.md](docs/usage.md) and a full example in [docs/examples/example.md](docs/examples/example.md). 
+## More Information
 
-For development and local testing instructions of this repo, see [docs/develop.md](docs/develop.md).
+Please refer to the following documentation for more information about various topics:
+
+
+- [Additional Settings and Best Practices](./docs/additional-features.md)
+- [Development / Local Testing](./docs/develop.md)
+- [Understanding Output Format](./docs/output.md)
+
