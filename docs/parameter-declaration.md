@@ -184,7 +184,7 @@ When hooking a method, frooky tries to decode the argument as well as the return
 
 These are required when the time of decoding varies, or when more context information is needed. The following two chapters explain these cases.
 
-A decoder is configured by adding a object 
+You can configure a decoder by adding a decoder configuration object to a parameter declaration.
 
 This is done using a decoder configuration added to any [unnamed](#1-unnamed-parameters) and [named](#2-named-parameters) parameters. It can contain the following options:
 
