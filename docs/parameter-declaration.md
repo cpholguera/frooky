@@ -326,8 +326,8 @@ objcClass: NSData
 methods:
   - name: "- getBytes"
     params:
-      - [ "(void *)", buffer, { decoderArgs: [ length ] } ]
-      - [ "(NSUInteger)", length ]
+      - [ "(void *)", buffer, { decoderArgs: [ range ] } ]
+      - [ "(NSUInteger)", range ]
 ```
 
 This example hooks the following method from [NSData](https://developer.apple.com/documentation/foundation/nsdata/getbytes(_:range:)?language=objc):
