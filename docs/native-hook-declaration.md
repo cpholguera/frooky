@@ -6,7 +6,7 @@ This documentation explains how to write native hook declarations.
 - [Basic Usage](#basic-usage)
 - [Decoding Arguments and Return Values](#decoding-arguments-and-return-values)
 
-## Structure of a `NativeHook` Declaration
+## Structure
 
 ```yaml
 module: <string>                       # Fully qualified module name
