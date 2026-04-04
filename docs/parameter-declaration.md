@@ -180,7 +180,7 @@ int sqlite3_exec(
 
 ## Decoders
 
-When hooking a method, frooky tries to decode the argument as well as the return values. Depending on the type, this can be fairly simple. Primitives, such as Integers, Floats, or Shorts, can always be decoded by the frooky agent. However, some values require more complex decoders.
+When hooking a method, frooky tries to decode arguments as well as return values. Depending on the type, this can be fairly simple. Primitives, such as Integers, Floats, or Shorts, can always be decoded by the frooky agent. However, some values require more complex decoders.
 
 These are required when the time of decoding varies, or when more context information is needed. The following two chapters explain these cases.
 
@@ -190,7 +190,7 @@ This is done using a decoder configuration added to any [unnamed](#1-unnamed-par
 
 - `decoder`
 - `decodeAt`
-- `decodeParams`
+- `decodeArgs`
 
 ```yaml
 params:
