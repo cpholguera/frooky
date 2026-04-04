@@ -40,14 +40,14 @@ The two versions are different only in the way hook files are send to the target
 
 1. **Compile the development standalone client**
 
-    For compressed code use:
+    For minified code use:
 
     ```sh
     npm run build:prod:android hook.yaml
     npm run build:prod:ios hook.yaml
     ```
 
-    For uncompressed code use:
+    If you want to work on the agent or develop new decoders, use the `dev` build, which does not minify the code:
 
     ```sh
     npm run build:dev:android hook.yaml
@@ -82,14 +82,14 @@ If you want to work on the frooky agent itself, you can also use the [Frida CLI]
 
 1. **Compile the development standalone client**
 
+    Using the `build:watch:*` command, `npm` will continuously watch for changed files in the code of the agent but also the hook files: 
+
     ```sh
     npm run build:watch:android hook.yaml
     npm run build:watch:ios hook.yaml
     ```
 
-    You can specify one or more `hook.yaml` files. Pattern expansion (`glob`) is supported.
-
-    This will compile a development build of the frooky agent, watch for changes in its source code and all `hook.yaml` files, and keep the compiled agents in the `./dist` folder up to date.
+    You can specify one or more `hook.yaml` files. Pattern expansion (`glob`) is supported. This command will continuously compile standalone agents and save them in the `./dist` folder.
 
 2. **Start Frida with the compiled agent**
    
