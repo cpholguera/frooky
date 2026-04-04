@@ -18,16 +18,21 @@
     "test:ios:local": "npm run build:dev:ios && npm run build:test:ios && node run-tests.js -p ios"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.4.10",
     "@types/frida-gum": "^19.0.1",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.10.9",
     "chokidar": "^5.0.0",
-    "frida": "17.9.1",
     "frida-compile": "^19.0.4",
     "frida-java-bridge": "^7.0.11",
     "frida-objc-bridge": "^8.0.5",
     "frida-swift-bridge": "^3.0.2",
-    "globals": "^17.4.0",
     "minimist": "^1.2.8"
+  },
+  "overrides": {
+    "@isaacs/brace-expansion": "^5.0.1"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.1"
   }
 }
