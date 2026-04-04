@@ -101,16 +101,18 @@ WebView.loadUrl(url: String, additionalHttpHeaders: MutableMap<String!, String!>
 
 ## Method Overloads
 
-If you only want to hook a specific overloaded method, specify it by adding a list of [parameter declarations](./parameter-declaration.md) to `overloads`:
+To hook only specific overloads of a method, use the expanded form and provide a list of overload declarations under `overloads`.
 
 ```yaml
-javaClass: <string>                    # Fully qualified Java class name
-methods:                               # List of Java methods to hook
-  - name: <string>                     # Name of the Java method
-    overloads:                         # List of overloaded methods 
-      - params:                        # List of parameter declarations for one overload
-        - <parameter_declaration>
+javaClass: <fully qualified Java class name>
+methods:
+  - name: <method name>
+    overloads:                        # Optional
+      - params:
+          - <parameter declaration>
 ```
+
+Each item in `overloads` matches one overloaded method signature including the relevant [parameter declarations](./parameter-declaration.md).
 
 **Example:**
 
@@ -120,14 +122,14 @@ methods:
   - name: putExtra
     overloads:
       - params:
-        - [ "java.lang.String", name ]
-        - [ "java.lang.String", value ]
+          - ["java.lang.String", name]
+          - ["java.lang.String", value]
       - params:
-        - [ "java.lang.String", name ]
-        - [ "[Z", value ]
+          - ["java.lang.String", name]
+          - ["[Z", value]
 ```
 
-This will *only* hook the following methods:
+This hooks **only** the following methods:
 
 ```kotlin
 Intent.putExtra(name: String!, value: String?): Intent
