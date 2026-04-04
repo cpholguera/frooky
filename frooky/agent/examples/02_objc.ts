@@ -79,7 +79,7 @@ const keychainHook: Frooky.ObjectiveCHook = {
       params: [
         ['(NSData *)', 'data'],
         ['(SecKeyAlgorithm)', 'algorithm'],
-        ['(void (^)(NSData *, NSError *))', 'handler', { decoder: 'LaPlaintextDecoder' }]
+        ['(void (^)(NSData *, NSError *))', 'handler']
       ]
     },
     {
