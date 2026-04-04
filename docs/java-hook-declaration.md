@@ -9,32 +9,44 @@ This documentation explains how to write Java hooks.
 
 ## Structure
 
+A `JavaHook` declaration is a YAML object with these top level fields:
+
 ```yaml
-javaClass: <string>                    # Fully qualified Java class name
-methods:                               # List of Java methods to hook
-  - <java_method_declaration>
+javaClass: <fully qualified Java class name>
+methods:
+  - <method name>
+  - name: <method name>
+    overloads:                        # Optional
+      - params:
+          - <parameter declaration>
 ```
 
-`<java_method_declaration>` without overloads can be shortened:
+Each item in `methods` can be written in one of two forms.
+
+Use the **short form** to hook all overloads of a method.
 
 ```yaml
-<java_method_declaration>:
-  - <string>                           # Name of the Java method
+javaClass: <fully qualified Java class name>
+methods:
+  - <method name>
 ```
 
-`<java_method_declaration>` with overloads must be declared like that:
+Use the **expanded form** when you want to declare specific overloads.
 
 ```yaml
-<java_method_declaration>:
-  name: <string>                       # Name of the Java method
-  overloads:                           # Optional: List of explicit method overloads
-    - <overloads_declaration>
+javaClass: <fully qualified Java class name>
+methods:
+  - name: <method name>
+    overloads:                        # Optional
+      - params:
+          - <parameter declaration>
 ```
 
+Each item in `overloads` describes one method signature.
+
 ```yaml
-<overloads_declaration>:
-  params:                              # Parameter list of the overloaded method
-    - <parameter_declaration>
+params:
+  - <parameter declaration>
 ```
 
 > [!IMPORTANT]
