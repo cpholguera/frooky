@@ -107,17 +107,20 @@ npm run test:ios:local -- --appIdentifier MASTestApp
 
 Use this when the app is running on a **physical Android device** or emulator connected over USB with `frida-server` running.
 
-#### Option A: Spawn by package name (physical rooted device)
-
-Frida will spawn a fresh instance of the app and inject at startup. Requires `frida-server` to have ptrace/spawn permissions (typically a rooted physical device).
+`test:android` supports `--appIdentifier <pid|package-id|app-name>`.
 
 ```bash
+# package-id (spawn)
 npm run test:android -- --appIdentifier org.owasp.mastestapp
+
+# pid (attach)
+npm run test:android -- --appIdentifier 4926
+
+# app-name (attach by name)
+npm run test:android -- --appIdentifier MASTestApp
 ```
 
-#### Option B: Attach by PID (emulator or when spawn is blocked)
-
-On Android emulators, SELinux typically blocks `spawn`. Use the numeric PID of the already-running app instead:
+On Android emulators, SELinux can block `spawn`. In that case, use PID or app-name attach:
 
 ```bash
 # Find the app's PID
@@ -132,7 +135,7 @@ npm run test:android -- --appIdentifier <PID>
 npm run test:android -- --appIdentifier 4926
 ```
 
-`run-tests.js` automatically detects whether `--appIdentifier` is a number (attach) or a string (spawn), so the same `test:android` script handles both cases.
+`run-tests.js` first tries spawn for string identifiers, then falls back to attach-by-name if spawn fails.
 
 ### What the Tests Do
 

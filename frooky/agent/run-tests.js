@@ -138,13 +138,14 @@ function showHelp() {
     console.log(`
     Options:
     -p, --platform <name>         Platform (android, ios)
-    --appIdentifier <value>       Required: bundle/package id (spawn mode) or numeric PID (attach mode)
+    --appIdentifier <value>       Required: pid, bundle/package id, or app name
     -u, --usb                     Use USB device mode
     -h, --help                    Show this help message
 
     Examples:
     npm run test:android -- --appIdentifier org.owasp.mastestapp
     npm run test:android -- --appIdentifier 4926
+    npm run test:android -- --appIdentifier MASTestApp
     npm run test:ios:usb -- --appIdentifier org.owasp.mastestapp.MASTestApp-iOS
     npm run test:ios:local -- --appIdentifier 39417
     `);
