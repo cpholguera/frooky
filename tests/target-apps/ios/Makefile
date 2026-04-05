@@ -20,11 +20,14 @@ build: clean $(BUILD_DIR) $(DIST_DIR)
 
 	cd $(CLONE_DIR) && \
 		IOS_SCHEME=$$(xcodebuild -list -json | jq -r '.project.targets[0]') && \
+		SIM_NAME=$$(xcrun simctl list devices available -j | \
+			jq -r '[.devices | to_entries[] | select(.key | contains("iOS")) | .value[]] | map(select(.isAvailable == true)) | first | .name') && \
 		echo "Using scheme: $$IOS_SCHEME" && \
+		echo "Using simulator: $$SIM_NAME" && \
 		xcodebuild build \
 			-project "MASTestApp.xcodeproj" \
 			-scheme "$$IOS_SCHEME" \
-			-destination "platform=iOS Simulator,name=Any iOS Simulator Device" \
+			-destination "platform=iOS Simulator,name=$$SIM_NAME" \
 			-derivedDataPath "$(DERIVED_DATA)" \
 			CODE_SIGN_IDENTITY="" \
 			CODE_SIGNING_REQUIRED=NO \
