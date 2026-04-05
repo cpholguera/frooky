@@ -20,8 +20,8 @@ jobs:
         working-directory: tests/target-apps/ios
         run: make build
         
-      - name: Upload MAS app iOS artifact
+      - name: Upload iOS artifact
         uses: actions/upload-artifact@v7
         with:
           name: target-app-ios
-          path: tests/target-apps/ios/dist/MASTestApp.app
+          path: tests/target-apps/ios/dist/
