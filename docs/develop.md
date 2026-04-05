@@ -59,6 +59,24 @@ When passing arguments to an npm script, you **must** use `--` to separate npm's
 npm run test:ios:local -- --appIdentifier <value>
 ```
 
+### Building Target App
+
+Tests usually require a target app which implements the feature that should be tested.
+
+These apps are located in the folder `frooky/agent/tests/<os>/target-apps`. They must be in the form of a [MASTG-DEMO app](https://mas.owasp.org/MASTG/demos/#).
+
+The app identified for the Android app is `org.owasp.mastestapp` and for the iOS app `org.owasp.mastestapp.MASTestApp-iOS`.
+
+To compile them, run `buildTargetApp.sh <target-apps>`, which can be found in the folder `frooky/agent/tests/<os>/target-apps`  This script will:
+
+1. Create a temporary build folder
+2. Checkout the base app
+3. Copy the files from the target app to the checked out app
+4. Build the target app
+5. Stores the binary in the folder `frooky/agent/tests/<os>/target-apps/<target-app>/dist`
+
+At the moment, there is no automation to start the app. This means, the developer is responsible that the right target app is running on the device. The test script will always just start the target app based on the app identifier.
+
 ### iOS Tests
 
 There are two test modes depending on where the app is running.
@@ -153,14 +171,13 @@ Each test script:
 frooky/agent/tests/
 ├── agent-test-framework.ts   # Minimal test runner (test/expect API)
 ├── android/
+│   ├── target-apps           # Folder of apps in the form of MASTG-DEMO app's
 │   ├── agent-runner.ts       # Entry point injected into the Android app
-│   ├── test-decoder.ts       # Tests for the Android decoder
-│   ├── test-runtime.ts       # Runtime smoke test in Android app process
-│   └── test-util.ts          # Utility tests
+│   ├── test-*.ts             # Tests 
 └── ios/
+    ├── target-apps           # Folder of apps in the form of MASTG-DEMO app's
     ├── agent-runner.ts       # Entry point injected into the iOS app
-    ├── test-method-resolver.ts  # Stub for future iOS method resolution tests
-    └── test-runtime.ts       # Runtime smoke test in iOS app process
+    └── test-*.ts             # Tests 
 ```
 
 To add a new test, create a `test-*.ts` file in the relevant platform folder and import it in `agent-runner.ts`.
