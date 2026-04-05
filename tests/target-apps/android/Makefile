@@ -7,7 +7,9 @@ APK_DST   := $(DIST_DIR)/MASTestApp.apk
 
 JAVA_HOME ?= $(shell java -XshowSettings:property -version 2>&1 | grep java.home | awk '{print $$3}')
 
-.PHONY: build clean
+BUNDLE_ID := org.owasp.mastestapp
+
+.PHONY: build install clean
 
 build: clean $(BUILD_DIR) $(DIST_DIR)
 	git clone $(REPO_URL) $(CLONE_DIR)
@@ -18,14 +20,18 @@ build: clean $(BUILD_DIR) $(DIST_DIR)
 		echo "Copied MastgTest.kt" || true
 
 	@[ -f "$(APP_DIR)/build.gradle.kts.libs" ] && \
-		sed -i "s|// ADD_LIBS_HERE|$$(cat "$(APP_DIR)/build.gradle.kts.libs")|" \
+		perl -i -pe "s|// ADD_LIBS_HERE|$$(cat "$(APP_DIR)/build.gradle.kts.libs")|" \
 			"$(CLONE_DIR)/app/build.gradle.kts" && \
 		echo "Replaced libs in build.gradle.kts" || true
 	
-	cd $(CLONE_DIR) && JAVA_HOME=$(JAVA_HOME) ./gradlew assembleDebug
+	cd $(CLONE_DIR) && JAVA_HOME="$(JAVA_HOME)" ./gradlew assembleDebug
 	mv $(APK_SRC) $(APK_DST)
 	@echo "APK available at: $(APK_DST)"
 
+
+install:
+	adb install -r $(APK_DST)
+	adb shell am start -n $(BUNDLE_ID)/.MainActivity
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)

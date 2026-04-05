@@ -54,6 +54,18 @@ Tests usually require a target app which implements the feature that should be t
 
 You find them in the folder `tests/test-apps`, together with [instructions](../tests/target-apps/README.md) how to build them.
 
+### Installing the Target App
+
+After building, the app must be installed manually on the device or simulator before running tests. This command will install and launch the app:
+
+```bash
+cd tests/target-apps/<android|ios>
+make install
+```
+
+> [!NOTE]
+> Before proceeding, make sure Frida is available on the target device (Android) or on the local machine (iOS Simulator).
+
 ### Running Agent Tests
 
 The Frida agent has its own test suite that runs inside a live Frida session (on a real device, simulator, or emulator). Tests are written in TypeScript and live under `frooky/agent/tests/`.

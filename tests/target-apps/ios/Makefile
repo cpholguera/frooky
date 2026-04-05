@@ -6,7 +6,9 @@ DERIVED_DATA := $(BUILD_DIR)/DerivedData
 IOS_APP_SRC  := $(DERIVED_DATA)/Build/Products/Debug-iphonesimulator
 IOS_APP_DST  := $(DIST_DIR)/
 
-.PHONY: build clean
+BUNDLE_ID := org.owasp.mastestapp.MASTestApp-iOS
+
+.PHONY: build install clean
 
 build: clean $(BUILD_DIR) $(DIST_DIR)
 	git clone $(REPO_URL) $(CLONE_DIR)
@@ -36,6 +38,10 @@ build: clean $(BUILD_DIR) $(DIST_DIR)
 	mkdir -p $(IOS_APP_DST)
 	cp -r $(IOS_APP_SRC)/*.app $(IOS_APP_DST)/
 	@echo "iOS app available at: $(IOS_APP_DST)"
+
+install:
+	xcrun simctl install booted $(DIST_DIR)/MASTestApp.app
+	xcrun simctl launch booted $(BUNDLE_ID)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
