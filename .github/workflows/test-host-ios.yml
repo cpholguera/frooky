@@ -1,4 +1,4 @@
-name: Test host integration iOS
+name: Test host iOS
 
 on:
   push:

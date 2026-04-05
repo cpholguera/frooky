@@ -2,8 +2,8 @@ name: Test agent Android
 
 on:
   push:
-    # paths:
-    #   - 'frooky/agent/**'
+    paths:
+      - 'frooky/agent/**'
   
 permissions:
   contents: read

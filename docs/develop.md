@@ -38,46 +38,25 @@ This document describes how to set up a local development environment for the re
 
    The output must be a path within the VENV directory, typically ending with `venv/bin/frooky`. If not, a different version might be used instead, such as a global installation.
 
-## Running Agent Tests
+## Testing
 
-The Frida agent has its own test suite that runs inside a live Frida session (on a real device, simulator, or emulator). Tests are written in TypeScript and live under `frooky/agent/tests/`.
+The project consists of two testable components: a Frida agent written in TypeScript and a Python host.
 
-All test commands must be run from the `frooky/agent/` directory with Node.js dependencies installed:
+The agent has its own dedicated unit tests that run directly on a target device, as the agent's functionality is  tied to the runtime environment Frida operates in.
 
-```bash
-cd frooky/agent
-npm ci
-```
+The host, on the other hand, serves as an integration test for the full application.
 
-You only need to do this once (or after updating `package-lock.json`).
-
-### Key Syntax Rule
-
-When passing arguments to an npm script, you **must** use `--` to separate npm's own flags from the script's flags. Without it, npm intercepts the flags and never forwards them to the underlying script.
-
-```bash
-npm run test:ios:local -- --appIdentifier <value>
-```
+The following chapters describe how to write tests and target apps the tests should run against.
 
 ### Building Target App
 
-Tests usually require a target app which implements the feature that should be tested.
+Tests usually require a target app which implements the feature that should be tested. For example, type decoders should be tested against real implementations on Android or iOS.
 
-These apps are located in the folder `tests/target-apps/<android|ios>/`. They must be in the form of a [MASTG-DEMO app](https://mas.owasp.org/MASTG/demos/#).
+These apps are located in the folder `tests/target-apps/<android|ios>/`. They must be in the form of a [MASTG-DEMO app](https://mas.owasp.org/MASTG/demos/#) Hence, the app identifier for the Android app is `org.owasp.mastestapp` and for the iOS app `org.owasp.mastestapp.MASTestApp-iOS`.
 
-The app identified for the Android app is `org.owasp.mastestapp` and for the iOS app `org.owasp.mastestapp.MASTestApp-iOS`.
-
-To compile them, run `make build APP_DIR=<app-dir>` in `tests/target-apps/<android|ios>/`.
+To compile them, run `make build APP_DIR=<app-dir>` in the directory `tests/target-apps/<android|ios>/`.
 
 `app-dir` is the folder where the demo app is. If no `APP_DIR` is provided, an empty [`mas-app-ios`](https://github.com/cpholguera/mas-app-ios) or [`mas-app-android`](https://github.com/cpholguera/mas-app-android) app is built.
-
-The build process does the following:
-
-1. Create a temporary build folder
-2. `git checkout` the base app (`mas-app-ios` or `mas-app-android`)
-3. Copy the files from the target app to the checked out base app
-4. Compile the app using the platform dependent build system
-5. Stores the binary in the folder `tests/target-apps/<android|ios>/dist`
 
 **Examples 1:** Building an empty `mas-app-ios` app:
 
@@ -101,6 +80,27 @@ This will compile the app and store it in `tests/target-apps/android/dist/MASTes
 > At the moment, there is no automation to start the app.
 > This means, the developer is responsible that the right target app is running on the device and that Frida is available.
 > Agent tests will always just start the target app based on the app identifier.
+
+### Running Agent Tests
+
+The Frida agent has its own test suite that runs inside a live Frida session (on a real device, simulator, or emulator). Tests are written in TypeScript and live under `frooky/agent/tests/`.
+
+All test commands must be run from the `frooky/agent/` directory with Node.js dependencies installed:
+
+```bash
+cd frooky/agent
+npm ci
+```
+
+You only need to do this once (or after updating `package-lock.json`).
+
+### Key Syntax Rule
+
+When passing arguments to an npm script, you **must** use `--` to separate npm's own flags from the script's flags. Without it, npm intercepts the flags and never forwards them to the underlying script.
+
+```bash
+npm run test:ios:local -- --appIdentifier <value>
+```
 
 ### iOS Tests
 

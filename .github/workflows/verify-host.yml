@@ -1,6 +1,7 @@
 name: Verify frooky host
 
-on: push
+on:
+  push: 
 
 permissions:
   contents: read

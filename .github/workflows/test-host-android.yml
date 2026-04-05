@@ -1,4 +1,4 @@
-name: Test host integration Android
+name: Test host Android
 
 on:
   push:
