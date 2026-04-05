@@ -13,7 +13,7 @@ jobs:
   build-app-android:
     uses: ./.github/workflows/build-app-android.yml
     with:
-      app_dir: "tests/target-apps/android/mastg-demo-0060"
+      app_dir: "mastg-demo-0060"
 
   test-host-android:
     name: Test agent Android
