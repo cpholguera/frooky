@@ -16,41 +16,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Clone mas-app-ios repository
-        uses: actions/checkout@v6
-        with:
-          repository: cpholguera/mas-app-ios
-          path: mas-app-ios
-
-      - name: Copy example files
-        run: |
-          EXAMPLE_DIR="docs/examples/ios-app"
-
-          # Copy MastgTest.swift if it exists
-          if [ -f "$EXAMPLE_DIR/MastgTest.swift" ]; then
-            cp -f "$EXAMPLE_DIR/MastgTest.swift" mas-app-ios/MASTestApp/MastgTest.swift
-            echo "Copied MastgTest.swift"
-          fi
-
-      - name: Build the app for simulator
-        run: |
-          cd mas-app-ios
-          cp .github/Local.xcconfig.ci Local.xcconfig
-
-          DEFAULT_SCHEME=$(xcodebuild -list -json | jq -r '.project.targets[0]')
-          echo "Using scheme: $DEFAULT_SCHEME"
-
-          xcodebuild build \
-            -project "MASTestApp.xcodeproj" \
-            -scheme "$DEFAULT_SCHEME" \
-            -destination "platform=iOS Simulator,name=iPhone 17" \
-            -derivedDataPath "$GITHUB_WORKSPACE/DerivedData" \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+      - name: Build iOS app (empty mas-app-ios)
+        working-directory: tests/target-apps/ios
+        run: make build
         
       - name: Upload MAS app iOS artifact
         uses: actions/upload-artifact@v7
         with:
           name: mas-app-ios
-          path: ${{ github.workspace }}/DerivedData/Build/Products/Debug-iphonesimulator/*.app
+          path: tests/target-apps/ios/dist/MASTestApp.app
