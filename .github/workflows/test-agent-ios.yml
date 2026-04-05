@@ -38,19 +38,15 @@ jobs:
       - name: Setup Frida
         uses: ./.github/actions/setup-frida
 
-      - name: Boot iOS Simulator
-        run: |         
-          echo "Booting iPhone 17 simulator"
-          xcrun simctl boot "iPhone 17"
-          
-          echo "Waiting for simulator to be ready"
-          xcrun simctl bootstatus "iPhone 17" -b
+      - name: Boot simulator
+        run: |
+          SIM_ID=$(xcrun simctl list devices available -j | \
+            jq -r '[.devices | to_entries[] | select(.key | contains("iOS")) | .value[]] | map(select(.isAvailable == true)) | first | .udid')
+          xcrun simctl boot "$SIM_ID"
 
       - name: Install app on simulator
         run: |
-          APP_PATH=target-app-ios/MASTestApp.app
-          echo "Installing target app on simulator: $SIM_ID"
-          xcrun simctl install "$SIM_ID" "$APP_PATH"
+          xcrun simctl install booted target-app-ios/MASTestApp.app
 
       - name: Run tests
         shell: bash

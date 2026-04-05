@@ -9,8 +9,6 @@ IOS_APP_DST  := $(DIST_DIR)/
 .PHONY: build clean
 
 build: clean $(BUILD_DIR) $(DIST_DIR)
-	@[ -n "$(GITHUB_ENV_FILE)" ] && echo "SIM_ID=$$SIM_ID" >> $(GITHUB_ENV_FILE) || true
-	
 	git clone $(REPO_URL) $(CLONE_DIR)
 
 	@[ -f "$(APP_DIR)/MastgTest.swift" ] && \
@@ -22,14 +20,11 @@ build: clean $(BUILD_DIR) $(DIST_DIR)
 
 	cd $(CLONE_DIR) && \
 		IOS_SCHEME=$$(xcodebuild -list -json | jq -r '.project.targets[0]') && \
-		SIM_ID=$$(xcrun simctl list devices available -j | \
-			jq -r '[.devices | to_entries[] | select(.key | contains("iOS")) | .value[]] | map(select(.isAvailable == true)) | first | .udid') && \
 		echo "Using scheme: $$IOS_SCHEME" && \
-		echo "SIM_ID=$$SIM_ID" >> $(GITHUB_ENV_FILE) && \
 		xcodebuild build \
 			-project "MASTestApp.xcodeproj" \
 			-scheme "$$IOS_SCHEME" \
-			-destination "platform=iOS Simulator,id=$$SIM_ID" \
+			-destination "platform=iOS Simulator,name=Any iOS Simulator Device" \
 			-derivedDataPath "$(DERIVED_DATA)" \
 			CODE_SIGN_IDENTITY="" \
 			CODE_SIGNING_REQUIRED=NO \
