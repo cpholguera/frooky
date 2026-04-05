@@ -9,13 +9,13 @@ permissions:
   contents: read
 
 jobs:
-  build-ios-app:
-    uses: ./.github/workflows/build-ios-app.yml
+  build-app-ios:
+    uses: ./.github/workflows/build-app-ios.yml
 
   test-agent-ios:
     name: Test agent iOS
     runs-on: macos-26
-    needs: build-ios-app
+    needs: build-app-ios
     timeout-minutes: 30
 
     steps:
