@@ -1,14 +1,19 @@
-name: Build MAS app Android
+name: Build Android target app
 
 on:
   workflow_call:
+    inputs:
+      app_dir:
+        description: 'Optional path to a custom app. Will be pass as APP_DIR to make build'
+        required: false
+        type: string
 
 permissions:
   contents: read
 
 jobs:
-  build-mas-app-android:
-    name: Build MAS app Android
+  build-android-app:
+    name: Build & Upload Android App
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -27,9 +32,16 @@ jobs:
         with:
           gradle-version: wrapper
 
-      - name: Build debug APK (empty mas-app-android)
+      - name: Build Android target app
         working-directory: tests/target-apps/android
-        run: make build
+        run: |
+          if [ -n "${{ inputs.app_dir }}" ]; then
+            echo "Building the custom app located in: ${{ inputs.app_dir }}"
+            make build APP_DIR=${{ inputs.app_dir }}
+          else
+            echo "Building empty MAS Test App."
+            make build
+          fi
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v7

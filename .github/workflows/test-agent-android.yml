@@ -9,13 +9,13 @@ permissions:
   contents: read
 
 jobs:
-  build-mas-app-android:
-    uses: ./.github/workflows/build-mas-app-android.yml
+  build-android-app:
+    uses: ./.github/workflows/build-app-android.yml
 
   test-agent-android:
     name: Test agent Android
     runs-on: ubuntu-latest
-    needs: build-mas-app-android
+    needs: build-android-app
     timeout-minutes: 30
 
     steps:
