@@ -1,6 +1,6 @@
 // very simple testing framework runnable in a frida environment
 
-interface Matcher<T = unknown> {
+interface Matcher<T> {
     toBe(expected: T): void;
     toEqual(expected: T): void;
     toBeTruthy(): void;
