@@ -12,7 +12,7 @@ type TestMessage =
 	| { type: 'test-result'; result: TestResult }
 	| { type: 'test-complete'; success: boolean; results: TestResult[] };
 
-interface Matcher<T = unknown> {
+interface Matcher<T> {
 	toBe: (expected: T) => void;
 	toEqual: (expected: T) => void;
 	toBeTruthy: () => void;
@@ -32,14 +32,14 @@ const assert = (condition: boolean, message: string) => {
 	if (!condition) throw new Error(message);
 };
 
-const deepEqual = (a: unknown, b: unknown): boolean => {
-	if (a === b) return true;
-	if (a == null || b == null || typeof a !== 'object' || typeof b !== 'object') return false;
-	const keysA = Object.keys(a);
-	if (keysA.length !== Object.keys(b).length) return false;
-	return keysA.every(k =>
-		deepEqual((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k])
-	);
+const deepEqual = <T>(a: T, b: T): boolean => {
+    if (a === b) return true;
+    if (a == null || b == null || typeof a !== 'object' || typeof b !== 'object') return false;
+    const keysA = Object.keys(a);
+    if (keysA.length !== Object.keys(b).length) return false;
+    return keysA.every(k =>
+        deepEqual((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k])
+    );
 };
 
 globalThis.expect = <T>(actual: T): Matcher<T> => ({
