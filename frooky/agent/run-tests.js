@@ -83,12 +83,20 @@ async function runTests() {
             const payload = message.payload;
 
             if (payload.type === 'test-result') {
-                // Print individual test results as they arrive
-                if (payload.passed) {
-                    console.log(`  ✅ PASS: ${payload.name}`);
-                } else {
-                    console.error(`  ❌ FAIL: ${payload.name}: ${payload.error}`);
-                }
+                const printResult = (result) => {
+                    const indent = '  '.repeat(result.depth ?? 0);
+                    if (result.passed) {
+                        console.log(`${indent}✅ PASS: ${result.name}`);
+                    } else {
+                        const error = result.error ? `: ${result.error}` : '';
+                        console.error(`${indent}❌ FAIL: ${result.name}${error}`);
+                    }
+                    for (const child of result.children ?? []) {
+                        printResult(child);
+                    }
+                };
+                printResult(payload.result);
+
             } else if (payload.type === 'test-complete') {
                 testComplete = true;
 

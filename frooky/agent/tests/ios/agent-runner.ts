@@ -1,8 +1,7 @@
-// tests/ios/agent-runner.ts
 import { runTests } from '../agent-test-framework';
 
-
 // Import all ios test files
+import '../shared/test-testing';
 import './test-method-resolver';
 import './test-runtime';
 
