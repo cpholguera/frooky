@@ -9,13 +9,18 @@ permissions:
   contents: read
 
 jobs:
+  build-agent:
+    uses: ./.github/workflows/build-agent.yml
+
   build-app-android:
     uses: ./.github/workflows/build-app-android.yml
 
   test-agent-android:
     name: Test agent Android
     runs-on: ubuntu-latest
-    needs: build-app-android
+    needs: 
+      - build-agent
+      - build-app-android
     timeout-minutes: 30
 
     steps:
@@ -30,52 +35,13 @@ jobs:
           name: target-app-android
           path: target-app-android
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
+      - name: Setup Frida
+        uses: ./.github/actions/setup-frida
+
+      - name: Setup Android emulator environment
+        uses: ./.github/actions/setup-android-emulator
         with:
-          node-version: "24"
-          cache: 'npm'
-          cache-dependency-path: './frooky/agent/package-lock.json'
-
-      - name: Install Node.js dependencies
-        run: npm ci
-        working-directory: frooky/agent
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.x"
-
-      - name: Install Frida
-        run: |
-          python -m pip install frida
-          python -m pip install frida-tools
-
-      - name: Enable KVM
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
-      - name: Cache AVD snapshot
-        uses: actions/cache@v5
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-34
-
-      - name: Create AVD and generate snapshot
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-          disable-animations: false
-          script: echo "Generated AVD snapshot"
+          api-level: "34"
 
       - name: Run tests
         uses: reactivecircus/android-emulator-runner@v2

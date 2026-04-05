@@ -9,13 +9,18 @@ permissions:
   contents: read
 
 jobs:
+  build-agent:
+    uses: ./.github/workflows/build-agent.yml
+
   build-app-ios:
     uses: ./.github/workflows/build-app-ios.yml
 
   test-agent-ios:
     name: Test agent iOS
     runs-on: macos-26
-    needs: build-app-ios
+    needs: 
+      - build-agent
+      - build-app-ios
     timeout-minutes: 30
 
     steps:
@@ -30,26 +35,8 @@ jobs:
           name: target-app-ios
           path: target-app-ios
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: 'npm'
-          cache-dependency-path: './frooky/agent/package-lock.json'
-
-      - name: Install Node.js dependencies
-        run: npm ci
-        working-directory: frooky/agent
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.x"
-
-      - name: Install Frida
-        run: |
-          python -m pip install frida
-          python -m pip install frida-tools
+      - name: Setup Frida
+        uses: ./.github/actions/setup-frida
 
       - name: Boot iOS Simulator
         run: |         
