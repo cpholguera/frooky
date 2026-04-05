@@ -25,11 +25,9 @@ jobs:
         working-directory: tests/target-apps/ios
         run: |
           if [ -n "${{ inputs.app_dir }}" ]; then
-            echo "Building the custom app located in: ${{ inputs.app_dir }}"
-            make build APP_DIR=${{ inputs.app_dir }}
+            make build APP_DIR=${{ inputs.app_dir }} GITHUB_ENV_FILE=$GITHUB_ENV
           else
-            echo "Building empty MAS Test App."
-            make build
+            make build GITHUB_ENV_FILE=$GITHUB_ENV
           fi
         
       - name: Upload iOS artifact

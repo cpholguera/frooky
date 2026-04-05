@@ -49,9 +49,8 @@ jobs:
       - name: Install app on simulator
         run: |
           APP_PATH=target-app-ios/MASTestApp.app
-
-          echo "Installing target app"
-          xcrun simctl install "iPhone 17" "$APP_PATH"
+          echo "Installing target app on simulator: $SIM_ID"
+          xcrun simctl install "$SIM_ID" "$APP_PATH"
 
       - name: Run tests
         shell: bash
