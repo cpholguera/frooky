@@ -10,15 +10,15 @@ Tests are written using `test()` and `expect()`. Tests can be nested to any dept
 
 ## Matchers
 
-| Matcher                  | Description                                 |
-| ------------------------ | ------------------------------------------- |
-| `.toBe(value)`           | Strict equality (`===`)                     |
-| `.toEqual(value)`        | Deep equality                               |
-| `.toBeTruthy()`          | Value is truthy                             |
-| `.toBeFalsy()`           | Value is falsy                              |
-| `.toThrow()`             | Exception thrown                            |
-| `.toThrow('message')`    | Exception thrown  with matching sub-message |
-| `.toThrow(error)`        | Exception thrown instance of class          |
+| Matcher               | Description                                 |
+| --------------------- | ------------------------------------------- |
+| `.toBe(value)`        | Strict equality (`===`)                     |
+| `.toEqual(value)`     | Deep equality                               |
+| `.toBeTruthy()`       | Value is truthy                             |
+| `.toBeFalsy()`        | Value is falsy                              |
+| `.toThrow()`          | Exception thrown                            |
+| `.toThrow('message')` | Exception thrown  with matching sub-message |
+| `.toThrow(error)`     | Exception thrown instance of class          |
 
 ### Basic syntax
 
