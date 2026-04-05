@@ -22,17 +22,15 @@ jobs:
           repository: cpholguera/mas-app-ios
           path: mas-app-ios
 
-    # TODO: Add the possibility to build a custom target app for the frooky unit tests
+      - name: Copy example files
+        run: |
+          EXAMPLE_DIR="docs/examples/ios-app"
 
-    #   - name: Copy example files
-    #     run: |
-    #       EXAMPLE_DIR="docs/examples/ios-app"
-
-    #       # Copy MastgTest.swift if it exists
-    #       if [ -f "$EXAMPLE_DIR/MastgTest.swift" ]; then
-    #         cp -f "$EXAMPLE_DIR/MastgTest.swift" mas-app-ios/MASTestApp/MastgTest.swift
-    #         echo "Copied MastgTest.swift"
-    #       fi
+          # Copy MastgTest.swift if it exists
+          if [ -f "$EXAMPLE_DIR/MastgTest.swift" ]; then
+            cp -f "$EXAMPLE_DIR/MastgTest.swift" mas-app-ios/MASTestApp/MastgTest.swift
+            echo "Copied MastgTest.swift"
+          fi
 
       - name: Build the app for simulator
         run: |
