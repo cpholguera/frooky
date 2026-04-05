@@ -63,7 +63,7 @@ jobs:
         run: |
           APP_PATH=target-app-ios/MASTestApp.app
 
-          echo "Installing app $APP_PATH on iPhone 17"
+          echo "Installing target app"
           xcrun simctl install "iPhone 17" "$APP_PATH"
 
       - name: Run tests
@@ -80,8 +80,10 @@ jobs:
             if kill -0 "$PID" 2>/dev/null; then
               echo "App is running (PID $PID)."
 
-              echo "Running frooky agent tests"
+              echo "Running iOS agent tests"
               npm --prefix frooky/agent run test:ios:local -- --appIdentifier $PID | tee test-results-ios.txt
+              cat test-results-ios.txt
+              cat test-results-ios.txt >> $GITHUB_STEP_SUMMARY
 
               exit 0
             fi

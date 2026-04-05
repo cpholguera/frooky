@@ -95,10 +95,10 @@ jobs:
             echo "Installing frida server"
             .github/scripts/android/install-frida-server.sh
 
-            echo "Installing MAS app Android"
+            echo "Installing target app"
             adb install target-app-android/MASTestApp.apk
 
-            echo "Running agent tests"
+            echo "Running Android agent tests"
             npm --prefix frooky/agent run test:android -- --appIdentifier org.owasp.mastestapp > test-results-android.txt
             cat test-results-android.txt
             cat test-results-android.txt >> $GITHUB_STEP_SUMMARY
