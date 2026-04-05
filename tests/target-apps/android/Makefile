@@ -3,7 +3,7 @@ BUILD_DIR := $(CURDIR)/build
 DIST_DIR  := $(CURDIR)/dist
 CLONE_DIR := $(BUILD_DIR)/mas-app-android
 APK_SRC   := $(CLONE_DIR)/app/build/outputs/apk/debug/app-debug.apk
-APK_DST   := $(DIST_DIR)/app-debug.apk
+APK_DST   := $(DIST_DIR)/MASTestApp.apk
 
 JAVA_HOME ?= $(shell java -XshowSettings:property -version 2>&1 | grep java.home | awk '{print $$3}')
 

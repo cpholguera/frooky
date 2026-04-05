@@ -63,19 +63,43 @@ npm run test:ios:local -- --appIdentifier <value>
 
 Tests usually require a target app which implements the feature that should be tested.
 
-These apps are located in the folder `frooky/agent/tests/<os>/target-apps`. They must be in the form of a [MASTG-DEMO app](https://mas.owasp.org/MASTG/demos/#).
+These apps are located in the folder `tests/target-apps/<android|ios>/`. They must be in the form of a [MASTG-DEMO app](https://mas.owasp.org/MASTG/demos/#).
 
 The app identified for the Android app is `org.owasp.mastestapp` and for the iOS app `org.owasp.mastestapp.MASTestApp-iOS`.
 
-To compile them, run `buildTargetApp.sh <target-apps>`, which can be found in the folder `frooky/agent/tests/<os>/target-apps`  This script will:
+To compile them, run `make build APP_DIR=<app-dir>` in `tests/target-apps/<android|ios>/`.
+
+`app-dir` is the folder where the demo app is. If no `APP_DIR` is provided, an empty [`mas-app-ios`](https://github.com/cpholguera/mas-app-ios) or [`mas-app-android`](https://github.com/cpholguera/mas-app-android) app is built.
+
+The build process does the following:
 
 1. Create a temporary build folder
-2. Checkout the base app
-3. Copy the files from the target app to the checked out app
-4. Build the target app
-5. Stores the binary in the folder `frooky/agent/tests/<os>/target-apps/<target-app>/dist`
+2. `git checkout` the base app (`mas-app-ios` or `mas-app-android`)
+3. Copy the files from the target app to the checked out base app
+4. Compile the app using the platform dependent build system
+5. Stores the binary in the folder `tests/target-apps/<android|ios>/dist`
 
-At the moment, there is no automation to start the app. This means, the developer is responsible that the right target app is running on the device. The test script will always just start the target app based on the app identifier.
+**Examples 1:** Building an empty `mas-app-ios` app:
+
+```sh
+cd tests/target-apps/ios
+make build
+```
+
+This will compile the app and store it in `tests/target-apps/ios/dist/MASTestApp.app`.
+
+**Examples 2:** Building a custom for parameter testing
+
+```sh
+cd tests/target-apps/android
+make build APP_DIR=./basic-parameter
+```
+
+This will compile the app and store it in `tests/target-apps/android/dist/MASTestApp.apk`.
+
+> [!NOTE]
+> At the moment, there is no automation to start the app.
+> This means, the developer is responsible that the right target app is running on the device. The test script will always just start the target app based on the app identifier.
 
 ### iOS Tests
 
