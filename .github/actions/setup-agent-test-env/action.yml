@@ -1,4 +1,4 @@
-name: Setup Test Environment
+name: Setup Test Environment for Agents
 description: Setup Node.js, Python & install Frida
 runs:
   using: composite

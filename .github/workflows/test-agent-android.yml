@@ -35,8 +35,8 @@ jobs:
           name: target-app-android
           path: target-app-android
 
-      - name: Setup Test Environment
-        uses: ./.github/actions/setup-test-env
+      - name: Setup Agent Test Environment
+        uses: ./.github/actions/setup-agent-test-env
 
       - name: Setup Android emulator environment
         uses: ./.github/actions/setup-android-emulator

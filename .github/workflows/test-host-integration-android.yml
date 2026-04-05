@@ -35,6 +35,9 @@ jobs:
           name: target-app-android
           path: target-app-android
 
+      - name: Setup Host Test Environment
+        uses: ./.github/actions/setup-host-test-env
+
       - name: Setup Android emulator environment
         uses: ./.github/actions/setup-android-emulator
         with:

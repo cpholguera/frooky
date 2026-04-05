@@ -35,6 +35,9 @@ jobs:
           name: target-app-ios
           path: target-app-ios
 
+      - name: Setup Host Test Environment
+        uses: ./.github/actions/setup-host-test-env
+
       - name: Boot simulator
         run: |
           SIM_ID=$(xcrun simctl list devices available -j | \

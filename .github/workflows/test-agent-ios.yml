@@ -35,8 +35,8 @@ jobs:
           name: target-app-ios
           path: target-app-ios
 
-      - name: Setup Test Environment
-        uses: ./.github/actions/setup-test-env
+      - name: Setup Agent Test Environment
+        uses: ./.github/actions/setup-agent-test-env
 
       - name: Boot simulator
         run: |

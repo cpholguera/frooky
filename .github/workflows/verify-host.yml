@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Download agent artifact
+      - name: Download host artifact
         uses: actions/download-artifact@v8
         with:
           name: frooky-host
