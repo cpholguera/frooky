@@ -27,8 +27,8 @@ jobs:
       - name: Download MAS app Android artifact
         uses: actions/download-artifact@v8
         with:
-          name: mas-app-android
-          path: mas-app-android
+          name: target-app-android
+          path: target-app-android
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -96,7 +96,7 @@ jobs:
             .github/scripts/android/install-frida-server.sh
 
             echo "Installing MAS app Android"
-            adb install mas-app-android/app-debug.apk
+            adb install target-app-android/MASTestApp.apk
 
             echo "Running agent tests"
             npm --prefix frooky/agent run test:android -- --appIdentifier org.owasp.mastestapp > test-results-android.txt

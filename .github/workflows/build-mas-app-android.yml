@@ -34,5 +34,5 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v7
         with:
-          name: mas-app-android
+          name: target-app-android
           path: tests/target-apps/android/dist/MASTestApp.apk

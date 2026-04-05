@@ -27,8 +27,8 @@ jobs:
       - name: Download MAS app iOS artifact
         uses: actions/download-artifact@v8
         with:
-          name: mas-app-ios
-          path: mas-app-ios
+          name: target-app-ios
+          path: target-app-ios
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -61,7 +61,7 @@ jobs:
 
       - name: Install app on simulator
         run: |
-          APP_PATH=$(find "mas-app-ios" -name "*.app" -type d | head -1)
+          APP_PATH=target-app-ios/MASTestApp.app
 
           echo "Installing app $APP_PATH on iPhone 17"
           xcrun simctl install "iPhone 17" "$APP_PATH"

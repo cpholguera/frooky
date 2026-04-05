@@ -23,5 +23,5 @@ jobs:
       - name: Upload MAS app iOS artifact
         uses: actions/upload-artifact@v7
         with:
-          name: mas-app-ios
+          name: target-app-ios
           path: tests/target-apps/ios/dist/MASTestApp.app
