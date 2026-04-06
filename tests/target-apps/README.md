@@ -9,7 +9,7 @@ To compile them, go to either `tests/target-apps/<android|ios>/` and run:
 - `make build APP_DIR=<app-dir>` to build a custom app.
 - `make build` to build an empty [`mas-app-ios`](https://github.com/cpholguera/mas-app-ios) or [`mas-app-android`](https://github.com/cpholguera/mas-app-android) app.
 
-**Examples 1:** Building an empty `mas-app-ios` app:
+**Example 1:** Build an empty `mas-app-ios` app:
 
 ```sh
 cd tests/target-apps/ios
@@ -18,7 +18,7 @@ make build
 
 This will compile the app and store it in `tests/target-apps/ios/dist/MASTestApp.app`.
 
-**Examples 2:** Building a custom for parameter testing
+**Example 2:** Build a custom `mas-app-android` app:
 
 ```sh
 cd tests/target-apps/android
