@@ -2,7 +2,7 @@
 
 Tests usually require a target app which implements the feature that should be tested. For example, type decoders should be tested against real implementations on Android or iOS.
 
-These apps are located in the folder `tests/target-apps/<android|ios>/`. They must be in the form of a [MASTG-DEMO app](https://mas.owasp.org/MASTG/demos/#) Hence, the app identifier for the Android app is `org.owasp.mastestapp` and for the iOS app `org.owasp.mastestapp.MASTestApp-iOS`.
+These apps are located in the folder `tests/target-apps/<android|ios>/`. They must be in the form of a [MASTG-DEMO app](https://mas.owasp.org/MASTG/demos/). Hence, the app identifier for the Android app is `org.owasp.mastestapp` and for the iOS app `org.owasp.mastestapp.MASTestApp-iOS`.
 
 To compile them, run `make build APP_DIR=<app-dir>` in the directory `tests/target-apps/<android|ios>/`.
 
