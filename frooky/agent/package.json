@@ -19,7 +19,7 @@
 
     "test:android": "npm run build:test:android && node tests/run-tests.js -p dist/agent-test-android.js -usb",
     "test:ios:usb": "npm run build:test:ios && node tests/run-tests.js -p dist/agent-test-ios.js -usb",
-    "test:ios:local": "npm run build:test:ios && tests/run-tests.js -p dist/agent-test-ios.js"
+    "test:ios:local": "npm run build:test:ios && node tests/run-tests.js -p dist/agent-test-ios.js"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
