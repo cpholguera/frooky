@@ -60,7 +60,7 @@ async function runTests() {
     }
   }
 
-  const distDir = path.join(__dirname, "dist");
+  const distDir = path.join(process.cwd(), "dist");
   const agentPath = path.join(distDir, `agent-test-${platform}.js`);
 
   const script = await session.createScript(fs.readFileSync(agentPath, "utf8"));
