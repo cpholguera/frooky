@@ -2,8 +2,8 @@ name: Test agent iOS
 
 on:
   push:
-    # paths:
-    #   - 'frooky/agent/**'
+    paths:
+      - 'frooky/agent/**'
 
 permissions:
   contents: read
