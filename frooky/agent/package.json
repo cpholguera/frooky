@@ -16,11 +16,10 @@
 
     "build:test:android": "mkdir -p dist && frida-compile --type-check none tests/android/agent-runner.ts -o dist/agent-test-android.js",
     "build:test:ios": "mkdir -p dist && frida-compile --type-check none tests/ios/agent-runner.ts -o dist/agent-test-ios.js",
-    "build:test": "npm run build:test:android && npm run build:test:ios",
 
-    "test:android": "npm run build:test && node tests/run-tests.js -p dist/agent-test-android.js -usb",
-    "test:ios:usb": "npm run build:test && node tests/run-tests.js -p dist/agent-test-ios.js -usb",
-    "test:ios:local": "npm run build:test && tests/run-tests.js -p dist/agent-test-ios.js"
+    "test:android": "npm run build:test:android && node tests/run-tests.js -p dist/agent-test-android.js -usb",
+    "test:ios:usb": "npm run build:test:ios && node tests/run-tests.js -p dist/agent-test-ios.js -usb",
+    "test:ios:local": "npm run build:test:ios && tests/run-tests.js -p dist/agent-test-ios.js"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
