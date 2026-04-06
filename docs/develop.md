@@ -79,83 +79,43 @@ npm ci
 
 You only need to do this once (or after updating `package-lock.json`).
 
-### iOS Tests
+In general, you need to have either the PID (attach), bundle-id (spawn then attach), or app name (attach by name).
 
-There are two test modes depending on where the app is running.
+#### Option A: USB Device (Android and iOS)
 
-#### Option A: USB Device
-
-Use this when the app is running on a **physical iOS device** connected over USB with `frida-server` running on the device (or with a Frida gadget embedded in the app).
+Use this when the app is running on a device connected over USB with `frida-server` running on the device (or with a Frida gadget embedded in the app).
 
 ```bash
-# From frooky/agent/
-npm run test:ios:usb -- --appIdentifier <pid|bundle-id|app-name>
+# Examples: Target is an physical or emulated Android:
+npm run test:android:usb -i org.owasp.mastestapp
+npm run test:android:usb -i MASTestApp
+npm run test:android:usb -i 4926
 
-# Examples:
-npm run test:ios:usb -- --appIdentifier org.owasp.mastestapp.MASTestApp-iOS
-npm run test:ios:usb -- --appIdentifier 12345
-npm run test:ios:usb -- --appIdentifier MASTestApp
+# Examples: Target is a physical iOS USB device mode:
+npm run test:ios:usb -i org.owasp.mastestapp.MASTestApp-iOS
+npm run test:ios:usb -i MASTestApp
+npm run test:ios:usb -i 23452
 ```
 
-For `test:ios:usb`, `--appIdentifier` supports PID (attach), bundle-id (spawn then attach), or app name (attach by name).
-
-#### Option B: Local (iOS Simulator)
+#### Option B: Local (iOS Simulator only)
 
 Use this when targeting an **iOS Simulator** on your Mac via the local device.
 
-For `test:ios:local`, `--appIdentifier` supports:
+Compared to option A, this differs, because the target app in an iOS simulator is running as local process on the host system. This means, that there is no need to start a dedicated Frida server.
 
-- numeric PID (attach)
-- bundle identifier (spawn then attach)
-- app/process name (attach by name; app must already be running)
+Use the following commands to test against the running simulator:
 
 ```bash
-# Option 1: use PID
-# 1. Launch the app in the simulator first, then find its PID:
-ps aux | grep -i <app-name>
-# Or use: frida-ps -D <simulator-udid>
-npm run test:ios:local -- --appIdentifier 12345
+# Examples: Target is an physical or emulated Android:
+npm run test:android:usb -i org.owasp.mastestapp
+npm run test:android:usb -i MASTestApp
+npm run test:android:usb -i 4926
 
-# Option 2: use bundle id (spawn)
-npm run test:ios:local -- --appIdentifier org.owasp.mastestapp.MASTestApp-iOS
-
-# Option 3: use process name (attach)
-npm run test:ios:local -- --appIdentifier MASTestApp
+# Examples: Target is a iOS simulator:
+npm run test:ios:local -i org.owasp.mastestapp.MASTestApp-iOS
+npm run test:ios:local -i MASTestApp
+npm run test:ios:local -i 23452
 ```
-
-### Android Tests
-
-Use this when the app is running on a **physical Android device** or emulator connected over USB with `frida-server` running.
-
-`test:android` supports `--appIdentifier <pid|package-id|app-name>`.
-
-```bash
-# package-id (spawn)
-npm run test:android -- --appIdentifier org.owasp.mastestapp
-
-# pid (attach)
-npm run test:android -- --appIdentifier 4926
-
-# app-name (attach by name)
-npm run test:android -- --appIdentifier MASTestApp
-```
-
-On Android emulators, SELinux can block `spawn`. In that case, use PID or app-name attach:
-
-```bash
-# Find the app's PID
-adb shell ps -A | grep mastestapp
-# or:
-frida-ps -U | grep -i mast
-
-# Run tests by attaching to the existing process
-npm run test:android -- --appIdentifier <PID>
-
-# Example:
-npm run test:android -- --appIdentifier 4926
-```
-
-`run-tests.js` first tries spawn for string identifiers, then falls back to attach-by-name if spawn fails.
 
 ### What the Tests Do
 
