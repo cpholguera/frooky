@@ -13,9 +13,9 @@
     "build:watch:ios": "node build.js -p ios -w -t frida --type-check none",
     "build:test:android": "frida-compile --type-check none tests/android/agent-runner.ts -o dist/agent-test-android.js",
     "build:test:ios": "frida-compile --type-check none tests/ios/agent-runner.ts -o dist/agent-test-ios.js",
-    "test:android": "npm run build:dev:android && npm run build:test:android && node run-tests.js -p android --usb",
-    "test:ios:usb": "npm run build:dev:ios && npm run build:test:ios && node run-tests.js -p ios --usb",
-    "test:ios:local": "npm run build:dev:ios && npm run build:test:ios && node run-tests.js -p ios"
+    "test:android": "npm run build:dev:android && npm run build:test:android && node test/run-tests.js -p android --usb",
+    "test:ios:usb": "npm run build:dev:ios && npm run build:test:ios && node test/run-tests.js -p ios --usb",
+    "test:ios:local": "npm run build:dev:ios && npm run build:test:ios && node test/run-tests.js -p ios"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
