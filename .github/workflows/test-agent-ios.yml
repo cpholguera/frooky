@@ -64,7 +64,7 @@ jobs:
               cat test-results-ios.txt
               
               echo '```' >> $GITHUB_STEP_SUMMARY
-              cat test-results-android.txt >> $GITHUB_STEP_SUMMARY
+              cat test-results-ios.txt >> $GITHUB_STEP_SUMMARY
               echo '```' >> $GITHUB_STEP_SUMMARY
                 
               exit 0
