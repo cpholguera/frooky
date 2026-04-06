@@ -51,13 +51,13 @@ After you created the desired hook file, run `frooky`:
 
 ```bash
 # Attach by app name
-frooky -U -n org.owasp.mastestapp --platform android hooks.yaml
+frooky android -U -n org.owasp.mastestapp hooks.yaml
 
 # Spawn and add multiple hook files (hooks are merged)
-frooky -U -f org.owasp.mastestapp --platform android storage.yaml crypto.yaml
+frooky android -U -f org.owasp.mastestapp storage.yaml crypto.yaml
 
 # Spawn and add multiple hook files using globs (hooks are merged)
-frooky -U -f org.owasp.mastestapp --platform android hooks_*.yaml
+frooky android -U -f org.owasp.mastestapp hooks_*.yaml
 ```
 
 See `frooky -h` for more options.
@@ -147,7 +147,7 @@ hooks:
 Then run `frooky` with the hook file against your target app:
 
 ```bash
-frooky -U -n org.owasp.mastestapp --platform android keygen.yaml
+frooky android -U -n org.owasp.mastestapp keygen.yaml
 ```
 
 Events are written to the output file in JSON Lines format (one JSON object per line, known as NDJSON). 
