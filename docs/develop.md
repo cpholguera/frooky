@@ -52,7 +52,7 @@ The following chapters describe how to write tests and target apps the tests sho
 
 Tests usually require a target app which implements the feature that should be tested.
 
-You find them in the folder `tests/test-apps`, together with [instructions](../tests/target-apps/README.md) how to build them.
+You find them in the folder `tests/target-apps`, together with [instructions](../tests/target-apps/README.md) how to build them.
 
 ### Installing the Target App
 
