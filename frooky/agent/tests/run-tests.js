@@ -1,18 +1,15 @@
 // run-tests.js
 
 import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import frida from "frida";
 import minimist from "minimist";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 const argv = minimist(process.argv.slice(2), {
-  string: ["platform", "appIdentifier"],
+  string: ["appIdentifier", "agentPath"],
   boolean: ["help", "usb"],
   alias: {
-    p: "platform",
+    i: "appIdentifier",
+    p: "agentPath",
     h: "help",
     u: "usb",
   },
@@ -20,7 +17,7 @@ const argv = minimist(process.argv.slice(2), {
 
 const help = argv.help;
 const usb = argv.usb;
-const platform = argv.platform;
+const agentPath = argv.agentPath;
 const appIdentifier = Number.isFinite(Number(argv.appIdentifier)) ? Number(argv.appIdentifier) : argv.appIdentifier;
 
 if (help) {
@@ -59,9 +56,6 @@ async function runTests() {
       session = await device.attach(pid);
     }
   }
-
-  const distDir = path.join(process.cwd(), "dist");
-  const agentPath = path.join(distDir, `agent-test-${platform}.js`);
 
   const script = await session.createScript(fs.readFileSync(agentPath, "utf8"));
 
@@ -134,29 +128,29 @@ runTests().catch((err) => {
 function showHelp() {
   console.log(`
     Options:
-    -p, --platform <name>         Platform (android, ios)
-    --appIdentifier <value>       Required: pid, bundle/package id, or app name
+    -p, --agentPath <name>        Required: Path to the testing framework for Frida (compiled JavaScript)
+    -i, --appIdentifier <value>   Required: pid, bundle/package id, or app name
     -u, --usb                     Use USB device mode
     -h, --help                    Show this help message
 
-    Examples:
-    npm run test:android -- --appIdentifier org.owasp.mastestapp
-    npm run test:android -- --appIdentifier 4926
-    npm run test:android -- --appIdentifier MASTestApp
-    npm run test:ios:usb -- --appIdentifier org.owasp.mastestapp.MASTestApp-iOS
-    npm run test:ios:local -- --appIdentifier 39417
+    Examples: Target is USB device mode:
+    node run-tests.js -i org.owasp.mastestapp -u -p test-framework.js
+    node run-tests.js -i 4926 -u -p test-framework.js
+    node run-tests.js -i MASTestApp -u -p test-framework.js
+
+    Example: Target is local simulator:
+    node run-tests.js -i org.owasp.mastestapp.MASTestApp-iOS -p test-framework.js 
     `);
   process.exit(0);
 }
 
 function validateInput(argv) {
-  const validPlatforms = ["android", "ios"];
-  if (!validPlatforms.includes(argv.platform)) {
-    console.error(`Platform must be one of: ${validPlatforms.join(", ")}`);
+  if (!argv.appIdentifier) {
+    console.error("App Identifier (-i/--appIdentifier) is required");
     process.exit(1);
   }
-  if (!argv.appIdentifier) {
-    console.error("App Identifier (--appIdentifier) is required");
+  if (!argv.agentPath) {
+    console.error("Agent path (-p/--agentPath) is required");
     process.exit(1);
   }
 }
