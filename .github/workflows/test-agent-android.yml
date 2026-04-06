@@ -61,7 +61,6 @@ jobs:
 
             echo "Running Android agent tests"
             npm --prefix frooky/agent run test:android -- --appIdentifier org.owasp.mastestapp > test-results-android.txt
-            cat test-results-android.txt
 
             echo '```' >> $GITHUB_STEP_SUMMARY
             cat test-results-android.txt >> $GITHUB_STEP_SUMMARY
