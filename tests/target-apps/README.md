@@ -30,4 +30,4 @@ This will compile the app and store it in `tests/target-apps/android/dist/MASTes
 > [!NOTE]
 > At the moment, there is no automation to start the app.
 > This means, the developer is responsible that the right target app is running on the device and that Frida is available.
-> Agent tests will always just start the target app based on the app identifier.
+> Agent tests will always spawn the target app based on the app identifier.
