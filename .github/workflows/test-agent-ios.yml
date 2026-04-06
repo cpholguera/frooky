@@ -66,8 +66,11 @@ jobs:
               echo "Running iOS agent tests"
               npm --prefix frooky/agent run test:ios:local -- --appIdentifier $PID | tee test-results-ios.txt
               cat test-results-ios.txt
-              cat test-results-ios.txt >> $GITHUB_STEP_SUMMARY
-
+              
+              echo '```&#x27; &gt;&gt; $GITHUB_STEP_SUMMARY
+              cat test-results-android.txt &gt;&gt; $GITHUB_STEP_SUMMARY
+              echo &#x27;```' >> $GITHUB_STEP_SUMMARY
+              
               exit 0
             fi
             echo "Attempt $i: app not running yet, retrying in 2s..."
