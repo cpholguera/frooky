@@ -4,8 +4,8 @@ This document describes the architecture of the frooky agent. The frooky agent i
 
 1. Bootstrap
 1. Hook File Validator
-1. Hook Lookup
-1. Decoder Lookup
+1. Hook Resolver
+1. Decoder Resolver
 1. Decoder
 1. Hooking
 2. Event Sender
@@ -19,8 +19,8 @@ The following graph shows what happens, when we start a frooky agent:
 sequenceDiagram
     participant BS as Bootstrap
     participant HFV as Hook File Validator
-    participant HL as Hook Lookup
-    participant DL as Decoder Lookup
+    participant HL as Hook Resolver
+    participant DL as Decoder Resolver
     participant H as Hooking
 
     BS->>BS: Init variables
@@ -28,13 +28,13 @@ sequenceDiagram
     BS->>BS: Init messaging
 
     BS->>HFV: 
-    HFV->>HL: Lookup hooks
+    HFV->>HL: Resolve hooks
 
-    HL->>HL: Lookup platform hooks
-    HL->>HL: Lookup native hooks
+    HL->>HL: Resolve platform hooks
+    HL->>HL: Resolve native hooks
 
 
-    HL->>DL: Lookup decoders
+    HL->>DL: Resolve decoders
     DL-->>HL: Decoders
 
     HL->>H: Hooks
@@ -55,14 +55,14 @@ Here the responsibilities for the different components:
 
     The code is shared between all platforms.
 
-1. **Hook Lookup**  
+1. **Hook Resolver**  
     Does the lookup of the target function or method. 
 
     This depends on the platform. Android, iOS both have their own implementation of the hook lookup for platform hooks (Java and Objective-C).
 
     The native lookup is shared between all platforms.
 
-1. **Decoder Lookup**  
+1. **Decoder Resolver**  
     If the hook contains a type, frooky will check, if an internal decoder for this type exists. If a custom decoder is specified, frooky will load it.
 
     The decoder is then stored in the hook structure for faster access when the hook fires.

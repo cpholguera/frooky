@@ -1,5 +1,5 @@
 import ObjC from "frida-objc-bridge";
-import { uuidv4, toHex } from "../shared/utils.js"
+import { uuidv4, toHex } from "../../shared/utils.js"
 
 
 // --- Native argument decoding utilities (mirroring Android native) ---
