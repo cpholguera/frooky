@@ -87,9 +87,9 @@ Use this when the app is running on a device connected over USB with `frida-serv
 
 ```bash
 # Examples: Target is an physical or emulated Android:
-npm run test:android:usb -i org.owasp.mastestapp
-npm run test:android:usb -i MASTestApp
-npm run test:android:usb -i 4926
+npm run test:android -i org.owasp.mastestapp
+npm run test:android -i MASTestApp
+npm run test:android -i 4926
 
 # Examples: Target is a physical iOS USB device mode:
 npm run test:ios:usb -i org.owasp.mastestapp.MASTestApp-iOS
