@@ -2,8 +2,8 @@ name: Test agent Android
 
 on:
   push:
-    paths:
-      - 'frooky/agent/**'
+    # paths:
+    #   - 'frooky/agent/**'
   
 permissions:
   contents: read
@@ -71,7 +71,7 @@ jobs:
             echo '```&#x27; &gt;&gt; $GITHUB_STEP_SUMMARY
             cat test-results-android.txt &gt;&gt; $GITHUB_STEP_SUMMARY
             echo &#x27;```' >> $GITHUB_STEP_SUMMARY
-            
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v7

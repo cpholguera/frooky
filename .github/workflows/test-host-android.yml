@@ -16,7 +16,7 @@ jobs:
       app_dir: "mastg-demo-0060"
 
   test-host-android:
-    name: Test agent Android
+    name: Test host Android
     runs-on: ubuntu-latest
     needs: 
       - build-host
