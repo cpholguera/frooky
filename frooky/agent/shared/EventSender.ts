@@ -1,1 +1,1 @@
-// stub
+// stub, takes care of event cache and sending events to the host
