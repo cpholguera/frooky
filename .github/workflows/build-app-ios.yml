@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       app_dir:
-        description: 'Optional path to a custom app. Will be pass as APP_DIR to make build'
+        description: "Optional path to a custom app. Will be pass as APP_DIR to make build"
         required: false
         type: string
 
@@ -29,7 +29,7 @@ jobs:
           else
             make build GITHUB_ENV_FILE=$GITHUB_ENV
           fi
-        
+
       - name: Upload iOS artifact
         uses: actions/upload-artifact@v7
         with:

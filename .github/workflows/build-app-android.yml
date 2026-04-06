@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       app_dir:
-        description: 'Optional path to a custom app. Will be pass as APP_DIR to make build'
+        description: "Optional path to a custom app. Will be pass as APP_DIR to make build"
         required: false
         type: string
 
@@ -20,12 +20,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-        
+
       - name: Set up Java
         uses: actions/setup-java@v5
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: "21"
+          distribution: "temurin"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6

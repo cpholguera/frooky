@@ -10,7 +10,7 @@ jobs:
     permissions:
       pull-requests: write
       issues: read
-    
+
     steps:
       - name: Sync labels from linked issues
         uses: actions/github-script@v7
@@ -18,14 +18,14 @@ jobs:
           script: |
             const prNumber = context.payload.pull_request.number;
             const prBody = context.payload.pull_request.body || '';
-            
+
             const issueNumbers = new Set();
-            
+
             // Pattern 1: Simple format - fixes #123, closes#456
             const simpleRegex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s*#(\d+)/gi;
             const simpleMatches = [...prBody.matchAll(simpleRegex)];
             simpleMatches.forEach(match => issueNumbers.add(parseInt(match[1])));
-            
+
             // Pattern 2: Owner/repo format - fixes owner/repo#123
             const ownerRepoRegex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+([a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+)#(\d+)/gi;
             const ownerRepoMatches = [...prBody.matchAll(ownerRepoRegex)];
@@ -39,7 +39,7 @@ jobs:
                 console.log(`Skipping cross-repository issue: ${repoPath}#${issueNum}`);
               }
             });
-            
+
             // Pattern 3: Full URL format - fixes https://github.com/owner/repo#123 or /issues/123
             const urlRegex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+https?:\/\/github\.com\/([a-zA-Z0-9._-]+)\/([a-zA-Z0-9._-]+)(?:\/issues\/|#)(\d+)/gi;
             const urlMatches = [...prBody.matchAll(urlRegex)];
@@ -54,19 +54,19 @@ jobs:
                 console.log(`Skipping cross-repository issue: ${owner}/${repo}#${issueNum}`);
               }
             });
-            
+
             const issueNumbersArray = Array.from(issueNumbers);
-            
+
             if (issueNumbersArray.length === 0) {
               console.log('No linked issues found in PR description');
               return;
             }
-            
+
             console.log(`Found linked issues: ${issueNumbersArray.join(', ')}`);
-            
+
             // Collect all labels from linked issues
             const allLabels = new Set();
-            
+
             for (const issueNumber of issueNumbersArray) {
               try {
                 const { data: issue } = await github.rest.issues.get({
@@ -84,26 +84,26 @@ jobs:
                 console.log(`Error fetching issue #${issueNumber}: ${error.message}`);
               }
             }
-            
+
             if (allLabels.size === 0) {
               console.log('No labels found on linked issues');
               return;
             }
-            
+
             console.log(`Syncing labels to PR: ${Array.from(allLabels).join(', ')}`);
-            
+
             // Get current PR labels
             const { data: currentPR } = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: prNumber
             });
-            
+
             const currentLabels = new Set(currentPR.labels.map(l => l.name));
-            
+
             // Add new labels from issues
             const labelsToAdd = Array.from(allLabels).filter(label => !currentLabels.has(label));
-            
+
             if (labelsToAdd.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,

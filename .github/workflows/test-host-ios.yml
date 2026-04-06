@@ -2,7 +2,7 @@ name: Test host iOS
 
 on:
   push:
-  
+
 permissions:
   contents: read
 
@@ -18,7 +18,7 @@ jobs:
   test-host-ios:
     name: Test host iOS
     runs-on: macos-26
-    needs: 
+    needs:
       - build-host
       - build-app-ios
     timeout-minutes: 30
@@ -73,7 +73,6 @@ jobs:
 
           echo "App did not start within the timeout."
           exit 1
-         
 
       - name: Upload test results
         if: always()

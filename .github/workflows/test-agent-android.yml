@@ -4,23 +4,18 @@ on:
   push:
     # paths:
     #   - 'frooky/agent/**'
-  
+
 permissions:
   contents: read
 
 jobs:
-  build-agent:
-    uses: ./.github/workflows/build-agent.yml
-
   build-app-android:
     uses: ./.github/workflows/build-app-android.yml
 
   test-agent-android:
     name: Test agent Android
     runs-on: ubuntu-latest
-    needs: 
-      - build-agent
-      - build-app-android
+    needs: build-app-android
     timeout-minutes: 30
 
     steps:

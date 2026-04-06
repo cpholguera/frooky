@@ -4,23 +4,18 @@ on:
   push:
     # paths:
     #   - 'frooky/agent/**'
-  
+
 permissions:
   contents: read
 
 jobs:
-  build-agent:
-    uses: ./.github/workflows/build-agent.yml
-
   build-app-ios:
     uses: ./.github/workflows/build-app-ios.yml
 
   test-agent-ios:
     name: Test agent iOS
     runs-on: macos-26
-    needs: 
-      - build-agent
-      - build-app-ios
+    needs: build-app-ios
     timeout-minutes: 30
 
     steps:
@@ -66,7 +61,7 @@ jobs:
               echo "Running iOS agent tests"
               npm --prefix frooky/agent run test:ios:local -- --appIdentifier $PID | tee test-results-ios.txt
               cat test-results-ios.txt
-
+              
               echo '```&#x27; &gt;&gt; $GITHUB_STEP_SUMMARY
               cat test-results-android.txt &gt;&gt; $GITHUB_STEP_SUMMARY
               echo &#x27;```' >> $GITHUB_STEP_SUMMARY
@@ -79,7 +74,6 @@ jobs:
 
           echo "App did not start within the timeout."
           exit 1
-         
 
       - name: Upload test results
         if: always()
