@@ -4,9 +4,10 @@ Tests usually require a target app which implements the feature that should be t
 
 These apps are located in the folder `tests/target-apps/<android|ios>/`. They must be in the form of a [MASTG-DEMO app](https://mas.owasp.org/MASTG/demos/). Hence, the app identifier for the Android app is `org.owasp.mastestapp` and for the iOS app `org.owasp.mastestapp.MASTestApp-iOS`.
 
-To compile them, run `make build APP_DIR=<app-dir>` in the directory `tests/target-apps/<android|ios>/`.
+To compile them, go to either `tests/target-apps/<android|ios>/` and run:
 
-`app-dir` is the folder where the demo app is. If no `APP_DIR` is provided, an empty [`mas-app-ios`](https://github.com/cpholguera/mas-app-ios) or [`mas-app-android`](https://github.com/cpholguera/mas-app-android) app is built.
+- `make build APP_DIR=<app-dir>` to build a custom app.
+- `make build` to build an empty [`mas-app-ios`](https://github.com/cpholguera/mas-app-ios) or [`mas-app-android`](https://github.com/cpholguera/mas-app-android) app.
 
 **Examples 1:** Building an empty `mas-app-ios` app:
 
