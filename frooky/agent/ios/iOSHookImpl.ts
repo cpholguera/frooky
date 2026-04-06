@@ -1,1 +1,2 @@
-// stub
+// stub, implements the replacement for the hooked function
+// takes care of decoding args, calling original function, decoding return value creating an event, ...

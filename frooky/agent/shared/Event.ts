@@ -1,1 +1,1 @@
-// stub
+// stub, represents an event
