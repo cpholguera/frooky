@@ -79,14 +79,6 @@ npm ci
 
 You only need to do this once (or after updating `package-lock.json`).
 
-### Key Syntax Rule
-
-When passing arguments to an npm script, you **must** use `--` to separate npm's own flags from the script's flags. Without it, npm intercepts the flags and never forwards them to the underlying script.
-
-```bash
-npm run test:ios:local -- --appIdentifier <value>
-```
-
 ### iOS Tests
 
 There are two test modes depending on where the app is running.
@@ -190,51 +182,3 @@ frooky/agent/tests/
 ```
 
 To add a new test, create a `test-*.ts` file in the relevant platform folder and import it in `agent-runner.ts`.
-
-### Troubleshooting
-
-#### `Need Gadget to attach on jailed Android`
-
-This message is a generic Frida error and may appear even when you are **not** using Frida Gadget.
-
-If you are using `frida-server`, this error almost always means one of:
-
-1. **frida-server not running** — even if the binary exists, confirm it's actually running:
-
-    ```bash
-    frida-ps -U   # should list processes; if it fails, frida-server isn't up
-    ```
-
-    Start it with: `adb root && adb shell /data/local/tmp/frida-server &`
-
-2. **Version mismatch** — the `frida` Node package used by `run-tests.js` and the `frida-server` binary on the device must be the **exact same version**. Even a minor version difference causes this error.
-
-   ```bash
-   # Check the frida-server version on the device
-   adb shell /data/local/tmp/frida-server --version
-
-   # Check the frida Node package version (from frooky/agent/)
-   npm list frida
-   ```
-
-   If they differ, download the matching `frida-server` binary from the [Frida releases page](https://github.com/frida/frida/releases) and push it to the device, then update the `frida` version pinned in `package.json` to match and run `npm ci`.
-
-   > **Note**: `frida` must be listed as a direct `devDependency` in `package.json` (not just a transitive dependency of `frida-compile`) so that its native bindings are reliably installed. If it is missing, add it with the exact matching version and re-run `npm ci`.
-
-3. **frida-server not running as root** — Frida needs root to inject into other processes. Verify:
-
-   ```bash
-   adb shell ps -A | grep frida-server   # UID should be root (or 0)
-   ```
-
-   If it's not running as root, restart it with `adb root` or via a root shell on the device.
-
-4. **spawn blocked on emulator/SELinux** — process listing may work but spawning can still fail.
-
-    Workaround: run the app first, then pass a numeric PID so tests attach instead of spawn:
-
-    ```bash
-    adb shell ps -A | grep mastestapp
-    npm run test:android -- --appIdentifier <PID>
-    ```
-
