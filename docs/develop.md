@@ -180,14 +180,13 @@ Each test script:
 ```sh
 frooky/agent/tests/
 ├── agent-test-framework.ts   # Minimal test runner (test/expect API)
+├── target-apps/              # Folder of apps in the form of MASTG-DEMO apps
 ├── android/
-│   ├── target-apps           # Folder of apps in the form of MASTG-DEMO app's
 │   ├── agent-runner.ts       # Entry point injected into the Android app
-│   ├── test-*.ts             # Tests 
+│   └── test-*.ts             # Tests
 └── ios/
-    ├── target-apps           # Folder of apps in the form of MASTG-DEMO app's
     ├── agent-runner.ts       # Entry point injected into the iOS app
-    └── test-*.ts             # Tests 
+    └── test-*.ts             # Tests
 ```
 
 To add a new test, create a `test-*.ts` file in the relevant platform folder and import it in `agent-runner.ts`.
