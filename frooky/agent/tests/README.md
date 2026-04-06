@@ -38,9 +38,27 @@ To run the tests, you need to:
 
 ## Writing Tests
 
-Tests are written using `test()` and `expect()`. Tests can be nested to any depth and can be synchronous or asynchronous.
+Tests are written using `test('testName', () => {});` and `expect(actualValue).to*(expectedValue)`.
+
+The basic syntax is:
+
+```typescript
+test('my test', () => {
+    expect(1).toBe(1);
+});
+```
+
+Tests can be nested to any depth and can be synchronous or asynchronous.
+
+The framework implicitly loads all files starting with `test_*.ts` located in the following folders:
+
+- `./android/`
+- `./ios/`
+- `./shared/`
 
 ## Matchers
+
+`expect(actualValue)` returns an Matcher which we can use to test for the expected value. Use the following functions to do that:
 
 | Matcher               | Description                                 |
 | --------------------- | ------------------------------------------- |
@@ -51,14 +69,6 @@ Tests are written using `test()` and `expect()`. Tests can be nested to any dept
 | `.toThrow()`          | Exception thrown                            |
 | `.toThrow('message')` | Exception thrown  with matching sub-message |
 | `.toThrow(error)`     | Exception thrown instance of class          |
-
-### Basic syntax
-
-```typescript
-test('my test', () => {
-    expect(1).toBe(1);
-});
-```
 
 ### Async tests
 
