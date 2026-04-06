@@ -60,6 +60,8 @@ jobs:
 
               echo "Running iOS agent tests"
               npm --prefix frooky/agent run test:ios:local -- --appIdentifier $PID > test-results-ios.txt
+
+              cat test-results-ios.txt
               
               echo '```' >> $GITHUB_STEP_SUMMARY
               cat test-results-android.txt >> $GITHUB_STEP_SUMMARY
