@@ -4,6 +4,38 @@ This is a small test framework which runs on the target. It should be used to un
 
 The following chapters explain how to write tests and how to use the framework to test remote Frida code.
 
+## Running Tests
+
+To run the tests, you need to:
+
+1. **Compile the testing framework agent**
+
+    For Android:  
+
+    ```sh
+    frida-compile tests/android/agent-runner.ts -o agent-test-android.js
+    ```
+
+    For iOS:
+
+    ```sh
+    frida-compile tests/ios/agent-runner.ts -o agent-test-ios.js
+    ```
+
+1. **Run the tests**
+
+    Now use `run-tests.js` to run the agent on the desired target device:
+
+    ```sh
+    # Examples: Target is USB device mode:
+    node run-tests.js -i org.owasp.mastestapp -u -p agent-test-android.js
+    node run-tests.js -i 4926 -u -p agent-test-android.js
+    node run-tests.js -i MASTestApp -u -p agent-test-android.js
+
+    # Example: Target is local simulator:
+    node run-tests.js -i org.owasp.mastestapp.MASTestApp-iOS -p agent-test-ios.js
+    ```
+
 ## Writing Tests
 
 Tests are written using `test()` and `expect()`. Tests can be nested to any depth and can be synchronous or asynchronous.
