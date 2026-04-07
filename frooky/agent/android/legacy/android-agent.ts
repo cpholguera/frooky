@@ -1,7 +1,7 @@
 import Java from "frida-java-bridge"
 import { decodeArgByDescriptor, filtersPass } from "./native_decoder.js"
 import { decodeArguments } from "./android-decoder.js"
-import { uuidv4 } from "../shared/utils.js"
+import { uuidv4 } from "../../shared/utils.js"
  
 /**
  * Decodes the parameter types of a Java method.
