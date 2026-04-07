@@ -48,7 +48,7 @@ export class FrookyApp {
    *
    * @param frookyConfig - The configuration to add.
    */
-  public addFrookyConfig(frookyConfig: FrookyConfig){
+  public loadFrookyConfig(frookyConfig: FrookyConfig){
     this.log.info("Loading frooky configuration...")
 
     try {
