@@ -12,10 +12,8 @@ export const paramOptionsSchema = z.object({
     decoderArgs: z.array(z.string()).optional()
 });
 
-export const paramSchema = z.union([paramTypeSchema, z.tuple([paramTypeSchema, paramOptionsSchema]), z.tuple([paramTypeSchema, paramNameSchema, paramOptionsSchema]), z.object({
+export const paramSchema = z.union([paramTypeSchema, z.tuple([paramTypeSchema, paramOptionsSchema]), z.tuple([paramTypeSchema, paramNameSchema]), z.tuple([paramTypeSchema, paramNameSchema, paramOptionsSchema]), z.object({
         type: paramTypeSchema,
         name: paramNameSchema.optional(),
         options: paramOptionsSchema.optional()
     })]);
-
-export const methodNameSchema = z.string();

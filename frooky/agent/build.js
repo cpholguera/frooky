@@ -113,42 +113,36 @@ function generateHooksFile() {
         category: null,
         hooks: []
     };
+    const frookyConfigs = []
     hooksFilePaths.forEach(file => {
         try {
             const content = fs.readFileSync(file, 'utf8');
             const ext = path.extname(file).toLowerCase();
 
-            const parsed = (ext === '.yaml' || ext === '.yml')
+            frookyConfigs.push((ext === '.yaml' || ext === '.yml')
                 ? yaml.load(content)
-                : JSON.parse(content);
+                : JSON.parse(content));
 
-            if (!mergedHooks.category && parsed.category) {
-                mergedHooks.category = parsed.category;
-            }
-
-            if (parsed.hooks && Array.isArray(parsed.hooks)) {
-                mergedHooks.hooks = mergedHooks.hooks.concat(parsed.hooks);
-            }
         } catch (error) {
             console.error(`Error reading ${file}:`, error.message);
             process.exit(1);
         }
     });
 
-
     const targetFile = path.join(buildDir, `index.${targetOption}.ts`);
-    const placeholder = 'const frookyConfig = { } as FrookyConfig;';
-    const replacement = `const frookyConfig = ${JSON.stringify(mergedHooks)} as FrookyConfig;`;
+    const replacement = `frookyConfigs = ${JSON.stringify(frookyConfigs)} as FrookyConfig;`;
+
+    const blockRegex = /(\/\/%%% REPLACE START\n)[\s\S]*?(\/\/%%% REPLACE STOP)/;
 
     try {
         let content = fs.readFileSync(targetFile, 'utf8');
 
-        if (!content.includes(placeholder)) {
-            console.error('Placeholder line not found in index.ts');
+        if (!blockRegex.test(content)) {
+            console.error('Replace block markers not found in index.ts');
             process.exit(1);
         }
 
-        content = content.replace(placeholder, replacement);
+        content = content.replace(blockRegex, `$1${replacement}\n$2`);
         fs.writeFileSync(targetFile, content, 'utf8');
 
         if (verbose) { console.log(`Hook compiling successful. Updated: ${targetFile}`); }
@@ -156,17 +150,6 @@ function generateHooksFile() {
         console.error('Error updating index.ts:', error.message);
         process.exit(1);
     }
-
-
-    // const tsContent = `export const frookyConfig = ${JSON.stringify(mergedHooks, null, 2)};\n`;
-
-    // try {
-    //     fs.writeFileSync(combinedHookPath, tsContent);
-    //     if (verbose) { console.log(`Hook compiling successful. Location: ${combinedHookPath}`) }
-    // } catch (error) {
-    //     console.error('Error writing hooks.ts:', error.message);
-    //     process.exit(1);
-    // }
 }
 
 

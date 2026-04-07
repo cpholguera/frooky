@@ -1,6 +1,6 @@
-import type { MethodName, Param } from '../parameter';
+import type { Param } from '../parameter';
 import type { ReturnType } from '../returnType';
-import type { BaseHook } from './baseHook';
+import type { BaseHook, MethodName } from './baseHook';
 
 /**
  * Expanded Objective-C method definition with name and optional overloads.

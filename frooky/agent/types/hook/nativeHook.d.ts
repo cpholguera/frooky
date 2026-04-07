@@ -1,6 +1,13 @@
 import type { ReturnType } from 'frooky';
-import type { MethodName, Param } from '../parameter';
+import type { Param } from '../parameter';
 import type { BaseHook } from './baseHook';
+
+/**
+ * Name of a native function method.
+ *
+ * @public
+ */
+export type SymbolName = string;
 
 
 /**
@@ -8,8 +15,8 @@ import type { BaseHook } from './baseHook';
  *
  * @public
  */
-export interface NativeMethodDefinition {
-  symbol: MethodName;
+export interface SymbolDefinition {
+  symbol: SymbolName;
   returnType?: ReturnType;
   params?: Param[];
 }
@@ -19,7 +26,7 @@ export interface NativeMethodDefinition {
  * 
  * @public
  */
-export type NativeMethod = MethodName | NativeMethodDefinition;
+export type NativeSymbol = SymbolName | SymbolDefinition;
 
 
 /**
@@ -29,15 +36,14 @@ export type NativeMethod = MethodName | NativeMethodDefinition;
  */
 export interface NativeHook extends BaseHook {
   /**
-   * Fully qualified Native class name.
+   * Fully qualified Native module name.
    */
-  objcClass: string;
+  module: string;
 
   /**
-   * Methods to hook on the target class.
+   * Symbol to hook on the target module.
    */
-  methods: NativeMethod[];
+  symbol: NativeSymbol[];
 
 }
-
 

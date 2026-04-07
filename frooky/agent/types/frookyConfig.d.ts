@@ -18,7 +18,7 @@ export interface HookMetadata {
   /**
    * Target platform for the hook collection.
    */
-  platform: Platform;
+  platform?: Platform;
 
   /**
    * Name of the hook collection.
@@ -48,7 +48,9 @@ export interface HookMetadata {
   version?: string;
 }
 
-
+/**
+ * Hook can either be for Java, Native or Objective-C
+ */
 export type Hook = JavaHook | NativeHook | ObjCHook;
 
 
@@ -65,7 +67,4 @@ export interface FrookyConfig {
    */
   hooks: Hook[];
 }
-
-
-
 
