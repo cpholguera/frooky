@@ -1,8 +1,8 @@
-import type { FrookyConfig } from "frooky";
+import type { FrookyConfig, Platform } from "frooky";
 import type { BaseEvent } from "./event/BaseEvent";
 import { enableLogging, log } from "./logger";
+import { validateFrookyConfig } from "./validator/frookyConfigValidator";
 
-type Platform = "android" | "ios"
 
 declare global {
   var frooky: FrookyApp;
@@ -10,6 +10,7 @@ declare global {
 
 export class FrookyApp {
   private eventCache: BaseEvent[] = [];
+  private frookyConfigs: FrookyConfig[] = [];
   private platform: Platform;
 
   constructor(platform: Platform, enableLoggingFlag: boolean = false) {
@@ -24,17 +25,22 @@ export class FrookyApp {
     log.info(`Target platform: ${this.platform}`);
   }
 
-  loadFrookyConfig(frookyConfig: FrookyConfig){
-    log.info("Loading frooky configuration")
-    log.info(`  Metadata: ${JSON.stringify(frookyConfig.metadata)}`)
-    log.info(`  Hooks: ${JSON.stringify(frookyConfig.hooks)}`)
+  public addFrookyConfig(frookyConfig: FrookyConfig){
+    log.info("Loading frooky configuration...")
+
+    try {
+      validateFrookyConfig(frookyConfig, this.platform)
+      this.frookyConfigs.push(frookyConfig)
+    } catch {
+      console.error("frooky configuration is not valid.")
+    }
   }
 
-  run() {
+  public run() {
     log.info("Starting frooky")
   }
 
-  addEvent(event: BaseEvent): void {
+  public addEvent(event: BaseEvent): void {
     log.info(`Adding event to event cache: ${event}`);
     this.eventCache.push(event);
   }

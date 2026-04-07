@@ -44,7 +44,6 @@ const hooksFilePaths = argv._;
 const sourceDir = path.join(__dirname, platformOption);
 const distDir = path.join(__dirname, 'dist');
 const buildDir = path.join(__dirname, 'build');
-const combinedHookPath = path.join(buildDir, '_frookyConfiguration.ts');
 const agentPath = path.join(distDir, `agent-${platformOption}.js`)
 const versionPath = path.join(distDir, `version.json`)
 
@@ -108,7 +107,7 @@ function cleanupBuildDir() {
 }
 
 // TODO: Patch when fixing https://github.com/cpholguera/frooky/issues/29
-// Function to merge and generate _hooks.ts
+// Function to merge multiple hook configuration files into one
 function generateHooksFile() {
     const mergedHooks = {
         category: null,
@@ -136,18 +135,38 @@ function generateHooksFile() {
         }
     });
 
-    const tsContent = `import type { FrookyConfig } from "frooky";
-    const frookyConfigJson = ${JSON.stringify(mergedHooks, null, 2)};
-    export const frookyConfig: FrookyConfig = frookyConfigJson as FrookyConfig
-    `;
+
+    const targetFile = path.join(buildDir, `index.${targetOption}.ts`);
+    const placeholder = 'const frookyConfig = { } as FrookyConfig;';
+    const replacement = `const frookyConfig = ${JSON.stringify(mergedHooks)} as FrookyConfig;`;
 
     try {
-        fs.writeFileSync(combinedHookPath, tsContent);
-        if (verbose) { console.log(`Hook compiling successful. Location: ${combinedHookPath}`) }
+        let content = fs.readFileSync(targetFile, 'utf8');
+
+        if (!content.includes(placeholder)) {
+            console.error('Placeholder line not found in index.ts');
+            process.exit(1);
+        }
+
+        content = content.replace(placeholder, replacement);
+        fs.writeFileSync(targetFile, content, 'utf8');
+
+        if (verbose) { console.log(`Hook compiling successful. Updated: ${targetFile}`); }
     } catch (error) {
-        console.error('Error writing hooks.ts:', error.message);
+        console.error('Error updating index.ts:', error.message);
         process.exit(1);
     }
+
+
+    // const tsContent = `export const frookyConfig = ${JSON.stringify(mergedHooks, null, 2)};\n`;
+
+    // try {
+    //     fs.writeFileSync(combinedHookPath, tsContent);
+    //     if (verbose) { console.log(`Hook compiling successful. Location: ${combinedHookPath}`) }
+    // } catch (error) {
+    //     console.error('Error writing hooks.ts:', error.message);
+    //     process.exit(1);
+    // }
 }
 
 
