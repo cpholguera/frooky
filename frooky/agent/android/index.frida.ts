@@ -1,6 +1,6 @@
 // This file is used when the agent is run by frida. Hooks embedded into the agent at build time.
 
-import { runFrookyAgent } from './legacy/android-agent.ts'
 import { target } from './_hooks.ts';
+import "../shared/Frooky.ts"
 
-runFrookyAgent(target);
+frooky.init(target, "android", true); 

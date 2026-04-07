@@ -22,7 +22,6 @@
     "android/**/*",
     "shared/**/*",
     "types/**/*",
-    "examples",
-    "tests/**/*"
-  ]
+    "docs/**/*"
+, "examples", "shared/Frooky.ts"  ]
 }
