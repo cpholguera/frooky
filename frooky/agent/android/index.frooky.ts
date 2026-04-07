@@ -4,9 +4,9 @@ import type { FrookyConfig } from 'frooky';
 import { FrookyApp } from 'shared/Frooky.ts';
 
 rpc.exports = {
-  runFrookyAgent(frookyConfig: FrookyConfig, enableLogging: boolean) {
-    globalThis.frooky = new FrookyApp("android", enableLogging);
-    frooky.loadFrookyConfig(frookyConfig);
-    frooky.run();
+  runFrookyAgent(frookyConfig: FrookyConfig) {
+    globalThis.frooky = new FrookyApp("Android", true);
+    frooky.addFrookyConfig(frookyConfig);
+    frooky.run(); 
   }
 };
