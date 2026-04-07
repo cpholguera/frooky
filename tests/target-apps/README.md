@@ -43,7 +43,7 @@ To install the app follow these steps:
 
     For that you need root access to the device. If this is not possible, embed Frida as gadget into the binary. To simplify this process, use [Objection](https://github.com/sensepost/objection).
 
-1. **Install the binary**
+2. **Install the binary**
 
     Use the following command to install the generated target app on the running device:
 
