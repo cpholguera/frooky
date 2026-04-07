@@ -12,6 +12,6 @@ frookyConfigs = { } as FrookyConfig[];
 
 globalThis.frooky = new FrookyApp("iOS", 3, "device");
 frookyConfigs.forEach(frookyConfig => {
-    frooky.addFrookyConfig(frookyConfig);
+    frooky.loadFrookyConfig(frookyConfig);
 });
 frooky.run(); 
