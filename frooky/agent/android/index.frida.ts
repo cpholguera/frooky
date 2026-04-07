@@ -6,6 +6,6 @@ import { FrookyApp } from "../Frooky";
 // !!!! Don't change this line, the build script will insert the actual frooky config here
 const frookyConfig = { } as FrookyConfig;
 
-globalThis.frooky = new FrookyApp("Android", 3, true);
+globalThis.frooky = new FrookyApp("Android", 3, "device");
 frooky.addFrookyConfig(frookyConfig);
 frooky.run(); 
