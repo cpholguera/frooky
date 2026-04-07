@@ -24,5 +24,5 @@
     "shared/**/*",
     "types/**/*",
     "docs/**/*"
-, "examples", "shared/Frooky.ts"  ]
+, "examples", "Frooky.ts"  ]
 }
