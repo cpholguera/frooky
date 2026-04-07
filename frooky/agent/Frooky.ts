@@ -25,7 +25,9 @@ export class FrookyApp {
 
     this.log.info("Initializing frooky");
     this.log.info(`  Target platform: ${this.platform}`);
-    this.log.info(`  Target process: ${Process}`);
+    this.log.info(`  Frida version:  ${Frida.version}`);
+    const json = JSON.stringify(Process, null, 2).replace(/\n/g, '\n        ');
+    this.log.info(`  Target process:\n        ${json}`);
   }
 
   public addFrookyConfig(frookyConfig: FrookyConfig){
