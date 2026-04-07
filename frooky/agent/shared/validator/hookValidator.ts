@@ -5,16 +5,16 @@ import { nativeHookSchema } from "../../types/hook/nativeHook.zod";
 import { objCHookSchema } from "../../types/hook/objcHook.zod";
 
 
-export interface HookValidationResult {
+export interface HookValidatorResult {
     validHooks: Hook[];
     invalidHooks: Hook[];
     totalHooks: number;
     totalErrors: number;
 }
 
-export function validateHooks(frookyConfig: FrookyConfig): HookValidationResult {
+export function validateHooks(frookyConfig: FrookyConfig): HookValidatorResult {
 
-    const result: HookValidationResult = {
+    const result: HookValidatorResult = {
         validHooks: [],
         invalidHooks: [],
         totalHooks: 0,
@@ -34,7 +34,7 @@ export function validateHooks(frookyConfig: FrookyConfig): HookValidationResult 
                 objCHookSchema.parse(objcHook);
                 result.validHooks.push(objcHook)
 
-            } else if ("nativeClass" in hook) {
+            } else if ("functions" in hook) {
                 const nativeHook = hook as NativeHook
                 nativeHookSchema.parse(nativeHook);
                 result.validHooks.push(nativeHook)

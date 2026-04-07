@@ -4,7 +4,7 @@ import type { HookEvent } from "./shared/event/HookEvent";
 import { LogEvent } from "./shared/event/LogEvent";
 import type { SummaryEvent } from "./shared/event/SummaryEvent";
 import { Logger, type logTo } from "./shared/Logger";
-import { validateFrookyConfig } from "./shared/validator/frookyConfigValidator";
+import { validateFrookyConfig } from "./shared/validator/configValidator";
 
 declare global {
   var frooky: FrookyApp;

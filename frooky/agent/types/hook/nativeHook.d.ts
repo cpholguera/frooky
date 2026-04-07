@@ -43,7 +43,7 @@ export interface NativeHook extends BaseHook {
   /**
    * Symbol to hook on the target module.
    */
-  symbol: NativeSymbol[];
+  functions: NativeSymbol[];
 
 }
 

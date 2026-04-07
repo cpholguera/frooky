@@ -1,13 +1,13 @@
 import type { FrookyConfig, HookMetadata, Platform } from "frooky";
-import { type HookValidationResult, validateHooks } from "./hookValidator";
+import { type HookValidatorResult, validateHooks } from "./hookValidator";
 
 
-export interface FrookyValidationResult {
+export interface ConfigValidationResult {
     metadata?: HookMetadata;
-    hookParsingResult: HookValidationResult;
+    hookParsingResult: HookValidatorResult;
 }
 
-export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platform): FrookyValidationResult{
+export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platform): ConfigValidationResult{
     frooky.log.info(`Validating frooky configuration for platform ${platform}`)
 
     // validate metadata
