@@ -1,1 +1,0 @@
-// stub, takes care of setting up all components

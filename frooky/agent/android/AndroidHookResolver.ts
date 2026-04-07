@@ -1,6 +1,6 @@
 // stub, implements hook lookup for Android
 
-import { BaseHookResolver } from "../shared/BaseHookResolver";
+import { BaseHookResolver } from "../shared/resolver/BaseHookResolver";
 
 export class AndroidHookResolver extends BaseHookResolver {
 
