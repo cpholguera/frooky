@@ -10,7 +10,7 @@ var frookyConfigs: FrookyConfig[]
 frookyConfigs = { } as FrookyConfig[];
 //%%% REPLACE STOP
 
-globalThis.frooky = new FrookyApp("iOS", 3, "device");
+globalThis.frooky = new FrookyApp("Android", 3, "device");
 frookyConfigs.forEach(frookyConfig => {
     frooky.addFrookyConfig(frookyConfig);
 });

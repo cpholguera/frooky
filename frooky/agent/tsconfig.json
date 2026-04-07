@@ -13,7 +13,7 @@
       "frida-objc-bridge",
       "frida-swift-bridge"
     ],
-    // "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
       "frooky": ["./types"]
     }
@@ -23,6 +23,8 @@
     "android/**/*",
     "shared/**/*",
     "types/**/*",
-    "docs/**/*"
-, "examples", "FrookyApp.ts"  ]
+    "docs/**/*",
+    "examples/**/*",
+    "FrookyApp.ts"
+  ]
 }

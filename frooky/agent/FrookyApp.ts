@@ -52,8 +52,11 @@ export class FrookyApp {
     this.log.info("Loading frooky configuration...")
 
     try {
-      validateFrookyConfig(frookyConfig, this.platform)
-      this.frookyConfigs.push(frookyConfig)
+      const { metadata, hookParsingResult } = validateFrookyConfig(frookyConfig, this.platform);
+
+      console.log(JSON.stringify(metadata, null, 2))
+      console.log(JSON.stringify(hookParsingResult, null, 2))
+
     } catch (error){
       this.log.error(`frooky configuration is not valid. Error: ${error}`)
     }
