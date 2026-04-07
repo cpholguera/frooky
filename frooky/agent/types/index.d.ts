@@ -1,7 +1,7 @@
 import type { JavaHook } from './java-hooks';
 import type { ObjCHook } from './objc-hooks';
 import type { NativeHook } from './native-hooks';
-import type { FrookyApp } from "../Frooky"
+import type { FrookyApp } from "../FrookyApp"
 
 /**
  * Target platform for hooks.
