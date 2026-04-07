@@ -1,4 +1,4 @@
-import * as Frooky from '../types/index'
+import * as Frooky from '../types/frookyConfig'
 
 import {
     wifiHook,

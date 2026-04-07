@@ -1,4 +1,4 @@
-import type { LogLevel } from "shared/Logger";
+import type { LogLevel } from "../Logger";
 import { BaseEvent } from "./BaseEvent";
 
 /**
