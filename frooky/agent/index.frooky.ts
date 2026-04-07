@@ -5,7 +5,7 @@ import { FrookyApp } from "../FrookyApp";
 
 rpc.exports = {
   runFrookyAgent(frookyConfig: FrookyConfig) {
-    globalThis.frooky = new FrookyApp("iOS");
+    globalThis.frooky = new FrookyApp("Android");
     frooky.addFrookyConfig(frookyConfig);
     frooky.run(); 
   }

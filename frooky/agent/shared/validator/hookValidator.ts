@@ -4,35 +4,54 @@ import { javaHookSchema } from "../../types/hook/javaHook.zod";
 import { nativeHookSchema } from "../../types/hook/nativeHook.zod";
 import { objCHookSchema } from "../../types/hook/objcHook.zod";
 
-export function validateHooks(frookyConfig: FrookyConfig) {
 
-    const validHooks: Hook[] = [];
+export interface HookValidationResult {
+    validHooks: Hook[];
+    invalidHooks: Hook[];
+    totalHooks: number;
+    totalErrors: number;
+}
+
+export function validateHooks(frookyConfig: FrookyConfig): HookValidationResult {
+
+    const result: HookValidationResult = {
+        validHooks: [],
+        invalidHooks: [],
+        totalHooks: 0,
+        totalErrors: 0
+    };
 
     frookyConfig.hooks.forEach(hook => {
+        result.totalHooks += 1;
         try {
             if ("javaClass" in hook) {
                 const javaHook = hook as JavaHook
                 javaHookSchema.parse(javaHook);
-                validHooks.push(javaHook)
+                result.validHooks.push(javaHook)
 
             } else if ("objcClass" in hook) {
                 const objcHook = hook as ObjCHook
                 objCHookSchema.parse(objcHook);
-                validHooks.push(objcHook)
+                result.validHooks.push(objcHook)
 
             } else if ("nativeClass" in hook) {
                 const nativeHook = hook as NativeHook
                 nativeHookSchema.parse(nativeHook);
-                validHooks.push(nativeHook)
+                result.validHooks.push(nativeHook)
             } else {
                 throw new Error("Hook type is unknown. Make sure that it is either a Java, Objective-C or native hook.");
             }
         } catch (error) {
+            result.totalErrors += 1;
+            result.invalidHooks.push(hook);
+            frooky.log.error(`Error when parsing the following hook:\n${JSON.stringify(hook, null, 2)}`);
             if (error instanceof z.ZodError) {
-                frooky.log.error(JSON.stringify(z.treeifyError(error), null, 2));
+                frooky.log.error(z.prettifyError(error));
             } else {
-                frooky.log.error(error);
+                frooky.log.error((error as Error).message);
             }
         }
     });
+
+    return result;
 }

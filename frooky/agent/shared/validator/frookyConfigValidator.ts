@@ -1,24 +1,14 @@
-import type { FrookyConfig, Hook, JavaHook, NativeHook, ObjCHook, Platform } from "frooky";
-import z from "zod";
-import { javaHookSchema } from "../../types/hook/javaHook.zod";
-import { objCHookSchema } from "../../types/hook/objcHook.zod";
-import { nativeHookSchema } from "../../types/hook/nativeHook.zod";
-import { validateHooks } from "./hookValidator";
+import type { FrookyConfig, HookMetadata, Platform } from "frooky";
+import { type HookValidationResult, validateHooks } from "./hookValidator";
 
 
-
-function getHookSchema(hook: Hook){
-  if ("javaClass" in hook) { return javaHookSchema }
-  if ("objcClass" in hook) { return objCHookSchema }
-  if ("nativeClass" in hook) { return nativeHookSchema }
-
-  throw Error("Unknown hook type detected.")
+export interface FrookyValidationResult {
+    metadata?: HookMetadata;
+    hookParsingResult: HookValidationResult;
 }
 
-
-export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platform){
+export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platform): FrookyValidationResult{
     frooky.log.info(`Validating frooky configuration for platform ${platform}`)
-    frooky.log.info(`frooky configuration:\n${JSON.stringify(frookyConfig, null, 2)}`)
 
     // validate metadata
     if (frookyConfig.metadata){
@@ -27,9 +17,10 @@ export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platf
        frooky.log.warn("This frooky configuration does not have metadata. Consider adding them for better results.")
     }
  
-    const validHooks: Hook[] = validateHooks(frookyConfig);
+    // validate hooks
+    const result = validateHooks(frookyConfig);
 
+    frooky.log.info("Hook configuration successfully validated.")
 
-
-    frooky.log.info("  Hook configuration successfully validated.")
+    return { hookParsingResult: result, metadata: frookyConfig.metadata };
 }
