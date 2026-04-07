@@ -38,7 +38,7 @@ hooks:
       - name: startActivity
         overloads:
           - params:
-              - ["android.content.Intent", intent]
+              - [android.content.Intent, intent]
 
   # Use `stackTraceFilter` with regex patterns to exclude framework/library stack frames.
   # This keeps only relevant app code by filtering out `java.*`, `android.*`, and external SDKs.

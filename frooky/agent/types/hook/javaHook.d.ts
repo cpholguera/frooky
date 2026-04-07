@@ -1,4 +1,5 @@
-import type { BaseHook, Param, MethodName } from './index';
+import type { Param } from '../parameter';
+import type { BaseHook, MethodName } from './baseHook';
 
 /**
  * Describes a specific Java method overload.
