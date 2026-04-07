@@ -43,7 +43,7 @@ const hooksFilePaths = argv._.slice(1);
 const sourceDir = path.join(__dirname, platformOption);
 const distDir = path.join(__dirname, 'dist');
 const buildDir = path.join(__dirname, 'build');
-const combinedHookPath = path.join(buildDir, '_hooks.ts');
+const combinedHookPath = path.join(buildDir, '_frookyConfiguration.ts');
 const agentPath = path.join(distDir, `agent-${platformOption}.js`)
 const versionPath = path.join(distDir, `version.json`)
 
@@ -135,7 +135,10 @@ function generateHooksFile() {
         }
     });
 
-    const tsContent = `export const target = ${JSON.stringify(mergedHooks, null, 2)};\n`;
+    const tsContent = `import type { FrookyConfig } from "frooky";
+    const frookyConfigJson = ${JSON.stringify(mergedHooks, null, 2)};
+    export const frookyConfig: FrookyConfig = frookyConfigJson as FrookyConfig
+    `;
 
     try {
         fs.writeFileSync(combinedHookPath, tsContent);

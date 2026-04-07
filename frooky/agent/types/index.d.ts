@@ -1,6 +1,6 @@
-import type { JavaHook } from './java-types';
-import type { ObjCHook } from './objc-types';
-import type { NativeHook } from './native-types';
+import type { JavaHook } from './java-hooks';
+import type { ObjCHook } from './objc-hooks';
+import type { NativeHook } from './native-hooks';
 
 /**
  * Target platform for hooks.

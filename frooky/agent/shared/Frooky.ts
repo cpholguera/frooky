@@ -1,45 +1,41 @@
-import { runFrookyAgent as runFrookyAgentAndroid } from "android/legacy/android-agent";
-import { runFrookyAgent as runFrookyAgentIOS } from "ios/legacy/ios-agent";
+import type { FrookyConfig } from "frooky";
 import type { BaseEvent } from "./event/BaseEvent";
 import { enableLogging, log } from "./logger";
 
-interface FrookyApp {
-  init(hooks: unknown, target: Target, verboseFlag?: boolean): void;
-  addEvent(event: BaseEvent): void;
-}
-
-type Target = "android" | "ios" | "native"
+type Platform = "android" | "ios"
 
 declare global {
   var frooky: FrookyApp;
 }
 
-function createFrooky(): FrookyApp {
+export class FrookyApp {
+  private eventCache: BaseEvent[] = [];
+  private platform: Platform;
 
-  // internal state
-  const eventCache: BaseEvent[] = [];
+  constructor(platform: Platform, enableLoggingFlag: boolean = false) {
+    this.platform = platform;
 
-  return {
-    init(hooks: unknown, target: Target, verboseFlag: boolean = false) {
+    if (enableLoggingFlag) {
+      enableLogging();
+      log.info("Logging enabled");
+    }
 
-      if (verboseFlag){
-        enableLogging();
-      }
+    log.info("Initializing frooky");
+    log.info(`Target platform: ${this.platform}`);
+  }
 
-      log.info(`Initializing frooky`);
+  loadFrookyConfig(frookyConfig: FrookyConfig){
+    log.info("Loading frooky configuration")
+    log.info(`  Metadata: ${JSON.stringify(frookyConfig.metadata)}`)
+    log.info(`  Hooks: ${JSON.stringify(frookyConfig.hooks)}`)
+  }
 
-      if (target === "android") {
-        runFrookyAgentAndroid(hooks);
-      } else if (target === "ios") {
-        runFrookyAgentIOS(hooks);
-      }
-    },
+  run() {
+    log.info("Starting frooky")
+  }
 
-    addEvent(event) {
-      log.info(`Adding event to event cache: ${event}`,);
-      eventCache.push(event);
-    },
-  };
+  addEvent(event: BaseEvent): void {
+    log.info(`Adding event to event cache: ${event}`);
+    this.eventCache.push(event);
+  }
 }
-
-globalThis.frooky = createFrooky();
