@@ -1,8 +1,6 @@
 # Target Apps
 
-Tests usually require a target app which implements the feature that should be tested. For example, type decoders should be tested against real implementations on Android or iOS.
-
-For that frooky used target apps.
+Frooky uses target apps for testing features that must run in a real runtime environment. Some behavior is only available on the actual operating system and cannot be reproduced reliably from the host OS (e.g. macOS) alone. Type decoders are one example, since they should be validated against real Android or iOS implementations.
 
 ## Building Target Apps
 
