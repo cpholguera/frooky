@@ -1,4 +1,7 @@
-import type { BaseHook, MethodName, Param, ReturnType } from './index';
+import type { ReturnType } from 'frooky';
+import type { MethodName, Param } from '../parameter';
+import type { BaseHook } from './baseHook';
+
 
 /**
  * Expanded Native method definition with name and optional overloads.

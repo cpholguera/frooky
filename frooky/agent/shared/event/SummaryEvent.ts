@@ -1,4 +1,4 @@
-import type { Hook } from "../../types/index";
+import type { Hook } from "frooky";
 import { BaseEvent } from "./BaseEvent";
 
 /**
