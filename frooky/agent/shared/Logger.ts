@@ -2,6 +2,7 @@ import type { FrookyApp } from "../Frooky";
 import { LogEvent } from "./event/LogEvent";
 
 export type LogLevel = "info" | "warn" | "error";
+export type logTo = "device" | "frooky"
 
 /**
  * Sets the level of logging.
@@ -9,26 +10,29 @@ export type LogLevel = "info" | "warn" | "error";
  * 1: Errors only
  * 2: Errors + Warnings
  * 3: Errors + Warnings + Info
+ * 
+ * Will log using frooky messaging for logging by default. 
+ * If you want to use Frida `console` for logging, you set `logTo = "device"` 
  */
 export class Logger {
-    private deviceLoggingEnabled: boolean = false;
-    private verbosity: number = 0;
+    private logTo: logTo;
+    private verbosity: number;
     private frooky: FrookyApp;
 
-    constructor(frooky: FrookyApp, verbosity: number = 0, deviceLoggingEnabled: boolean = false) {
+    constructor(frooky: FrookyApp, verbosity: number = 0, logTo: logTo = "frooky") {
         this.frooky = frooky;
         this.verbosity = verbosity;
-        this.deviceLoggingEnabled = deviceLoggingEnabled;
+        this.logTo = logTo;
     }
 
     private emit(level: LogLevel, msg: string): void {
-        if (this.deviceLoggingEnabled) {
+        if (this.logTo === "device") {
             switch (level) {
                 case "info":  console.log(`[i] ${msg}`);   break;
                 case "warn":  console.warn(`[!] ${msg}`);  break;
                 case "error": console.error(`[-] ${msg}`); break;
             }
-        } else {
+        } else if (this.logTo === "frooky") {
             this.frooky.addEvent(new LogEvent(level, msg))            
         }
     }
