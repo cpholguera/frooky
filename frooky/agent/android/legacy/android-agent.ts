@@ -1,6 +1,8 @@
 import Java from "frida-java-bridge"
 import { decodeArgByDescriptor, filtersPass } from "./native_decoder.js"
 import { decodeArguments } from "./android-decoder.js"
+import { uuidv4 } from "../shared/utils.js"
+ 
 /**
  * Decodes the parameter types of a Java method.
  * @param {string} methodHeader - Java method (e.g., `function setBlockModes([Ljava.lang.String;): android.security.keystore.KeyGenParameterSpec$Builder`)
@@ -22,30 +24,6 @@ function parseParameterTypes(methodHeader) {
  */
 function parseReturnValue(methodHeader) {
   return methodHeader.split(":")[1].trim();
-}
-
-/**
- * Generates a v4 UUID
- * @returns {string} v4 UUID (e.g. "bf01006f-1d6c-4faa-8680-36818b4681bc")
- */
-function generateUUID() {
-  let d = new Date().getTime();
-  let d2 =
-      (typeof performance !== "undefined" &&
-          performance.now &&
-          performance.now() * 1000) ||
-      0;
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    let r = Math.random() * 16;
-    if (d > 0) {
-      r = (d + r) % 16 | 0;
-      d = Math.floor(d / 16);
-    } else {
-      r = (d2 + r) % 16 | 0;
-      d2 = Math.floor(d2 / 16);
-    }
-    return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
-  });
 }
 
 
@@ -193,7 +171,7 @@ function registerNativeHook(hook, categoryName) {
       }
 
       let event = {
-        id: generateUUID(),
+        id: uuidv4(),
         type: "native-hook",
         category: categoryName,
         time: new Date().toISOString(),
@@ -265,7 +243,7 @@ function registerHook(
     }
 
     const event = {
-      id: generateUUID(),
+      id: uuidv4(),
       type: "hook",
       category: categoryName,
       time: new Date().toISOString(),

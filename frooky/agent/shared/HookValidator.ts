@@ -1,0 +1,1 @@
+// stub, loads and validates the incoming JSON. The JSON must match the type declaration of a hook file
