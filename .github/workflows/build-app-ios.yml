@@ -1,0 +1,37 @@
+name: Build target app iOS
+
+on:
+  workflow_call:
+    inputs:
+      app_dir:
+        description: "Optional path to a custom app. Will be pass as APP_DIR to make build"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build-app-ios:
+    name: Build & Upload iOS App
+    runs-on: macos-26
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Build target app iOS
+        working-directory: tests/target-apps/ios
+        run: |
+          if [ -n "${{ inputs.app_dir }}" ]; then
+            make build APP_DIR=${{ inputs.app_dir }} GITHUB_ENV_FILE=$GITHUB_ENV
+          else
+            make build GITHUB_ENV_FILE=$GITHUB_ENV
+          fi
+
+      - name: Upload iOS artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: target-app-ios
+          path: tests/target-apps/ios/dist/

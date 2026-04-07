@@ -1,0 +1,25 @@
+name: Publish Python Package
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  verify-host:
+    uses: ./.github/workflows/build-host.yml
+
+  publish-host:
+    runs-on: ubuntu-latest
+    needs: verify-host
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: frooky-host
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@release/v1

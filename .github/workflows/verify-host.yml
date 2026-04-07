@@ -1,0 +1,43 @@
+name: Verify frooky host
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  build-host:
+    uses: ./.github/workflows/build-host.yml
+
+  verify-host:
+    name: Verify host
+    runs-on: ubuntu-latest
+    needs: build-host
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - name: Download host artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: frooky-host
+          path: dist
+
+      - name: Install wheel
+        run: |
+          python -m pip install dist/*.whl
+          frooky --help
+
+      - name: Check agent artifacts
+        run: |
+          unzip -l dist/*.whl | grep "frooky/agent/dist/agent-android.js"
+          unzip -l dist/*.whl | grep "frooky/agent/dist/agent-ios.js"
+          echo "All agent artifacts present in wheel"

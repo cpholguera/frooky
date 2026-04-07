@@ -76,7 +76,7 @@ function simpleHash(str) {
  * @param {Object} value - Reference to the Java key object.
  * @returns {Object} Object containing key parameters (modulusHex, modulusBitLength, publicExponentDec, privateExponentDec, keyHash).
  */
-function decodeRSAKey(value) {
+export function decodeRSAKey(value) {
   let out = {};
 
   try {

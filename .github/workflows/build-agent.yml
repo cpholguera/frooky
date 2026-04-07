@@ -1,0 +1,42 @@
+name: Build frooky agent
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  build-agent:
+    name: Build frooky agent
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: "./frooky/agent/package-lock.json"
+
+      - name: Install dependencies
+        working-directory: frooky/agent
+        run: npm ci
+
+      - name: Build frooky agent
+        working-directory: frooky/agent
+        run: |
+          npm run build:prod:android
+          npm run build:prod:ios
+
+      - name: Upload frooky agent artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: frooky-agent
+          path: frooky/agent/dist/*

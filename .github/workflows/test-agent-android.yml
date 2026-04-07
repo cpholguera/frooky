@@ -1,0 +1,76 @@
+name: Test agent Android
+
+on:
+  push:
+    paths:
+      - 'frooky/agent/**'
+
+permissions:
+  contents: read
+
+jobs:
+  build-app-android:
+    uses: ./.github/workflows/build-app-android.yml
+
+  test-agent-android:
+    name: Test agent Android
+    runs-on: ubuntu-latest
+    needs: build-app-android
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download MAS app Android artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: target-app-android
+          path: target-app-android
+
+      - name: Setup Agent Test Environment
+        uses: ./.github/actions/setup-agent-test-env
+
+      - name: Setup Android emulator environment
+        uses: ./.github/actions/setup-android-emulator
+        with:
+          api-level: "34"
+
+      - name: Run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            chmod +x .github/scripts/android/prep-device.sh
+            chmod +x .github/scripts/android/install-frida-server.sh
+
+            echo "Starting adb as root"
+            .github/scripts/android/prep-device.sh
+
+            echo "Installing frida server"
+            .github/scripts/android/install-frida-server.sh
+
+            echo "Installing target app"
+            adb install target-app-android/MASTestApp.apk
+
+            echo "Running Android agent tests"
+            npm --prefix frooky/agent run test:android -- --appIdentifier org.owasp.mastestapp > test-results-android.txt
+
+            cat test-results-android.txt
+
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat test-results-android.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-android
+          path: test-results-android.txt

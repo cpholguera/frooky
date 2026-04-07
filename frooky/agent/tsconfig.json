@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2024",
     "lib": ["ES2024"],
-    "module": "es2022",
+    "module": "ES2022",
     "strict": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
@@ -13,7 +13,6 @@
       "frida-objc-bridge",
       "frida-swift-bridge"
     ],
-    "baseUrl": ".",
     "paths": {
       "frooky": ["./types/index.d.ts"]
     }
@@ -23,6 +22,7 @@
     "android/**/*",
     "shared/**/*",
     "types/**/*",
-    "docs/**/*"
-, "examples"  ]
+    "examples",
+    "tests/**/*"
+  ]
 }
