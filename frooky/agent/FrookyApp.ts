@@ -16,7 +16,6 @@ declare global {
  */
 export class FrookyApp {
   private eventCache: BaseEvent[] = [];
-  private frookyConfigs: FrookyConfig[] = [];
   private platform: Platform;
   public verbosity: number;
 
@@ -50,16 +49,10 @@ export class FrookyApp {
    */
   public loadFrookyConfig(frookyConfig: FrookyConfig){
     this.log.info("Loading frooky configuration...")
+    const { metadata, hookParsingResult } = validateFrookyConfig(frookyConfig, this.platform);
 
-    try {
-      const { metadata, hookParsingResult } = validateFrookyConfig(frookyConfig, this.platform);
 
-      console.log(JSON.stringify(metadata, null, 2))
-      console.log(JSON.stringify(hookParsingResult, null, 2))
 
-    } catch (error){
-      this.log.error(`frooky configuration is not valid. Error: ${error}`)
-    }
   }
 
   /** Starts the Frooky instrumentation session. */

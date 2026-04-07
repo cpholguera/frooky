@@ -108,10 +108,6 @@ function cleanupBuildDir() {
 // TODO: Patch when fixing https://github.com/cpholguera/frooky/issues/29
 // Function to merge multiple hook configuration files into one
 function generateHooksFile() {
-    const mergedHooks = {
-        category: null,
-        hooks: []
-    };
     const frookyConfigs = []
     hooksFilePaths.forEach(file => {
         try {
