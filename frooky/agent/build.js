@@ -187,7 +187,7 @@ function validateInput() {
 
     // validate hooks files
     if (targetOption === 'frida') {
-        if (hooksFilePaths.length == 0) {
+        if (hooksFilePaths.length === 0) {
             console.error(`No hook files provided. Provide one or more hook files.`);
             process.exit(1);
         }
@@ -226,7 +226,7 @@ function setupBuildDir() {
         fs.unlinkSync(unusedIndexPath);
     }
 
-    if (targetOption == 'frida') {
+    if (targetOption === 'frida') {
         generateHooksFile();
     }
 }
