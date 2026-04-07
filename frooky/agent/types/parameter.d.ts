@@ -83,16 +83,10 @@ export interface ParamOptions {
 export type Param =
   | ParamType
   | [ParamType, ParamOptions]
+  | [ParamType, ParamName]
   | [ParamType, ParamName, ParamOptions]
   | {
       type: ParamType;
       name?: ParamName;
       options?: ParamOptions;
     };
-
-/**
- * Name of a Java or Objective-C method.
- *
- * @public
- */
-export type MethodName = string;
