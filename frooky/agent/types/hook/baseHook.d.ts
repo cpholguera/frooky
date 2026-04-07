@@ -1,7 +1,3 @@
-import type { JavaHook } from './javaHook';
-import type { NativeHook } from './nativeHook';
-import type { ObjCHook } from './objcHook';
-
 /**
  * Base hook configuration.
  *
@@ -19,9 +15,4 @@ export interface BaseHook {
   eventFilter?: string[];
 }
 
-
-/**
- * frooky hook.
- */
-export type Hook = JavaHook | ObjCHook | NativeHook
 

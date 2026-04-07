@@ -1,5 +1,5 @@
-import type { ReturnType } from 'types/returnType';
 import type { MethodName, Param } from '../parameter';
+import type { ReturnType } from '../returnType';
 import type { BaseHook } from './baseHook';
 
 /**
