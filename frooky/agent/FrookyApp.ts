@@ -1,4 +1,4 @@
-import type { FrookyConfig, Platform } from "types/frookyConfig";
+import type { FrookyConfig, Platform } from "frooky";
 import type { BaseEvent } from "./shared/event/BaseEvent";
 import type { HookEvent } from "./shared/event/HookEvent";
 import { LogEvent } from "./shared/event/LogEvent";
@@ -18,6 +18,7 @@ export class FrookyApp {
   private eventCache: BaseEvent[] = [];
   private frookyConfigs: FrookyConfig[] = [];
   private platform: Platform;
+  public verbosity: number;
 
   /** Logger instance for this for frooky. */
   public log: Logger;
@@ -29,6 +30,7 @@ export class FrookyApp {
    */
   constructor(platform: Platform, verbosity: number = 3, logTo: logTo = "device") {
     this.platform = platform;
+    this.verbosity = verbosity;
 
     // setup logger
     this.log = new Logger(this, verbosity, logTo)
@@ -36,10 +38,9 @@ export class FrookyApp {
 
     // printing some context infos
     this.log.info("Initializing frooky");
-    this.log.info(`  Target platform: ${this.platform}`);
-    this.log.info(`  Frida version:  ${Frida.version}`);
-    const json = JSON.stringify(Process, null, 2).replace(/\n/g, '\n        ');
-    this.log.info(`  Target process:\n        ${json}`);
+    this.log.info(`Target platform: ${this.platform}`);
+    this.log.info(`Frida version:  ${Frida.version}`);
+    this.log.info(`Target process:\n${JSON.stringify(Process, null, 2)}}`);
   }
 
   /**

@@ -1,4 +1,6 @@
-import type { Hook } from "./hook/baseHook";
+import type { JavaHook } from './hook/javaHook';
+import type { NativeHook } from './hook/nativeHook';
+import type { ObjCHook } from './hook/objcHook';
 
 /**
  * Target platform for hooks.
@@ -46,6 +48,8 @@ export interface HookMetadata {
   version?: string;
 }
 
+
+export type Hook = JavaHook | NativeHook | ObjCHook;
 
 
 /**
