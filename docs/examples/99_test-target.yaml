@@ -1,0 +1,23 @@
+metadata:
+  name: Android Hook Examples
+  asdfasdf: 234234
+  somethignelse: "3423"
+
+hooks:
+  # - javaClass: java.net.URL
+  #   methods:
+  #     - name: openConnection
+  #       overloads:
+  #         - params:
+  #             - [ java.net.Proxy, proxy ]
+
+
+  - javaClass: android.app.Activity 
+    methods:
+      - name: setIntent
+        overloads:
+          - params:
+              - android.content.Intent 
+              - android.app.ComponentCaller 
+          - params:
+              - [ android.content.Intent, newIntent ] 
