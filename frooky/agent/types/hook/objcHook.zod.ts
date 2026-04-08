@@ -14,6 +14,7 @@ export const objCMethodDefinitionSchema = z.object({
 export const objCMethodSchema = z.union([methodNameSchema, objCMethodDefinitionSchema]);
 
 export const objCHookSchema = baseHookSchema.extend({
+    type: z.literal("objc"),
     objcClass: z.string(),
     methods: z.array(objCMethodSchema)
 });

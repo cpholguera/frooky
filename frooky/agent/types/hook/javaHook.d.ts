@@ -60,8 +60,14 @@ export interface JavaHook extends BaseHook {
  * Native hook configuration.
  *
  * @public
+ * @discriminator {type}
  */
 export interface JavaHook extends BaseHook {
+  /**
+  * Internally used type guard.
+  */
+  type: "java"
+
   /**
    * Fully qualified Java class name.
    */

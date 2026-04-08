@@ -7,7 +7,7 @@ export interface ConfigValidationResult {
     hookParsingResult: HookValidatorResult;
 }
 
-export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platform): ConfigValidationResult{
+export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platform): ConfigValidationResult | null{
     frooky.log.info(`Validating frooky configuration for platform ${platform}`)
 
     // validate metadata

@@ -17,6 +17,7 @@ export const symbolDefinitionSchema = z.object({
 export const nativeSymbolSchema = z.union([symbolNameSchema, symbolDefinitionSchema]);
 
 export const nativeHookSchema = baseHookSchema.extend({
+    type: z.literal("native"),
     module: z.string(),
     functions: z.array(nativeSymbolSchema)
 });

@@ -33,8 +33,14 @@ export type NativeSymbol = SymbolName | SymbolDefinition;
  * Native hook configuration.
  *
  * @public
+ * @discriminator {type}
  */
 export interface NativeHook extends BaseHook {
+  /**
+  * Internally used type guard.
+  */
+  type: "native"
+
   /**
    * Fully qualified Native module name.
    */

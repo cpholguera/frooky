@@ -15,7 +15,7 @@ if (ObjC.available) {
     frookyConfigs.forEach(frookyConfig => {
         frooky.loadFrookyConfig(frookyConfig);
     });
-    frooky.run(); 
+    frooky.run();
 
 } else {
   console.error("[!] The agent is not run on an iOS device. Make sure to run this version of the frooky agent on iOS.")

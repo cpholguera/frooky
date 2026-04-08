@@ -3,6 +3,7 @@ import z from "zod";
 import { javaHookSchema } from "../../types/hook/javaHook.zod";
 import { nativeHookSchema } from "../../types/hook/nativeHook.zod";
 import { objCHookSchema } from "../../types/hook/objcHook.zod";
+import { prettyPrintHook } from "shared/utils";
 
 
 export interface HookValidatorResult {
@@ -25,23 +26,26 @@ export function validateHooks(frookyConfig: FrookyConfig, platform: Platform): H
         result.totalHooks += 1;
         try {
             if ("javaClass" in hook) {
-                if( platform !== "Android" ){
-                    throw Error("Hook is not compatible with Android.")
-                }
                 const javaHook = hook as JavaHook
+                javaHook.type = "java";
+                if( platform !== "Android" ){
+                    throw Error(`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(javaHook)}`)
+                }
                 javaHookSchema.parse(javaHook);
                 result.validHooks.push(javaHook)
 
             } else if ("objcClass" in hook) {
-                if( platform !== "iOS" ){
-                    throw Error("Hook is not compatible with iOS.")
-                }
                 const objcHook = hook as ObjCHook
+                objcHook.type = "objc";
+                if( platform !== "iOS" ){
+                    throw Error(`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(objcHook)}`)
+                }
                 objCHookSchema.parse(objcHook);
                 result.validHooks.push(objcHook)
 
             } else if ("functions" in hook) {
                 const nativeHook = hook as NativeHook
+                nativeHook.type = "native";
                 nativeHookSchema.parse(nativeHook);
                 result.validHooks.push(nativeHook)
             } else {
@@ -50,11 +54,10 @@ export function validateHooks(frookyConfig: FrookyConfig, platform: Platform): H
         } catch (error) {
             result.totalErrors += 1;
             result.invalidHooks.push(hook);
-            frooky.log.error(`Error when parsing the following hook:\n${JSON.stringify(hook, null, 2)}`);
             if (error instanceof z.ZodError) {
-                frooky.log.error(z.prettifyError(error));
+                frooky.log.error(`Hook is not according to schema: ${z.prettifyError(error)}`);
             } else {
-                frooky.log.error((error as Error).message);
+                frooky.log.error(error as string);
             }
         }
     });
