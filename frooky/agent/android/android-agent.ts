@@ -28,7 +28,7 @@ function parseReturnValue(methodHeader) {
  * Generates a v4 UUID
  * @returns {string} v4 UUID (e.g. "bf01006f-1d6c-4faa-8680-36818b4681bc")
  */
-function generateUUID() {
+export function generateUUID() {
   let d = new Date().getTime();
   let d2 =
       (typeof performance !== "undefined" &&

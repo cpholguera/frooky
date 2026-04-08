@@ -1,0 +1,74 @@
+name: Test host Android
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  build-host:
+    uses: ./.github/workflows/build-host.yml
+
+  build-app-android:
+    uses: ./.github/workflows/build-app-android.yml
+    with:
+      app_dir: "mastg-demo-0060"
+
+  test-host-android:
+    name: Test host Android
+    runs-on: ubuntu-latest
+    needs:
+      - build-host
+      - build-app-android
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download MAS app Android artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: target-app-android
+          path: target-app-android
+
+      - name: Setup Host Test Environment
+        uses: ./.github/actions/setup-host-test-env
+
+      - name: Setup Android emulator environment
+        uses: ./.github/actions/setup-android-emulator
+        with:
+          api-level: "34"
+
+      - name: Run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            chmod +x .github/scripts/android/prep-device.sh
+            chmod +x .github/scripts/android/install-frida-server.sh
+
+            echo "Starting adb as root"
+            .github/scripts/android/prep-device.sh
+
+            echo "Installing frida server"
+            .github/scripts/android/install-frida-server.sh
+
+            echo "Installing target app"
+            adb install target-app-android/MASTestApp.apk
+
+            echo "TBD: run integration tests for Android"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-android
+          path: test-results-android.txt

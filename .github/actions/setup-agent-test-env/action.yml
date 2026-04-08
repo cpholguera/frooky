@@ -1,0 +1,27 @@
+name: Setup Test Environment for Agents
+description: Setup Node.js, Python & install Frida
+runs:
+  using: composite
+  steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: 'npm'
+          cache-dependency-path: './frooky/agent/package-lock.json'
+
+      - name: Install Node.js dependencies
+        shell: bash
+        working-directory: frooky/agent
+        run: npm ci
+        
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - name: Install Frida
+        shell: bash
+        run: |
+          python -m pip install frida
+          python -m pip install frida-tools
