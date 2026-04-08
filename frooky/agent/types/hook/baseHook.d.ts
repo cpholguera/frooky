@@ -1,3 +1,5 @@
+import { HookMetadata } from "types/frookyConfig";
+
 /**
  * Name of a Java or Objective-C method.
  *
@@ -12,6 +14,13 @@ export type MethodName = string;
  * @public
  */
 export interface BaseHook {
+  /**
+   * Optional metadata for this hook. If provided, these values will be merged with the metadata defined in the frooky configuration during hook loading, and will take priority on conflict.
+   *
+   * @example The `description` field in the frooky config will be overwritten if this metadata also defines one.
+   */
+  metadata?: HookMetadata;
+
   /**
    * Maximum number of stack frames to capture.
    */
