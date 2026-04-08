@@ -1,4 +1,6 @@
 import { Hook, HookMetadata } from "frooky";
+import { prettyPrintHook } from "shared/utils";
+
 
 function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
@@ -37,37 +39,37 @@ export class HookStore {
   private insertHook(hook: Hook, metaIndex?: number): void {
     this.hooks.push(hook);
 
-    if (metaIndex){
-        const existing = this.hooks.findIndex((h) => deepEqual(h, hook));
-        if (existing !== -1) {
+    if (metaIndex) {
+      const existing = this.hooks.findIndex((h) => deepEqual(h, hook));
+      if (existing !== -1) {
         // Hook already exists, update its metadata link
         this.linkMap.set(existing, metaIndex);
         return;
-        }
-        this.linkMap.set(this.hooks.length - 1, metaIndex);
+      }
+      this.linkMap.set(this.hooks.length - 1, metaIndex);
     }
   }
-  
+
 
   addHook(hook: Hook, meta?: HookMetadata): void {
-    if(meta){
-        const metaIndex = this.findOrInsertMetadata(meta);
-        this.insertHook(hook, metaIndex);
+    if (meta) {
+      const metaIndex = this.findOrInsertMetadata(meta);
+      this.insertHook(hook, metaIndex);
     } else {
-        this.insertHook(hook);
+      this.insertHook(hook);
     }
   }
 
   addHooks(hooks: Hook[], meta?: HookMetadata): void {
-    if(meta){
-        const metaIndex = this.findOrInsertMetadata(meta);
-        for (const hook of hooks) {
+    if (meta) {
+      const metaIndex = this.findOrInsertMetadata(meta);
+      for (const hook of hooks) {
         this.insertHook(hook, metaIndex);
-        }
+      }
     } else {
-        for (const hook of hooks) {
+      for (const hook of hooks) {
         this.insertHook(hook);
-        }
+      }
     }
   }
 
@@ -80,5 +82,18 @@ export class HookStore {
 
   listMetadata(): HookMetadata[] {
     return [...this.metadata];
+  }
+
+  prettyPrintHooks(): string {
+      let result: string = "";
+      this.hooks.forEach((h) => {
+          result += `${prettyPrintHook(h)}`;
+      })
+      return result;
+  }
+
+
+  prettyPrintMetadata(): string {
+    return JSON.stringify([...this.metadata], null, 2);
   }
 }

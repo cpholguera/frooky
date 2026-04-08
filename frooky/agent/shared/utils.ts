@@ -114,30 +114,21 @@ export function prettyPrintHook(hook: JavaHook | ObjCHook | NativeHook, short: b
     var result: string = "";
     if (short) {
         if (hook.type === "java") {
-            hook.methods.forEach((m: JavaMethod) => {
-                if (typeof m === "string") {
-                    result += `${hook.javaClass}: ${m[0]}\n`;
-                } else {
-                    result += `${hook.javaClass}: ${m.name}\n`;
-                }
+            hook.methods.forEach((m: JavaMethod, index: number) => {
+                const prefix = index === 0 ? "- " : "  ";
+                result += typeof m === "string" ? `${prefix}${hook.javaClass}: ${m}\n` : `${prefix}${hook.javaClass}: ${m.name}\n`;
             })
         }
         else if (hook.type === "objc") {
-            hook.methods.forEach((m: ObjCMethod) => {
-                if (typeof m === "string") {
-                    result += `${hook.objcClass}: ${m[0]}\n`;
-                } else {
-                    result += `${hook.objcClass}: ${m.name}\n`;
-                }
+            hook.methods.forEach((m: ObjCMethod, index: number) => {
+                const prefix = index === 0 ? "- " : "  ";
+                result += typeof m === "string" ? `${prefix}${hook.objcClass}: ${m}\n` : `${prefix}${hook.objcClass}: ${m.name}\n`;
             })
         }
         if (hook.type === "native") {
-            hook.functions.forEach((f: NativeSymbol) => {
-                if (typeof f === "string") {
-                    result += `${hook.functions}: ${f[0]}\n`;
-                } else {
-                    result += `${hook.functions}: ${f.symbol}\n`;
-                }
+            hook.functions.forEach((f: NativeSymbol, index: number) => {
+                const prefix = index === 0 ? "- " : "  ";
+                result += typeof f === "string" ? `${prefix}${hook.module}: ${f}\n` : `${prefix}${hook.module}: ${f.symbol}\n`;
             })
         }
     } else {
