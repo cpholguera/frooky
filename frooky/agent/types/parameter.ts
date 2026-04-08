@@ -64,6 +64,32 @@ export interface ParamOptions {
 
 
 /**
+ * Canonical definition of a parameter to be decoded during function hooking.
+ *
+ * This is the normalized form used internally. If you are providing parameters
+ * as input, you may also use the shorthand {@link ParamInput} forms, which are
+ * automatically normalized via {@link normalizeParam}.
+ *
+ * @example
+ * // Minimal – type only
+ * { type: "java.lang.String" }
+ *
+ * @example
+ * // With name and options
+ * { type: "java.lang.String", name: "username", options: { decodeAt: "exit" } }
+ *
+ * @public
+ */
+export interface ParamDefinition {
+  /** Frida-compatible type of the parameter, e.g. `"java.lang.String"` or `"int"`. */
+  type: ParamType;
+  /** Optional human-readable name for the parameter, e.g. `"username"`. */
+  name?: ParamName;
+  /** Optional decoder options controlling when and how the parameter is decoded. */
+  options?: ParamOptions;
+}
+
+/**
  * Parameter definition can be provided in multiple forms.
  * 
  * The following examples all describe the same parameter:
@@ -82,11 +108,28 @@ export interface ParamOptions {
  */
 export type Param =
   | ParamType
-  | [ParamType, ParamOptions]
   | [ParamType, ParamName]
+  | [ParamType, ParamOptions]
   | [ParamType, ParamName, ParamOptions]
-  | {
-      type: ParamType;
-      name?: ParamName;
-      options?: ParamOptions;
-    };
+  | ParamDefinition;
+
+  
+/** Normalizes any {@link Param} shorthand into a {@link ParamDefinition}. */
+export function normalizeParam(input: Param): ParamDefinition {
+  // Already in canonical form
+  if (!Array.isArray(input) && typeof input === 'object') return input;
+
+  // Type-only shorthand: "java.lang.String"
+  if (typeof input === 'string') return { type: input };
+
+  const [type, second, third] = input;
+
+  // Tuple with name and options: [type, name, options]
+  if (third !== undefined) return { type, name: second as ParamName, options: third };
+
+  // Tuple with name only: [type, name]
+  if (typeof second === 'string') return { type, name: second };
+
+  // Tuple with options only: [type, options]
+  return { type, options: second as ParamOptions };
+}

@@ -20,7 +20,6 @@ export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platf
     }
  
     // validate hooks
-
     let hookValidatorResult: HookValidatorResult;
     if(frookyConfig.hooks){
         hookValidatorResult = validateHooks(frookyConfig.hooks, platform, frookyConfig.metadata);
