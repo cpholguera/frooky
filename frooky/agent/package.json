@@ -7,8 +7,8 @@
   "scripts": {
     "build:zodSchema": "npx ts-to-zod --all",
 
-    "prod-android": "node build.js -p android -c --type-check none",
-    "prod-ios": "node build.js -p ios -c --type-check none",
+    "prod-android": "npm run build:zodSchema && node build.js -p android -c --type-check none",
+    "prod-ios": "npm run build:zodSchema && node build.js -p ios -c --type-check none",
     "dev-android": "node build.js -p android --type-check none",
     "dev-ios": "node build.js -p ios --type-check none",
     "watch-android": "node build.js -p android -t frida -w --type-check none",
