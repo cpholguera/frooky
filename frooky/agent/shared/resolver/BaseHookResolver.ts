@@ -1,5 +1,6 @@
 // stub, implements shared hook resolver functions
+import type { Hook } from  "frooky";
 
-export abstract class BaseHookResolver {
-
+export interface HookResolver {
+  resolve(hook: Hook): void;
 }

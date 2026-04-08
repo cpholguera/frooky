@@ -4,6 +4,7 @@
 import Java from "frida-java-bridge";
 import type { FrookyConfig } from "frooky";
 import { FrookyApp } from "../FrookyApp";
+import { AndroidHookResolver } from "./resolver/AndroidHookResolver";
 
 var frookyConfigs: FrookyConfig[];
 
@@ -13,11 +14,12 @@ if (Java.available) {
     frookyConfigs = { } as FrookyConfig[];
 //%%% REPLACE STOP
 
-    globalThis.frooky = new FrookyApp("Android", 3, "device");
+    globalThis.frooky = new FrookyApp("Android", new AndroidHookResolver(), 3, "device");
     frookyConfigs.forEach(frookyConfig => {
         frooky.loadFrookyConfig(frookyConfig);
     });
-    frooky.run(); 
+
+
 
 } else {
     console.error("[!] The agent is not run on an Android device. Make sure to run this version of the frooky agent on Android.")

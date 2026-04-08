@@ -6,6 +6,7 @@ import type { SummaryEvent } from "./shared/event/SummaryEvent";
 import { Logger, type logTo } from "./shared/Logger";
 import { validateFrookyConfig } from "./shared/validator/configValidator";
 import { HookStore } from "shared/hook/HookStore";
+import { HookResolver } from "shared/resolver/BaseHookResolver";
 
 declare global {
   var frooky: FrookyApp;
@@ -19,6 +20,7 @@ export class FrookyApp {
   private eventCache: BaseEvent[] = [];
   private platform: Platform;
   private hookStore: HookStore = new HookStore();
+  private platformHookResolver: HookResolver;
 
   /** Logger instance for this for frooky. */
   public log: Logger;
@@ -30,8 +32,9 @@ export class FrookyApp {
    * @param verbosity - Log verbosity level (default: `3`).
    * @param logTo - Log destination (default: `"device"`).
    */
-  constructor(platform: Platform, verbosity: number = 3, logTo: logTo = "device") {
+  constructor(platform: Platform, platformHookResolver: HookResolver, verbosity: number = 3, logTo: logTo = "device") {
     this.platform = platform;
+    this.platformHookResolver = platformHookResolver;
     this.verbosity = verbosity;
 
     // setup logger
@@ -60,11 +63,6 @@ export class FrookyApp {
     // adding valid metadata and hooks to the hook store
     this.hookStore.addHooks(hookParsingResult.validHooks);
     this.log.info(`Added the following hooks to the store: \n${this.hookStore.prettyPrintHooks()}`);
-  }
-
-  /** Starts the Frooky instrumentation session. */
-  public run() {
-    this.log.info("Starting frooky")
   }
 
   /**
