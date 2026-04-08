@@ -1,4 +1,4 @@
-import { Hook, HookMetadata } from "frooky";
+import { Hook, HookMetadata, NativeHook, ObjCHook, JavaHook, Platform } from "frooky";
 import { prettyPrintHook } from "shared/utils";
 
 
@@ -83,6 +83,18 @@ export class HookStore {
     return [...this.metadata];
   }
 
+  getNativeHooks(): NativeHook[] {
+    return this.hooks.filter((hook) => hook.type === 'native');
+  }
+
+  getJavaHooks(): JavaHook[] {
+    return this.hooks.filter((hook) => hook.type === 'java');
+  }
+
+  getObjcHooks(): ObjCHook[] {
+    return this.hooks.filter((hook) => hook.type === 'objc');
+  }
+
   prettyPrintHooks(): string {
       let result: string = "";
       this.hooks.forEach((h) => {
@@ -90,7 +102,6 @@ export class HookStore {
       })
       return result;
   }
-
 
   prettyPrintMetadata(): string {
     return JSON.stringify([...this.metadata], null, 2);
