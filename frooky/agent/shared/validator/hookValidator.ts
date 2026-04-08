@@ -1,4 +1,4 @@
-import type { FrookyConfig, Hook, JavaHook, NativeHook, ObjCHook, Platform } from "frooky";
+import type { HookMetadata, Hook, JavaHook, NativeHook, ObjCHook, Platform } from "frooky";
 import z from "zod";
 import { javaHookSchema } from "../../types/hook/javaHook.zod";
 import { nativeHookSchema } from "../../types/hook/nativeHook.zod";
@@ -13,7 +13,7 @@ export interface HookValidatorResult {
     totalErrors: number;
 }
 
-export function validateHooks(frookyConfig: FrookyConfig, platform: Platform): HookValidatorResult {
+export function validateHooks(hooks: Hook[], platform: Platform, metadata?: HookMetadata,): HookValidatorResult {
 
     const result: HookValidatorResult = {
         validHooks: [],
@@ -22,12 +22,13 @@ export function validateHooks(frookyConfig: FrookyConfig, platform: Platform): H
         totalErrors: 0
     };
 
-    frookyConfig.hooks.forEach(hook => {
+
+    hooks.forEach(hook => {
         result.totalHooks += 1;
 
         // Merge config metadata into hook metadata
-        if (frookyConfig.metadata) {
-            hook.metadata = { ...frookyConfig.metadata, ...hook.metadata };
+        if (metadata) {
+            hook.metadata = { ...metadata, ...hook.metadata };
         }
 
         try {
@@ -61,7 +62,7 @@ export function validateHooks(frookyConfig: FrookyConfig, platform: Platform): H
             result.totalErrors += 1;
             result.invalidHooks.push(hook);
             if (error instanceof z.ZodError) {
-                frooky.log.error(`Hook is not according to schema: ${z.prettifyError(error)}`);
+                frooky.log.error(`Hook is not according to schema: ${JSON.stringify(z.treeifyError(error), null, 2)}`);
             } else {
                 frooky.log.error(error as string);
             }
