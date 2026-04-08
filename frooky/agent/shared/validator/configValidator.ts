@@ -1,9 +1,13 @@
-import type { FrookyConfig, HookMetadata, Platform } from "frooky";
+import type { FrookyConfig, Platform } from "frooky";
 import { type HookValidatorResult, validateHooks } from "./hookValidator";
 
 
 export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platform): HookValidatorResult{
     frooky.log.info(`Validating frooky configuration for platform ${platform}`)
+
+    if(!frookyConfig){
+        throw Error("No or empty frooky configuration provided.")
+    }
 
     // validate configuration metadata
     if (frookyConfig.metadata){
@@ -16,9 +20,17 @@ export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platf
     }
  
     // validate hooks
-    const hookValidatorResult = validateHooks(frookyConfig, platform);
-    
-    frooky.log.info("Hook configuration validated.")
 
-    return hookValidatorResult 
+    let hookValidatorResult: HookValidatorResult;
+    if(frookyConfig.hooks){
+        hookValidatorResult = validateHooks(frookyConfig.hooks, platform, frookyConfig.metadata);
+
+        frooky.log.info("Hook configuration validated.")
+        return hookValidatorResult 
+
+    } else {
+        throw Error("Config file does not have any hooks declared.")
+    }
+    
+
 }

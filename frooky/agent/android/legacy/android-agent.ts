@@ -111,8 +111,17 @@ export function resolveNativeSymbol(hook: NativeHook): JavaOperationsResult {
  * @param {object} hook - Native hook definition.
  * @param {string} categoryName - OWASP MAS category for identification.
  */
+  ////////
+  //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  ///////
+  ////////
+  //////// Works as before, but needs to be refactored later
+  ///////
+  ////////
+  //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  ///////
 function registerNativeHook(hook, categoryName) {
-    let address = resolveNativeSymbol(hook);
+    let address = resolveNativeSymbol(hook); 
     if (!address) {
       console.error("Cannot attach to native symbol '" + hook.symbol + "': address not resolved.");
       return;
@@ -250,27 +259,36 @@ function registerNativeHook(hook, categoryName) {
    * @param {string} categoryName - OWASP MAS category for easier identification (e.g., "CRYPTO")
    * @param {number} maxFrames - Maximum number of stack frames to capture (default is 8, set to -1 for unlimited frames).
    */
-  function registerHook(
-    clazz,
-    method,
-    overloadIndex,
-    categoryName,
-    maxFrames = 8
-  ) {
+    ////////
+  //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  ///////
+  ////////
+  //////// Works as before, but needs to be refactored later
+  ///////
+  ////////
+  //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  ///////
+  export function registerHook(hookOps: JavaHookOperation) {
 
     let Exception = Java.use("java.lang.Exception");
     let System = Java.use('java.lang.System');
 
-    let toHook = Java.use(clazz)[method];
+    let toHook;
+    if (typeof hookOps.method === "string"){
+      toHook = Java.use(hookOps.class)[hookOps.method];
+    } else {
+      toHook = Java.use(hookOps.class)[hookOps.method.name];
+    }
 
-    let methodHeader = toHook.overloads[overloadIndex].toString();
 
-    toHook.overloads[overloadIndex].implementation = function () {
+    let methodHeader = toHook.overloads[hookOps.overloadIndex].toString();
+
+    toHook.overloads[hookOps.overloadIndex].implementation = function () {
 
       let st = Exception.$new().getStackTrace();
       let stackTrace = [];
-      st.forEach(function (stElement, index) {
-        if (maxFrames === -1 || index < maxFrames) {
+      st.forEach((stElement, index) => {
+        if (hookOps.maxFrames === -1 || index < hookOps.maxFrames) {
           let stLine = stElement.toString();
           stackTrace.push(stLine);
         }
@@ -295,17 +313,17 @@ function registerNativeHook(hook, categoryName) {
       const event = {
         id: uuidv4(),
         type: "hook",
-        category: categoryName,
+        // category: categoryName,
         time: new Date().toISOString(),
-        class: clazz,
-        method: method,
+        class: hookOps.class,
+        method: hookOps.class,
         instanceId: instanceId,
         stackTrace: stackTrace,
         inputParameters: decodeArguments(parameterTypes, arguments),
       };
 
       try {
-        let returnValue = this[method].apply(this, arguments);
+        let returnValue = this[hookOps.method].apply(this, arguments);
         event.returnValue = decodeArguments([returnType], [returnValue]);
         send(event)
         return returnValue;
@@ -408,173 +426,160 @@ function registerNativeHook(hook, categoryName) {
   ////////
   //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   ///////
+export function buildHookOperations(hook: JavaHook): JavaOperationsResult {
+  const operations: JavaHookOperation[] = [];
+  const errors: string[] = [];
 
-  export function buildHookOperations(hook: JavaHook): JavaOperationsResult {
-    const operations: JavaHookOperation[] = [];
-    const errors: string[] = [];
+  const buildResult = (): JavaOperationsResult => ({
+    operations,
+    count: operations.length,
+    errors,
+    errorCount: errors.length,
+  });
 
-    const buildResult = (): JavaOperationsResult => ({
-      operations,
-      count: operations.length,
-      errors,
-      errorCount: errors.length,
-    });
+  try {
+    if (!hook.methods) {
+      return buildResult();
+    }
 
-    try {
-      if (!hook.methods) {
-        return buildResult();
-      }
+    for (const javaMethod of hook.methods) {
 
-      for (const javaMethod of hook.methods) {
+      // single method string: overload everything
+      if (typeof javaMethod === 'string') {
+        try {
+          const handle = Java.use(hook.javaClass)[javaMethod];
 
-        // single method, overload everything
-        if (typeof javaMethod === 'string') {
+          for (let j = 0; j < handle.overloads.length; j++) {
+            const paramsEach = parseParameterTypes(handle.overloads[j].toString());
+
+            operations.push({
+              hook,
+              class: hook.javaClass,
+              method: javaMethod,
+              overloadIndex: j,
+              args: paramsEach,
+              maxFrames: 10,
+            });
+          }
+        } catch (e) {
+          const errMsg = `Failed to process method '${javaMethod}' in class '${hook.javaClass}': ${e}`;
+          console.warn(`Warning: ${errMsg}`);
+          errors.push(errMsg);
+        }
+
+      } else {
+
+        // named method with explicit overloads
+        let handle;
+        try {
+          handle = Java.use(hook.javaClass)[javaMethod.name];
+        } catch (e) {
+          const errMsg = `Failed to resolve method '${javaMethod.name}' in class '${hook.javaClass}': ${e}`;
+          console.warn(`Warning: ${errMsg}`);
+          errors.push(errMsg);
+          continue;
+        }
+
+        javaMethod.overloads?.forEach((o: JavaOverload) => {
           try {
+            const argsExplicit: string[] = Array.isArray(o.params)
+              ? o.params.map((p) => (Array.isArray(p) ? p[0] as string : p as string))
+              : [];
 
-            const handle = Java.use(hook.javaClass)[javaMethod as string];
+            const idx = findOverloadIndex(handle, argsExplicit);
 
-            for (let j = 0; j < handle.overloads.length; j++) {
-              const paramsEach = parseParameterTypes(handle.overloads[j].toString());
+            if (idx !== -1) {
+              const params = parseParameterTypes(handle.overloads[idx].toString());
 
               operations.push({
                 hook,
                 class: hook.javaClass,
-                method: javaMethod,
-                overloadIndex: j,
-                args: paramsEach,
+                method: javaMethod.name,
+                overloadIndex: idx,
+                args: params,
+                maxFrames: 10,
               });
+            } else {
+              const errMsg = `Overload not found for ${hook.javaClass}:${javaMethod.name} with args [${argsExplicit.join(", ")}]`;
+              console.warn(`[frida-android] Warning: ${errMsg}. This hook will be skipped.`);
+              errors.push(errMsg);
             }
           } catch (e) {
-            const errMsg = `Failed to process method '${javaMethod}' in class '${hook.javaClass}': ${e}`;
+            const errMsg = `Failed to process overload of '${javaMethod.name}' in class '${hook.javaClass}': ${e}`;
             console.warn(`Warning: ${errMsg}`);
             errors.push(errMsg);
           }
-        } else {
-
-          let handle = Java.use(hook.javaClass)[javaMethod.name];
-
-
-          javaMethod.overloads?.forEach((o: JavaOverload) => {
-
-            try {
-
-              // different variants:
-              // simple strings
-              const argsExplicit: string[] = Array.isArray(o.params)
-                ? o.params.map((p) => (Array.isArray(p) ? p[0] as string : p as string))
-                : [];
-
-
-              let idx = findOverloadIndex(handle, argsExplicit);
-
-              if (idx !== -1) {
-                let params = parseParameterTypes(handle.overloads[idx].toString());
-
-
-                operations.push({
-                  hook,
-                  class: hook.javaClass,
-                  method: javaMethod,
-                  overloadIndex: idx,
-                  args: params,
-                });
-
-              } else {
-                console.warn(
-                  "[frida-android] Warning: Overload not found for class '" +
-                  hook.javaClass +
-                  "', method '" +
-                  hook.javaClass +
-                  "', args [" +
-                  argsExplicit.join(", ") +
-                  "]. This hook will be skipped."
-                );
-                errors.push("Overload not found for " + hook.javaClass + ":" + javaMethod.name + " with args [" + argsExplicit.join(", ") + "]");
-              }
-            } catch (e) {
-              let errMsg = "Failed to process method '" + hook.javaClass + "' in class '" + hook.javaClass + "': " + e;
-              console.warn("Warning: " + errMsg);
-              errors.push(errMsg);
-            }
-
-
-          })
-
-          return buildResult();
-        }
-
-
-
-
-
+        });
       }
-    } catch (e) {
-      const errMsg = `Error in buildHookOperations for hook: ${hook?.javaClass ?? "<unknown>"}: ${e}`;
-      console.error(errMsg);
-      errors.push(errMsg);
     }
-
-    return buildResult();
+  } catch (e) {
+    const errMsg = `Error in buildHookOperations for hook: ${hook?.javaClass ?? "<unknown>"}: ${e}`;
+    console.error(errMsg);
+    errors.push(errMsg);
   }
 
+  return buildResult();
+}
 
-  /**
-   * Takes an array of objects usually defined in the `hooks.js` file of a DEMO and loads all classes and functions stated in there.
-   * @param {[object]} hook - Contains a list of objects which contains all methods which will be overloaded.
-   *   Basic format: {class: "android.security.keystore.KeyGenParameterSpec$Builder", methods: ["setBlockModes"]}
-   *   With overloads: {class: "android.content.ContentResolver", method: "insert", overloads: [{args: ["android.net.Uri", "android.content.ContentValues"]}]}
-   * @param {string} categoryName - OWASP MAS category for easier identification (e.g., "CRYPTO")
-   * @param {{operations: Array<{clazz:string, method:string, overloadIndex:number, args:string[]}>, count:number}} [cachedOperations] - Optional pre-computed hook operations to avoid redundant processing.
-   */
-  function registerAllHooks(hook, categoryName, cachedOperations) {
-    if (hook.methods && hook.overloads && hook.overloads.length > 0) {
-      console.error(`Invalid hook configuration for ${hook.class}: 'overloads' is only supported with a singular 'method', not with 'methods'.`);
-      return;
-    }
-    let built = cachedOperations || buildHookOperations(hook);
-    built.operations.forEach((op) => {
-      try {
-        registerHook(op.clazz, op.method, op.overloadIndex, categoryName, hook.maxFrames);
-      } catch (err) {
-        console.error(err);
-        console.error(`Problem when overloading ${op.clazz}:${op.method}#${op.overloadIndex}`);
-      }
-    });
-  }
+
+
+  // /**
+  //  * Takes an array of objects usually defined in the `hooks.js` file of a DEMO and loads all classes and functions stated in there.
+  //  * @param {[object]} hook - Contains a list of objects which contains all methods which will be overloaded.
+  //  *   Basic format: {class: "android.security.keystore.KeyGenParameterSpec$Builder", methods: ["setBlockModes"]}
+  //  *   With overloads: {class: "android.content.ContentResolver", method: "insert", overloads: [{args: ["android.net.Uri", "android.content.ContentValues"]}]}
+  //  * @param {string} categoryName - OWASP MAS category for easier identification (e.g., "CRYPTO")
+  //  * @param {{operations: Array<{clazz:string, method:string, overloadIndex:number, args:string[]}>, count:number}} [cachedOperations] - Optional pre-computed hook operations to avoid redundant processing.
+  //  */
+  // function registerAllHooks(hook, categoryName, cachedOperations) {
+  //   if (hook.methods && hook.overloads && hook.overloads.length > 0) {
+  //     console.error(`Invalid hook configuration for ${hook.class}: 'overloads' is only supported with a singular 'method', not with 'methods'.`);
+  //     return;
+  //   }
+  //   let built = cachedOperations || buildHookOperations(hook);
+  //   built.operations.forEach((op) => {
+  //     try {
+  //       registerHook(op.clazz, op.method, op.overloadIndex, categoryName, hook.maxFrames);
+  //     } catch (err) {
+  //       console.error(err);
+  //       console.error(`Problem when overloading ${op.clazz}:${op.method}#${op.overloadIndex}`);
+  //     }
+  //   });
+  // }
 
   export function runFrookyAgent(target) {
-    // Main execution: separate native hooks from Java hooks
-    // Separate hooks into native and Java categories
-    let nativeHooks = [];
-    let javaHooks = [];
-    target.hooks.forEach((hook) => {
-      if (isNativeHook(hook)) {
-        nativeHooks.push(hook);
-      } else {
-        javaHooks.push(hook);
-      }
-    });
+    // // Main execution: separate native hooks from Java hooks
+    // // Separate hooks into native and Java categories
+    // let nativeHooks = [];
+    // let javaHooks = [];
+    // target.hooks.forEach((hook) => {
+    //   if (isNativeHook(hook)) {
+    //     nativeHooks.push(hook);
+    //   } else {
+    //     javaHooks.push(hook);
+    //   }
+    // });
 
-    // Prepare native summary upfront without attaching hooks yet
-    let nativeHooksSummary = [];
-    let nativeErrors = [];
-    nativeHooks.forEach((hook) => {
-      try {
-        // Attempt to resolve symbol to surface errors early, but do not attach
-        let addr = resolveNativeSymbol(hook);
-        if (!addr) {
-          nativeErrors.push("Failed to resolve native symbol '" + hook.symbol + "'" + (hook.module ? " in module '" + hook.module + "'" : ""));
-        }
-        nativeHooksSummary.push({
-          module: hook.module || "<global>",
-          symbol: hook.symbol
-        });
-      } catch (e) {
-        let errMsg = "Failed to resolve native hook for symbol '" + hook.symbol + "': " + e;
-        console.error(errMsg);
-        nativeErrors.push(errMsg);
-      }
-    });
+    // // Prepare native summary upfront without attaching hooks yet
+    // let nativeHooksSummary = [];
+    // let nativeErrors = [];
+    // nativeHooks.forEach((hook) => {
+    //   try {
+    //     // Attempt to resolve symbol to surface errors early, but do not attach
+    //     let addr = resolveNativeSymbol(hook);
+    //     if (!addr) {
+    //       nativeErrors.push("Failed to resolve native symbol '" + hook.symbol + "'" + (hook.module ? " in module '" + hook.module + "'" : ""));
+    //     }
+    //     nativeHooksSummary.push({
+    //       module: hook.module || "<global>",
+    //       symbol: hook.symbol
+    //     });
+    //   } catch (e) {
+    //     let errMsg = "Failed to resolve native hook for symbol '" + hook.symbol + "': " + e;
+    //     console.error(errMsg);
+    //     nativeErrors.push(errMsg);
+    //   }
+    // });
 
     // Register hooks inside Java.perform, but only after emitting both summaries
     // Enter Java.perform to allow Java stack augmentation (even if only native hooks)
@@ -582,14 +587,14 @@ function registerNativeHook(hook, categoryName) {
       const delay = 1000
 
       setTimeout(() => {
-        // Pre-compute hook operations once to avoid redundant processing
-        let hookOperationsCache = [];
-        javaHooks.forEach((hook) => {
-          hookOperationsCache.push({
-            hook: hook,
-            built: buildHookOperations(hook)
-          });
-        });
+        // // Pre-compute hook operations once to avoid redundant processing
+        // let hookOperationsCache = [];
+        // javaHooks.forEach((hook) => {
+        //   hookOperationsCache.push({
+        //     hook: hook,
+        //     built: buildHookOperations(hook)
+        //   });
+        // });
 
         // 1) Emit native summary
         if (nativeHooks.length > 0) {
@@ -603,49 +608,49 @@ function registerNativeHook(hook, categoryName) {
           send(nativeSummary);
         }
 
-        // 2) Emit an initial summary of all overloads that will be hooked
-        try {
-          // Aggregate map nested by class then method
-          let aggregate = {};
-          let totalHooks = 0;
-          let errors = [];
-          let totalErrors = 0;
-          hookOperationsCache.forEach((cached) => {
-            totalHooks += cached.built.count;
-            if (cached.built.errors && cached.built.errors.length) {
-              Array.prototype.push.apply(errors, cached.built.errors);
-              totalErrors += cached.built.errors.length;
-            }
-            cached.built.operations.forEach((op) => {
-              if (!aggregate[op.clazz]) {
-                aggregate[op.clazz] = {};
-              }
-              if (!aggregate[op.clazz][op.method]) {
-                aggregate[op.clazz][op.method] = [];
-              }
-              aggregate[op.clazz][op.method].push(op.args);
-            });
-          });
+        // // 2) Emit an initial summary of all overloads that will be hooked
+        // try {
+        //   // Aggregate map nested by class then method
+        //   let aggregate = {};
+        //   let totalHooks = 0;
+        //   let errors = [];
+        //   let totalErrors = 0;
+        //   hookOperationsCache.forEach((cached) => {
+        //     totalHooks += cached.built.count;
+        //     if (cached.built.errors && cached.built.errors.length) {
+        //       Array.prototype.push.apply(errors, cached.built.errors);
+        //       totalErrors += cached.built.errors.length;
+        //     }
+        //     cached.built.operations.forEach((op) => {
+        //       if (!aggregate[op.clazz]) {
+        //         aggregate[op.clazz] = {};
+        //       }
+        //       if (!aggregate[op.clazz][op.method]) {
+        //         aggregate[op.clazz][op.method] = [];
+        //       }
+        //       aggregate[op.clazz][op.method].push(op.args);
+        //     });
+        //   });
 
-          let hooks = [];
-          for (let clazz in aggregate) {
-            if (!aggregate.hasOwnProperty(clazz)) continue;
-            let methodsMap = aggregate[clazz];
-            for (let methodName in methodsMap) {
-              if (!methodsMap.hasOwnProperty(methodName)) continue;
-              let entries = methodsMap[methodName].map(function (argsArr) {
-                return { args: argsArr };
-              });
-              hooks.push({ class: clazz, method: methodName, overloads: entries });
-            }
-          }
+        //   let hooks = [];
+        //   for (let clazz in aggregate) {
+        //     if (!aggregate.hasOwnProperty(clazz)) continue;
+        //     let methodsMap = aggregate[clazz];
+        //     for (let methodName in methodsMap) {
+        //       if (!methodsMap.hasOwnProperty(methodName)) continue;
+        //       let entries = methodsMap[methodName].map(function (argsArr) {
+        //         return { args: argsArr };
+        //       });
+        //       hooks.push({ class: clazz, method: methodName, overloads: entries });
+        //     }
+        //   }
 
-          let summary = { type: "summary", hooks: hooks, totalHooks: totalHooks, errors: errors, totalErrors: totalErrors };
-          send(summary);
-        } catch (e) {
-          // If summary fails, don't block hooking
-          console.error("Summary generation failed, but hooking will continue. Error:", e);
-        }
+        //   let summary = { type: "summary", hooks: hooks, totalHooks: totalHooks, errors: errors, totalErrors: totalErrors };
+        //   send(summary);
+        // } catch (e) {
+        //   // If summary fails, don't block hooking
+        //   console.error("Summary generation failed, but hooking will continue. Error:", e);
+        // }
 
         // 3) Now that both summaries were emitted, attach native hooks
         if (nativeHooks.length > 0) {
@@ -659,9 +664,9 @@ function registerNativeHook(hook, categoryName) {
         }
 
         // 4) Register Java hooks using cached operations
-        hookOperationsCache.forEach((cached) => {
-          registerAllHooks(cached.hook, target.category, cached.built);
-        });
+        // hookOperationsCache.forEach((cached) => {
+        //   registerAllHooks(cached.hook, target.category, cached.built);
+        // });
       }, delay);
     });
   };

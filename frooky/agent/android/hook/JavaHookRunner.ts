@@ -1,13 +1,14 @@
 import type { JavaHook } from "frooky";
-import { buildHookOperations } from "../legacy/android-agent"
+import { buildHookOperations, registerHook } from "../legacy/android-agent"
 import type { HookOperation, HookRunner, OperationBuilderResult } from "../../shared/hook/HookRunner"
 
 
 export interface JavaHookOperation extends HookOperation {
-    class: string;
-    method: any;        // Todo needs to be refactored when legacy code is refactored
-    overloadIndex: number;
-    args: string[];
+    class: string,
+    method: any,        // Todo needs to be refactored when legacy code is refactored
+    overloadIndex: number,
+    args: string[],
+    maxFrames: number,
 }
 
 
@@ -28,13 +29,17 @@ export class JavaHookRunner implements HookRunner {
       operationBuilderResultArray.push(buildHookOperations(h))
     })
 
-    frooky.log.info(`Hook operations for the following hooks built: ${JSON.stringify(operationBuilderResultArray)}`)
+    frooky.log.info(`Android hook operations for the following hooks built: ${JSON.stringify(operationBuilderResultArray)}`)
 
     return operationBuilderResultArray;
   }
 
-  executeHooking(operations: HookOperation[]): void {
-    throw new Error("Method not implemented.");
+  executeHooking(hookOps: JavaHookOperation[]): void {
+    frooky.log.info(`Executing Android hook operations`)
+    hookOps.forEach((hookOp: JavaHookOperation) => {
+      registerHook(hookOp)
+    })
   }
+
 
 } 

@@ -44,8 +44,8 @@ export class NativeHookRunner implements HookRunner {
 
   }
 
-  executeHooking(operations: HookOperation[]): void {
-    throw new Error("Method not implemented.");
+  executeHooking(operations: NativeHookOperation[]): void {
+    frooky.log.info(`Executing native hook operations`)
   }
 
 } 

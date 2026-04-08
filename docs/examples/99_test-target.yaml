@@ -4,25 +4,28 @@ metadata:
   somethignelse: "3423"
 
 hooks:
-  # - javaClass: java.net.URL
-  #   methods:
-  #     - name: openConnection
-  #       overloads:
-  #         - params:
-  #             - [ java.net.Proxy, proxy ]
+  - javaClass: java.net.URL
+    methods:
+      - name: openConnection
+        overloads:
+          - params:
+              - [ java.net.Proxy, proxy ] 
 
-
-  # - javaClass: android.app.Activity 
-  #   methods:
-  #     - name: setIntent
-  #       overloads:
-  #         - params:
-  #             - android.content.Intent 
-  #             - android.app.ComponentCaller 
-  #         - params:
-  #             - [ android.content.Intent, newIntent ] 
+  - javaClass: androidx.security.crypto.EncryptedSharedPreferences$Editor
+    methods:
+      - name: putString
+        overloads:
+          - params:
+            - java.lang.String
+            - [ java.lang.String, value ]
+      - putStringSet
+  
+  - javaClass: android.app.Activity 
+    methods:
+      - startActivity
 
   - module: libcrypto.so
     functions:
       - ENGINE_load_builtin_engines
       - symbol: EVP_cleanup
+   
