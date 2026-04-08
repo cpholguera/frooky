@@ -47,6 +47,15 @@ function isNativeHook(hook) {
  * @param {object} hook - Native hook definition with symbol and optional module.
  * @returns {NativePointer|null} The address of the symbol, or null if not found.
  */
+  ////////
+  //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  ///////
+  ////////
+  //////// Works as before, but needs to be refactored later
+  ///////
+  ////////
+  //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  ///////
 export function resolveNativeSymbol(hook: NativeHook): JavaOperationsResult {
     const nativeOps: NativeHookOperation[] = [];
     const errors: string[] = [];
