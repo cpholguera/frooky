@@ -10,8 +10,8 @@ if (Java.available) {
     runFrookyAgent(frookyConfig: FrookyConfig) {
       globalThis.frooky = new FrookyApp("Android", new JavaHookRunner());
       frooky.loadFrookyConfig(frookyConfig);
-      // frooky.resolvePlatformHooks();
-      // frooky.resolveNativeHooks();
+      frooky.prepareHookOperation();
+      frooky.executeHookOperations();
     }
   };
 } else {

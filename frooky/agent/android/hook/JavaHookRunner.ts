@@ -15,7 +15,9 @@ export interface JavaHookOperation extends HookOperation {
 export class JavaHookRunner implements HookRunner {
 
   operationsBuilder(hooks: JavaHook[]): OperationBuilderResult[] {
-    var OperationBuilderResultArray: OperationBuilderResult[] = [];
+    frooky.log.info(`Building hook operations for Android`)
+
+    var operationBuilderResultArray: OperationBuilderResult[] = [];
     hooks.forEach((h: JavaHook) => {
       // !!!!!!!!!!!!!!!!!!!!!!!!!!!! 
       // TODO: JUMP to legacy code
@@ -23,12 +25,12 @@ export class JavaHookRunner implements HookRunner {
       // Also, the naming is pretty confusing, should be refactored later
       // We should use the validators for the result set, just like with config and hook validations
       // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      OperationBuilderResultArray.push(buildHookOperations(h))
+      operationBuilderResultArray.push(buildHookOperations(h))
     })
 
-    frooky.log.info(`Hook operations for the following hooks built: ${JSON.stringify(OperationBuilderResultArray)}`)
+    frooky.log.info(`Hook operations for the following hooks built: ${JSON.stringify(operationBuilderResultArray)}`)
 
-    return OperationBuilderResultArray;
+    return operationBuilderResultArray;
   }
 
   executeHooking(operations: HookOperation[]): void {
