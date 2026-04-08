@@ -1,4 +1,4 @@
-import type { FrookyConfig, Hook, JavaHook, NativeHook, ObjCHook } from "frooky";
+import type { FrookyConfig, Hook, JavaHook, NativeHook, ObjCHook, Platform } from "frooky";
 import z from "zod";
 import { javaHookSchema } from "../../types/hook/javaHook.zod";
 import { nativeHookSchema } from "../../types/hook/nativeHook.zod";
@@ -12,7 +12,7 @@ export interface HookValidatorResult {
     totalErrors: number;
 }
 
-export function validateHooks(frookyConfig: FrookyConfig): HookValidatorResult {
+export function validateHooks(frookyConfig: FrookyConfig, platform: Platform): HookValidatorResult {
 
     const result: HookValidatorResult = {
         validHooks: [],
@@ -25,11 +25,17 @@ export function validateHooks(frookyConfig: FrookyConfig): HookValidatorResult {
         result.totalHooks += 1;
         try {
             if ("javaClass" in hook) {
+                if( platform !== "Android" ){
+                    throw Error("Hook is not compatible with Android.")
+                }
                 const javaHook = hook as JavaHook
                 javaHookSchema.parse(javaHook);
                 result.validHooks.push(javaHook)
 
             } else if ("objcClass" in hook) {
+                if( platform !== "iOS" ){
+                    throw Error("Hook is not compatible with iOS.")
+                }
                 const objcHook = hook as ObjCHook
                 objCHookSchema.parse(objcHook);
                 result.validHooks.push(objcHook)
