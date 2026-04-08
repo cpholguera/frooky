@@ -62,5 +62,7 @@ export function validateHooks(frookyConfig: FrookyConfig, platform: Platform): H
         }
     });
 
+    frooky.log.info("All hooks validated.")
+
     return result;
 }

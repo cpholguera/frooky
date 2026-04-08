@@ -20,7 +20,6 @@ function deepEqual(a: unknown, b: unknown): boolean {
   );
 }
 
-
 export class HookStore {
   private hooks: Hook[] = [];
   private metadata: HookMetadata[] = [];

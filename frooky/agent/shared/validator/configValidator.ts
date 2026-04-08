@@ -23,7 +23,12 @@ export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platf
     // validate hooks
     const result = validateHooks(frookyConfig, platform);
     
-    frooky.log.info("Hook configuration successfully validated.")
+    frooky.log.info("Hook configuration validated.")
 
-    return { hookParsingResult: result, metadata: frookyConfig.metadata };
+    // if all hooks are invalid, return an empty ConfigValidationResult
+    if (result.totalHooks === result.totalErrors) {
+        return { hookParsingResult: result }
+    } else {
+        return { hookParsingResult: result, metadata: frookyConfig.metadata };
+    }
 }
