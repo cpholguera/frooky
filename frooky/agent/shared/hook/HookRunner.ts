@@ -14,6 +14,6 @@ export interface OperationBuilderResult {
 
 
 export abstract class HookRunner {
-  abstract operationsBuilder(hooks: Hook[]): OperationBuilderResult;
+  abstract operationsBuilder(hooks: Hook[]): OperationBuilderResult[];
   abstract executeHooking(operations: HookOperation[]): void;
 }
