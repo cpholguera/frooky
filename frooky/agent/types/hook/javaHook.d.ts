@@ -37,25 +37,6 @@ export interface JavaMethodDefinition {
  */
 export type JavaMethod = MethodName | JavaMethodDefinition;
 
-
-/**
- * Java hook configuration.
- *
- * @public
- */
-export interface JavaHook extends BaseHook {
-  /**
-   * Fully qualified Java class name.
-   */
-  javaClass: string;
-
-  /**
-   * Methods to hook on the target class.
-   */
-  methods: JavaMethod[];
-
-}
-
 /**
  * Native hook configuration.
  *

@@ -11,5 +11,4 @@ export default [
     {"name":"javaHook",  "input":"types/hook/javaHook.d.ts","output":"types/hook/javaHook.zod.ts"},
     {"name":"objcHook",  "input":"types/hook/objcHook.d.ts","output":"types/hook/objcHook.zod.ts"},
     {"name":"nativeHook","input":"types/hook/nativeHook.d.ts","output":"types/hook/nativeHook.zod.ts"}
-
 ]
