@@ -18,7 +18,12 @@ export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platf
     }
  
     // validate hooks
-    const result = validateHooks(frookyConfig);
+    const result = validateHooks(frookyConfig, platform);
+    
+    // skip adding metadata if all hooks were invalid
+    if (result.totalHooks === result.totalErrors) {
+        frooky.log.warn("No hook was valid. Make sure that the hooks are compatible to your platform.")
+    }
 
     frooky.log.info("Hook configuration successfully validated.")
 

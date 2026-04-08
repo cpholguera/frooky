@@ -1,12 +1,17 @@
 // This file is used when the agent is run by frooky. Hooks are dynamically loaded using rpc at runtime.
 
+import ObjC from "frida-objc-bridge";
 import type { FrookyConfig } from "frooky";
 import { FrookyApp } from "../FrookyApp";
 
-rpc.exports = {
-  runFrookyAgent(frookyConfig: FrookyConfig) {
-    globalThis.frooky = new FrookyApp("iOS");
-    frooky.loadFrookyConfig(frookyConfig);
-    frooky.run(); 
-  }
-};
+if (ObjC.available) {
+  rpc.exports = {
+    runFrookyAgent(frookyConfig: FrookyConfig) {
+      globalThis.frooky = new FrookyApp("iOS");
+      frooky.loadFrookyConfig(frookyConfig);
+      frooky.run(); 
+    }
+  };
+} else {
+  console.error("[!] The agent is not run on an iOS device. Make sure to run this version of the frooky agent on iOS.")
+}
