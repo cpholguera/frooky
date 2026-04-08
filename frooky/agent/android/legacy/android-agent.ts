@@ -33,14 +33,14 @@ function parseReturnValue(methodHeader) {
 }
 
 
-/**
- * Checks if a hook definition is for a native function.
- * @param {object} hook - Hook definition object.
- * @returns {boolean} True if the hook targets a native function.
- */
-function isNativeHook(hook) {
-  return hook.native === true;
-}
+// /**
+//  * Checks if a hook definition is for a native function.
+//  * @param {object} hook - Hook definition object.
+//  * @returns {boolean} True if the hook targets a native function.
+//  */
+// function isNativeHook(hook) {
+//   return hook.native === true;
+// }
 
 /**
  * Resolves the address of a native symbol for Interceptor.attach.
@@ -548,7 +548,7 @@ export function buildHookOperations(hook: JavaHook): JavaOperationsResult {
   //   });
   // }
 
-  export function runFrookyAgent(target) {
+  // export function runFrookyAgent(target) {
     // // Main execution: separate native hooks from Java hooks
     // // Separate hooks into native and Java categories
     // let nativeHooks = [];
@@ -584,10 +584,10 @@ export function buildHookOperations(hook: JavaHook): JavaOperationsResult {
 
     // Register hooks inside Java.perform, but only after emitting both summaries
     // Enter Java.perform to allow Java stack augmentation (even if only native hooks)
-    Java.perform(() => {
-      const delay = 1000
+    // Java.perform(() => {
+    //   const delay = 1000
 
-      setTimeout(() => {
+    //   setTimeout(() => {
         // // Pre-compute hook operations once to avoid redundant processing
         // let hookOperationsCache = [];
         // javaHooks.forEach((hook) => {
@@ -598,16 +598,16 @@ export function buildHookOperations(hook: JavaHook): JavaOperationsResult {
         // });
 
         // 1) Emit native summary
-        if (nativeHooks.length > 0) {
-          let nativeSummary = {
-            type: "native-summary",
-            hooks: nativeHooksSummary,
-            totalHooks: nativeHooksSummary.length,
-            errors: nativeErrors,
-            totalErrors: nativeErrors.length
-          };
-          send(nativeSummary);
-        }
+        // if (nativeHooks.length > 0) {
+        //   let nativeSummary = {
+        //     type: "native-summary",
+        //     hooks: nativeHooksSummary,
+        //     totalHooks: nativeHooksSummary.length,
+        //     errors: nativeErrors,
+        //     totalErrors: nativeErrors.length
+        //   };
+        //   send(nativeSummary);
+        // }
 
         // // 2) Emit an initial summary of all overloads that will be hooked
         // try {
@@ -654,20 +654,20 @@ export function buildHookOperations(hook: JavaHook): JavaOperationsResult {
         // }
 
         // 3) Now that both summaries were emitted, attach native hooks
-        if (nativeHooks.length > 0) {
-          nativeHooks.forEach((hook) => {
-            try {
-              registerNativeHook(hook, target.category);
-            } catch (e) {
-              console.error("Failed to register native hook after summary for symbol '" + hook.symbol + "': " + e);
-            }
-          });
-        }
+        // if (nativeHooks.length > 0) {
+        //   nativeHooks.forEach((hook) => {
+        //     try {
+        //       registerNativeHook(hook, target.category);
+        //     } catch (e) {
+        //       console.error("Failed to register native hook after summary for symbol '" + hook.symbol + "': " + e);
+        //     }
+        //   });
+        // }
 
         // 4) Register Java hooks using cached operations
         // hookOperationsCache.forEach((cached) => {
         //   registerAllHooks(cached.hook, target.category, cached.built);
         // });
-      }, delay);
-    });
-  };
+  //     }, delay);
+  //   });
+  // };
