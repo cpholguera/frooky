@@ -1,7 +1,8 @@
-import type { NativeHook } from "frooky";
 import { Pointer } from "frida-gum";
 import type { HookOperation, HookRunner, OperationBuilderResult } from "./HookRunner"
 import { resolveNativeSymbol } from "android/legacy/android-agent";
+import { registerNativeHook } from "android/legacy/android-agent"
+import { NativeHook } from "frooky";
 
 
 export interface NativeHookOperation extends HookOperation {
@@ -44,8 +45,12 @@ export class NativeHookRunner implements HookRunner {
 
   }
 
-  executeHooking(operations: NativeHookOperation[]): void {
+
+  executeHooking(hookOps: NativeHookOperation[]): void {
     frooky.log.info(`Executing native hook operations`)
+    hookOps.forEach((hookOp: NativeHookOperation) => {
+      registerNativeHook(hookOp)
+    })
   }
 
 } 

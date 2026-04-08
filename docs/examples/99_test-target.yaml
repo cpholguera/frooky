@@ -26,6 +26,15 @@ hooks:
 
   - module: libcrypto.so
     functions:
-      - ENGINE_load_builtin_engines
-      - symbol: EVP_cleanup
-   
+      - X509_new
+      - symbol: RSA_parse_public_key
+      - EVP_EncryptUpdate
+      - HMAC
+      - RSA_public_encrypt
+      - EVP_DecryptUpdate
+      - EVP_DigestUpdate
+
+  - module: libc.so
+    functions:
+      - open
+      - close
