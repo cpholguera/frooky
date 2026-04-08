@@ -6,7 +6,8 @@ import type { SummaryEvent } from "./shared/event/SummaryEvent";
 import { Logger, type logTo } from "./shared/Logger";
 import { validateFrookyConfig } from "./shared/validator/configValidator";
 import { HookStore } from "shared/hook/HookStore";
-import { HookRunner } from "shared/hook/HookRunner";
+import { HookRunner, OperationBuilderResult } from "shared/hook/HookRunner";
+import { NativeHookRunner } from "shared/hook/NativeHookRunner";
 
 declare global {
   var frooky: FrookyApp;
@@ -21,6 +22,8 @@ export class FrookyApp {
   private platform: Platform;
   private hookStore: HookStore = new HookStore();
   private platformHookRunner: HookRunner;
+  private nativeHookRunner: NativeHookRunner;
+
 
   /** Logger instance for this for frooky. */
   public log: Logger;
@@ -32,9 +35,15 @@ export class FrookyApp {
    * @param verbosity - Log verbosity level (default: `3`).
    * @param logTo - Log destination (default: `"device"`).
    */
-  constructor(platform: Platform, platformHookRunner: HookRunner, verbosity: number = 3, logTo: logTo = "device") {
+  constructor(
+    platform: Platform,
+    platformHookRunner: HookRunner,
+    verbosity: number = 3,
+    logTo: logTo = "device") {
+
     this.platform = platform;
     this.platformHookRunner = platformHookRunner;
+    this.nativeHookRunner = new NativeHookRunner();
     this.verbosity = verbosity;
 
     // setup logger
@@ -53,7 +62,7 @@ export class FrookyApp {
    *
    * @param frookyConfig - The configuration to add.
    */
-  public loadFrookyConfig(frookyConfig: FrookyConfig){
+  public loadFrookyConfig(frookyConfig: FrookyConfig) {
     this.log.info("Loading frooky configuration.")
 
     // validating frooky config
@@ -65,11 +74,43 @@ export class FrookyApp {
     this.log.info(`Added the following hooks to the store: \n${this.hookStore.prettyPrintHooks()}`);
   }
 
-  public resolvePlatformHooks() {
-      if (this.platform === "Android") {
-          this.platformHookRunner.operationsBuilder(this.hookStore.getJavaHooks());
-      }
+  public prepareHookOperation() {
+    this.log.info(`Preparing the hook operations`);
+
+    if (this.platform === "Android") {
+      const operationBuilderResults = this.platformHookRunner.operationsBuilder(this.hookStore.getJavaHooks());
+      operationBuilderResults.forEach((opResult: OperationBuilderResult) => {
+        this.hookStore.addHookOperations(opResult.operations)
+      })
+    }
+    if (this.platform === "iOS") {
+      const operationBuilderResults = this.platformHookRunner.operationsBuilder(this.hookStore.getObjcHooks());
+      operationBuilderResults.forEach((opResult: OperationBuilderResult) => {
+        this.hookStore.addHookOperations(opResult.operations)
+      })
+    }
+    // run native hook on both platforms
+    const operationBuilderResults = this.nativeHookRunner.operationsBuilder(this.hookStore.getNativeHooks());
+    operationBuilderResults.forEach((opResult: OperationBuilderResult) => {
+      this.hookStore.addHookOperations(opResult.operations)
+    })
   }
+
+
+  public executeHookOperations() {
+    this.log.info(`Executing the hook operations`);
+
+    if (this.platform === "Android") {
+      this.platformHookRunner.executeHooking(this.hookStore.getJavaHookOperations());
+    }
+    if (this.platform === "iOS") {
+      this.platformHookRunner.executeHooking(this.hookStore.getObjcHookOperations());
+    }
+    // run native hook on both platforms
+    this.platformHookRunner.executeHooking(this.hookStore.getNativeHookOperations());
+  }
+
+
   /**
    * Adds an event to the internal event cache.
    *
