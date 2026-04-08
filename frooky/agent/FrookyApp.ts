@@ -75,21 +75,24 @@ export class FrookyApp {
   }
 
   public prepareHookOperation() {
-    this.log.info(`Preparing the hook operations`);
-
     if (this.platform === "Android") {
+      this.log.info(`Preparing Android hook operations`);
+
       const operationBuilderResults = this.platformHookRunner.operationsBuilder(this.hookStore.getJavaHooks());
       operationBuilderResults.forEach((opResult: OperationBuilderResult) => {
         this.hookStore.addHookOperations(opResult.operations)
       })
     }
     if (this.platform === "iOS") {
+      this.log.info(`Preparing Objective-C hook operations`);
+
       const operationBuilderResults = this.platformHookRunner.operationsBuilder(this.hookStore.getObjcHooks());
       operationBuilderResults.forEach((opResult: OperationBuilderResult) => {
         this.hookStore.addHookOperations(opResult.operations)
       })
     }
     // run native hook on both platforms
+    this.log.info(`Preparing native hook operations`);
     const operationBuilderResults = this.nativeHookRunner.operationsBuilder(this.hookStore.getNativeHooks());
     operationBuilderResults.forEach((opResult: OperationBuilderResult) => {
       this.hookStore.addHookOperations(opResult.operations)
@@ -98,15 +101,16 @@ export class FrookyApp {
 
 
   public executeHookOperations() {
-    this.log.info(`Executing the hook operations`);
-
     if (this.platform === "Android") {
+      this.log.info(`Executing Android hook operations`);
       this.platformHookRunner.executeHooking(this.hookStore.getJavaHookOperations());
     }
     if (this.platform === "iOS") {
+      this.log.info(`Executing Objective-C hook operations`);
       this.platformHookRunner.executeHooking(this.hookStore.getObjcHookOperations());
     }
     // run native hook on both platforms
+    this.log.info(`Executing native hook operations`);
     this.platformHookRunner.executeHooking(this.hookStore.getNativeHookOperations());
   }
 
