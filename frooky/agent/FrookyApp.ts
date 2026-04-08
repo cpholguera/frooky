@@ -5,6 +5,7 @@ import { LogEvent } from "./shared/event/LogEvent";
 import type { SummaryEvent } from "./shared/event/SummaryEvent";
 import { Logger, type logTo } from "./shared/Logger";
 import { validateFrookyConfig } from "./shared/validator/configValidator";
+import { HookStore } from "shared/hook/HookStore";
 
 declare global {
   var frooky: FrookyApp;
@@ -17,10 +18,12 @@ declare global {
 export class FrookyApp {
   private eventCache: BaseEvent[] = [];
   private platform: Platform;
-  public verbosity: number;
+  private hookStore: HookStore = new HookStore();
 
   /** Logger instance for this for frooky. */
   public log: Logger;
+  public verbosity: number;
+
 
   /**
    * @param platform - The target platform to instrument.
@@ -48,8 +51,13 @@ export class FrookyApp {
    * @param frookyConfig - The configuration to add.
    */
   public loadFrookyConfig(frookyConfig: FrookyConfig){
-    this.log.info("Loading frooky configuration...")
+    this.log.info("Loading frooky configuration.")
     const { metadata, hookParsingResult } = validateFrookyConfig(frookyConfig, this.platform);
+
+    this.log.info("Adding valid hook and their metadata to the hook store.")
+    this.hookStore.addHooks(hookParsingResult.validHooks, metadata);
+
+
 
 
 
