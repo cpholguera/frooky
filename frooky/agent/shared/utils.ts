@@ -1,3 +1,5 @@
+import { JavaHook, NativeHook, ObjCHook, JavaMethod, NativeSymbol, ObjCMethod } from "frooky";
+
 /**
  * Generates a v4 UUID
  * @returns {string} v4 UUID (e.g. "6b5354ed-8c3e-476d-8999-96b2251d8a3c")
@@ -10,8 +12,8 @@ export function uuidv4(): string {
     );
 }
 
-const HEX_TABLE:  readonly string[]= Object.freeze(
-    Array.from({ length: 256 }, (_, i) => 
+const HEX_TABLE: readonly string[] = Object.freeze(
+    Array.from({ length: 256 }, (_, i) =>
         (i < 16 ? '0' : '') + i.toString(16)
     )
 );
@@ -106,4 +108,40 @@ export function toHexAndAscii(
     }
 
     return ["0x" + hexArray.join("") + ellipsis, asciiArray.join("") + ellipsis];
+}
+
+export function prettyPrintHook(hook: JavaHook | ObjCHook | NativeHook, short: boolean = true): string {
+    var result: string = "";
+    if (short) {
+        if (hook.type === "java") {
+            hook.methods.forEach((m: JavaMethod) => {
+                if (typeof m === "string") {
+                    result += `${hook.javaClass}: ${m[0]}\n`;
+                } else {
+                    result += `${hook.javaClass}: ${m.name}\n`;
+                }
+            })
+        }
+        else if (hook.type === "objc") {
+            hook.methods.forEach((m: ObjCMethod) => {
+                if (typeof m === "string") {
+                    result += `${hook.objcClass}: ${m[0]}\n`;
+                } else {
+                    result += `${hook.objcClass}: ${m.name}\n`;
+                }
+            })
+        }
+        if (hook.type === "native") {
+            hook.functions.forEach((f: NativeSymbol) => {
+                if (typeof f === "string") {
+                    result += `${hook.functions}: ${f[0]}\n`;
+                } else {
+                    result += `${hook.functions}: ${f.symbol}\n`;
+                }
+            })
+        }
+    } else {
+        result = JSON.stringify(hook, null, 2)
+    }
+    return result;
 }

@@ -16,6 +16,7 @@ export const javaMethodDefinitionSchema = z.object({
 export const javaMethodSchema = z.union([methodNameSchema, javaMethodDefinitionSchema]);
 
 export const javaHookSchema = baseHookSchema.extend({
+    type: z.literal("java"),
     javaClass: z.string(),
     methods: z.array(javaMethodSchema)
 });

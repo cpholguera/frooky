@@ -23,10 +23,15 @@ export type ObjCMethod = MethodName | ObjCMethodDefinition;
 
 /**
  * Objective-C hook configuration.
- *
  * @public
+ * @discriminator {type}
  */
 export interface ObjCHook extends BaseHook {
+  /**
+  * Internally used type guard.
+  */
+  type: "objc"
+
   /**
    * Fully qualified Objective-C class name.
    */
