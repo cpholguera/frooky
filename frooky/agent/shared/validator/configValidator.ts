@@ -13,6 +13,9 @@ export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platf
     // validate metadata
     if (frookyConfig.metadata){
         frooky.log.info(`frooky config metadata:\n${JSON.stringify(frookyConfig.metadata, null, 2)}`)
+        if(frookyConfig.metadata.platform?.toLowerCase() !== platform.toLocaleLowerCase()){
+            frooky.log.warn(`The declared platform (${frookyConfig.metadata.platform}) in the frooky configuration does not match the actual platform (${platform}). Not all hooks may be valid.`)
+        }
     } else {
        frooky.log.warn("This frooky configuration does not have metadata. Consider adding them for better results.")
     }
@@ -20,11 +23,6 @@ export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platf
     // validate hooks
     const result = validateHooks(frookyConfig, platform);
     
-    // skip adding metadata if all hooks were invalid
-    if (result.totalHooks === result.totalErrors) {
-        frooky.log.warn("No hook was valid. Make sure that the hooks are compatible to your platform.")
-    }
-
     frooky.log.info("Hook configuration successfully validated.")
 
     return { hookParsingResult: result, metadata: frookyConfig.metadata };
