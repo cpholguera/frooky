@@ -18,10 +18,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser.suggest_on_error = True
 
     parser.add_argument(
-        "-v",
-        "--version",
+        "-V", "--version",
         action="version",
         version=f"frooky {__version__}",
+    )
+
+    parser.add_argument(
+        "-v", "--verbose",
+        action="count",
+        default=0,
+        help="Verbosity: -v info, -vv simplified hook output, -vvv full hook output",
     )
 
     # Device selection group
@@ -94,6 +100,7 @@ def main() -> int:
         attach_identifier=args.attach_identifier,
         attach_pid=args.attach_pid,
         spawn=args.spawn,
+        verbose=args.verbose
     )
 
     runner = FrookyRunner(options)
