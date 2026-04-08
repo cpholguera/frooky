@@ -99,9 +99,9 @@ export class FrookyApp {
     if (this.platform === "Android") {
       this.platformHookRunner.executeHooking(this.hookStore.getJavaHookOperations());
     }
-    if (this.platform === "iOS") {
-      this.platformHookRunner.executeHooking(this.hookStore.getObjcHookOperations());
-    }
+    // if (this.platform === "iOS") {
+    //   this.platformHookRunner.executeHooking(this.hookStore.getObjcHookOperations());
+    // }
     // run native hook on both platforms
     this.nativeHookRunner.executeHooking(this.hookStore.getNativeHookOperations());
   }
