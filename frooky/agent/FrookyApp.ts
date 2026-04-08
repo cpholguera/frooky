@@ -52,15 +52,15 @@ export class FrookyApp {
    */
   public loadFrookyConfig(frookyConfig: FrookyConfig){
     this.log.info("Loading frooky configuration.")
+
+    // validating frooky config
     const { metadata, hookParsingResult } = validateFrookyConfig(frookyConfig, this.platform);
-
     this.log.info("Adding valid hook and their metadata to the hook store.")
+
+    // adding valid metadata and hooks to the hook store
     this.hookStore.addHooks(hookParsingResult.validHooks, metadata);
-
-
-
-
-
+    this.log.info(`Added the following metadata to the store: \n${this.hookStore.prettyPrintMetadata()}`);
+    this.log.info(`Added the following hooks to the store: \n${this.hookStore.prettyPrintHooks()}`);
   }
 
   /** Starts the Frooky instrumentation session. */
