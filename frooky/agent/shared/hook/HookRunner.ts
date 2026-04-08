@@ -2,7 +2,7 @@
 import type { Hook } from  "frooky";
 
 export interface HookOperation {
-  hook: Hook; 
+  hook: Hook;
 }
 
 export interface OperationBuilderResult {

@@ -6,10 +6,11 @@ import { NativeHook } from "frooky";
 
 
 export interface NativeHookOperation extends HookOperation {
-    module: string
-    moduleAddress: Pointer
-    symbol: string;              // Todo needs to be refactored when legacy code is refactored
-    symbolAddress: Pointer
+  hook: NativeHook
+  module: string
+  moduleAddress: Pointer
+  symbol: string;              // Todo needs to be refactored when legacy code is refactored
+  symbolAddress: Pointer
 }
 
 
@@ -45,10 +46,9 @@ export class NativeHookRunner implements HookRunner {
 
   }
 
-
-  executeHooking(hookOps: NativeHookOperation[]): void {
+  executeHooking(operations: NativeHookOperation[]): void {
     frooky.log.info(`Executing native hook operations`)
-    hookOps.forEach((hookOp: NativeHookOperation) => {
+    operations.forEach((hookOp: NativeHookOperation) => {
       registerNativeHook(hookOp)
     })
   }
