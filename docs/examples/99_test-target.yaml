@@ -4,12 +4,12 @@ metadata:
   somethignelse: "3423"
 
 hooks:
-  # - javaClass: java.net.URL
-  #   methods:
-  #     - name: openConnection
-  #       overloads:
-  #         - params:
-  #             - [ java.net.Proxy, proxy ]
+  - javaClass: java.net.URL
+    methods:
+      - name: openConnection
+        overloads:
+          - params:
+              - [ java.net.Proxy, proxy ]
 
 
   - javaClass: android.app.Activity 
