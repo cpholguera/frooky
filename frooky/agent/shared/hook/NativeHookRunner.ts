@@ -35,9 +35,6 @@ export class NativeHookRunner implements HookRunner {
       operationBuilderResultArray.push(resolveNativeSymbol(h))
 
       
-
-
-
     })
 
     frooky.log.info(`Hook operations for the following hooks built: ${JSON.stringify(operationBuilderResultArray)}`)
