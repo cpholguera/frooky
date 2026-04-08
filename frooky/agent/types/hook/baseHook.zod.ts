@@ -3,7 +3,10 @@ import { z } from "zod";
 
 export const methodNameSchema = z.string();
 
+const hookMetadataSchema = z.any();
+
 export const baseHookSchema = z.object({
+    metadata: hookMetadataSchema.optional(),
     stackTraceLimit: z.number().optional(),
     eventFilter: z.array(z.string()).optional()
 });

@@ -24,6 +24,12 @@ export function validateHooks(frookyConfig: FrookyConfig, platform: Platform): H
 
     frookyConfig.hooks.forEach(hook => {
         result.totalHooks += 1;
+
+        // Merge config metadata into hook metadata
+        if (frookyConfig.metadata) {
+            hook.metadata = { ...frookyConfig.metadata, ...hook.metadata };
+        }
+
         try {
             if ("javaClass" in hook) {
                 const javaHook = hook as JavaHook

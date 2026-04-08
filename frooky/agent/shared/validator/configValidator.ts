@@ -1,16 +1,11 @@
-import type { FrookyConfig, HookMetadata, Platform } from "frooky";
+import type { FrookyConfig, Platform } from "frooky";
 import { type HookValidatorResult, validateHooks } from "./hookValidator";
 
 
-export interface ConfigValidationResult {
-    metadata?: HookMetadata;
-    hookParsingResult: HookValidatorResult;
-}
-
-export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platform): ConfigValidationResult{
+export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platform): HookValidatorResult{
     frooky.log.info(`Validating frooky configuration for platform ${platform}`)
 
-    // validate metadata
+    // validate configuration metadata
     if (frookyConfig.metadata){
         frooky.log.info(`frooky config metadata:\n${JSON.stringify(frookyConfig.metadata, null, 2)}`)
         if(frookyConfig.metadata.platform?.toLowerCase() !== platform.toLocaleLowerCase()){
@@ -24,11 +19,5 @@ export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platf
     const result = validateHooks(frookyConfig, platform);
     
     frooky.log.info("Hook configuration validated.")
-
-    // if all hooks are invalid, return an empty ConfigValidationResult
-    if (result.totalHooks === result.totalErrors) {
-        return { hookParsingResult: result }
-    } else {
-        return { hookParsingResult: result, metadata: frookyConfig.metadata };
-    }
+    return result
 }
