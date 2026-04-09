@@ -1,5 +1,5 @@
 import type { Hook, MethodName } from '../../shared/hook/hook';
-import type { Param } from '../../shared/parameter';
+import type { Param } from '../../shared/hook/parameter';
 
 /**
  * Describes a specific Java method overload.

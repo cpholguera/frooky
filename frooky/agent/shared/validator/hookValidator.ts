@@ -1,11 +1,6 @@
-import type { HookMetadata, Hook, JavaHook, NativeHook, ObjCHook, Platform } from "frooky";
+import type { Hook, HookMetadata, NativeHook, Platform } from "frooky";
 import z from "zod";
-import { javaHookInputSchema } from "../../types/yamlParsing/zodSchemas/javaHook.yaml.zod.ts";
-import { nativeHookSchema } from "../../types/yamlParsing/zodSchemas/nativeHook.internal.zod.ts";
-import { objcHookInputSchema } from "../../types/yamlParsing/zodSchemas/objcHook.yaml.zod.ts";
-import { prettyPrintHook } from "shared/utils";
-import { JavaHookInput } from "types/yamlParsing/hook/javaHook.ts";
-import { ObjcHookInput } from "types/yamlParsing/hook/objcHook.ts";
+
 
 
 export interface HookValidatorResult {

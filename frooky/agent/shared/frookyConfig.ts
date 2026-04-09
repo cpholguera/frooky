@@ -1,6 +1,4 @@
-import type { JavaHook } from './hook/javaHook';
-import type { NativeHook } from './hook/nativeHook';
-import type { ObjcHook } from './hook/objcHook';
+import type { Hook } from 'frooky';
 
 /**
  * Target platform for hooks.
@@ -47,12 +45,6 @@ export interface HookMetadata {
    */
   version?: string;
 }
-
-/**
- * Hook can either be for Java, Native or Objective-C
- */
-export type Hook = JavaHook | NativeHook | ObjcHook;
-
 
 /**
  * frooky configuration.
