@@ -1,5 +1,5 @@
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from '../../android/hook/javaHook';
-import type { MethodName } from '../hook/hook';
+import type { Hook, MethodName } from '../hook/hook';
 import type { ParamYamlInput } from './parameterInput';
 
 
@@ -48,4 +48,9 @@ export type JavaMethod = MethodName | JavaMethodDefinition;
 
 export interface JavaHookInput extends Omit<JavaHook, 'methods'> {
   methods: JavaMethod[];
+}
+
+// Type guard functions
+function isJavaHook(h: Hook): h is JavaHook {
+  return h.type === 'java';
 }
