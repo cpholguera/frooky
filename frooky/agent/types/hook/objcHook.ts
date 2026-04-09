@@ -1,13 +1,13 @@
 import type { Param } from '../parameter';
-import type { ReturnType } from '../returnType';
-import type { BaseHook, MethodName } from './baseHook';
+import type { BaseHook, MethodName, ReturnType } from './baseHook';
+
 
 /**
  * Expanded Objective-C method definition with name and optional overloads.
  *
  * @public
  */
-export interface ObjCMethodDefinition {
+export interface ObjcMethodDefinition {
   name: MethodName;
   returnType?: ReturnType;
   params?: Param[];
@@ -18,7 +18,7 @@ export interface ObjCMethodDefinition {
  * 
  * @public
  */
-export type ObjCMethod = MethodName | ObjCMethodDefinition;
+export type ObjcMethod = ObjcMethodDefinition;
 
 
 /**
@@ -26,7 +26,7 @@ export type ObjCMethod = MethodName | ObjCMethodDefinition;
  * @public
  * @discriminator {type}
  */
-export interface ObjCHook extends BaseHook {
+export interface ObjcHook extends BaseHook {
   /**
   * Internally used type guard.
   */
@@ -40,7 +40,7 @@ export interface ObjCHook extends BaseHook {
   /**
    * Methods to hook on the target class.
    */
-  methods: ObjCMethod[];
+  methods: ObjcMethod[];
 
 }
 

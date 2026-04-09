@@ -18,4 +18,4 @@ export const paramDefinitionSchema = z.object({
     options: paramOptionsSchema.optional()
 });
 
-export const paramSchema = z.union([paramTypeSchema, z.tuple([paramTypeSchema, paramNameSchema]), z.tuple([paramTypeSchema, paramOptionsSchema]), z.tuple([paramTypeSchema, paramNameSchema, paramOptionsSchema]), paramDefinitionSchema]);
+export const paramSchema = paramDefinitionSchema;

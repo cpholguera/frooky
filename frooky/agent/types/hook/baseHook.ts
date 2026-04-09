@@ -1,6 +1,17 @@
 import { HookMetadata } from "types/frookyConfig";
 
 /**
+ * Frida-compatible type for a return value used with Native and Objective-C hooks
+ *
+ * @example "(NSString *)"
+ * @example "int"
+ * 
+ * @public
+ */
+export type ReturnType = string;
+
+
+/**
  * Name of a Java or Objective-C method.
  *
  * @public

@@ -1,6 +1,5 @@
-import type { ReturnType } from 'frooky';
 import type { Param } from '../parameter';
-import type { BaseHook } from './baseHook';
+import type { BaseHook, ReturnType } from './baseHook';
 
 /**
  * Name of a native function method.
@@ -26,7 +25,7 @@ export interface SymbolDefinition {
  * 
  * @public
  */
-export type NativeSymbol = SymbolName | SymbolDefinition;
+export type NativeSymbol = SymbolDefinition;
 
 
 /**

@@ -1,8 +1,8 @@
 import type { HookMetadata, Hook, JavaHook, NativeHook, ObjCHook, Platform } from "frooky";
 import z from "zod";
-import { javaHookSchema } from "../../types/hook/javaHook.zod";
-import { nativeHookSchema } from "../../types/hook/nativeHook.zod";
-import { objCHookSchema } from "../../types/hook/objcHook.zod";
+import { javaHookSchemaInput } from "../../types/hook/javaHook.zod";
+import { nativeHookSchemaInput } from "../../types/hook/nativeHook.zod";
+import { objCHookSchemaInput } from "../../types/hook/objcHook.zod";
 import { prettyPrintHook } from "shared/utils";
 
 
