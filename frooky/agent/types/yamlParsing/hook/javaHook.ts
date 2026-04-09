@@ -1,5 +1,5 @@
 import type { JavaHook, JavaMethodDefinition } from '../../hook/javaHook';
-import type { MethodName } from '../../../shared/hook/baseHook';
+import type { MethodName } from '../../../shared/hook/hook';
 
 /**
  * Java method selector — either a simple method name or a detailed definition.

@@ -1,4 +1,4 @@
-import { Param, ParamName, ParamOptions, ParamType } from "../../shared/parameter";
+import { Param, ParamName, ParamOptions, ParamType } from "../parameter";
 
 /**
  * Extended parameter type for YAML input parsing.
@@ -17,7 +17,7 @@ import { Param, ParamName, ParamOptions, ParamType } from "../../shared/paramete
  *
  * @public
  */
-export type ParamInput =
+export type ParamYamlParsing =
   | Param
   | ParamType
   | [ParamType, ParamName]

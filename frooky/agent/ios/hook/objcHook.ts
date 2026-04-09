@@ -1,5 +1,5 @@
-import type { Param } from '../parameter';
-import type { BaseHook, MethodName, ReturnType } from '../../shared/hook/baseHook';
+import type { Hook, MethodName, ReturnType } from '../../shared/hook/hook';
+import type { Param } from '../../shared/parameter';
 
 
 /**
@@ -26,7 +26,7 @@ export type ObjcMethod = ObjcMethodDefinition;
  * @public
  * @discriminator {type}
  */
-export interface ObjcHook extends BaseHook {
+export interface ObjcHook extends Hook {
   /**
   * Internally used type guard.
   */
