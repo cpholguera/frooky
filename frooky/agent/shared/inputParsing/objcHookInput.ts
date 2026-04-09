@@ -6,7 +6,7 @@ import type { MethodName } from '../hook/hook';
  *
  * @public
  */
-export type ObjcMethodYamlParsing = MethodName | ObjcMethodDefinition;
+export type ObjcMethodInput = MethodName | ObjcMethodDefinition;
 
 
 /** 
@@ -18,6 +18,6 @@ export type ObjcMethodYamlParsing = MethodName | ObjcMethodDefinition;
  * @discriminator {type}
  */
 
-export interface ObjcHookYamlParsing extends Omit<ObjcHook, 'methods'> {
-  methods: ObjcMethodYamlParsing[];
+export interface ObjcHookInput extends Omit<ObjcHook, 'methods'> {
+  methods: ObjcMethodInput[];
 }

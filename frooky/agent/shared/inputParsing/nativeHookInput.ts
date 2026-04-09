@@ -1,5 +1,5 @@
 import type { NativeHook, SymbolDefinition, SymbolName } from '../hook/nativeHook';
-import type { ParamYamlParsing } from '../yamlParsing/parameterYamlParsing';
+import type { ParamYamlInput } from './parameterInput';
 
 export type { SymbolName };
 
@@ -9,7 +9,7 @@ export type { SymbolName };
  * @public
  */
 export interface SymbolDefinitionInput extends Omit<SymbolDefinition, 'params'> {
-  params?: ParamYamlParsing[];
+  params?: ParamYamlInput[];
 }
 
 /**
@@ -27,6 +27,6 @@ export type NativeSymbol = SymbolName | SymbolDefinitionInput;
  * @public
  * @discriminator {type}
  */
-export interface NativeHookYamlParsing extends Omit<NativeHook, 'functions'> {
+export interface NativeHookInput extends Omit<NativeHook, 'functions'> {
   functions: NativeSymbol[];
 }

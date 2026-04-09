@@ -17,7 +17,7 @@ import type { Param, ParamName, ParamOptions, ParamType } from "../hook/paramete
  *
  * @public
  */
-export type ParamYamlParsing =
+export type ParamYamlInput =
   | Param
   | ParamType
   | [ParamType, ParamName]

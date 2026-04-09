@@ -1,4 +1,4 @@
-import type { Param } from './parameter';
+import type { Param } from '../hook/parameter';
 import type { Hook, ReturnType } from './hook';
 
 /**

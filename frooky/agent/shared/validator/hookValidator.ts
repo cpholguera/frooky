@@ -1,5 +1,8 @@
-import type { Hook, HookMetadata, NativeHook, Platform } from "frooky";
-import z from "zod";
+import type { Hook, HookMetadata, JavaHook, NativeHook, Platform } from "frooky";
+import {  }
+import { JavaHookInputSchema } from "../inputParsing/zodSchemas/javaHook.yaml.parsing.zod";
+import { prettyPrintHook } from "../utils";
+import { JavaHookInput } from "../inputParsing/javaHookInput";
 
 
 
@@ -30,14 +33,17 @@ export function validateHooks(hooks: Hook[], platform: Platform, metadata?: Hook
 
         try {
             if ("javaClass" in hook) {
-                const javaHookInputParsing = hook as JavaHookInput
-                javaHookInputParsing.type = "java";
-                if( platform !== "Android" ){
-                    throw Error(`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(javaHookInputParsing)}`)
-                }
-                javaHookInputSchema.parse(javaHookInputParsing);
+                // validate the input based on the ZOD schema
+                const javaHookInput = hook as JavaHookInput
+                JavaHookInputSchema.parse(javaHookInput);
 
-                // normalizing the hook for internal use
+                const javaHook = hook as JavaHook
+                javaHook.type = "java";
+
+                if( platform !== "Android" ){
+                    throw Error(`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(javaHookInput)}`)
+                }
+
                 
                 result.validHooks.push(javaHook)
 
