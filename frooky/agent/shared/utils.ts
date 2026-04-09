@@ -1,4 +1,4 @@
-import { JavaHook, NativeHook, ObjCHook, JavaMethod, NativeSymbol, ObjCMethod } from "frooky";
+import { JavaHook, JavaMethod, NativeHook, NativeSymbol, ObjCHook, ObjCMethod } from "frooky";
 
 /**
  * Generates a v4 UUID
