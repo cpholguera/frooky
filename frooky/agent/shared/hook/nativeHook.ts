@@ -1,5 +1,5 @@
 import type { Param } from '../parameter';
-import type { BaseHook, ReturnType } from './baseHook';
+import type { Hook, ReturnType } from './hook';
 
 /**
  * Name of a native function method.
@@ -34,7 +34,7 @@ export type NativeSymbol = SymbolDefinition;
  * @public
  * @discriminator {type}
  */
-export interface NativeHook extends BaseHook {
+export interface NativeHook extends Hook {
   /**
   * Internally used type guard.
   */

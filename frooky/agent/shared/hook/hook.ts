@@ -1,4 +1,4 @@
-import { HookMetadata } from "shared/frookyConfig";
+import type { HookMetadata } from "shared/frookyConfig";
 
 /**
  * Frida-compatible type for a return value used with Native and Objective-C hooks
@@ -24,7 +24,7 @@ export type MethodName = string;
  *
  * @public
  */
-export interface BaseHook {
+export interface Hook {
   /**
    * Optional metadata for this hook. If provided, these values will be merged with the metadata defined in the frooky configuration during hook loading, and will take priority on conflict.
    *
