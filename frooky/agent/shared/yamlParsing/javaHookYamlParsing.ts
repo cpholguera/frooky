@@ -1,4 +1,4 @@
-import type { JavaHook, JavaMethodDefinition } from '../../android/hook/javaHook';
+import type { JavaHook, JavaMethodDefinition, JavaOverload } from '../../android/hook/javaHook';
 import type { MethodName } from '../hook/hook';
 import type { ParamYamlParsing } from './parameterYamlParsing';
 
@@ -8,7 +8,7 @@ import type { ParamYamlParsing } from './parameterYamlParsing';
  * Extended type for YAML input parsing.
  * @public
  */
-export interface JavaOverloadYamlParsing extends Omit<JavaMethodDefinition, 'params'> {
+export interface JavaOverloadYamlParsing extends Omit<JavaOverload, 'params'> {
   /**
    * Parameter definitions for this overload.
    */
@@ -46,6 +46,6 @@ export type JavaMethod = MethodName | JavaMethodDefinition;
  * @discriminator {type}
  */
 
-export interface JavaHookInput extends Omit<JavaHook, 'methods'> {
+export interface JavaHookYamlParsing extends Omit<JavaHook, 'methods'> {
   methods: JavaMethod[];
 }
