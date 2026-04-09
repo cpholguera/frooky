@@ -1,5 +1,5 @@
-import type { LogLevel } from "../Logger";
-import { BaseEvent } from "./BaseEvent";
+import type { LogLevel } from "../logger";
+import { BaseEvent } from "./baseEvent";
 
 /**
  * Class representing a log event created by frooky.

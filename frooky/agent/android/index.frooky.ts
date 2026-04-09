@@ -3,7 +3,7 @@
 import Java from "frida-java-bridge";
 import type { FrookyConfig } from "frooky";
 import { FrookyApp } from "../FrookyApp";
-import { JavaHookRunner } from "./hook/JavaHookRunner";
+import { JavaHookRunner } from "./hook/javaHookRunner";
 
 if (Java.available) {
   rpc.exports = {

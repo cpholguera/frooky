@@ -1,4 +1,4 @@
-import { BaseEvent } from "./BaseEvent";
+import { BaseEvent } from "./baseEvent";
 
 /**
  * Abstract class for all hook events created by frooky.

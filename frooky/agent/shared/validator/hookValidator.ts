@@ -1,9 +1,11 @@
 import type { HookMetadata, Hook, JavaHook, NativeHook, ObjCHook, Platform } from "frooky";
 import z from "zod";
-import { javaHookSchemaInput } from "../../types/hook/javaHook.zod";
-import { nativeHookSchemaInput } from "../../types/hook/nativeHook.zod";
-import { objCHookSchemaInput } from "../../types/hook/objcHook.zod";
+import { javaHookInputSchema } from "../../types/yamlParsing/zodSchemas/javaHook.yaml.zod.ts";
+import { nativeHookSchema } from "../../types/yamlParsing/zodSchemas/nativeHook.internal.zod.ts";
+import { objcHookInputSchema } from "../../types/yamlParsing/zodSchemas/objcHook.yaml.zod.ts";
 import { prettyPrintHook } from "shared/utils";
+import { JavaHookInput } from "types/yamlParsing/hook/javaHook.ts";
+import { ObjcHookInput } from "types/yamlParsing/hook/objcHook.ts";
 
 
 export interface HookValidatorResult {
@@ -33,21 +35,28 @@ export function validateHooks(hooks: Hook[], platform: Platform, metadata?: Hook
 
         try {
             if ("javaClass" in hook) {
-                const javaHook = hook as JavaHook
-                javaHook.type = "java";
+                const javaHookInputParsing = hook as JavaHookInput
+                javaHookInputParsing.type = "java";
                 if( platform !== "Android" ){
-                    throw Error(`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(javaHook)}`)
+                    throw Error(`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(javaHookInputParsing)}`)
                 }
-                javaHookSchema.parse(javaHook);
+                javaHookInputSchema.parse(javaHookInputParsing);
+
+                // normalizing the hook for internal use
+                
                 result.validHooks.push(javaHook)
 
             } else if ("objcClass" in hook) {
-                const objcHook = hook as ObjCHook
-                objcHook.type = "objc";
+                const objcHookInputParsing = hook as ObjcHookInput
+                objcHookInputParsing.type = "objc";
                 if( platform !== "iOS" ){
-                    throw Error(`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(objcHook)}`)
+                    throw Error(`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(objcHookInputParsing)}`)
                 }
-                objCHookSchema.parse(objcHook);
+                objcHookInputSchema.parse(objcHookInputParsing);
+
+                // normalizing the hook for internal use
+
+
                 result.validHooks.push(objcHook)
 
             } else if ("functions" in hook) {

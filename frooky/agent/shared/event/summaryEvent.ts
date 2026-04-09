@@ -1,5 +1,5 @@
 import type { Hook } from "frooky";
-import { BaseEvent } from "./BaseEvent";
+import { BaseEvent } from "./baseEvent";
 
 /**
  * Represents a summary event created by frooky.

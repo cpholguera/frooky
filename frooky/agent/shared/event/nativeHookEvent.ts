@@ -1,4 +1,4 @@
-import { HookEvent } from "./HookEvent";
+import { HookEvent } from "./hookEvent";
 
 /**
  * Represents a native hook event created by frooky.

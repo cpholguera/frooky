@@ -4,8 +4,8 @@
 import Java from "frida-java-bridge";
 import type { FrookyConfig } from "frooky";
 import { FrookyApp } from "../FrookyApp";
-import { JavaHookRunner } from "./hook/JavaHookRunner";
-import { NativeHookRunner } from "../shared/hook/NativeHookRunner";
+import { JavaHookRunner } from "./hook/javaHookRunner";
+import { NativeHookRunner } from "../shared/hook/nativeHookRunner";
 
 var frookyConfigs: FrookyConfig[];
 

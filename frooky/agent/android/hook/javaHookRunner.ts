@@ -1,6 +1,6 @@
 import type { JavaHook } from "frooky";
 import { buildHookOperations, registerHook } from "../legacy/android-agent"
-import type { HookOperation, HookRunner, OperationBuilderResult } from "../../shared/hook/HookRunner"
+import type { HookOperation, HookRunner, OperationBuilderResult } from "../../shared/hook/hookRunner"
 
 
 export interface JavaHookOperation extends HookOperation {
