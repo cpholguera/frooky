@@ -90,46 +90,10 @@ export interface ParamDefinition {
 }
 
 /**
- * Parameter definition can be provided in multiple forms.
- * 
- * The following examples all describe the same parameter:
+ * Parameter definition intended for the internal usage
  *
- * 1. As a simple type name.
- * 2. As a tuple of [type, options].
- * 3. As a tuple of [type, name, options].
- * 4. As a structured object with type, name, and options.
- *
- * @example "java.lang.String"
- * @example ["java.lang.String", { decodeAt: "exit" }]
- * @example ["java.lang.String", "value", { decodeAt: "exit" }]
  * @example { type: "java.lang.String", name: "value", options: { decodeAt: "exit" } }
  *
  * @public
  */
-export type Param =
-  | ParamType
-  | [ParamType, ParamName]
-  | [ParamType, ParamOptions]
-  | [ParamType, ParamName, ParamOptions]
-  | ParamDefinition;
-
-  
-/** Normalizes any {@link Param} shorthand into a {@link ParamDefinition}. */
-export function normalizeParam(input: Param): ParamDefinition {
-  // Already in canonical form
-  if (!Array.isArray(input) && typeof input === 'object') return input;
-
-  // Type-only shorthand: "java.lang.String"
-  if (typeof input === 'string') return { type: input };
-
-  const [type, second, third] = input;
-
-  // Tuple with name and options: [type, name, options]
-  if (third !== undefined) return { type, name: second as ParamName, options: third };
-
-  // Tuple with name only: [type, name]
-  if (typeof second === 'string') return { type, name: second };
-
-  // Tuple with options only: [type, options]
-  return { type, options: second as ParamOptions };
-}
+export type Param = ParamDefinition;

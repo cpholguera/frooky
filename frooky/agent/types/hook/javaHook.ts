@@ -31,11 +31,11 @@ export interface JavaMethodDefinition {
 }
 
 /**
- * Java method selector — either a simple method name or a detailed definition.
+ * Java method selector
  *
  * @public
  */
-export type JavaMethod = MethodName | JavaMethodDefinition;
+export type JavaMethod = JavaMethodDefinition;
 
 /**
  * Native hook configuration.

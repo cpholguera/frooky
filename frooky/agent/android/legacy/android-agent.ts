@@ -5,7 +5,7 @@ import { uuidv4 } from "../../shared/utils.js"
 import { Hook, JavaHook, JavaOverload, NativeHook } from "frooky";
 import { JavaHookOperation, JavaOperationBuilderResult, JavaOperationsResult } from "android/hook/JavaHookRunner.js";
 import { OperationBuilderResult } from "shared/hook/HookRunner.js";
-import type { NativeSymbol } from "../../types/hook/nativeHook.js"
+import type { NativeSymbol } from "../../types/nativeHook.js"
 import { NativeHookOperation } from "shared/hook/NativeHookRunner.js";
 
 
