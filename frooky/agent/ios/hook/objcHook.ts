@@ -1,5 +1,5 @@
 import type { Param } from '../parameter';
-import type { BaseHook, MethodName, ReturnType } from './baseHook';
+import type { BaseHook, MethodName, ReturnType } from '../../shared/hook/baseHook';
 
 
 /**

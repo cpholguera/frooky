@@ -1,5 +1,5 @@
 import type { FrookyApp } from "../FrookyApp";
-import { LogEvent } from "./event/LogEvent";
+import { LogEvent } from "./event/logEvent";
 
 export type LogLevel = "info" | "warn" | "error";
 export type logTo = "device" | "frooky"

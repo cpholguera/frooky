@@ -1,4 +1,4 @@
-import { HookMetadata } from "types/frookyConfig";
+import { HookMetadata } from "shared/frookyConfig";
 
 /**
  * Frida-compatible type for a return value used with Native and Objective-C hooks

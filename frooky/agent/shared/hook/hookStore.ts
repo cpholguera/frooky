@@ -1,8 +1,8 @@
 import { Hook, NativeHook, ObjCHook, JavaHook } from "frooky";
 import { prettyPrintHook } from "shared/utils";
-import { HookOperation } from "./HookRunner";
-import { NativeHookOperation } from "./NativeHookRunner";
-import { JavaHookOperation } from "android/hook/JavaHookRunner";
+import { HookOperation } from "./hookRunner";
+import { NativeHookOperation } from "./nativeHookRunner";
+import { JavaHookOperation } from "android/hook/javaHookRunner";
 
 
 function isNativeHookOperation(op: HookOperation): op is NativeHookOperation {
