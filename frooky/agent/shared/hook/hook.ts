@@ -29,7 +29,7 @@ export interface Hook {
     * Internally used type guard.
     */
     type: "java" | "objc" | "native"
-    
+
   /**
    * Optional metadata for this hook. If provided, these values will be merged with the metadata defined in the frooky configuration during hook loading, and will take priority on conflict.
    *

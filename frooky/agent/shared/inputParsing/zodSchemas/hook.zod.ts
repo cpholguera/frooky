@@ -8,6 +8,7 @@ export const methodNameSchema = z.string();
 const hookMetadataSchema = z.any();
 
 export const hookSchema = z.object({
+    type: z.union([z.literal("java"), z.literal("objc"), z.literal("native")]),
     metadata: hookMetadataSchema.optional(),
     stackTraceLimit: z.number().optional(),
     eventFilter: z.array(z.string()).optional()

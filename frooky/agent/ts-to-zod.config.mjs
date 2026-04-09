@@ -6,47 +6,47 @@
 export default [
     {
         "name": "parameter",
-        "input": "shared/parameter.ts",
-        "output": "shared/yamlParsing/zodSchemas/parameter.zod.ts"
+        "input": "shared/hook/parameter.ts",
+        "output": "shared/inputParsing/zodSchemas/parameter.zod.ts"
     },
     {
         "name": "parameter_yaml_parsing",
-        "input": "shared/yamlParsing/parameterYamlParsing.ts",
-        "output": "shared/yamlParsing/zodSchemas/parameter.yaml.parsing.zod.ts"
+        "input": "shared/inputParsing/parameterInput.ts",
+        "output": "shared/inputParsing/zodSchemas/parameter.yaml.parsing.zod.ts"
     },
     {
         "name": "hook",
         "input": "shared/hook/hook.ts",
-        "output": "shared/yamlParsing/zodSchemas/hook.zod.ts"
+        "output": "shared/inputParsing/zodSchemas/hook.zod.ts"
     },
     {
         "name": "javaHook",
         "input": "android/hook/javaHook.ts",
-        "output": "shared/yamlParsing/zodSchemas/javaHook.zod.ts"
+        "output": "shared/inputParsing/zodSchemas/javaHook.zod.ts"
     },
     {
         "name": "javaHook_yaml_parsing",
-        "input": "shared/yamlParsing/javaHookYamlParsing.ts",
-        "output": "shared/yamlParsing/zodSchemas/javaHook.yaml.parsing.zod.ts"
+        "input": "shared/inputParsing/javaHookInput.ts",
+        "output": "shared/inputParsing/zodSchemas/javaHook.yaml.parsing.zod.ts"
     },
     {
         "name": "objcHook",
         "input": "ios/hook/objcHook.ts",
-        "output": "shared/yamlParsing/zodSchemas/objcHook.zod.ts"
+        "output": "shared/inputParsing/zodSchemas/objcHook.zod.ts"
     },
     {
         "name": "objcHook_yaml_parsing",
-        "input": "shared/yamlParsing/objcHookYamlParsing.ts",
-        "output": "shared/yamlParsing/zodSchemas/objcHook.yaml.parsing.zod.ts"
+        "input": "shared/inputParsing/objcHookInput.ts",
+        "output": "shared/inputParsing/zodSchemas/objcHook.yaml.parsing.zod.ts"
     },
     {
         "name": "nativeHook",
         "input": "shared/hook/nativeHook.ts",
-        "output": "shared/yamlParsing/zodSchemas/nativeHook.internal.zod.ts"
+        "output": "shared/inputParsing/zodSchemas/nativeHook.internal.zod.ts"
     },
     {
         "name": "nativeHook_yaml_parsing",
-        "input": "shared/yamlParsing/nativeHookYamlParsing.ts",
-        "output": "shared/yamlParsing/zodSchemas/nativeHook.yaml.parsing.zod.ts"
+        "input": "shared/inputParsing/nativeHookInput.ts",
+        "output": "shared/inputParsing/zodSchemas/nativeHook.yaml.parsing.zod.ts"
     }
 ]

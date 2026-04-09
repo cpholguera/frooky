@@ -2,15 +2,14 @@
 import { z } from "zod";
 
 import { nativeHookSchema, symbolDefinitionSchema, symbolNameSchema } from "./nativeHook.internal.zod";
-
-const paramYamlParsingSchema = z.any();
+import { paramYamlInputSchema } from "./parameter.yaml.parsing.zod";
 
 export const symbolDefinitionInputSchema = symbolDefinitionSchema.omit({ "params": true }).extend({
-    params: z.array(paramYamlParsingSchema).optional()
+    params: z.array(paramYamlInputSchema).optional()
 });
 
 export const nativeSymbolSchema = z.union([symbolNameSchema, symbolDefinitionInputSchema]);
 
-export const nativeHookYamlParsingSchema = nativeHookSchema.omit({ "functions": true }).extend({
+export const nativeHookInputSchema = nativeHookSchema.omit({ "functions": true }).extend({
     functions: z.array(nativeSymbolSchema)
 });

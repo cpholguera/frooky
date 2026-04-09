@@ -1,4 +1,4 @@
-import { JavaHook, JavaMethod, NativeHook, NativeSymbol, ObjCHook, ObjCMethod } from "frooky";
+import type { JavaHook, JavaMethod, NativeHook, NativeSymbol, ObjcHook, ObjcMethod } from "frooky";
 
 /**
  * Generates a v4 UUID
@@ -110,7 +110,7 @@ export function toHexAndAscii(
     return ["0x" + hexArray.join("") + ellipsis, asciiArray.join("") + ellipsis];
 }
 
-export function prettyPrintHook(hook: JavaHook | ObjCHook | NativeHook, short: boolean = true): string {
+export function prettyPrintHook(hook: JavaHook | ObjcHook | NativeHook, short: boolean = true): string {
     var result: string = "";
     if (short) {
         if (hook.type === "java") {
@@ -120,7 +120,7 @@ export function prettyPrintHook(hook: JavaHook | ObjCHook | NativeHook, short: b
             })
         }
         else if (hook.type === "objc") {
-            hook.methods.forEach((m: ObjCMethod, index: number) => {
+            hook.methods.forEach((m: ObjcMethod, index: number) => {
                 const prefix = index === 0 ? "- " : "  ";
                 result += typeof m === "string" ? `${prefix}${hook.objcClass}: ${m}\n` : `${prefix}${hook.objcClass}: ${m.name}\n`;
             })

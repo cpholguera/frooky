@@ -1,8 +1,7 @@
+import { registerNativeHook, resolveNativeSymbol } from "android/legacy/android-agent";
 import { Pointer } from "frida-gum";
-import type { HookOperation, HookRunner, OperationBuilderResult } from "./hookRunner"
-import { resolveNativeSymbol } from "android/legacy/android-agent";
-import { registerNativeHook } from "android/legacy/android-agent"
 import { NativeHook } from "frooky";
+import type { HookOperation, HookRunner, OperationBuilderResult } from "./hookRunner";
 
 
 export interface NativeHookOperation extends HookOperation {

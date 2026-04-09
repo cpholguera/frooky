@@ -3,18 +3,18 @@ import { z } from "zod";
 
 import { javaHookSchema, javaMethodDefinitionSchema, javaOverloadSchema } from "./javaHook.zod";
 import { methodNameSchema } from "./hook.zod";
-import { paramYamlParsingSchema } from "./parameter.yaml.parsing.zod";
+import { paramYamlInputSchema } from "./parameter.yaml.parsing.zod";
 
 export const javaOverloadYamlParsingSchema = javaOverloadSchema.omit({ "params": true }).extend({
-    params: z.array(paramYamlParsingSchema)
+    params: z.array(paramYamlInputSchema)
 });
 
-export const javaMethodDefinitionYamlParsingSchema = javaMethodDefinitionSchema.omit({ "overloads": true }).extend({
+export const javaMethodDefinitionInputSchema = javaMethodDefinitionSchema.omit({ "overloads": true }).extend({
     overloads: z.array(javaOverloadYamlParsingSchema).optional()
 });
 
 export const javaMethodSchema = z.union([methodNameSchema, javaMethodDefinitionSchema]);
 
-export const javaHookYamlParsingSchema = javaHookSchema.omit({ "methods": true }).extend({
+export const javaHookInputSchema = javaHookSchema.omit({ "methods": true }).extend({
     methods: z.array(javaMethodSchema)
 });
