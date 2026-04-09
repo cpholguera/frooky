@@ -1,4 +1,4 @@
-import { Param, ParamName, ParamOptions, ParamType } from "../parameter";
+import type { Param, ParamName, ParamOptions, ParamType } from "../parameter";
 
 /**
  * Extended parameter type for YAML input parsing.
