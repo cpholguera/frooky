@@ -12,7 +12,7 @@ export default [
     {
         "name": "parameter_yaml_parsing",
         "input": "shared/inputParsing/parameterInput.ts",
-        "output": "shared/inputParsing/zodSchemas/parameter.yaml.parsing.zod.ts"
+        "output": "shared/inputParsing/zodSchemas/parameter.input.zod.ts"
     },
     {
         "name": "hook",
@@ -27,7 +27,7 @@ export default [
     {
         "name": "javaHook_yaml_parsing",
         "input": "shared/inputParsing/javaHookInput.ts",
-        "output": "shared/inputParsing/zodSchemas/javaHook.yaml.parsing.zod.ts"
+        "output": "shared/inputParsing/zodSchemas/javaHook.input.zod.ts"
     },
     {
         "name": "objcHook",
@@ -37,7 +37,7 @@ export default [
     {
         "name": "objcHook_yaml_parsing",
         "input": "shared/inputParsing/objcHookInput.ts",
-        "output": "shared/inputParsing/zodSchemas/objcHook.yaml.parsing.zod.ts"
+        "output": "shared/inputParsing/zodSchemas/objcHook.input.zod.ts"
     },
     {
         "name": "nativeHook",
@@ -47,6 +47,6 @@ export default [
     {
         "name": "nativeHook_yaml_parsing",
         "input": "shared/inputParsing/nativeHookInput.ts",
-        "output": "shared/inputParsing/zodSchemas/nativeHook.yaml.parsing.zod.ts"
+        "output": "shared/inputParsing/zodSchemas/nativeHook.input.zod.ts"
     }
 ]
