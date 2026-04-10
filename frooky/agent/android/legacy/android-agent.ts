@@ -101,6 +101,16 @@ export function resolveNativeSymbol(hook: NativeHook): NativeHookEntry[] {
 }
 
 
+
+export function registerNativeHooks(hookEntries: NativeHookEntry[]) {
+
+  hookEntries.forEach((hookEntry: NativeHookEntry) => {
+      registerNativeHook(hookEntry, "FROOKY")
+  })
+
+}
+
+
 /**
  * Registers a native function hook using Frida's Interceptor API.
  * @param {object} hook - Native hook definition.
@@ -121,11 +131,11 @@ export function resolveNativeSymbol(hook: NativeHook): NativeHookEntry[] {
 // }
 //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ///////
-export function registerNativeHook(hookOp: NativeHookOperation, category: string = "FROOKY") {
+export function registerNativeHook(hookEntry: NativeHookEntry, category: string = "FROOKY") {
   // let maxFrames = typeof hook.maxFrames === 'number' ? hook.maxFrames : 8;
   let maxFrames = 10;
 
-  Interceptor.attach(hookOp.symbolAddress, {
+  Interceptor.attach(hookEntry.symbolAddress, {
     onEnter: function (args) {
       // Capture full native stack first (no truncation yet)
       let fullNativeStack = [];
@@ -230,9 +240,9 @@ export function registerNativeHook(hookOp: NativeHookOperation, category: string
         type: "native-hook",
         category: category,
         time: new Date().toISOString(),
-        module: hookOp.module || "<global>",
-        symbol: hookOp.symbol,
-        address: hookOp.symbolAddress.toString(),
+        module: hookEntry.module || "<global>",
+        symbol: hookEntry.symbol,
+        address: hookEntry.symbolAddress.toString(),
         stackTrace: effectiveStack,
         // inputParameters: decodedArgs
       };
@@ -264,72 +274,69 @@ export function registerNativeHook(hookOp: NativeHookOperation, category: string
 ////////
 //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ///////
-export function registerHook(hookOps: JavaHookEntry[]) {
-
+export function registerHook(hookEntries: JavaHookEntry[]) {
   let Exception = Java.use("java.lang.Exception");
   let System = Java.use('java.lang.System');
 
-  let toHook;
-  if (typeof hookOps.method === "string") {
-    toHook = Java.use(hookOps.class)[hookOps.method];
-  } else {
-    toHook = Java.use(hookOps.class)[hookOps.method.name];
-  }
-
-
-  let methodHeader = toHook.overloads[hookOps.overloadIndex].toString();
-
-  toHook.overloads[hookOps.overloadIndex].implementation = function () {
-
-    let st = Exception.$new().getStackTrace();
-    let stackTrace = [];
-    st.forEach((stElement, index) => {
-      if (hookOps.maxFrames === -1 || index < hookOps.maxFrames) {
-        let stLine = stElement.toString();
-        stackTrace.push(stLine);
-      }
-    });
-
-    let parameterTypes = parseParameterTypes(methodHeader);
-    let returnType = parseReturnValue(methodHeader);
-
-    let instanceId;
-    if (this && this.$className && typeof this.$h === 'undefined') {
-      instanceId = 'static';
+  hookEntries.forEach((hookEntry: JavaHookEntry) => {
+    let toHook;
+    if (typeof hookEntry.method === "string") {
+      toHook = Java.use(hookEntry.class)[hookEntry.method];
     } else {
-      // call Java’s identityHashCode on the real object
-      try {
-        instanceId = System.identityHashCode(this);
-      } catch (e) {
-        console.error("Error in identityHashCode", e)
-        instanceId = "error"
+      toHook = Java.use(hookEntry.class)[hookEntry.method.name];
+    }
+
+    let methodHeader = toHook.overloads[hookEntry.overloadIndex].toString();
+
+    toHook.overloads[hookEntry.overloadIndex].implementation = function () {
+      let st = Exception.$new().getStackTrace();
+      let stackTrace = [];
+      st.forEach((stElement, index) => {
+        if (hookEntry.maxFrames === -1 || index < hookEntry.maxFrames) {
+          stackTrace.push(stElement.toString());
+        }
+      });
+
+      let parameterTypes = parseParameterTypes(methodHeader);
+      let returnType = parseReturnValue(methodHeader);
+
+      let instanceId;
+      if (this && this.$className && typeof this.$h === 'undefined') {
+        instanceId = 'static';
+      } else {
+        try {
+          instanceId = System.identityHashCode(this);
+        } catch (e) {
+          console.error("Error in identityHashCode", e);
+          instanceId = "error";
+        }
       }
-    }
 
-    const event = {
-      id: uuidv4(),
-      type: "hook",
-      // category: categoryName,
-      time: new Date().toISOString(),
-      class: hookOps.class,
-      method: hookOps.class,
-      instanceId: instanceId,
-      stackTrace: stackTrace,
-      inputParameters: decodeArguments(parameterTypes, arguments),
+      const event = {
+        id: uuidv4(),
+        type: "hook",
+        time: new Date().toISOString(),
+        class: hookEntry.class,
+        method: hookEntry.method,
+        instanceId: instanceId,
+        stackTrace: stackTrace,
+        inputParameters: decodeArguments(parameterTypes, arguments),
+      };
+
+      try {
+        let returnValue = this[hookEntry.method].apply(this, arguments);
+        event.returnValue = decodeArguments([returnType], [returnValue]);
+        send(event);
+        return returnValue;
+      } catch (e) {
+        event.exception = e.toString();
+        send(event);
+        throw e;
+      }
     };
-
-    try {
-      let returnValue = this[hookOps.method].apply(this, arguments);
-      event.returnValue = decodeArguments([returnType], [returnValue]);
-      send(event)
-      return returnValue;
-    } catch (e) {
-      event.exception = e.toString();
-      send(event)
-      throw e;
-    }
-  };
+  });
 }
+
 
 /**
  * Finds the overload index that matches the given argument types.
@@ -423,11 +430,6 @@ function findOverloadIndex(methodHandle, argTypes) {
 //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ///////
 export function buildHookOperations(hook: JavaHook): JavaHookEntry[] {
-
-  console.log("BUILDING ANDROID HOOOOOKKKK")
-  console.log(JSON.stringify(hook, null, 2)) 
-
-
   const entries: JavaHookEntry[] = [];
   const errors: string[] = [];
 
@@ -437,7 +439,6 @@ export function buildHookOperations(hook: JavaHook): JavaHookEntry[] {
     }
 
     for (const javaMethod of hook.methods) {
-      // named method with explicit overloads
       let handle;
       try {
         handle = Java.use(hook.javaClass)[javaMethod.name];
@@ -448,7 +449,28 @@ export function buildHookOperations(hook: JavaHook): JavaHookEntry[] {
         continue;
       }
 
-      javaMethod.overloads?.forEach((o: JavaOverload) => {
+      // If no overloads are specified, hook all available overloads
+      if (!javaMethod.overloads || javaMethod.overloads.length === 0) {
+        handle.overloads.forEach((overload: any, idx: number) => {
+          try {
+            const params = parseParameterTypes(overload.toString());
+            entries.push({
+              class: hook.javaClass,
+              method: javaMethod.name,
+              overloadIndex: idx,
+              args: params,
+              maxFrames: 10,
+            });
+          } catch (e) {
+            const errMsg = `Failed to process overload[${idx}] of '${javaMethod.name}' in class '${hook.javaClass}': ${e}`;
+            console.warn(`Warning: ${errMsg}`);
+            errors.push(errMsg);
+          }
+        });
+        continue;
+      }
+
+      javaMethod.overloads.forEach((o: JavaOverload) => {
         try {
           const argsExplicit: string[] = Array.isArray(o.params)
             ? o.params.map((p) => (Array.isArray(p) ? p[0] as string : p as string))
@@ -458,7 +480,6 @@ export function buildHookOperations(hook: JavaHook): JavaHookEntry[] {
 
           if (idx !== -1) {
             const params = parseParameterTypes(handle.overloads[idx].toString());
-
             entries.push({
               class: hook.javaClass,
               method: javaMethod.name,
@@ -486,6 +507,7 @@ export function buildHookOperations(hook: JavaHook): JavaHookEntry[] {
 
   return entries;
 }
+
 
 
 

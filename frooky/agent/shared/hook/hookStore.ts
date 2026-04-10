@@ -1,8 +1,8 @@
 import { type Hook, isJavaHook, isNativeHook, isObjcHook, type JavaHook, type NativeHook, type ObjcHook } from "frooky";
-import type { JavaHookOperation } from "../../android/hook/javaHookRunner";
+import type { JavaHookEntry } from "../../android/hook/javaHookRunner";
 import { prettyPrintHook } from "../../shared/utils";
-import type { HookOperation } from "./hookRunner";
-import type { NativeHookOperation } from "./nativeHookRunner";
+import type { HookEntry } from "./hookRunner";
+import type { NativeHookEntry } from "./nativeHookRunner";
 
 export class HookStore {
   private hooks: Hook[] = [];
@@ -21,24 +21,22 @@ export class HookStore {
     return [...this.hooks];
   }
 
-  getHookOperations(): HookOperation[] {
+  getHookEntries(): HookEntry[] {
     return this.hooks
       .map(hook => hook.hookOp)
-      .filter((hookOp): hookOp is HookOperation => hookOp !== undefined);
+      .filter((hookOp): hookOp is HookEntry => hookOp !== undefined);
   }
 
-  getNativeHookOperations(): NativeHookOperation[] {
+  getNativeHookEntries(): NativeHookEntry[] {
     return this.getNativeHooks()
       .map(hook => hook.hookOp)
-      .filter((hookOp): hookOp is NativeHookOperation => hookOp !== undefined);
+      .filter((hookOp): hookOp is NativeHookEntry => hookOp !== undefined);
   }
 
-  getJavaHookOperations(): JavaHookOperation[] {
-    console.log("aaaa ")
-    console.log(JSON.stringify(this.hooks, null, 2));
+  getJavaHookEntries(): JavaHookEntry[] {
     return this.getJavaHooks()
       .map(hook => hook.hookOp)
-      .filter((hookOp): hookOp is JavaHookOperation => hookOp !== undefined);
+      .filter((hookOp): hookOp is JavaHookEntry => hookOp !== undefined);
   }
 
   // TODO: ObjcHookOperation needs to be implemented

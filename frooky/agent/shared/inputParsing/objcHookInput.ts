@@ -1,6 +1,6 @@
 import type { ObjcHook, ObjcMethodDefinition } from '../../ios/hook/objcHook';
 import type { MethodName, ReturnType } from '../hook/hook';
-import { normalizeParam, ParamInput } from './parameterInput';
+import { normalizeParam, type ParamInput } from './parameterInput';
 
 
 /**

@@ -88,8 +88,6 @@ export class FrookyApp {
 
   public executeHookOperations() {
     if (this.platform === "Android") {
-      console.log("ZZZZZZZZZZZZZZZZZZZZZ")
-      console.log(this.hookStore.getJavaHooks())
       this.platformHookRunner.executeHooking(this.hookStore.getJavaHooks());
     }
     // if (this.platform === "iOS") {

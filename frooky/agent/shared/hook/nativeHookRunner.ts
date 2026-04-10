@@ -1,5 +1,5 @@
 import type { NativeHook } from "frooky";
-import { registerNativeHook, resolveNativeSymbol } from "../../android/legacy/android-agent";
+import { registerNativeHook, registerNativeHooks, resolveNativeSymbol } from "../../android/legacy/android-agent";
 import type { HookEntry, HookRunner } from "./hookRunner";
 
 
@@ -11,7 +11,8 @@ export interface NativeHookEntry extends HookEntry {
 export class NativeHookRunner implements HookRunner {
   executeHooking(hooks: NativeHook[]): void {
 
-    var nativeEntryArray: NativeHookEntry[][] = [];
+    var nativeHookEntryArray: NativeHookEntry[] = [];
+
 
     frooky.log.info(`Executing native hook operations`)
     hooks.forEach((h: NativeHook) => {
@@ -23,11 +24,11 @@ export class NativeHookRunner implements HookRunner {
       // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       frooky.log.info(`Building hook operations for native`)
-      nativeEntryArray.push(resolveNativeSymbol(h))
+      nativeHookEntryArray.push(...resolveNativeSymbol(h))
 
     });
-    frooky.log.info(`Hook operations for the following hook built: ${JSON.stringify(nativeEntryArray)}`)
+    frooky.log.info(`Hook operations for the following hook built: ${JSON.stringify(nativeHookEntryArray, null, 2)}`)
     frooky.log.info(`Run native hooking`)
-    registerNativeHook(nativeEntryArray)
+    registerNativeHooks(nativeHookEntryArray)
   }
 }  
