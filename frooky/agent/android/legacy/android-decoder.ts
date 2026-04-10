@@ -1,5 +1,5 @@
-import Java from "frida-java-bridge"
-import { toHex } from "../../shared/utils.js"
+import Java from "frida-java-bridge";
+import { toHex } from "../../shared/utils.js";
 
 /**
  * Generates a simple hash from a string.
@@ -21,24 +21,24 @@ function simpleHash(str) {
  * @returns {Object} Object containing key parameters (modulusHex, modulusBitLength, publicExponentDec, privateExponentDec, keyHash).
  */
 function decodeRSAKey(value) {
-  let out = {};
+  const out = {};
 
   try {
     // Load RSA interfaces
-    let RSAKey = Java.use('java.security.interfaces.RSAKey');
-    let RSAPub = Java.use('java.security.interfaces.RSAPublicKey');
-    let RSAPriv = Java.use('java.security.interfaces.RSAPrivateKey');
+    const RSAKey = Java.use("java.security.interfaces.RSAKey");
+    const RSAPub = Java.use("java.security.interfaces.RSAPublicKey");
+    const RSAPriv = Java.use("java.security.interfaces.RSAPrivateKey");
     let RSAPrivateCrt = null;
     try {
-      RSAPrivateCrt = Java.use('java.security.interfaces.RSAPrivateCrtKey');
+      RSAPrivateCrt = Java.use("java.security.interfaces.RSAPrivateCrtKey");
     } catch (_) {
       RSAPrivateCrt = null;
     }
 
     // Any RSA key, public or private, for modulus
     try {
-      let anyRsa = Java.cast(value, RSAKey);
-      let modBI = anyRsa.getModulus();
+      const anyRsa = Java.cast(value, RSAKey);
+      const modBI = anyRsa.getModulus();
       out.modulusHex = modBI.toString(16);
       out.modulusBitLength = modBI.bitLength();
     } catch (_) {
@@ -47,8 +47,8 @@ function decodeRSAKey(value) {
 
     // Public key exponent
     try {
-      let vpub = Java.cast(value, RSAPub);
-      let expBI = vpub.getPublicExponent();
+      const vpub = Java.cast(value, RSAPub);
+      const expBI = vpub.getPublicExponent();
       if (expBI) {
         out.publicExponentDec = expBI.toString(10);
       }
@@ -59,9 +59,9 @@ function decodeRSAKey(value) {
     // Private key exponents, may be unavailable for keystore backed keys
     if (RSAPrivateCrt !== null) {
       try {
-        let vprivCrt = Java.cast(value, RSAPrivateCrt);
-        let dBI = vprivCrt.getPrivateExponent();
-        let eBI = vprivCrt.getPublicExponent();
+        const vprivCrt = Java.cast(value, RSAPrivateCrt);
+        const dBI = vprivCrt.getPrivateExponent();
+        const eBI = vprivCrt.getPublicExponent();
         if (dBI) {
           out.privateExponentDec = dBI.toString(10);
         }
@@ -73,8 +73,8 @@ function decodeRSAKey(value) {
       }
     } else {
       try {
-        let vpriv = Java.cast(value, RSAPriv);
-        let dBI2 = vpriv.getPrivateExponent();
+        const vpriv = Java.cast(value, RSAPriv);
+        const dBI2 = vpriv.getPrivateExponent();
         if (dBI2) {
           out.privateExponentDec = dBI2.toString(10);
         }
@@ -111,10 +111,11 @@ function decodeValue(type, value) {
           readableValue = value.toArray().toString();
           break;
 
-        case "java.util.Map":
-          let entrySet = value.entrySet();
+        case "java.util.Map": {
+          const entrySet = value.entrySet();
           readableValue = entrySet.toArray().toString();
           break;
+        }
 
         case "[B":
           // for performance reasons only decode the first 256 bytes of the full byte array
@@ -123,7 +124,7 @@ function decodeValue(type, value) {
 
         case "[C":
           readableValue = "";
-          for (let i in value) {
+          for (const i in value) {
             readableValue = readableValue + value[i];
           }
           break;
@@ -132,11 +133,12 @@ function decodeValue(type, value) {
           readableValue = value.getAbsolutePath();
           break;
 
-        case "java.util.Date":
-          let DateFormat = Java.use('java.text.DateFormat');
-          let formatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM.value, DateFormat.SHORT.value);
+        case "java.util.Date": {
+          const DateFormat = Java.use("java.text.DateFormat");
+          const formatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM.value, DateFormat.SHORT.value);
           readableValue = formatter.format(value);
           break;
+        }
 
         case "androidx.sqlite.db.SupportSQLiteQuery":
           readableValue = value.getSql();
@@ -169,21 +171,23 @@ function decodeValue(type, value) {
           }
           break;
 
-        case "[Ljava.lang.Object;":
+        case "[Ljava.lang.Object;": {
           let out = "";
-          for (let i in value) {
+          for (const i in value) {
             out = out + value[i] + ", ";
           }
           readableValue = out;
           break;
+        }
 
-        case "java.util.Enumeration":
-          let elements = [];
+        case "java.util.Enumeration": {
+          const elements = [];
           while (value.hasMoreElements()) {
             elements.push(value.nextElement().toString());
           }
           readableValue = JSON.stringify(elements);
           break;
+        }
 
         case "android.database.Cursor":
           readableValue = decodeCursor(value);
@@ -207,14 +211,14 @@ function decodeValue(type, value) {
  * @param {object} value - Reference to the object.
  * @returns {string} The decoded rows and columns.
  */
-function decodeCursor(value){
+function decodeCursor(value) {
   let out = "";
-  let cursor = value;
-  let originalCursorPosition = cursor.getPosition();
+  const cursor = value;
+  const originalCursorPosition = cursor.getPosition();
 
   // rows
   for (let i = 0; i < cursor.getColumnCount(); i++) {
-    let columnName = cursor.getColumnName(i);
+    const columnName = cursor.getColumnName(i);
     out = out + columnName + " | ";
   }
 
@@ -225,7 +229,7 @@ function decodeCursor(value){
     do {
       for (let i = 0; i < cursor.getColumnCount(); i++) {
         try {
-          let columnValue = cursor.getString(i);
+          const columnValue = cursor.getString(i);
           out = out + columnValue + " | ";
         } catch (e) {
           out = out + " | ";
@@ -255,8 +259,8 @@ let _SystemClsInitialized = false;
 function getToStringMethod() {
   if (!_toStringMethodInitialized) {
     try {
-      let ObjCls = Java.use('java.lang.Object');
-      _toStringMethod = ObjCls.class.getDeclaredMethod('toString', []);
+      const ObjCls = Java.use("java.lang.Object");
+      _toStringMethod = ObjCls.class.getDeclaredMethod("toString", []);
       _toStringMethod.setAccessible(true);
     } catch (_) {
       _toStringMethod = null;
@@ -269,7 +273,7 @@ function getToStringMethod() {
 function getSystemCls() {
   if (!_SystemClsInitialized) {
     try {
-      _SystemCls = Java.use('java.lang.System');
+      _SystemCls = Java.use("java.lang.System");
     } catch (_) {
       _SystemCls = null;
     }
@@ -278,36 +282,42 @@ function getSystemCls() {
   return _SystemCls;
 }
 
-export const decodeArguments = function (types, args) {
-  let parameters = [];
-  let toStringMethod = getToStringMethod();
-  let SystemCls = getSystemCls();
+export const decodeArguments = (types, args) => {
+  const parameters = [];
+  const toStringMethod = getToStringMethod();
+  const SystemCls = getSystemCls();
 
-  for (let i in types) {
-    let declaredType = types[i];
-    let argVal = args[i];
-    let entry = { declaredType: declaredType, value: decodeValue(declaredType, argVal) };
+  for (const i in types) {
+    const declaredType = types[i];
+    const argVal = args[i];
+    const entry = { declaredType: declaredType, value: decodeValue(declaredType, argVal) };
 
     // Attach runtime info if this is a Java object
-    if (argVal && typeof argVal === 'object') {
+    if (argVal && typeof argVal === "object") {
       let runtimeType = null;
-      try { runtimeType = argVal.$className || (argVal.getClass ? argVal.getClass().getName() : null); } catch (_) {}
+      try {
+        runtimeType = argVal.$className || (argVal.getClass ? argVal.getClass().getName() : null);
+      } catch (_) {}
       if (runtimeType) {
         entry.runtimeType = runtimeType;
         if (SystemCls) {
           try {
-            entry.instanceId = '' + SystemCls.identityHashCode(argVal);
+            entry.instanceId = "" + SystemCls.identityHashCode(argVal);
           } catch (_) {}
         }
         // Robust toString retrieval: prefer reflected method, fallback to direct call
         try {
           if (toStringMethod) {
-            entry.instanceToString = '' + toStringMethod.invoke(argVal, []);
+            entry.instanceToString = "" + toStringMethod.invoke(argVal, []);
           } else {
-            entry.instanceToString = '' + argVal.toString();
+            entry.instanceToString = "" + argVal.toString();
           }
         } catch (e1) {
-          try { entry.instanceToString = '' + argVal.toString(); } catch (e2) { entry.instanceToString = '<toString-unavailable>'; }
+          try {
+            entry.instanceToString = "" + argVal.toString();
+          } catch (e2) {
+            entry.instanceToString = "<toString-unavailable>";
+          }
         }
       }
     }
@@ -315,5 +325,4 @@ export const decodeArguments = function (types, args) {
     parameters.push(entry);
   }
   return parameters;
-}
-
+};

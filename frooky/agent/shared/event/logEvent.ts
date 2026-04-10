@@ -6,17 +6,13 @@ import { BaseEvent } from "./baseEvent";
  *
  */
 export class LogEvent extends BaseEvent {
-
   readonly type = "log" as const;
 
-  readonly level: LogLevel
+  readonly level: LogLevel;
 
   readonly msg: string;
 
-  constructor(
-    level: LogLevel,
-    msg: string
-  ) {
+  constructor(level: LogLevel, msg: string) {
     super();
     this.level = level;
     this.msg = msg;

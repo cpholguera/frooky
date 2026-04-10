@@ -1,4 +1,3 @@
-
 /**
  * Specifies when a decoder should be applied during function execution.
  *
@@ -8,9 +7,7 @@
  *
  * @public
  */
-export type DecodeAt = 'enter' | 'exit' | 'both';
-
-
+export type DecodeAt = "enter" | "exit" | "both";
 
 /**
  * Frida-compatible type of the parameter.
@@ -19,10 +16,10 @@ export type DecodeAt = 'enter' | 'exit' | 'both';
  * @example "[Ljava.lang.Object;"
  * @example "[Z"
  * @example "int"
- * 
+ *
  * @public
  */
-export type ParamType = string
+export type ParamType = string;
 
 /**
  * Parameter name.
@@ -30,11 +27,10 @@ export type ParamType = string
  * @example "username"
  * @example "buffer"
  * @example "url"
- * 
+ *
  * @public
  */
-export type ParamName = string
-
+export type ParamName = string;
 
 /**
  * Decoder options for a parameter.
@@ -51,17 +47,15 @@ export interface ParamOptions {
    */
   decodeAt?: DecodeAt;
 
-
   /**
-   * Extra arguments passed to the decoder. They must be a valid parameter name. 
-   * 
+   * Extra arguments passed to the decoder. They must be a valid parameter name.
+   *
    * @example [ "username" ]
    * @example [ "ctxPointer" ]
    * @example [ "inBuffer", "bufferLength" ]
    */
   decoderArgs?: string[];
 }
-
 
 /**
  * Canonical definition of a parameter to be decoded during function hooking.

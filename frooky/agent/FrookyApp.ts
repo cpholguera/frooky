@@ -1,11 +1,11 @@
 import type { FrookyConfig, Platform } from "frooky";
-import type { HookRunner } from "./shared/hook/hookRunner";
-import { HookStore } from "./shared/hook/hookStore";
-import { NativeHookRunner } from "./shared/hook/nativeHookRunner";
 import type { BaseEvent } from "./shared/event/baseEvent";
 import type { HookEvent } from "./shared/event/hookEvent";
 import { LogEvent } from "./shared/event/logEvent";
 import type { SummaryEvent } from "./shared/event/summaryEvent";
+import type { HookRunner } from "./shared/hook/hookRunner";
+import { HookStore } from "./shared/hook/hookStore";
+import { NativeHookRunner } from "./shared/hook/nativeHookRunner";
 import { Logger, type logTo } from "./shared/logger";
 import { validateFrookyConfig } from "./shared/validator/configValidator";
 
@@ -24,31 +24,24 @@ export class FrookyApp {
   private platformHookRunner: HookRunner;
   private nativeHookRunner: NativeHookRunner;
 
-
   /** Logger instance for this for frooky. */
   public log: Logger;
   public verbosity: number;
-
 
   /**
    * @param platform - The target platform to instrument.
    * @param verbosity - Log verbosity level (default: `3`).
    * @param logTo - Log destination (default: `"device"`).
    */
-  constructor(
-    platform: Platform,
-    platformHookRunner: HookRunner,
-    verbosity: number = 3,
-    logTo: logTo = "device") {
-
+  constructor(platform: Platform, platformHookRunner: HookRunner, verbosity: number = 3, logTo: logTo = "device") {
     this.platform = platform;
     this.platformHookRunner = platformHookRunner;
     this.nativeHookRunner = new NativeHookRunner();
     this.verbosity = verbosity;
 
     // setup logger
-    this.log = new Logger(this, verbosity, logTo)
-    this.log.info("Logging initialized")
+    this.log = new Logger(this, verbosity, logTo);
+    this.log.info("Logging initialized");
 
     // printing some context infos
     this.log.info("Initializing frooky");
@@ -63,11 +56,11 @@ export class FrookyApp {
    * @param frookyConfig - The configuration to add.
    */
   public loadFrookyConfig(frookyConfig: FrookyConfig) {
-    this.log.info("Loading frooky configuration.")
+    this.log.info("Loading frooky configuration.");
 
     // validating frooky config
     const hookParsingResult = validateFrookyConfig(frookyConfig, this.platform);
-    this.log.info("Adding valid hook and their metadata to the hook store.")
+    this.log.info("Adding valid hook and their metadata to the hook store.");
 
     // adding valid metadata and hooks to the hook store
     this.hookStore.addHooks(hookParsingResult.validHooks);
@@ -85,7 +78,6 @@ export class FrookyApp {
   //   this.nativeHookRunner.operationsBuilder(this.hookStore.getNativeHooks());
   // }
 
-
   public executeHookOperations() {
     if (this.platform === "Android") {
       this.platformHookRunner.executeHooking(this.hookStore.getJavaHooks());
@@ -96,7 +88,6 @@ export class FrookyApp {
     // run native hook on both platforms
     this.nativeHookRunner.executeHooking(this.hookStore.getNativeHooks());
   }
-
 
   /**
    * Adds an event to the internal event cache.

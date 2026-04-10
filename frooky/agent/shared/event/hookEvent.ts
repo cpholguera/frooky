@@ -4,7 +4,7 @@ import { BaseEvent } from "./baseEvent";
  * Abstract class for all hook events created by frooky.
  *
  * Extends {@link BaseEvent} with hook-specific fields.
-* ```
+ * ```
  */
 export abstract class HookEvent extends BaseEvent {
   /**
@@ -31,12 +31,7 @@ export abstract class HookEvent extends BaseEvent {
    */
   readonly returnValue?: unknown;
 
-  constructor(
-    category: string,
-    stackTrace: string,
-    args?: unknown[],
-    returnValue?: unknown,
-  ) {
+  constructor(category: string, stackTrace: string, args?: unknown[], returnValue?: unknown) {
     super();
     this.category = category;
     this.stackTrace = stackTrace;

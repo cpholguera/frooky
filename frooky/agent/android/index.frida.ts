@@ -9,21 +9,18 @@ import { JavaHookRunner } from "./hook/javaHookRunner";
 var frookyConfigs: FrookyConfig[];
 
 if (Java.available) {
+  //%%% REPLACE START
+  frookyConfigs = {} as FrookyConfig[];
+  //%%% REPLACE STOP
 
-//%%% REPLACE START
-	frookyConfigs = {} as FrookyConfig[];
-//%%% REPLACE STOP
+  globalThis.frooky = new FrookyApp("Android", new JavaHookRunner(), 3, "device");
+  frookyConfigs.forEach((frookyConfig) => {
+    frooky.loadFrookyConfig(frookyConfig);
+  });
 
-	globalThis.frooky = new FrookyApp("Android", new JavaHookRunner(),  3, "device");
-	frookyConfigs.forEach(frookyConfig => {
-		frooky.loadFrookyConfig(frookyConfig);
-	});
-
-
-	Java.perform(() => {
-		frooky.executeHookOperations();
-	}) 
-
+  Java.perform(() => {
+    frooky.executeHookOperations();
+  });
 } else {
-	console.error("[!] The agent is not run on an Android device. Make sure to run this version of the frooky agent on Android.")
+  console.error("[!] The agent is not run on an Android device. Make sure to run this version of the frooky agent on Android.");
 }

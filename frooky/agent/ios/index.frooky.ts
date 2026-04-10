@@ -19,5 +19,4 @@
 //   console.error("[!] The agent is not run on an iOS device. Make sure to run this version of the frooky agent on iOS.")
 // }
 
-
-throw Error("This is the PoC branch for the agent refactoring. At the moment, iOS is not yet implemented.")
+throw Error("This is the PoC branch for the agent refactoring. At the moment, iOS is not yet implemented.");

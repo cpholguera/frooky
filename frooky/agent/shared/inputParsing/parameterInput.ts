@@ -2,7 +2,7 @@ import type { ParamDefinition, ParamName, ParamOptions, ParamType } from "../hoo
 
 /**
  * Extended parameter type for YAML input parsing.
- * 
+ *
  * The following examples all describe the same parameter:
  *
  * 1. As a simple type.
@@ -17,16 +17,11 @@ import type { ParamDefinition, ParamName, ParamOptions, ParamType } from "../hoo
  *
  * @public
  */
-export type ParamInput =
-  | ParamType
-  | [ParamType, ParamName]
-  | [ParamType, ParamOptions]
-  | [ParamType, ParamName, ParamOptions];
-
+export type ParamInput = ParamType | [ParamType, ParamName] | [ParamType, ParamOptions] | [ParamType, ParamName, ParamOptions];
 
 export function normalizeParam(input: ParamInput): ParamDefinition {
   // Simple string: just a type
-  if (typeof input === 'string') {
+  if (typeof input === "string") {
     return { type: input };
   }
 
@@ -38,7 +33,7 @@ export function normalizeParam(input: ParamInput): ParamDefinition {
   }
 
   // [ParamType, ParamOptions] — second element is an object
-  if (typeof second === 'object') {
+  if (typeof second === "object") {
     return { type: first, options: second };
   }
 
