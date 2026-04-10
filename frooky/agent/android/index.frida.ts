@@ -5,15 +5,14 @@ import Java from "frida-java-bridge";
 import type { FrookyConfig } from "frooky";
 import { FrookyApp } from "../FrookyApp";
 import { JavaHookRunner } from "./hook/javaHookRunner";
-import { NativeHookRunner } from "../shared/hook/nativeHookRunner";
 
 var frookyConfigs: FrookyConfig[];
 
 if (Java.available) {
 
-	//%%% REPLACE START
+//%%% REPLACE START
 	frookyConfigs = {} as FrookyConfig[];
-	//%%% REPLACE STOP
+//%%% REPLACE STOP
 
 	globalThis.frooky = new FrookyApp("Android", new JavaHookRunner(),  3, "device");
 	frookyConfigs.forEach(frookyConfig => {

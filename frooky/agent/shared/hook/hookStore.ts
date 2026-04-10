@@ -1,8 +1,8 @@
-import { JavaHookOperation } from "android/hook/javaHookRunner";
-import { Hook, JavaHook, NativeHook, ObjcHook, ObjCHook } from "frooky";
+import { type Hook, isJavaHook, isNativeHook, isObjcHook, type JavaHook, type NativeHook, type ObjcHook } from "frooky";
+import type { JavaHookOperation } from "../../android/hook/javaHookRunner";
 import { prettyPrintHook } from "../../shared/utils";
-import { HookOperation } from "./hookRunner";
-import { NativeHookOperation } from "./nativeHookRunner";
+import type { HookOperation } from "./hookRunner";
+import type { NativeHookOperation } from "./nativeHookRunner";
 
 
 function isNativeHookOperation(op: HookOperation): op is NativeHookOperation {
@@ -57,19 +57,16 @@ export class HookStore {
   }
 
 
-  // TODO: implement Objective-C
-
-
   getNativeHooks(): NativeHook[] {
-    return this.hooks.filter((hook) => hook.type === "native");
+    return this.hooks.filter(isNativeHook);
   }
 
   getJavaHooks(): JavaHook[] {
-    return this.hooks.filter((hook) => hook.type === "java");
+    return this.hooks.filter(isJavaHook);
   }
 
   getObjcHooks(): ObjcHook[] {
-    return this.hooks.filter((hook) => hook.type === "objc");
+    return this.hooks.filter(isObjcHook);
   }
 
   prettyPrintHooks(): string {

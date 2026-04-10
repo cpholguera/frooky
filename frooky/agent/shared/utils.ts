@@ -1,21 +1,21 @@
-import type { JavaHook, JavaMethod, NativeHook, NativeSymbol, ObjcHook, ObjcMethod } from "frooky";
+import { isJavaHook, isNativeHook, isObjcHook, type Hook, type JavaMethod, type NativeSymbol, type ObjcMethod } from "frooky";
 
 /**
  * Generates a v4 UUID
  * @returns {string} v4 UUID (e.g. "6b5354ed-8c3e-476d-8999-96b2251d8a3c")
  */
 export function uuidv4(): string {
-    return "10000000-1000-4000-8000-100000000000".replace(
-        /[018]/g,
-        (c: string): string =>
-            ((+c ^ Math.random() * 16 >> +c / 4) & 15).toString(16)
-    );
+  return "10000000-1000-4000-8000-100000000000".replace(
+    /[018]/g,
+    (c: string): string =>
+      ((+c ^ Math.random() * 16 >> +c / 4) & 15).toString(16)
+  );
 }
 
 const HEX_TABLE: readonly string[] = Object.freeze(
-    Array.from({ length: 256 }, (_, i) =>
-        (i < 16 ? '0' : '') + i.toString(16)
-    )
+  Array.from({ length: 256 }, (_, i) =>
+    (i < 16 ? '0' : '') + i.toString(16)
+  )
 );
 
 /**
@@ -26,14 +26,14 @@ const HEX_TABLE: readonly string[] = Object.freeze(
  * @throws {RangeError} If length is negative.
  */
 function getDecodeBounds(bytes: Uint8Array, length: number): [number, string] {
-    if (length < 0) {
-        throw new RangeError("Length cannot be negative");
-    }
+  if (length < 0) {
+    throw new RangeError("Length cannot be negative");
+  }
 
-    if (bytes.length > length) {
-        return [length, "..."];
-    }
-    return [bytes.length, ""];
+  if (bytes.length > length) {
+    return [length, "..."];
+  }
+  return [bytes.length, ""];
 }
 
 /**
@@ -42,7 +42,7 @@ function getDecodeBounds(bytes: Uint8Array, length: number): [number, string] {
  * @returns True if the byte represents a printable character (32-126) or tab/newline/carriage return.
  */
 function isPrintable(byte: number): boolean {
-    return (byte >= 32 && byte <= 126) || byte === 9 || byte === 10 || byte === 13;
+  return (byte >= 32 && byte <= 126) || byte === 9 || byte === 10 || byte === 13;
 }
 
 /**
@@ -53,15 +53,15 @@ function isPrintable(byte: number): boolean {
  * @throws {RangeError} If length is negative.
  */
 export function toHex(bytes: Uint8Array, length: number = Infinity): string {
-    const [lengthToDecode, ellipsis] = getDecodeBounds(bytes, length);
-    const hexArray = new Array(lengthToDecode);
+  const [lengthToDecode, ellipsis] = getDecodeBounds(bytes, length);
+  const hexArray = new Array(lengthToDecode);
 
-    for (let i = 0; i < lengthToDecode; i++) {
-        const byte = bytes[i];
-        hexArray[i] = HEX_TABLE[byte];
-    }
+  for (let i = 0; i < lengthToDecode; i++) {
+    const byte = bytes[i];
+    hexArray[i] = HEX_TABLE[byte];
+  }
 
-    return "0x" + hexArray.join("") + ellipsis;
+  return "0x" + hexArray.join("") + ellipsis;
 }
 
 /**
@@ -73,15 +73,15 @@ export function toHex(bytes: Uint8Array, length: number = Infinity): string {
  * @throws {RangeError} If length is negative.
  */
 export function toAscii(bytes: Uint8Array, length: number = Infinity, placeholder: string = "."): string {
-    const [lengthToDecode, ellipsis] = getDecodeBounds(bytes, length);
-    const asciiArray = new Array(lengthToDecode);
+  const [lengthToDecode, ellipsis] = getDecodeBounds(bytes, length);
+  const asciiArray = new Array(lengthToDecode);
 
-    for (let i = 0; i < lengthToDecode; i++) {
-        const byte = bytes[i];
-        asciiArray[i] = isPrintable(byte) ? String.fromCharCode(byte) : placeholder;
-    }
+  for (let i = 0; i < lengthToDecode; i++) {
+    const byte = bytes[i];
+    asciiArray[i] = isPrintable(byte) ? String.fromCharCode(byte) : placeholder;
+  }
 
-    return asciiArray.join("") + ellipsis;
+  return asciiArray.join("") + ellipsis;
 }
 
 /**
@@ -93,46 +93,48 @@ export function toAscii(bytes: Uint8Array, length: number = Infinity, placeholde
  * @throws {RangeError} If length is negative.
  */
 export function toHexAndAscii(
-    bytes: Uint8Array,
-    length: number = Infinity,
-    placeholder: string = "."
+  bytes: Uint8Array,
+  length: number = Infinity,
+  placeholder: string = "."
 ): [string, string] {
-    const [lengthToDecode, ellipsis] = getDecodeBounds(bytes, length);
-    const hexArray = new Array(lengthToDecode);
-    const asciiArray = new Array(lengthToDecode);
+  const [lengthToDecode, ellipsis] = getDecodeBounds(bytes, length);
+  const hexArray = new Array(lengthToDecode);
+  const asciiArray = new Array(lengthToDecode);
 
-    for (let i = 0; i < lengthToDecode; i++) {
-        const byte = bytes[i];
-        hexArray[i] = HEX_TABLE[byte];
-        asciiArray[i] = isPrintable(byte) ? String.fromCharCode(byte) : placeholder;
-    }
+  for (let i = 0; i < lengthToDecode; i++) {
+    const byte = bytes[i];
+    hexArray[i] = HEX_TABLE[byte];
+    asciiArray[i] = isPrintable(byte) ? String.fromCharCode(byte) : placeholder;
+  }
 
-    return ["0x" + hexArray.join("") + ellipsis, asciiArray.join("") + ellipsis];
+  return ["0x" + hexArray.join("") + ellipsis, asciiArray.join("") + ellipsis];
 }
 
-export function prettyPrintHook(hook: JavaHook | ObjcHook | NativeHook, short: boolean = true): string {
-    var result: string = "";
-    if (short) {
-        if (hook.type === "java") {
-            hook.methods.forEach((m: JavaMethod, index: number) => {
-                const prefix = index === 0 ? "- " : "  ";
-                result += typeof m === "string" ? `${prefix}${hook.javaClass}: ${m}\n` : `${prefix}${hook.javaClass}: ${m.name}\n`;
-            })
-        }
-        else if (hook.type === "objc") {
-            hook.methods.forEach((m: ObjcMethod, index: number) => {
-                const prefix = index === 0 ? "- " : "  ";
-                result += typeof m === "string" ? `${prefix}${hook.objcClass}: ${m}\n` : `${prefix}${hook.objcClass}: ${m.name}\n`;
-            })
-        }
-        if (hook.type === "native") {
-            hook.functions.forEach((f: NativeSymbol, index: number) => {
-                const prefix = index === 0 ? "- " : "  ";
-                result += typeof f === "string" ? `${prefix}${hook.module}: ${f}\n` : `${prefix}${hook.module}: ${f.symbol}\n`;
-            })
-        }
-    } else {
-        result = JSON.stringify(hook, null, 2)
+
+export function prettyPrintHook(hook: Hook, short: boolean = true): string {
+  var result: string = "";
+  if (short) {
+    if (isJavaHook(hook)) {
+      hook.methods.forEach((m: JavaMethod, index: number) => {
+        const prefix = index === 0 ? "- " : "  ";
+        result += typeof m === "string" ? `${prefix}${hook.javaClass}: ${m}\n` : `${prefix}${hook.javaClass}: ${m.name}\n`;
+      })
     }
-    return result;
+    else if (isObjcHook(hook)) {
+      hook.methods.forEach((m: ObjcMethod, index: number) => {
+        const prefix = index === 0 ? "- " : "  ";
+        result += typeof m === "string" ? `${prefix}${hook.objcClass}: ${m}\n` : `${prefix}${hook.objcClass}: ${m.name}\n`;
+      })
+    }
+    if (isNativeHook(hook)) {
+      hook.functions.forEach((f: NativeSymbol, index: number) => {
+        const prefix = index === 0 ? "- " : "  ";
+        result += typeof f === "string" ? `${prefix}${hook.module}: ${f}\n` : `${prefix}${hook.module}: ${f.symbol}\n`;
+      })
+    }
+  }
+  else {
+    result = JSON.stringify(hook, null, 2)
+  }
+  return result;
 }

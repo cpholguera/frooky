@@ -60,3 +60,9 @@ export interface JavaHook extends Hook {
     methods: JavaMethod[];
 
 }
+
+// Type guard function
+export function isJavaHook(h: Hook): h is JavaHook {
+  return h.type === 'java';
+}
+

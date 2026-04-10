@@ -1,5 +1,5 @@
 import type { ObjcHook, ObjcMethodDefinition } from '../../ios/hook/objcHook';
-import type { Hook, MethodName } from '../hook/hook';
+import type { MethodName } from '../hook/hook';
 
 /**
  * Objc method selector — either a simple method name or a detailed definition.
@@ -20,9 +20,4 @@ export type ObjcMethodInput = MethodName | ObjcMethodDefinition;
 
 export interface ObjcHookInput extends Omit<ObjcHook, 'methods'> {
   methods: ObjcMethodInput[];
-}
-
-// Type guard functions
-function isObjcHook(h: Hook): h is ObjcHook {
-  return h.type === 'objc';
 }

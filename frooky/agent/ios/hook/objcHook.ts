@@ -45,3 +45,7 @@ export interface ObjcHook extends Hook {
 }
 
 
+// Type guard function
+export function isObjcHook(h: Hook): h is ObjcHook {
+  return h.type === 'objc';
+}
