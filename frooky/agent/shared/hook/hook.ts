@@ -5,11 +5,10 @@ import type { HookMetadata } from "../frookyConfig";
  *
  * @example "(NSString *)"
  * @example "int"
- * 
+ *
  * @public
  */
 export type ReturnType = string;
-
 
 /**
  * Name of a Java or Objective-C method.
@@ -17,7 +16,6 @@ export type ReturnType = string;
  * @public
  */
 export type MethodName = string;
-
 
 /**
  * Base hook configuration.
@@ -41,5 +39,4 @@ export interface Hook {
    * Stack trace filters to apply.
    */
   eventFilter?: string[];
-
 }

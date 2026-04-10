@@ -5,7 +5,7 @@ import { BaseEvent } from "./baseEvent";
  * Represents a summary event created by frooky.
  *
  * Extends {@link BaseEvent} with summary fields.
-* ```
+ * ```
  */
 export abstract class SummaryEvent extends BaseEvent {
   /**
@@ -15,7 +15,7 @@ export abstract class SummaryEvent extends BaseEvent {
 
   /**
    * Successfully hooked functions / methods.
-  */
+   */
   readonly hooks: Hook[];
 
   /**
@@ -23,9 +23,9 @@ export abstract class SummaryEvent extends BaseEvent {
    */
   readonly totalHooks: number;
 
-  /** 
+  /**
    * Relevant errors for this summary.
-  */
+   */
   readonly errors: Error[];
 
   /**
@@ -38,10 +38,7 @@ export abstract class SummaryEvent extends BaseEvent {
    */
   readonly returnValue?: unknown;
 
-  constructor(
-    hooks: Hook[],
-    errors?: Error[],
-  ) {
+  constructor(hooks: Hook[], errors?: Error[]) {
     super();
     this.hooks = hooks;
     this.totalHooks = hooks.length;

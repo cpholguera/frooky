@@ -1,11 +1,11 @@
-import type { Hook } from 'frooky';
+import type { Hook } from "frooky";
 
 /**
  * Target platform for hooks.
  *
  * @public
  */
-export type Platform = 'Android' | 'iOS';
+export type Platform = "Android" | "iOS";
 
 /**
  * Metadata that describes a hook collection.
@@ -59,4 +59,3 @@ export interface FrookyConfig {
    */
   hooks: Hook[];
 }
-

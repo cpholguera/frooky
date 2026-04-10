@@ -1,5 +1,5 @@
-import type { Param } from '../hook/parameter';
-import type { Hook, ReturnType } from './hook';
+import type { Param } from "../hook/parameter";
+import type { Hook, ReturnType } from "./hook";
 
 /**
  * Name of a native function method.
@@ -7,7 +7,6 @@ import type { Hook, ReturnType } from './hook';
  * @public
  */
 export type SymbolName = string;
-
 
 /**
  * Expanded Native method definition with name and optional overloads.
@@ -22,11 +21,10 @@ export interface SymbolDefinition {
 
 /**
  * Native method selector — either a simple method name or a detailed definition.
- * 
+ *
  * @public
  */
 export type NativeSymbol = SymbolDefinition;
-
 
 /**
  * Native hook configuration.
@@ -44,9 +42,8 @@ export interface NativeHook extends Hook {
    * Symbol to hook on the target module.
    */
   functions: NativeSymbol[];
-
 }
 
 export function isNativeHook(h: Hook): h is NativeHook {
-  return 'functions' in h;
+  return "functions" in h;
 }

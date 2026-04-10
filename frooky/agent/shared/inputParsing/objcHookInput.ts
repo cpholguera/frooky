@@ -1,7 +1,6 @@
-import type { ObjcHook, ObjcMethodDefinition } from '../../ios/hook/objcHook';
-import type { MethodName, ReturnType } from '../hook/hook';
-import { normalizeParam, type ParamInput } from './parameterInput';
-
+import type { ObjcHook, ObjcMethodDefinition } from "../../ios/hook/objcHook";
+import type { MethodName, ReturnType } from "../hook/hook";
+import { normalizeParam, type ParamInput } from "./parameterInput";
 
 /**
  * Expanded Objective-C method definition with name and optional overloads.
@@ -14,7 +13,6 @@ export interface ObjcMethodDefinitionInput {
   params?: ParamInput[];
 }
 
-
 /**
  * Objc method selector — either a simple method name or a detailed definition.
  *
@@ -22,23 +20,21 @@ export interface ObjcMethodDefinitionInput {
  */
 export type ObjcMethodInput = MethodName | ObjcMethodDefinitionInput;
 
-
-/** 
+/**
  * Native hook configuration.
  *
  * Extended type for YAML input parsing.
- * 
+ *
  * @public
  * @discriminator {type}
  */
 
-export interface ObjcHookInput extends Omit<ObjcHook, 'methods'> {
+export interface ObjcHookInput extends Omit<ObjcHook, "methods"> {
   methods: ObjcMethodInput[];
 }
 
-
 function normalizeObjcMethod(input: ObjcMethodInput): ObjcMethodDefinition {
-  if (typeof input === 'string') {
+  if (typeof input === "string") {
     return { name: input };
   }
 

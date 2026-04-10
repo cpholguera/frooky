@@ -1,33 +1,30 @@
-import type { JavaHook, JavaMethodDefinition, JavaOverload } from '../../android/hook/javaHook';
-import type { MethodName } from '../hook/hook';
-import { normalizeParam, type ParamInput } from './parameterInput';
-
+import type { JavaHook, JavaMethodDefinition, JavaOverload } from "../../android/hook/javaHook";
+import type { MethodName } from "../hook/hook";
+import { normalizeParam, type ParamInput } from "./parameterInput";
 
 /**
  * Describes a specific Java method overload.
  * Extended type for YAML input parsing.
  * @public
  */
-export interface JavaOverloadYamlParsing extends Omit<JavaOverload, 'params'> {
+export interface JavaOverloadYamlParsing extends Omit<JavaOverload, "params"> {
   /**
    * Parameter definitions for this overload.
    */
   params: ParamInput[];
 }
 
-
 /**
  * Extended type for YAML input parsing.
  *
  * @public
  */
-export interface JavaMethodDefinitionInput extends Omit<JavaMethodDefinition, 'overloads'> {
+export interface JavaMethodDefinitionInput extends Omit<JavaMethodDefinition, "overloads"> {
   /**
    * Explicit overload definitions.
    */
   overloads?: JavaOverloadYamlParsing[];
 }
-
 
 /**
  * Java method selector — either a simple method name or a detailed definition.
@@ -36,20 +33,18 @@ export interface JavaMethodDefinitionInput extends Omit<JavaMethodDefinition, 'o
  */
 export type JavaMethod = MethodName | JavaMethodDefinitionInput;
 
-
 /**
  * Native hook configuration.
- * 
+ *
  * Extended type for YAML input parsing.
- * 
+ *
  * @public
  * @discriminator {type}
  */
 
-export interface JavaHookInput extends Omit<JavaHook, 'methods'> {
+export interface JavaHookInput extends Omit<JavaHook, "methods"> {
   methods: JavaMethod[];
 }
-
 
 function normalizeOverload(input: JavaOverloadYamlParsing): JavaOverload {
   return {
@@ -60,7 +55,7 @@ function normalizeOverload(input: JavaOverloadYamlParsing): JavaOverload {
 
 function normalizeMethod(input: JavaMethodDefinitionInput | string): JavaMethodDefinition {
   // MethodName shorthand → wrap into a JavaMethodDefinition
-  if (typeof input === 'string') {
+  if (typeof input === "string") {
     return { name: input };
   }
 

@@ -2,13 +2,13 @@
  * Convert ArrayBuffer to hex string.
  */
 // --- Native argument decoding utilities (mirroring Android native) ---
-import { toHex } from "../../shared/utils.js"
+import { toHex } from "../../shared/utils.js";
 
 function _arrayBufferToHex(buffer) {
-  try{
-      var bytes = new Uint8Array(buffer);
-      return toHex(bytes)
-  }catch (e) {
+  try {
+    var bytes = new Uint8Array(buffer);
+    return toHex(bytes);
+  } catch (e) {
     return "<hex-conversion-error>";
   }
 }
@@ -17,9 +17,9 @@ function _arrayBufferToHex(buffer) {
  * Decode up to `count` native arguments conservatively.
  * Tries C-string first, then 32-bit int, then 64 bytes as hex.
  */
-const decodeNativeArgs = function(args, count) {
+const decodeNativeArgs = (args, count) => {
   var out = [];
-  var max = typeof count === 'number' ? count : 5;
+  var max = typeof count === "number" ? count : 5;
   for (var i = 0; i < max; i++) {
     var value = null;
     try {
@@ -30,7 +30,7 @@ const decodeNativeArgs = function(args, count) {
       // Try read as C-string
       try {
         value = p.readCString();
-        if (typeof value === 'string') {
+        if (typeof value === "string") {
           out.push(value);
           continue;
         }
@@ -39,7 +39,7 @@ const decodeNativeArgs = function(args, count) {
       // Try 32-bit integer
       try {
         var i32 = p.toInt32();
-        if (typeof i32 === 'number') {
+        if (typeof i32 === "number") {
           out.push(i32);
           continue;
         }
@@ -65,15 +65,15 @@ const decodeNativeArgs = function(args, count) {
     }
   }
   return out;
-}
+};
 
 /**
  * Decode a single native argument according to a descriptor.
  * Supported types: string, int32, uint32, int64, pointer, bytes(length), bool, double
  * Returns { name, type, value } where value is a JS primitive or string.
  */
-const decodeArgByDescriptor = function (ptr, index, desc) {
-  var name = desc && desc.name ? desc.name : ("args[" + index + "]");
+const decodeArgByDescriptor = (ptr, index, desc) => {
+  var name = desc && desc.name ? desc.name : "args[" + index + "]";
   var type = desc && desc.type ? desc.type : "string";
   var value = null;
 
@@ -90,27 +90,45 @@ const decodeArgByDescriptor = function (ptr, index, desc) {
         break;
       case "int64":
         // emit as string to avoid precision loss
-        try { value = ptr.toInt64().toString(); } catch (e64) { value = ptr.toInt32(); }
+        try {
+          value = ptr.toInt64().toString();
+        } catch (e64) {
+          value = ptr.toInt32();
+        }
         break;
       case "pointer":
         value = ptr.toString();
         break;
-      case "bytes":
-        var len = (desc && typeof desc.length === 'number') ? desc.length : 64;
+      case "bytes": {
+        var len = desc && typeof desc.length === "number" ? desc.length : 64;
         var buf = Memory.readByteArray(ptr, len);
         value = buf ? _arrayBufferToHex(buf) : "";
         break;
+      }
       case "bool":
         value = !!ptr.toInt32();
         break;
       case "double":
-        try { value = ptr.readDouble(); } catch (ed) { value = Number(ptr.toInt32()); }
+        try {
+          value = ptr.readDouble();
+        } catch (ed) {
+          value = Number(ptr.toInt32());
+        }
         break;
       default:
         // fallback like conservative decoder
-        try { value = ptr.readCString(); } catch(e1) {
-          try { value = ptr.toInt32(); } catch(e2) {
-            try { var buf2 = Memory.readByteArray(ptr, 64); value = buf2 ? _arrayBufferToHex(buf2) : ptr.toString(); } catch(e3) { value = ptr.toString(); }
+        try {
+          value = ptr.readCString();
+        } catch (e1) {
+          try {
+            value = ptr.toInt32();
+          } catch (e2) {
+            try {
+              var buf2 = Memory.readByteArray(ptr, 64);
+              value = buf2 ? _arrayBufferToHex(buf2) : ptr.toString();
+            } catch (e3) {
+              value = ptr.toString();
+            }
           }
         }
         break;
@@ -120,14 +138,14 @@ const decodeArgByDescriptor = function (ptr, index, desc) {
   }
 
   return { name: name, type: type, value: value };
-}
+};
 
 /**
  * Apply per-argument filters.
  * If any descriptor includes a filter array, require that decoded value matches at least one entry.
  * For multiple descriptors with filters, all must match.
  */
-const filtersPass = function(decodedList, descriptors) {
+const filtersPass = (decodedList, descriptors) => {
   if (!descriptors || !descriptors.length) return true;
   var anyFilters = false;
   for (var i = 0; i < descriptors.length; i++) {
@@ -139,23 +157,34 @@ const filtersPass = function(decodedList, descriptors) {
       var matched = false;
       for (var f = 0; f < d.filter.length; f++) {
         var term = d.filter[f];
-        if (val === null || typeof val === 'undefined') continue;
-        if (typeof val === 'string') {
-          if (val.indexOf(term) !== -1) { matched = true; break; }
-        } else if (typeof val === 'number') {
-          if (val === Number(term) || (String(val).indexOf(String(term)) !== -1)) { matched = true; break; }
-        } else if (typeof val === 'boolean') {
-          if ((term === true || term === false) ? (val === term) : (String(val).toLowerCase() === String(term).toLowerCase())) { matched = true; break; }
+        if (val === null || typeof val === "undefined") continue;
+        if (typeof val === "string") {
+          if (val.indexOf(term) !== -1) {
+            matched = true;
+            break;
+          }
+        } else if (typeof val === "number") {
+          if (val === Number(term) || String(val).indexOf(String(term)) !== -1) {
+            matched = true;
+            break;
+          }
+        } else if (typeof val === "boolean") {
+          if (term === true || term === false ? val === term : String(val).toLowerCase() === String(term).toLowerCase()) {
+            matched = true;
+            break;
+          }
         } else {
           // pointer/bytes (string), other types - stringify
-          if (String(val).indexOf(String(term)) !== -1) { matched = true; break; }
+          if (String(val).indexOf(String(term)) !== -1) {
+            matched = true;
+            break;
+          }
         }
       }
       if (!matched) return false; // one filtered arg failed
     }
   }
   return anyFilters ? true : true; // if no filters present, pass
-}
+};
 
-
-export { decodeNativeArgs, decodeArgByDescriptor, filtersPass }
+export { decodeArgByDescriptor, decodeNativeArgs, filtersPass };

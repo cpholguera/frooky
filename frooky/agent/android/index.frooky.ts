@@ -13,10 +13,9 @@ if (Java.available) {
 
       Java.perform(() => {
         frooky.executeHookOperations();
-      }) 
-      
-    }
+      });
+    },
   };
 } else {
-  console.error("[!] The agent is not run on an Android device. Make sure to run this version of the frooky agent on Android.")
+  console.error("[!] The agent is not run on an Android device. Make sure to run this version of the frooky agent on Android.");
 }
