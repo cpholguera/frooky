@@ -44,19 +44,16 @@ export function validateHooks(hooks: Hook[], platform: Platform, metadata?: Hook
             if (isJavaHook(hook)) {
                 javaHookInputSchema.parse(hook as JavaHookInput);
                 const javaHook = hook as JavaHook;
-                javaHook.type = "java";
                 result.validHooks.push(javaHook);
 
             } else if (isObjcHook(hook)) {
                 objcHookInputSchema.parse(hook as ObjcHookInput);
                 const objcHook = hook as ObjcHook;
-                objcHook.type = "objc";
                 result.validHooks.push(objcHook);
 
             } else if (isNativeHook(hook)) {
                 nativeHookInputSchema.parse(hook as NativeHook);
                 const nativeHook = hook as NativeHook;
-                nativeHook.type = "native";
                 result.validHooks.push(nativeHook);
             } else {
                 throw new Error("Hook type is unknown. Make sure that it is either a Java, Objective-C or native hook.");

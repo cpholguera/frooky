@@ -34,7 +34,7 @@ export interface JavaMethodDefinitionInput extends Omit<JavaMethodDefinition, 'o
  *
  * @public
  */
-export type JavaMethod = MethodName | JavaMethodDefinition;
+export type JavaMethod = MethodName | JavaMethodDefinitionInput;
 
 
 /**

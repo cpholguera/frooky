@@ -1,3 +1,4 @@
+import Java from 'frida-java-bridge';
 import type { Hook, MethodName } from '../../shared/hook/hook';
 import type { Param } from '../../shared/hook/parameter';
 
@@ -45,11 +46,6 @@ export type JavaMethod = JavaMethodDefinition;
  */
 export interface JavaHook extends Hook {
     /**
-    * Internally used type guard.
-    */
-    type: "java"
-
-    /**
      * Fully qualified Java class name.
      */
     javaClass: string;
@@ -63,6 +59,6 @@ export interface JavaHook extends Hook {
 
 // Type guard function
 export function isJavaHook(h: Hook): h is JavaHook {
-  return h.type === 'java';
+  return 'javaClass' in h;
 }
 

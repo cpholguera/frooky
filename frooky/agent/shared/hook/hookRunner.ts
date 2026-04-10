@@ -2,7 +2,8 @@
 import type { Hook } from  "frooky";
 
 export interface HookOperation {
-  hook: Hook;
+  module?: string
+  moduleAddress?: NativePointer
 }
 
 export interface OperationBuilderResult {

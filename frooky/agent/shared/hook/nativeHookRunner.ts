@@ -4,10 +4,7 @@ import type { HookOperation, HookRunner, OperationBuilderResult } from "./hookRu
 
 
 export interface NativeHookOperation extends HookOperation {
-  hook: NativeHook
-  module: string
-  moduleAddress: NativePointer
-  symbol: string;              // Todo needs to be refactored when legacy code is refactored
+  symbol: string;               // Todo needs to be refactored when legacy code is refactored
   symbolAddress: NativePointer
 }
 
@@ -30,17 +27,14 @@ export class NativeHookRunner implements HookRunner {
 
       console.log(JSON.stringify(h))
 
-
       operationBuilderResultArray.push(resolveNativeSymbol(h))
-
       
     })
 
     frooky.log.info(`Hook operations for the following hooks built: ${JSON.stringify(operationBuilderResultArray)}`)
 
     return operationBuilderResultArray;
-
-
+    
   }
 
   executeHooking(operations: NativeHookOperation[]): void {

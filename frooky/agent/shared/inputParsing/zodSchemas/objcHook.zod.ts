@@ -13,7 +13,6 @@ export const objcMethodDefinitionSchema = z.object({
 export const objcMethodSchema = objcMethodDefinitionSchema;
 
 export const objcHookSchema = hookSchema.extend({
-    type: z.literal("objc"),
     objcClass: z.string(),
     methods: z.array(objcMethodSchema)
 });
