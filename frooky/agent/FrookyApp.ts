@@ -1,5 +1,5 @@
 import type { FrookyConfig, Platform } from "frooky";
-import type { HookRunner, OperationBuilderResult } from "./shared/hook/hookRunner";
+import type { HookRunner } from "./shared/hook/hookRunner";
 import { HookStore } from "./shared/hook/hookStore";
 import { NativeHookRunner } from "./shared/hook/nativeHookRunner";
 import type { BaseEvent } from "./shared/event/baseEvent";
@@ -74,27 +74,29 @@ export class FrookyApp {
     this.log.info(`Added the following hooks to the store: \n${this.hookStore.prettyPrintHooks()}`);
   }
 
-  public prepareHookOperation() {
-    if (this.platform === "Android") {
-      this.platformHookRunner.operationsBuilder(this.hookStore.getJavaHooks());
-    }
-    if (this.platform === "iOS") {
-      this.platformHookRunner.operationsBuilder(this.hookStore.getObjcHooks());
-    }
-    // run native hook on both platforms
-    this.nativeHookRunner.operationsBuilder(this.hookStore.getNativeHooks());
-  }
+  // public prepareHookOperation() {
+  //   if (this.platform === "Android") {
+  //     this.platformHookRunner.operationsBuilder(this.hookStore.getJavaHooks());
+  //   }
+  //   if (this.platform === "iOS") {
+  //     this.platformHookRunner.operationsBuilder(this.hookStore.getObjcHooks());
+  //   }
+  //   // run native hook on both platforms
+  //   this.nativeHookRunner.operationsBuilder(this.hookStore.getNativeHooks());
+  // }
 
 
   public executeHookOperations() {
     if (this.platform === "Android") {
-      this.platformHookRunner.executeHooking(this.hookStore.getJavaHookOperations());
+      console.log("ZZZZZZZZZZZZZZZZZZZZZ")
+      console.log(this.hookStore.getJavaHooks())
+      this.platformHookRunner.executeHooking(this.hookStore.getJavaHooks());
     }
     // if (this.platform === "iOS") {
     //   this.platformHookRunner.executeHooking(this.hookStore.getObjcHookOperations());
     // }
     // run native hook on both platforms
-    this.nativeHookRunner.executeHooking(this.hookStore.getNativeHookOperations());
+    this.nativeHookRunner.executeHooking(this.hookStore.getNativeHooks());
   }
 
 

@@ -34,6 +34,8 @@ export class HookStore {
   }
 
   getJavaHookOperations(): JavaHookOperation[] {
+    console.log("aaaa ")
+    console.log(JSON.stringify(this.hooks, null, 2));
     return this.getJavaHooks()
       .map(hook => hook.hookOp)
       .filter((hookOp): hookOp is JavaHookOperation => hookOp !== undefined);
