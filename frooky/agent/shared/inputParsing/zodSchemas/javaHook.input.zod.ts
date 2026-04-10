@@ -3,10 +3,10 @@ import { z } from "zod";
 
 import { javaHookSchema, javaMethodDefinitionSchema, javaOverloadSchema } from "./javaHook.zod";
 import { methodNameSchema } from "./hook.zod";
-import { paramYamlInputSchema } from "./parameter.input.zod";
+import { paramInputSchema } from "./parameter.input.zod";
 
 export const javaOverloadYamlParsingSchema = javaOverloadSchema.omit({ "params": true }).extend({
-    params: z.array(paramYamlInputSchema)
+    params: z.array(paramInputSchema)
 });
 
 export const javaMethodDefinitionInputSchema = javaMethodDefinitionSchema.omit({ "overloads": true }).extend({

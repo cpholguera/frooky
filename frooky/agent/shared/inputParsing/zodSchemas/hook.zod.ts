@@ -7,11 +7,8 @@ export const methodNameSchema = z.string();
 
 const hookMetadataSchema = z.any();
 
-const hookOperationSchema = z.any();
-
 export const hookSchema = z.object({
     metadata: hookMetadataSchema.optional(),
     stackTraceLimit: z.number().optional(),
-    eventFilter: z.array(z.string()).optional(),
-    hookOp: hookOperationSchema.optional()
+    eventFilter: z.array(z.string()).optional()
 });

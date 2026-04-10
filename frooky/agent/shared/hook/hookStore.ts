@@ -1,8 +1,5 @@
 import { type Hook, isJavaHook, isNativeHook, isObjcHook, type JavaHook, type NativeHook, type ObjcHook } from "frooky";
-import type { JavaHookEntry } from "../../android/hook/javaHookRunner";
 import { prettyPrintHook } from "../../shared/utils";
-import type { HookEntry } from "./hookRunner";
-import type { NativeHookEntry } from "./nativeHookRunner";
 
 export class HookStore {
   private hooks: Hook[] = [];
@@ -19,24 +16,6 @@ export class HookStore {
 
   getHooks(): Hook[] {
     return [...this.hooks];
-  }
-
-  getHookEntries(): HookEntry[] {
-    return this.hooks
-      .map(hook => hook.hookOp)
-      .filter((hookOp): hookOp is HookEntry => hookOp !== undefined);
-  }
-
-  getNativeHookEntries(): NativeHookEntry[] {
-    return this.getNativeHooks()
-      .map(hook => hook.hookOp)
-      .filter((hookOp): hookOp is NativeHookEntry => hookOp !== undefined);
-  }
-
-  getJavaHookEntries(): JavaHookEntry[] {
-    return this.getJavaHooks()
-      .map(hook => hook.hookOp)
-      .filter((hookOp): hookOp is JavaHookEntry => hookOp !== undefined);
   }
 
   // TODO: ObjcHookOperation needs to be implemented
