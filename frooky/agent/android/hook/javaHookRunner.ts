@@ -13,8 +13,6 @@ export interface JavaHookEntry extends HookEntry {
 
 export class JavaHookRunner implements HookRunner {
   executeHooking(hooks: JavaHook[]): void {
-    console.log("assfdasdfasdgasdgadsfg")
-    console.log(JSON.stringify(hooks))
 
     var javaHookEntryArray: JavaHookEntry[] = [];
 
@@ -29,12 +27,10 @@ export class JavaHookRunner implements HookRunner {
       // We should use the validators for the result set, just like with config and hook validations
       // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      frooky.log.info(`Building hook operations for Android`);
-      console.log("aaaaa")
-      javaHookEntryArray.push(buildHookOperations(h));
+      javaHookEntryArray.push(...buildHookOperations(h));
 
     });
-    frooky.log.info(`Hook operations for the following hook built: ${JSON.stringify(javaHookEntryArray)}`)
+    frooky.log.info(`Hook operations for the following hook built: ${JSON.stringify(javaHookEntryArray, null, 2)}`)
     frooky.log.info(`Run Android hooking`)
     registerHook(javaHookEntryArray)
   }

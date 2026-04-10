@@ -1,6 +1,6 @@
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from '../../android/hook/javaHook';
 import type { MethodName } from '../hook/hook';
-import { normalizeParam, type ParamYamlInput } from './parameterInput';
+import { normalizeParam, type ParamInput } from './parameterInput';
 
 
 /**
@@ -12,7 +12,7 @@ export interface JavaOverloadYamlParsing extends Omit<JavaOverload, 'params'> {
   /**
    * Parameter definitions for this overload.
    */
-  params: ParamYamlInput[];
+  params: ParamInput[];
 }
 
 
