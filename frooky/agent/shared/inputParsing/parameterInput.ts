@@ -1,4 +1,4 @@
-import type { ParamName, ParamOptions, ParamType } from "../hook/parameter";
+import type { ParamDefinition, ParamName, ParamOptions, ParamType } from "../hook/parameter";
 
 /**
  * Extended parameter type for YAML input parsing.
@@ -17,8 +17,31 @@ import type { ParamName, ParamOptions, ParamType } from "../hook/parameter";
  *
  * @public
  */
-export type ParamYamlInput =
+export type ParamInput =
   | ParamType
   | [ParamType, ParamName]
   | [ParamType, ParamOptions]
   | [ParamType, ParamName, ParamOptions];
+
+
+export function normalizeParam(input: ParamInput): ParamDefinition {
+  // Simple string: just a type
+  if (typeof input === 'string') {
+    return { type: input };
+  }
+
+  const [first, second, third] = input;
+
+  // [ParamType, ParamName, ParamOptions]
+  if (input.length === 3) {
+    return { type: first, name: second as string, options: third };
+  }
+
+  // [ParamType, ParamOptions] — second element is an object
+  if (typeof second === 'object') {
+    return { type: first, options: second };
+  }
+
+  // [ParamType, ParamName] — second element is a string
+  return { type: first, name: second };
+}

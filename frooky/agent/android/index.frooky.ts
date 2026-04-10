@@ -12,7 +12,6 @@ if (Java.available) {
       frooky.loadFrookyConfig(frookyConfig);
 
       Java.perform(() => {
-        frooky.prepareHookOperation();
         frooky.executeHookOperations();
       }) 
       

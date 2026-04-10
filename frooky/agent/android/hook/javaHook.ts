@@ -1,4 +1,3 @@
-import Java from 'frida-java-bridge';
 import type { Hook, MethodName } from '../../shared/hook/hook';
 import type { Param } from '../../shared/hook/parameter';
 

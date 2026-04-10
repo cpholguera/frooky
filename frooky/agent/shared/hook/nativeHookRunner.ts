@@ -1,21 +1,19 @@
 import type { NativeHook } from "frooky";
 import { registerNativeHook, resolveNativeSymbol } from "../../android/legacy/android-agent";
-import type { HookOperation, HookRunner, OperationBuilderResult } from "./hookRunner";
+import type { HookEntry, HookRunner } from "./hookRunner";
 
 
-export interface NativeHookOperation extends HookOperation {
+export interface NativeHookEntry extends HookEntry {
   symbol: string;               // Todo needs to be refactored when legacy code is refactored
   symbolAddress: NativePointer
 }
 
-
 export class NativeHookRunner implements HookRunner {
+  executeHooking(hooks: NativeHook[]): void {
 
-  operationsBuilder(hooks: NativeHook[]): OperationBuilderResult[] {
-    frooky.log.info(`Building hook operations for native`)
+    var nativeEntryArray: NativeHookEntry[][] = [];
 
-
-    var operationBuilderResultArray: OperationBuilderResult[] = [];
+    frooky.log.info(`Executing native hook operations`)
     hooks.forEach((h: NativeHook) => {
       // !!!!!!!!!!!!!!!!!!!!!!!!!!!! 
       // TODO: JUMP to legacy code
@@ -24,24 +22,12 @@ export class NativeHookRunner implements HookRunner {
       // We should use the validators for the result set, just like with config and hook validations
       // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+      frooky.log.info(`Building hook operations for native`)
+      nativeEntryArray.push(resolveNativeSymbol(h))
 
-      console.log(JSON.stringify(h))
-
-      operationBuilderResultArray.push(resolveNativeSymbol(h))
-      
-    })
-
-    frooky.log.info(`Hook operations for the following hooks built: ${JSON.stringify(operationBuilderResultArray)}`)
-
-    return operationBuilderResultArray;
-    
+    });
+    frooky.log.info(`Hook operations for the following hook built: ${JSON.stringify(nativeEntryArray)}`)
+    frooky.log.info(`Run native hooking`)
+    registerNativeHook(nativeEntryArray)
   }
-
-  executeHooking(operations: NativeHookOperation[]): void {
-    frooky.log.info(`Executing native hook operations`)
-    operations.forEach((hookOp: NativeHookOperation) => {
-      registerNativeHook(hookOp)
-    })
-  }
-
-} 
+}  

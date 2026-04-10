@@ -21,7 +21,6 @@ if (Java.available) {
 
 
 	Java.perform(() => {
-		frooky.prepareHookOperation();
 		frooky.executeHookOperations();
 	}) 
 

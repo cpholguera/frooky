@@ -1,9 +1,9 @@
-import type { JavaHook } from "frooky";
 import { buildHookOperations, registerHook } from "../legacy/android-agent"
-import type { HookOperation, HookRunner, OperationBuilderResult } from "../../shared/hook/hookRunner"
+import type { HookEntry, HookRunner } from "../../shared/hook/hookRunner"
+import { JavaHook } from "./javaHook"
 
 
-export interface JavaHookOperation extends HookOperation {
+export interface JavaHookEntry extends HookEntry {
   class: string,
   method: any,           // Todo needs to be refactored when legacy code is refactored
   overloadIndex: number,
@@ -11,13 +11,16 @@ export interface JavaHookOperation extends HookOperation {
   maxFrames: number,
 }
 
-
 export class JavaHookRunner implements HookRunner {
+  executeHooking(hooks: JavaHook[]): void {
+    console.log("assfdasdfasdgasdgadsfg")
+    console.log(JSON.stringify(hooks))
 
-  operationsBuilder(hooks: JavaHook[]): OperationBuilderResult[] {
-    frooky.log.info(`Building hook operations for Android`)
+    var javaHookEntryArray: JavaHookEntry[] = [];
 
-    var operationBuilderResultArray: OperationBuilderResult[] = [];
+    frooky.log.info(`Executing Android hook operations`)
+
+
     hooks.forEach((h: JavaHook) => {
       // !!!!!!!!!!!!!!!!!!!!!!!!!!!! 
       // TODO: JUMP to legacy code
@@ -25,20 +28,17 @@ export class JavaHookRunner implements HookRunner {
       // Also, the naming is pretty confusing, should be refactored later
       // We should use the validators for the result set, just like with config and hook validations
       // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      operationBuilderResultArray.push(buildHookOperations(h))
-    })
 
-    frooky.log.info(`Android hook operations for the following hooks built: ${JSON.stringify(operationBuilderResultArray)}`)
+      frooky.log.info(`Building hook operations for Android`);
+      console.log("aaaaa")
+      javaHookEntryArray.push(buildHookOperations(h));
 
-    return operationBuilderResultArray;
+    });
+    frooky.log.info(`Hook operations for the following hook built: ${JSON.stringify(javaHookEntryArray)}`)
+    frooky.log.info(`Run Android hooking`)
+    registerHook(javaHookEntryArray)
   }
-
-  executeHooking(hookOps: JavaHookOperation[]): void {
-    frooky.log.info(`Executing Android hook operations`)
-    hookOps.forEach((hookOp: JavaHookOperation) => {
-      registerHook(hookOp)
-    })
-  }
-
-
 } 
+
+
+

@@ -1,13 +1,14 @@
 import type { Hook, HookMetadata, JavaHook, NativeHook, ObjcHook, Platform } from "frooky";
 import { isJavaHook, isNativeHook, isObjcHook } from "frooky";
-import type { JavaHookInput } from "../inputParsing/javaHookInput";
-import type { ObjcHookInput } from "../inputParsing/objcHookInput";
+import { normalizeJavaHook, type JavaHookInput } from "../inputParsing/javaHookInput";
+import { normalizeObjcHook, type ObjcHookInput } from "../inputParsing/objcHookInput";
 
 import z from "zod";
 import { javaHookInputSchema } from "../inputParsing/zodSchemas/javaHook.input.zod";
 import { nativeHookInputSchema } from "../inputParsing/zodSchemas/nativeHook.input.zod";
 import { objcHookInputSchema } from "../inputParsing/zodSchemas/objcHook.input.zod";
 import { prettyPrintHook } from "../utils";
+import { normalizeNativeHook } from "../inputParsing/nativeHookInput";
 
 
 
@@ -43,17 +44,17 @@ export function validateHooks(hooks: Hook[], platform: Platform, metadata?: Hook
             }
             if (isJavaHook(hook)) {
                 javaHookInputSchema.parse(hook as JavaHookInput);
-                const javaHook = hook as JavaHook;
+                const javaHook = normalizeJavaHook(hook) as JavaHook;
                 result.validHooks.push(javaHook);
 
             } else if (isObjcHook(hook)) {
                 objcHookInputSchema.parse(hook as ObjcHookInput);
-                const objcHook = hook as ObjcHook;
+                const objcHook = normalizeObjcHook(hook) as ObjcHook;
                 result.validHooks.push(objcHook);
 
             } else if (isNativeHook(hook)) {
                 nativeHookInputSchema.parse(hook as NativeHook);
-                const nativeHook = hook as NativeHook;
+                const nativeHook = normalizeNativeHook(hook) as NativeHook;
                 result.validHooks.push(nativeHook);
             } else {
                 throw new Error("Hook type is unknown. Make sure that it is either a Java, Objective-C or native hook.");

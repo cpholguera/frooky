@@ -1,6 +1,6 @@
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from '../../android/hook/javaHook';
 import type { MethodName } from '../hook/hook';
-import type { ParamYamlInput } from './parameterInput';
+import { normalizeParam, type ParamYamlInput } from './parameterInput';
 
 
 /**
@@ -48,4 +48,31 @@ export type JavaMethod = MethodName | JavaMethodDefinitionInput;
 
 export interface JavaHookInput extends Omit<JavaHook, 'methods'> {
   methods: JavaMethod[];
+}
+
+
+function normalizeOverload(input: JavaOverloadYamlParsing): JavaOverload {
+  return {
+    ...input,
+    params: input.params.map(normalizeParam),
+  };
+}
+
+function normalizeMethod(input: JavaMethodDefinitionInput | string): JavaMethodDefinition {
+  // MethodName shorthand → wrap into a JavaMethodDefinition
+  if (typeof input === 'string') {
+    return { name: input };
+  }
+
+  return {
+    ...input,
+    overloads: input.overloads?.map(normalizeOverload),
+  };
+}
+
+export function normalizeJavaHook(input: JavaHookInput): JavaHook {
+  return {
+    ...input,
+    methods: input.methods.map(normalizeMethod),
+  };
 }
