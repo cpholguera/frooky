@@ -102,7 +102,7 @@ export function registerNativeHooks(hookEntries: NativeHookEntry[]) {
 //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ///////
 ////////
-//////// Works as before, but needs to be refactored later
+//////// Does not decode any arguments
 ///////
 //////// type
 // export interface NativeHookOperation extends HookOperation {
