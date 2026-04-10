@@ -52,3 +52,7 @@ export interface NativeHook extends Hook {
 
 }
 
+// Type guard functions
+export function isNativeHook(h: Hook): h is NativeHook {
+  return h.type === 'native';
+}

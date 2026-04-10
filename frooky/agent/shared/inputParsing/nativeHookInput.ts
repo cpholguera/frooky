@@ -1,4 +1,3 @@
-import { Hook } from 'frooky';
 import type { NativeHook, SymbolDefinition, SymbolName } from '../hook/nativeHook';
 import type { ParamYamlInput } from './parameterInput';
 
@@ -30,9 +29,4 @@ export type NativeSymbol = SymbolName | SymbolDefinitionInput;
  */
 export interface NativeHookInput extends Omit<NativeHook, 'functions'> {
   functions: NativeSymbol[];
-}
-
-// Type guard functions
-function isNativeHook(h: Hook): h is NativeHook {
-  return h.type === 'native';
 }

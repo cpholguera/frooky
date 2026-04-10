@@ -18,12 +18,6 @@
     }
   },
   "include": [
-    "ios/**/*",
-    "android/**/*",
-    "shared/**/*",
-    "types/**/*",
-    "docs/**/*",
-    "examples/**/*",
-    "FrookyApp.ts"
+    "./**/*",
   ]
 }

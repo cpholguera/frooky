@@ -1,7 +1,13 @@
-import type { Hook, HookMetadata, JavaHook, NativeHook, Platform } from "frooky";
+import type { Hook, HookMetadata, JavaHook, NativeHook, ObjcHook, Platform } from "frooky";
+import { isJavaHook, isNativeHook, isObjcHook } from "frooky";
+import type { JavaHookInput } from "../inputParsing/javaHookInput";
+import type { ObjcHookInput } from "../inputParsing/objcHookInput";
+
+import z from "zod";
 import { javaHookInputSchema } from "../inputParsing/zodSchemas/javaHook.input.zod";
+import { nativeHookInputSchema } from "../inputParsing/zodSchemas/nativeHook.input.zod";
+import { objcHookInputSchema } from "../inputParsing/zodSchemas/objcHook.input.zod";
 import { prettyPrintHook } from "../utils";
-import { JavaHookInput } from "../inputParsing/javaHookInput";
 
 
 
@@ -11,6 +17,7 @@ export interface HookValidatorResult {
     totalHooks: number;
     totalErrors: number;
 }
+
 
 export function validateHooks(hooks: Hook[], platform: Platform, metadata?: HookMetadata,): HookValidatorResult {
 
@@ -31,39 +38,26 @@ export function validateHooks(hooks: Hook[], platform: Platform, metadata?: Hook
         }
 
         try {
-            if ("javaClass" in hook) {
-                // validate the input based on the ZOD schema
-                const javaHookInput = hook as JavaHookInput
-                javaHookInputSchema.parse(javaHookInput);
-
-                // initiation the internally use type
-                const javaHook = hook as JavaHook
+            if (platform !== "Android") {
+                throw new Error(`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(hook)}`);
+            }
+            if (isJavaHook(hook)) {
+                javaHookInputSchema.parse(hook as JavaHookInput);
+                const javaHook = hook as JavaHook;
                 javaHook.type = "java";
+                result.validHooks.push(javaHook);
 
-                if( platform !== "Android" ){
-                    throw Error(`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(javaHookInput)}`)
-                }
+            } else if (isObjcHook(hook)) {
+                objcHookInputSchema.parse(hook as ObjcHookInput);
+                const objcHook = hook as ObjcHook;
+                objcHook.type = "objc";
+                result.validHooks.push(objcHook);
 
-                result.validHooks.push(javaHook)
-
-            } else if ("objcClass" in hook) {
-                const objcHookInputParsing = hook as ObjcHookInput
-                objcHookInputParsing.type = "objc";
-                if( platform !== "iOS" ){
-                    throw Error(`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(objcHookInputParsing)}`)
-                }
-                objcHookInputSchema.parse(objcHookInputParsing);
-
-                // normalizing the hook for internal use
-
-
-                result.validHooks.push(objcHook)
-
-            } else if ("functions" in hook) {
-                const nativeHook = hook as NativeHook
+            } else if (isNativeHook(hook)) {
+                nativeHookInputSchema.parse(hook as NativeHook);
+                const nativeHook = hook as NativeHook;
                 nativeHook.type = "native";
-                nativeHookSchema.parse(nativeHook);
-                result.validHooks.push(nativeHook)
+                result.validHooks.push(nativeHook);
             } else {
                 throw new Error("Hook type is unknown. Make sure that it is either a Java, Objective-C or native hook.");
             }
