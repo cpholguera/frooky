@@ -1,5 +1,4 @@
 import type { HookMetadata } from "../frookyConfig";
-import { HookOperation } from "./hookRunner";
 
 /**
  * Frida-compatible type for a return value used with Native and Objective-C hooks
@@ -43,8 +42,4 @@ export interface Hook {
    */
   eventFilter?: string[];
 
-  /**
-   * Hook Operation
-   */
-  hookOp?: HookOperation;
 }

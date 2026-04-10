@@ -1,5 +1,5 @@
 import type { NativeHook } from "frooky";
-import { registerNativeHook, registerNativeHooks, resolveNativeSymbol } from "../../android/legacy/android-agent";
+import { registerNativeHooks, resolveNativeSymbol } from "../../android/legacy/android-agent";
 import type { HookEntry, HookRunner } from "./hookRunner";
 
 

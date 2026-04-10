@@ -2,10 +2,10 @@
 import { z } from "zod";
 
 import { nativeHookSchema, symbolDefinitionSchema, symbolNameSchema } from "./nativeHook.internal.zod";
-import { paramYamlInputSchema } from "./parameter.input.zod";
+import { paramInputSchema } from "./parameter.input.zod";
 
 export const symbolDefinitionInputSchema = symbolDefinitionSchema.omit({ "params": true }).extend({
-    params: z.array(paramYamlInputSchema).optional()
+    params: z.array(paramInputSchema).optional()
 });
 
 export const nativeSymbolSchema = z.union([symbolNameSchema, symbolDefinitionInputSchema]);

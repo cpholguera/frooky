@@ -3,4 +3,4 @@ import { z } from "zod";
 
 import { paramNameSchema, paramOptionsSchema, paramTypeSchema } from "./parameter.zod";
 
-export const paramYamlInputSchema = z.union([paramTypeSchema, z.tuple([paramTypeSchema, paramNameSchema]), z.tuple([paramTypeSchema, paramOptionsSchema]), z.tuple([paramTypeSchema, paramNameSchema, paramOptionsSchema])]);
+export const paramInputSchema = z.union([paramTypeSchema, z.tuple([paramTypeSchema, paramNameSchema]), z.tuple([paramTypeSchema, paramOptionsSchema]), z.tuple([paramTypeSchema, paramNameSchema, paramOptionsSchema])]);
