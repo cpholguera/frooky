@@ -76,22 +76,13 @@ export class FrookyApp {
 
   public prepareHookOperation() {
     if (this.platform === "Android") {
-      const operationBuilderResults = this.platformHookRunner.operationsBuilder(this.hookStore.getJavaHooks());
-      operationBuilderResults.forEach((opResult: OperationBuilderResult) => {
-        this.hookStore.addHookOperations(opResult.operations)
-      })
+      this.platformHookRunner.operationsBuilder(this.hookStore.getJavaHooks());
     }
     if (this.platform === "iOS") {
-      const operationBuilderResults = this.platformHookRunner.operationsBuilder(this.hookStore.getObjcHooks());
-      operationBuilderResults.forEach((opResult: OperationBuilderResult) => {
-        this.hookStore.addHookOperations(opResult.operations)
-      })
+      this.platformHookRunner.operationsBuilder(this.hookStore.getObjcHooks());
     }
     // run native hook on both platforms
-    const operationBuilderResults = this.nativeHookRunner.operationsBuilder(this.hookStore.getNativeHooks());
-    operationBuilderResults.forEach((opResult: OperationBuilderResult) => {
-      this.hookStore.addHookOperations(opResult.operations)
-    })
+    this.nativeHookRunner.operationsBuilder(this.hookStore.getNativeHooks());
   }
 
 

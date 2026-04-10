@@ -36,11 +36,6 @@ export type NativeSymbol = SymbolDefinition;
  */
 export interface NativeHook extends Hook {
   /**
-  * Internally used type guard.
-  */
-  type: "native"
-
-  /**
    * Fully qualified Native module name.
    */
   module: string;
@@ -52,7 +47,6 @@ export interface NativeHook extends Hook {
 
 }
 
-// Type guard functions
 export function isNativeHook(h: Hook): h is NativeHook {
-  return h.type === 'native';
+  return 'functions' in h;
 }

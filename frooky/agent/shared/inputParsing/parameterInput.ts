@@ -1,11 +1,11 @@
-import type { Param, ParamName, ParamOptions, ParamType } from "../hook/parameter";
+import type { ParamName, ParamOptions, ParamType } from "../hook/parameter";
 
 /**
  * Extended parameter type for YAML input parsing.
  * 
  * The following examples all describe the same parameter:
  *
- * 1. As a simple type name.
+ * 1. As a simple type.
  * 2. As a tuple of [type, options].
  * 3. As a tuple of [type, name, options].
  * 4. As a structured object with type, name, and options.
@@ -18,7 +18,6 @@ import type { Param, ParamName, ParamOptions, ParamType } from "../hook/paramete
  * @public
  */
 export type ParamYamlInput =
-  | Param
   | ParamType
   | [ParamType, ParamName]
   | [ParamType, ParamOptions]

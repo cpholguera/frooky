@@ -4,14 +4,12 @@ import type { HookOperation, HookRunner, OperationBuilderResult } from "../../sh
 
 
 export interface JavaHookOperation extends HookOperation {
-  hook: JavaHook
   class: string,
-  method: any,        // Todo needs to be refactored when legacy code is refactored
+  method: any,           // Todo needs to be refactored when legacy code is refactored
   overloadIndex: number,
   args: string[],
   maxFrames: number,
 }
-
 
 
 export class JavaHookRunner implements HookRunner {

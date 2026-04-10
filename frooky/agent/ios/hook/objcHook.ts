@@ -28,11 +28,6 @@ export type ObjcMethod = ObjcMethodDefinition;
  */
 export interface ObjcHook extends Hook {
   /**
-  * Internally used type guard.
-  */
-  type: "objc"
-
-  /**
    * Fully qualified Objective-C class name.
    */
   objcClass: string;
@@ -47,5 +42,5 @@ export interface ObjcHook extends Hook {
 
 // Type guard function
 export function isObjcHook(h: Hook): h is ObjcHook {
-  return h.type === 'objc';
+  return 'objcClass' in h;
 }

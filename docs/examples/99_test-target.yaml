@@ -1,7 +1,8 @@
 metadata:
-  name: Android Hook Examples
-  asdfasdf: 234234
-  somethignelse: "3423"
+  name: Android Hooks for Testing
+  version: 1
+  author: frooky dev
+  platform: Android
 
 hooks:
   - javaClass: java.net.URL
@@ -20,21 +21,21 @@ hooks:
             - [ java.lang.String, value ]
       - putStringSet
   
-  - javaClass: android.app.Activity 
-    methods:
-      - startActivity
+  # - javaClass: android.app.Activity 
+  #   methods:
+  #     - startActivity
 
-  - module: libcrypto.so
-    functions:
-      - X509_new
-      - symbol: RSA_parse_public_key
-      - EVP_EncryptUpdate
-      - HMAC
-      - RSA_public_encrypt
-      - EVP_DecryptUpdate
-      - EVP_DigestUpdate
+  # - module: libcrypto.so
+  #   functions:
+  #     - X509_new
+  #     - symbol: RSA_parse_public_key
+  #     - EVP_EncryptUpdate
+  #     - HMAC
+  #     - RSA_public_encrypt
+  #     - EVP_DecryptUpdate
+  #     - EVP_DigestUpdate
 
-  - module: libc.so
-    functions:
-      - open
-      - close
+  # - module: libc.so
+  #   functions:
+  #     - open
+  #     - close
