@@ -1,15 +1,9 @@
-import Java from "frida-java-bridge"
-import { decodeArgByDescriptor, filtersPass } from "./native_decoder.js"
-import { decodeArguments } from "./android-decoder.js"
-import { uuidv4 } from "../../shared/utils.js"
-import { Hook, JavaHook, JavaOverload, NativeHook } from "frooky";
-import { JavaHookOperation, JavaOperationBuilderResult, JavaOperationsResult } from "android/hook/javaHookRunner.js";
-import { OperationBuilderResult } from "shared/hook/hookRunner.js";
-import type { NativeSymbol } from "../../types/nativeHook.js"
-import { NativeHookOperation } from "shared/hook/nativeHookRunner.js";
-import { NativeHookEntry } from "../../shared/hook/nativeHookRunner.js";
-import { JavaHookEntry } from "../hook/javaHookRunner.js";
-
+import Java from "frida-java-bridge";
+import type { JavaHook, JavaOverload, NativeHook, NativeSymbol } from "frooky";
+import type { NativeHookEntry } from "../../shared/hook/nativeHookRunner.js";
+import { uuidv4 } from "../../shared/utils.js";
+import type { JavaHookEntry } from "../hook/javaHookRunner.js";
+import { decodeArguments } from "./android-decoder.js";
 
 /**
  * Decodes the parameter types of a Java method.
@@ -17,8 +11,8 @@ import { JavaHookEntry } from "../hook/javaHookRunner.js";
  * @returns {[string]} The decoded parameter types (e.g., "['[Ljava.lang.String;']")
  */
 function parseParameterTypes(methodHeader) {
-  let regex = /\((.*?)\)/;
-  let parameterString = regex.exec(methodHeader)[1];
+  const regex = /\((.*?)\)/;
+  const parameterString = regex.exec(methodHeader)[1];
   if (parameterString === "") {
     return [];
   }
@@ -33,7 +27,6 @@ function parseParameterTypes(methodHeader) {
 function parseReturnValue(methodHeader) {
   return methodHeader.split(":")[1].trim();
 }
-
 
 // /**
 //  * Checks if a hook definition is for a native function.
@@ -63,53 +56,42 @@ export function resolveNativeSymbol(hook: NativeHook): NativeHookEntry[] {
   const errors: string[] = [];
 
   try {
-
-    let mod = Process.getModuleByName(hook.module);
+    const mod = Process.getModuleByName(hook.module);
 
     hook.functions.forEach((s: NativeSymbol) => {
-
       try {
         if (typeof s === "string") {
           nativeEntry.push({
             module: hook.module,
             moduleAddress: mod.base,
             symbol: s,
-            symbolAddress: mod.getExportByName(s)
+            symbolAddress: mod.getExportByName(s),
           });
         } else {
           nativeEntry.push({
             module: hook.module,
             moduleAddress: mod.base,
             symbol: s.symbol,
-            symbolAddress: mod.getExportByName(s.symbol)
+            symbolAddress: mod.getExportByName(s.symbol),
           });
         }
       } catch (e) {
-        errors.push(e as string)
-        console.error("Failed to resolve native symbol '" + s + "'" +
-          (hook.module ? " in module '" + hook.module + "'" : "") + ": " + e);
+        errors.push(e as string);
+        console.error("Failed to resolve native symbol '" + s + "'" + (hook.module ? " in module '" + hook.module + "'" : "") + ": " + e);
       }
-
     });
-
   } catch (e) {
     console.error("Failed to get module '" + hook.module + "': " + e);
   }
 
-
-  return nativeEntry
+  return nativeEntry;
 }
-
-
 
 export function registerNativeHooks(hookEntries: NativeHookEntry[]) {
-
   hookEntries.forEach((hookEntry: NativeHookEntry) => {
-      registerNativeHook(hookEntry, "FROOKY")
-  })
-
+    registerNativeHook(hookEntry, "FROOKY");
+  });
 }
-
 
 /**
  * Registers a native function hook using Frida's Interceptor API.
@@ -133,14 +115,14 @@ export function registerNativeHooks(hookEntries: NativeHookEntry[]) {
 ///////
 export function registerNativeHook(hookEntry: NativeHookEntry, category: string = "FROOKY") {
   // let maxFrames = typeof hook.maxFrames === 'number' ? hook.maxFrames : 8;
-  let maxFrames = 10;
+  const maxFrames = 10;
 
   Interceptor.attach(hookEntry.symbolAddress, {
     onEnter: function (args) {
       // Capture full native stack first (no truncation yet)
-      let fullNativeStack = [];
+      const fullNativeStack = [];
       try {
-        let btFull = Thread.backtrace(this.context, Backtracer.FUZZY);
+        const btFull = Thread.backtrace(this.context, Backtracer.FUZZY);
         for (let i = 0; i < btFull.length; i++) {
           try {
             fullNativeStack.push(DebugSymbol.fromAddress(btFull[i]).toString());
@@ -156,9 +138,9 @@ export function registerNativeHook(hookEntry: NativeHookEntry, category: string 
       let fullJavaStack = null;
       if (Java.available) {
         try {
-          let Exception = Java.use("java.lang.Exception");
-          let stJavaFull = Exception.$new().getStackTrace();
-          let jstFull = [];
+          const Exception = Java.use("java.lang.Exception");
+          const stJavaFull = Exception.$new().getStackTrace();
+          const jstFull = [];
           for (let j = 0; j < stJavaFull.length; j++) {
             jstFull.push(stJavaFull[j].toString());
           }
@@ -185,11 +167,11 @@ export function registerNativeHook(hookEntry: NativeHookEntry, category: string 
       function _truncate(arr) {
         // if (hook.filterEventsByStacktrace) return arr.slice();
         if (maxFrames === -1) return arr.slice();
-        let out = [];
+        const out = [];
         for (let t = 0; t < arr.length && t < maxFrames; t++) out.push(arr[t]);
         return out;
       }
-      let effectiveStack = fullJavaStack && fullJavaStack.length ? _truncate(fullJavaStack) : _truncate(fullNativeStack);
+      const effectiveStack = fullJavaStack && fullJavaStack.length ? _truncate(fullJavaStack) : _truncate(fullNativeStack);
 
       // // Decode native args: if descriptors provided, decode only those; else auto decode up to 5
       // let decodedArgs = [];
@@ -235,7 +217,7 @@ export function registerNativeHook(hookEntry: NativeHookEntry, category: string 
       //   // If filtering fails, default to emitting
       // }
 
-      let event = {
+      const event = {
         id: uuidv4(),
         type: "native-hook",
         category: category,
@@ -249,13 +231,12 @@ export function registerNativeHook(hookEntry: NativeHookEntry, category: string 
 
       send(event);
     },
-    onLeave: function (retval) {
+    onLeave: () => {
       // Optionally emit a separate event or extend the onEnter event
       // For now, we just log the return if needed
-    }
+    },
   });
 }
-
 
 /**
  * Overloads a method. If the method is called, the parameters and the return value are decoded and together with a stack trace send back to the frida.re client.
@@ -275,8 +256,8 @@ export function registerNativeHook(hookEntry: NativeHookEntry, category: string 
 //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ///////
 export function registerHook(hookEntries: JavaHookEntry[]) {
-  let Exception = Java.use("java.lang.Exception");
-  let System = Java.use('java.lang.System');
+  const Exception = Java.use("java.lang.Exception");
+  const System = Java.use("java.lang.System");
 
   hookEntries.forEach((hookEntry: JavaHookEntry) => {
     let toHook;
@@ -286,23 +267,23 @@ export function registerHook(hookEntries: JavaHookEntry[]) {
       toHook = Java.use(hookEntry.class)[hookEntry.method.name];
     }
 
-    let methodHeader = toHook.overloads[hookEntry.overloadIndex].toString();
+    const methodHeader = toHook.overloads[hookEntry.overloadIndex].toString();
 
     toHook.overloads[hookEntry.overloadIndex].implementation = function () {
-      let st = Exception.$new().getStackTrace();
-      let stackTrace = [];
+      const st = Exception.$new().getStackTrace();
+      const stackTrace = [];
       st.forEach((stElement, index) => {
         if (hookEntry.maxFrames === -1 || index < hookEntry.maxFrames) {
           stackTrace.push(stElement.toString());
         }
       });
 
-      let parameterTypes = parseParameterTypes(methodHeader);
-      let returnType = parseReturnValue(methodHeader);
+      const parameterTypes = parseParameterTypes(methodHeader);
+      const returnType = parseReturnValue(methodHeader);
 
       let instanceId;
-      if (this && this.$className && typeof this.$h === 'undefined') {
-        instanceId = 'static';
+      if (this && this.$className && typeof this.$h === "undefined") {
+        instanceId = "static";
       } else {
         try {
           instanceId = System.identityHashCode(this);
@@ -324,7 +305,7 @@ export function registerHook(hookEntries: JavaHookEntry[]) {
       };
 
       try {
-        let returnValue = this[hookEntry.method].apply(this, arguments);
+        const returnValue = this[hookEntry.method].apply(this, arguments);
         event.returnValue = decodeArguments([returnType], [returnValue]);
         send(event);
         return returnValue;
@@ -337,7 +318,6 @@ export function registerHook(hookEntries: JavaHookEntry[]) {
   });
 }
 
-
 /**
  * Finds the overload index that matches the given argument types.
  * @param {Object} methodHandle - Frida method handle with overloads.
@@ -346,8 +326,8 @@ export function registerHook(hookEntries: JavaHookEntry[]) {
  */
 function findOverloadIndex(methodHandle, argTypes) {
   for (let i = 0; i < methodHandle.overloads.length; i++) {
-    let overload = methodHandle.overloads[i];
-    let parameterTypes = parseParameterTypes(overload.toString());
+    const overload = methodHandle.overloads[i];
+    const parameterTypes = parseParameterTypes(overload.toString());
 
     if (parameterTypes.length !== argTypes.length) {
       continue;
@@ -419,7 +399,6 @@ function findOverloadIndex(methodHandle, argTypes) {
  * // Returns { operations: [], count: 0 }
  */
 
-
 ////////
 //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ///////
@@ -472,9 +451,7 @@ export function buildHookOperations(hook: JavaHook): JavaHookEntry[] {
 
       javaMethod.overloads.forEach((o: JavaOverload) => {
         try {
-          const argsExplicit: string[] = Array.isArray(o.params)
-            ? o.params.map((p) => (Array.isArray(p) ? p[0] as string : p as string))
-            : [];
+          const argsExplicit: string[] = Array.isArray(o.params) ? o.params.map((p) => (Array.isArray(p) ? (p[0] as string) : (p as string))) : [];
 
           const idx = findOverloadIndex(handle, argsExplicit);
 
@@ -507,9 +484,6 @@ export function buildHookOperations(hook: JavaHook): JavaHookEntry[] {
 
   return entries;
 }
-
-
-
 
 // /**
 //  * Takes an array of objects usually defined in the `hooks.js` file of a DEMO and loads all classes and functions stated in there.
