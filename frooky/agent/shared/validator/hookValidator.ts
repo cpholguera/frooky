@@ -1,4 +1,4 @@
-import type { Hook, HookMetadata, JavaHook, NativeHook, ObjcHook, Platform } from "frooky";
+import type { Hook, HookMetadata, NativeHook, Platform } from "frooky";
 import { isJavaHook, isNativeHook, isObjcHook } from "frooky";
 import z from "zod";
 import { type JavaHookInput, normalizeJavaHook } from "../inputParsing/javaHookInput";
