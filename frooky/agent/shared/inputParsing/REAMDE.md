@@ -35,7 +35,7 @@ hooks:
 
 These are all valid ways which give the user flexibility. But internally it introduces complexity when working with the different types.
 
-We therefore only use objects internally (e.g. `{ type: "ENGINE *", name: "impl" }`).
+We therefore only use objects internally (e.g. `{name: "getKeyPair"}` or `{ type: "ENGINE *", name: "impl" }`).
 
 The types in this folder are therefore extending the internally used types for YAML parsing.
 

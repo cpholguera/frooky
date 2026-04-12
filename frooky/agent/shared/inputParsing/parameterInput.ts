@@ -17,26 +17,27 @@ import type { ParamDefinition, ParamName, ParamOptions, ParamType } from "../hoo
  *
  * @public
  */
-export type ParamInput = ParamType | [ParamType, ParamName] | [ParamType, ParamOptions] | [ParamType, ParamName, ParamOptions];
+export type ParamInput = ParamType | ParamDefinition | [ParamType, ParamName] | [ParamType, ParamOptions] | [ParamType, ParamName, ParamOptions];
 
 export function normalizeParam(input: ParamInput): ParamDefinition {
-  // Simple string: just a type
   if (typeof input === "string") {
     return { type: input };
   }
 
-  const [first, second, third] = input;
+  // Check array before plain object, since arrays are also objects
+  if (Array.isArray(input)) {
+    const [first, second, third] = input;
 
-  // [ParamType, ParamName, ParamOptions]
-  if (input.length === 3) {
-    return { type: first, name: second as string, options: third };
+    if (input.length === 3) {
+      return { type: first, name: second as string, options: third as ParamOptions };
+    }
+
+    if (typeof second === "object") {
+      return { type: first, options: second };
+    }
+
+    return { type: first, name: second };
   }
 
-  // [ParamType, ParamOptions] — second element is an object
-  if (typeof second === "object") {
-    return { type: first, options: second };
-  }
-
-  // [ParamType, ParamName] — second element is a string
-  return { type: first, name: second };
+  return input as ParamDefinition;
 }
