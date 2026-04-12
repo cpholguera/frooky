@@ -80,7 +80,7 @@ function registerHook(hookEntries: JavaHookEntry[]) {
   const System = Java.use("java.lang.System");
 
   hookEntries.forEach((hookEntry: JavaHookEntry) => {
-    hookEntry.javaMethod.implementation = function () {
+    hookEntry.javaMethod.implementation = function (...args: any[]) {
       const st = Exception.$new().getStackTrace();
       const stackTrace: string[] = [];
       st.forEach((stElement: string, index: number) => {
@@ -119,7 +119,7 @@ function registerHook(hookEntries: JavaHookEntry[]) {
 
       try {
         // call original method
-        const returnValue = hookEntry.javaMethod.apply(this, arguments);
+        const returnValue = hookEntry.javaMethod.apply(this, args);
         // event.returnValue = decodeArguments([returnType], [returnValue]);
         send(event);
         return returnValue;
