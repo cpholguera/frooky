@@ -12,7 +12,7 @@ export interface JavaHookOp extends HookOp {
   javaMethod: Java.Method;
 }
 
-function buildEntriesForAllOverloads(hook: JavaHook, handle: Java.MethodDispatcher, methodDefinition: JavaMethodDefinition, entries: JavaHookOp[]): void {
+function buildHookOpsForAllOverloads(hook: JavaHook, handle: Java.MethodDispatcher, methodDefinition: JavaMethodDefinition, javaHookOps: JavaHookOp[]): void {
   handle.overloads.forEach((javaMethod: Java.Method) => {
     const params: Param[] = [];
     javaMethod.argumentTypes.forEach((t: Java.Type) => {
@@ -23,18 +23,16 @@ function buildEntriesForAllOverloads(hook: JavaHook, handle: Java.MethodDispatch
       }
     });
 
-    entries.push({
+    javaHookOps.push({
       class: hook.javaClass,
       methodName: methodDefinition.name,
       params: params,
       javaMethod: javaMethod,
     });
-
-    console.log(JSON.stringify(entries, null, 2));
   });
 }
 
-function buildEntriesForDeclaredOverloads(hook: JavaHook, handle: Java.MethodDispatcher, methodDefinition: JavaMethodDefinition, entries: JavaHookOp[]): void {
+function buildHookOpsForDeclaredOverloads(hook: JavaHook, handle: Java.MethodDispatcher, methodDefinition: JavaMethodDefinition, javaHookOps: JavaHookOp[]): void {
   methodDefinition.overloads?.forEach((declaredOverload: JavaOverload) => {
     const paramList: ParamType[] = [];
     declaredOverload.params.forEach((p: Param) => {
@@ -42,7 +40,7 @@ function buildEntriesForDeclaredOverloads(hook: JavaHook, handle: Java.MethodDis
     });
     try {
       const javaMethod: Java.Method = handle.overload(...paramList);
-      entries.push({
+      javaHookOps.push({
         class: hook.javaClass,
         methodName: methodDefinition.name,
         params: declaredOverload.params,
@@ -60,20 +58,20 @@ function buildHookOperations(hook: JavaHook): JavaHookOp[] {
     return [];
   }
 
-  const entries: JavaHookOp[] = [];
+  const hookOps: JavaHookOp[] = [];
   for (const method of hook.methods) {
     try {
       const handle: Java.MethodDispatcher = Java.use(hook.javaClass)[method.name];
       if (!method.overloads) {
-        buildEntriesForAllOverloads(hook, handle, method, entries);
+        buildHookOpsForAllOverloads(hook, handle, method, hookOps);
       } else {
-        buildEntriesForDeclaredOverloads(hook, handle, method, entries);
+        buildHookOpsForDeclaredOverloads(hook, handle, method, hookOps);
       }
     } catch (e) {
       frooky.log.warn(`Failed to resolve method '${method.name}' in class '${hook.javaClass}': ${e}.`);
     }
   }
-  return entries;
+  return hookOps;
 }
 
 function registerHookOperations(javaHookOps: JavaHookOp[]) {
