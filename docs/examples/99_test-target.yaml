@@ -10,24 +10,24 @@ hooks:
   #     - putExtra
   
 
-  - javaClass: androidx.security.crypto.EncryptedSharedPreferences$Editor
-    methods:
-      - putString
-      - putStringSet
-
-  # # overloads with different ways of param declaration (t)
-  # - javaClass: android.content.Intent 
+  # - javaClass: androidx.security.crypto.EncryptedSharedPreferences$Editor
   #   methods:
-  #     - name: $init
-  #       overloads:
-  #         - params:
-  #           - android.content.Intent
-  #         - params: 
-  #           - [ android.content.Context, packageContext]
-  #           - [ java.lang.Class, cls]
-  #         - params:
-  #           - { type: java.lang.String, name: action}
-  #           - android.net.Uri
+  #     - putString
+  #     - putStringSet
+
+  # overloads with different ways of param declaration (t)
+  - javaClass: android.content.Intent 
+    methods:
+      - name: $init
+        overloads:
+          - params:
+            - android.content.Intent
+          - params: 
+            - [ android.content.Context, packageContext]
+            - [ java.lang.Class, cls]
+          - params:
+            - { type: java.lang.String, name: action}
+            - android.net.Uri
           
         
   
