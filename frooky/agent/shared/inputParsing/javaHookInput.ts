@@ -7,7 +7,7 @@ import { normalizeParam, type ParamInput } from "./parameterInput";
  * Extended type for YAML input parsing.
  * @public
  */
-export interface JavaOverloadYamlParsing extends Omit<JavaOverload, "params"> {
+export interface JavaOverloadInput extends Omit<JavaOverload, "params"> {
   /**
    * Parameter definitions for this overload.
    */
@@ -23,7 +23,7 @@ export interface JavaMethodDefinitionInput extends Omit<JavaMethodDefinition, "o
   /**
    * Explicit overload definitions.
    */
-  overloads?: JavaOverloadYamlParsing[];
+  overloads?: JavaOverloadInput[];
 }
 
 /**
@@ -46,7 +46,7 @@ export interface JavaHookInput extends Omit<JavaHook, "methods"> {
   methods: JavaMethod[];
 }
 
-function normalizeOverload(input: JavaOverloadYamlParsing): JavaOverload {
+function normalizeOverload(input: JavaOverloadInput): JavaOverload {
   return {
     ...input,
     params: input.params.map(normalizeParam),
@@ -54,7 +54,6 @@ function normalizeOverload(input: JavaOverloadYamlParsing): JavaOverload {
 }
 
 function normalizeMethod(input: JavaMethodDefinitionInput | string): JavaMethodDefinition {
-  // MethodName shorthand → wrap into a JavaMethodDefinition
   if (typeof input === "string") {
     return { name: input };
   }

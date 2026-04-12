@@ -6,20 +6,6 @@ import type { JavaHookEntry } from "../hook/javaHookRunner.js";
 import { decodeArguments } from "./android-decoder.js";
 
 /**
- * Decodes the parameter types of a Java method.
- * @param {string} methodHeader - Java method (e.g., `function setBlockModes([Ljava.lang.String;): android.security.keystore.KeyGenParameterSpec$Builder`)
- * @returns {[string]} The decoded parameter types (e.g., "['[Ljava.lang.String;']")
- */
-function parseParameterTypes(methodHeader) {
-  const regex = /\((.*?)\)/;
-  const parameterString = regex.exec(methodHeader)[1];
-  if (parameterString === "") {
-    return [];
-  }
-  return parameterString.replace(/ /g, "").split(",");
-}
-
-/**
  * Decodes the type of the return value of a Java method.
  * @param {string} methodHeader - Java method (e.g., "function setBlockModes([Ljava.lang.String;): android.security.keystore.KeyGenParameterSpec$Builder")
  * @returns {string} The decoded parameter types (e.g., "android.security.keystore.KeyGenParameterSpec$Builder")
@@ -238,115 +224,85 @@ export function registerNativeHook(hookEntry: NativeHookEntry, category: string 
   });
 }
 
-/**
- * Overloads a method. If the method is called, the parameters and the return value are decoded and together with a stack trace send back to the frida.re client.
- * @param {string} clazz - Java class (e.g., "android.security.keystore.KeyGenParameterSpec$Builder").
- * @param {string} method - Name of the method which should be overloaded (e.g., "setBlockModes").
- * @param {number} overloadIndex - If there are overloaded methods available, this number represents them (e.g., 0 for the first one)
- * @param {string} categoryName - OWASP MAS category for easier identification (e.g., "CRYPTO")
- * @param {number} maxFrames - Maximum number of stack frames to capture (default is 8, set to -1 for unlimited frames).
- */
-////////
-//////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-///////
-////////
-//////// Works as before, but needs to be refactored later
-///////
-////////
-//////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-///////
-export function registerHook(hookEntries: JavaHookEntry[]) {
-  const Exception = Java.use("java.lang.Exception");
-  const System = Java.use("java.lang.System");
+// /**
+//  * Overloads a method. If the method is called, the parameters and the return value are decoded and together with a stack trace send back to the frida.re client.
+//  * @param {string} clazz - Java class (e.g., "android.security.keystore.KeyGenParameterSpec$Builder").
+//  * @param {string} method - Name of the method which should be overloaded (e.g., "setBlockModes").
+//  * @param {number} overloadIndex - If there are overloaded methods available, this number represents them (e.g., 0 for the first one)
+//  * @param {string} categoryName - OWASP MAS category for easier identification (e.g., "CRYPTO")
+//  * @param {number} maxFrames - Maximum number of stack frames to capture (default is 8, set to -1 for unlimited frames).
+//  */
+// ////////
+// //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// ///////
+// ////////
+// //////// Works as before, but needs to be refactored later
+// ///////
+// ////////
+// //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// ///////
+// export function registerHook(hookEntries: JavaHookEntry[]) {
+//   const Exception = Java.use("java.lang.Exception");
+//   const System = Java.use("java.lang.System");
 
-  hookEntries.forEach((hookEntry: JavaHookEntry) => {
-    let toHook;
-    if (typeof hookEntry.method === "string") {
-      toHook = Java.use(hookEntry.class)[hookEntry.method];
-    } else {
-      toHook = Java.use(hookEntry.class)[hookEntry.method.name];
-    }
+//   hookEntries.forEach((hookEntry: JavaHookEntry) => {
+//     let toHook;
+//     if (typeof hookEntry.method === "string") {
+//       toHook = Java.use(hookEntry.class)[hookEntry.method];
+//     } else {
+//       toHook = Java.use(hookEntry.class)[hookEntry.method.name];
+//     }
 
-    const methodHeader = toHook.overloads[hookEntry.overloadIndex].toString();
+//     const methodHeader = toHook.overloads[hookEntry.overloadIndex].toString();
 
-    toHook.overloads[hookEntry.overloadIndex].implementation = function () {
-      const st = Exception.$new().getStackTrace();
-      const stackTrace = [];
-      st.forEach((stElement, index) => {
-        if (hookEntry.maxFrames === -1 || index < hookEntry.maxFrames) {
-          stackTrace.push(stElement.toString());
-        }
-      });
+//     toHook.overloads[hookEntry.overloadIndex].implementation = function () {
+//       const st = Exception.$new().getStackTrace();
+//       const stackTrace = [];
+//       st.forEach((stElement, index) => {
+//         if (hookEntry.maxFrames === -1 || index < hookEntry.maxFrames) {
+//           stackTrace.push(stElement.toString());
+//         }
+//       });
 
-      const parameterTypes = parseParameterTypes(methodHeader);
-      const returnType = parseReturnValue(methodHeader);
+//       const parameterTypes = parseParameterTypes(methodHeader);
+//       const returnType = parseReturnValue(methodHeader);
 
-      let instanceId;
-      if (this && this.$className && typeof this.$h === "undefined") {
-        instanceId = "static";
-      } else {
-        try {
-          instanceId = System.identityHashCode(this);
-        } catch (e) {
-          console.error("Error in identityHashCode", e);
-          instanceId = "error";
-        }
-      }
+//       let instanceId;
+//       if (this && this.$className && typeof this.$h === "undefined") {
+//         instanceId = "static";
+//       } else {
+//         try {
+//           instanceId = System.identityHashCode(this);
+//         } catch (e) {
+//           console.error("Error in identityHashCode", e);
+//           instanceId = "error";
+//         }
+//       }
 
-      const event = {
-        id: uuidv4(),
-        type: "hook",
-        time: new Date().toISOString(),
-        class: hookEntry.class,
-        method: hookEntry.method,
-        instanceId: instanceId,
-        stackTrace: stackTrace,
-        inputParameters: decodeArguments(parameterTypes, arguments),
-      };
+//       const event = {
+//         id: uuidv4(),
+//         type: "hook",
+//         time: new Date().toISOString(),
+//         class: hookEntry.class,
+//         method: hookEntry.method,
+//         instanceId: instanceId,
+//         stackTrace: stackTrace,
+//         inputParameters: decodeArguments(parameterTypes, arguments),
+//       };
 
-      try {
-        const returnValue = this[hookEntry.method].apply(this, arguments);
-        event.returnValue = decodeArguments([returnType], [returnValue]);
-        send(event);
-        return returnValue;
-      } catch (e) {
-        event.exception = e.toString();
-        send(event);
-        throw e;
-      }
-    };
-  });
-}
-
-/**
- * Finds the overload index that matches the given argument types.
- * @param {Object} methodHandle - Frida method handle with overloads.
- * @param {string[]} argTypes - Array of argument type strings (e.g., ["android.net.Uri", "android.content.ContentValues"]).
- * @returns {number} The index of the matching overload, or -1 if not found.
- */
-function findOverloadIndex(methodHandle, argTypes) {
-  for (let i = 0; i < methodHandle.overloads.length; i++) {
-    const overload = methodHandle.overloads[i];
-    const parameterTypes = parseParameterTypes(overload.toString());
-
-    if (parameterTypes.length !== argTypes.length) {
-      continue;
-    }
-
-    let match = true;
-    for (let j = 0; j < argTypes.length; j++) {
-      if (parameterTypes[j] !== argTypes[j]) {
-        match = false;
-        break;
-      }
-    }
-
-    if (match) {
-      return i;
-    }
-  }
-  return -1;
-}
+//       try {
+//         const returnValue = this[hookEntry.method].apply(this, arguments);
+//         event.returnValue = decodeArguments([returnType], [returnValue]);
+//         send(event);
+//         return returnValue;
+//       } catch (e) {
+//         event.exception = e.toString();
+//         send(event);
+//         throw e;
+//       }
+//     };
+//   });
+// }
 
 /**
  * Builds a normalized list of hook operations for a single hook definition.
@@ -408,82 +364,6 @@ function findOverloadIndex(methodHandle, argTypes) {
 ////////
 //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ///////
-export function buildHookOperations(hook: JavaHook): JavaHookEntry[] {
-  const entries: JavaHookEntry[] = [];
-  const errors: string[] = [];
-
-  try {
-    if (!hook.methods) {
-      return entries;
-    }
-
-    for (const javaMethod of hook.methods) {
-      let handle;
-      try {
-        handle = Java.use(hook.javaClass)[javaMethod.name];
-      } catch (e) {
-        const errMsg = `Failed to resolve method '${javaMethod.name}' in class '${hook.javaClass}': ${e}`;
-        console.warn(`Warning: ${errMsg}`);
-        errors.push(errMsg);
-        continue;
-      }
-
-      // If no overloads are specified, hook all available overloads
-      if (!javaMethod.overloads || javaMethod.overloads.length === 0) {
-        handle.overloads.forEach((overload: any, idx: number) => {
-          try {
-            const params = parseParameterTypes(overload.toString());
-            entries.push({
-              class: hook.javaClass,
-              method: javaMethod.name,
-              overloadIndex: idx,
-              args: params,
-              maxFrames: 10,
-            });
-          } catch (e) {
-            const errMsg = `Failed to process overload[${idx}] of '${javaMethod.name}' in class '${hook.javaClass}': ${e}`;
-            console.warn(`Warning: ${errMsg}`);
-            errors.push(errMsg);
-          }
-        });
-        continue;
-      }
-
-      javaMethod.overloads.forEach((o: JavaOverload) => {
-        try {
-          const argsExplicit: string[] = Array.isArray(o.params) ? o.params.map((p) => (Array.isArray(p) ? (p[0] as string) : (p as string))) : [];
-
-          const idx = findOverloadIndex(handle, argsExplicit);
-
-          if (idx !== -1) {
-            const params = parseParameterTypes(handle.overloads[idx].toString());
-            entries.push({
-              class: hook.javaClass,
-              method: javaMethod.name,
-              overloadIndex: idx,
-              args: params,
-              maxFrames: 10,
-            });
-          } else {
-            const errMsg = `Overload not found for ${hook.javaClass}:${javaMethod.name} with args [${argsExplicit.join(", ")}]`;
-            console.warn(`[frida-android] Warning: ${errMsg}. This hook will be skipped.`);
-            errors.push(errMsg);
-          }
-        } catch (e) {
-          const errMsg = `Failed to process overload of '${javaMethod.name}' in class '${hook.javaClass}': ${e}`;
-          console.warn(`Warning: ${errMsg}`);
-          errors.push(errMsg);
-        }
-      });
-    }
-  } catch (e) {
-    const errMsg = `Error in buildHookOperations for hook: ${hook?.javaClass ?? "<unknown>"}: ${e}`;
-    console.error(errMsg);
-    errors.push(errMsg);
-  }
-
-  return entries;
-}
 
 // /**
 //  * Takes an array of objects usually defined in the `hooks.js` file of a DEMO and loads all classes and functions stated in there.

@@ -5,12 +5,12 @@ import { javaHookSchema, javaMethodDefinitionSchema, javaOverloadSchema } from "
 import { methodNameSchema } from "./hook.zod";
 import { paramInputSchema } from "./parameter.input.zod";
 
-export const javaOverloadYamlParsingSchema = javaOverloadSchema.omit({ "params": true }).extend({
+export const javaOverloadInputSchema = javaOverloadSchema.omit({ "params": true }).extend({
     params: z.array(paramInputSchema)
 });
 
 export const javaMethodDefinitionInputSchema = javaMethodDefinitionSchema.omit({ "overloads": true }).extend({
-    overloads: z.array(javaOverloadYamlParsingSchema).optional()
+    overloads: z.array(javaOverloadInputSchema).optional()
 });
 
 export const javaMethodSchema = z.union([methodNameSchema, javaMethodDefinitionInputSchema]);
