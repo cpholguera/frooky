@@ -1,19 +1,19 @@
 import Java from "frida-java-bridge";
 import type { MethodName } from "../../shared/hook/hook";
-import type { HookEntry, HookRunner } from "../../shared/hook/hookRunner";
+import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import type { Param, ParamType } from "../../shared/hook/parameter";
 import { uuidv4 } from "../../shared/utils";
 import type { JavaHook, JavaOverload } from "./javaHook";
 
-export interface JavaHookEntry extends HookEntry {
+export interface JavaHookOp extends HookOp {
   class: string;
   methodName: MethodName;
   params: Param[];
   javaMethod: Java.Method;
 }
 
-function buildHookOperations(hook: JavaHook): JavaHookEntry[] {
-  const entries: JavaHookEntry[] = [];
+function buildHookOperations(hook: JavaHook): JavaHookOp[] {
+  const entries: JavaHookOp[] = [];
   let handle: Java.Wrapper;
 
   if (!hook.methods) {
@@ -75,12 +75,12 @@ function buildHookOperations(hook: JavaHook): JavaHookEntry[] {
   return entries;
 }
 
-function registerHook(hookEntries: JavaHookEntry[]) {
+function registerHookOperations(javaHookOps: JavaHookOp[]) {
   const Exception = Java.use("java.lang.Exception");
   const System = Java.use("java.lang.System");
 
-  hookEntries.forEach((hookEntry: JavaHookEntry) => {
-    hookEntry.javaMethod.implementation = function (...args: any[]) {
+  javaHookOps.forEach((javaHookOp: JavaHookOp) => {
+    javaHookOp.javaMethod.implementation = function (...args: any[]) {
       const st = Exception.$new().getStackTrace();
       const stackTrace: string[] = [];
       st.forEach((stElement: string, index: number) => {
@@ -110,8 +110,8 @@ function registerHook(hookEntries: JavaHookEntry[]) {
         id: uuidv4(),
         type: "hook",
         time: new Date().toISOString(),
-        class: hookEntry.class,
-        method: hookEntry.methodName,
+        class: javaHookOp.class,
+        method: javaHookOp.methodName,
         instanceId: instanceId,
         stackTrace: stackTrace,
         // inputParameters: decodeArguments(parameterTypes, arguments),
@@ -119,7 +119,7 @@ function registerHook(hookEntries: JavaHookEntry[]) {
 
       try {
         // call original method
-        const returnValue = hookEntry.javaMethod.apply(this, args);
+        const returnValue = javaHookOp.javaMethod.apply(this, args);
         // event.returnValue = decodeArguments([returnType], [returnValue]);
         send(event);
         return returnValue;
@@ -134,7 +134,7 @@ function registerHook(hookEntries: JavaHookEntry[]) {
 
 export class JavaHookRunner implements HookRunner {
   executeHooking(hooks: JavaHook[]): void {
-    var javaHookEntryArray: JavaHookEntry[] = [];
+    var hookOps: JavaHookOp[] = [];
 
     frooky.log.info(`Executing Android hook operations`);
 
@@ -146,10 +146,10 @@ export class JavaHookRunner implements HookRunner {
       // We should use the validators for the result set, just like with config and hook validations
       // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      javaHookEntryArray.push(...buildHookOperations(h));
+      hookOps.push(...buildHookOperations(h));
     });
-    frooky.log.info(`Hook operations for the following hook built: ${JSON.stringify(javaHookEntryArray, null, 2)}`);
+    frooky.log.info(`Hook operations for the following hook built: ${JSON.stringify(hookOps, null, 2)}`);
     frooky.log.info(`Run Android hooking`);
-    registerHook(javaHookEntryArray);
+    registerHookOperations(hookOps);
   }
 }
