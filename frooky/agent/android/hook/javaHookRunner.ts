@@ -5,6 +5,7 @@ import type { Param, ParamType } from "../../shared/hook/parameter";
 import { uuidv4 } from "../../shared/utils";
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "./javaHook";
 
+// contains everything needed to hook one java method
 export interface JavaHookOp extends HookOp {
   class: string;
   methodName: MethodName;
@@ -74,81 +75,76 @@ function buildHookOperations(hook: JavaHook): JavaHookOp[] {
   return hookOps;
 }
 
-function registerHookOperations(javaHookOps: JavaHookOp[]) {
+// actually hooks the java method
+function registerHookOperation(javaHookOp: JavaHookOp) {
   const Exception = Java.use("java.lang.Exception");
   const System = Java.use("java.lang.System");
 
-  javaHookOps.forEach((javaHookOp: JavaHookOp) => {
-    javaHookOp.javaMethod.implementation = function (...args: any[]) {
-      const st = Exception.$new().getStackTrace();
-      const stackTrace: string[] = [];
-      st.forEach((stElement: string, index: number) => {
-        if (index < 10) {
-          stackTrace.push(stElement.toString());
-        }
-        // if (hookEntry.maxFrames === -1 || index < hookEntry.maxFrames) {
-        //   stackTrace.push(stElement.toString());
-        // }
-      });
-
-      // const returnType = parseReturnValue(methodHeader);
-
-      let instanceId: string;
-      if (this && this.$className && typeof this.$h === "undefined") {
-        instanceId = "static";
-      } else {
-        try {
-          instanceId = System.identityHashCode(this);
-        } catch (e) {
-          console.error("Error in identityHashCode", e);
-          instanceId = "error";
-        }
+  javaHookOp.javaMethod.implementation = function (...args: any[]) {
+    const st = Exception.$new().getStackTrace();
+    const stackTrace: string[] = [];
+    st.forEach((stElement: string, index: number) => {
+      if (index < 10) {
+        stackTrace.push(stElement.toString());
       }
+      // if (hookEntry.maxFrames === -1 || index < hookEntry.maxFrames) {
+      //   stackTrace.push(stElement.toString());
+      // }
+    });
 
-      const event = {
-        id: uuidv4(),
-        type: "hook",
-        time: new Date().toISOString(),
-        class: javaHookOp.class,
-        method: javaHookOp.methodName,
-        instanceId: instanceId,
-        stackTrace: stackTrace,
-        // inputParameters: decodeArguments(parameterTypes, arguments),
-      };
+    // const returnType = parseReturnValue(methodHeader);
 
+    let instanceId: string;
+    if (this && this.$className && typeof this.$h === "undefined") {
+      instanceId = "static";
+    } else {
       try {
-        // call original method
-        const returnValue = javaHookOp.javaMethod.apply(this, args);
-        // event.returnValue = decodeArguments([returnType], [returnValue]);
-        send(event);
-        return returnValue;
+        instanceId = System.identityHashCode(this);
       } catch (e) {
-        // event.exception = e.toString();
-        send(event);
-        throw e;
+        console.error("Error in identityHashCode", e);
+        instanceId = "error";
       }
+    }
+
+    const event = {
+      id: uuidv4(),
+      type: "hook",
+      time: new Date().toISOString(),
+      class: javaHookOp.class,
+      method: javaHookOp.methodName,
+      instanceId: instanceId,
+      stackTrace: stackTrace,
+      // inputParameters: decodeArguments(parameterTypes, arguments),
     };
-  });
+
+    try {
+      // call original method
+      const returnValue = javaHookOp.javaMethod.apply(this, args);
+      // event.returnValue = decodeArguments([returnType], [returnValue]);
+      send(event);
+      return returnValue;
+    } catch (e) {
+      // event.exception = e.toString();
+      send(event);
+      throw e;
+    }
+  };
 }
 
 export class JavaHookRunner implements HookRunner {
   executeHooking(hooks: JavaHook[]): void {
     var hookOps: JavaHookOp[] = [];
-
     frooky.log.info(`Executing Android hook operations`);
 
     hooks.forEach((h: JavaHook) => {
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      // TODO: JUMP to legacy code
-      // Needs to be refactored later
-      // Also, the naming is pretty confusing, should be refactored later
-      // We should use the validators for the result set, just like with config and hook validations
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
       hookOps.push(...buildHookOperations(h));
     });
+
     frooky.log.info(`Hook operations for the following hook built: ${JSON.stringify(hookOps, null, 2)}`);
     frooky.log.info(`Run Android hooking`);
-    registerHookOperations(hookOps);
+
+    hookOps.forEach((hookOp: JavaHookOp) => {
+      registerHookOperation(hookOp);
+    });
   }
 }
