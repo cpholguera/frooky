@@ -13,6 +13,7 @@ export interface JavaHookOp extends HookOp {
   javaMethod: Java.Method;
 }
 
+// builds JavaHookOps fro ALL overloads of a certain method
 function buildHookOpsForAllOverloads(hook: JavaHook, handle: Java.MethodDispatcher, methodDefinition: JavaMethodDefinition, javaHookOps: JavaHookOp[]): void {
   handle.overloads.forEach((javaMethod: Java.Method) => {
     const params: Param[] = [];
@@ -33,6 +34,7 @@ function buildHookOpsForAllOverloads(hook: JavaHook, handle: Java.MethodDispatch
   });
 }
 
+// only builds JavaHookOps for overloads which are explicitly declared
 function buildHookOpsForDeclaredOverloads(hook: JavaHook, handle: Java.MethodDispatcher, methodDefinition: JavaMethodDefinition, javaHookOps: JavaHookOp[]): void {
   methodDefinition.overloads?.forEach((declaredOverload: JavaOverload) => {
     const paramList: ParamType[] = [];
@@ -53,6 +55,7 @@ function buildHookOpsForDeclaredOverloads(hook: JavaHook, handle: Java.MethodDis
   });
 }
 
+// builds a list of JavaHookOp. Each JavaHookOp contains all information to hook ONE java method
 function buildHookOperations(hook: JavaHook): JavaHookOp[] {
   if (!hook.methods) {
     frooky.log.warn(`Java hook did not specify an methods.`);
@@ -133,8 +136,9 @@ function registerHookOperation(javaHookOp: JavaHookOp) {
 
 export class JavaHookRunner implements HookRunner {
   executeHooking(hooks: JavaHook[]): void {
-    var hookOps: JavaHookOp[] = [];
     frooky.log.info(`Executing Android hook operations`);
+
+    var hookOps: JavaHookOp[] = [];
 
     hooks.forEach((h: JavaHook) => {
       hookOps.push(...buildHookOperations(h));
