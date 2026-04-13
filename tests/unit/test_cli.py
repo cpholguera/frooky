@@ -8,15 +8,16 @@ class TestArgumentParsing:
     """Tests for CLI argument parsing functionality."""
 
     def test_parser_requires_platform(self, capsys):
-        """Platform argument is required"""
+        """Platform positional argument is required"""
         parser = build_parser()
         with pytest.raises(SystemExit) as exc_info:
             parser.parse_args(["-U", "-F", "hooks.yaml"])
 
         assert exc_info.value.code == 2
         captured = capsys.readouterr()
-        assert "the following arguments are required" in captured.err.lower()
-        assert "--platform" in captured.err.lower()
+        print(captured)
+        assert "error: argument platform" in captured.err.lower()
+        assert "(choose from android, ios)" in captured.err.lower()
 
     def test_parser_invalid_platform(self, capsys):
         """Platform argument is required"""
@@ -24,7 +25,7 @@ class TestArgumentParsing:
         parser = build_parser()
         with pytest.raises(SystemExit) as exc_info:
             parser.parse_args(
-                ["-U", "-F", "--platform", invalid_platform, "hooks.yaml"])
+                [invalid_platform, "-U", "-F", "hooks.yaml"])
 
         assert exc_info.value.code == 2
         captured = capsys.readouterr()
