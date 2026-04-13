@@ -46,7 +46,7 @@ jobs:
         with:
           api-level: "34"
 
-      - name: Run tests
+      - name: Install Frida and app
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34

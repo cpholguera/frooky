@@ -52,7 +52,7 @@ jobs:
       - name: Install app on simulator
         run: xcrun simctl install booted target-app-ios/MASTestApp.app
 
-      - name: Install and run app
+      - name: Run app 
         shell: bash
         run: |
           set -o pipefail
@@ -79,7 +79,7 @@ jobs:
           pytest tests/integration/ios  > test-results-ios.txt
           
           cat test-results-ios.txt
-          
+
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat test-results-ios.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
