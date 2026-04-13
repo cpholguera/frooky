@@ -67,7 +67,15 @@ jobs:
             echo "Installing target app"
             adb install target-app-android/MASTestApp.apk
 
-            echo "TBD: run integration tests for Android"
+      - name: Run Android integration tests
+        run: |
+          pytest tests/integration/android  > test-results-android.txt
+          
+          cat test-results-android.txt
+          
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat test-results-android.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Upload test results
         if: always()

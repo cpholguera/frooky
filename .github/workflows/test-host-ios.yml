@@ -52,7 +52,7 @@ jobs:
       - name: Install app on simulator
         run: xcrun simctl install booted target-app-ios/MASTestApp.app
 
-      - name: Run tests
+      - name: Install and run app
         shell: bash
         run: |
           set -o pipefail
@@ -65,9 +65,6 @@ jobs:
           for i in $(seq 1 10); do
             if kill -0 "$PID" 2>/dev/null; then
               echo "App is running (PID $PID)."
-
-              echo "TBD: run integration tests for iOS"
-
               exit 0
             fi
             echo "Attempt $i: app not running yet, retrying in 2s..."
@@ -76,6 +73,16 @@ jobs:
 
           echo "App did not start within the timeout."
           exit 1
+
+      - name: Run iOS integration tests
+        run: |
+          pytest tests/integration/ios  > test-results-ios.txt
+          
+          cat test-results-ios.txt
+          
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat test-results-ios.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Upload test results
         if: always()
