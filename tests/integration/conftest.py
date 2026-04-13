@@ -150,9 +150,9 @@ def run_frooky(platform, output_file_path, app_id, mastestapp_start_path):
             # start Android with PID, and iOS with app name
             frooky_process = subprocess.Popen([
                 "frooky",
+                platform,
                 *(["-U"] if platform == "android" else []),
                 *(["-p"] if platform == "android" else ["-n"]), app_id,
-                "--platform", platform,
                 "-o", output_file_path,
                 temp_hook_path
             ],
