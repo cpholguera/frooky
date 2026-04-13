@@ -11,9 +11,11 @@ runs:
           key: maestro-${{ runner.os }}
 
       - name: Install Maestro
+        shell: bash
         if: steps.maestro-cache.outputs.cache-hit != 'true'
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
 
       - name: Add Maestro to PATH
+        shell: bash
         run: echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
