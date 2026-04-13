@@ -38,6 +38,9 @@ jobs:
       - name: Setup Host Test Environment
         uses: ./.github/actions/setup-host-test-env
 
+      - name: Setup Maestro
+        uses: ./.github/actions/setup-maestro
+
       - name: Setup Android emulator environment
         uses: ./.github/actions/setup-android-emulator
         with:
