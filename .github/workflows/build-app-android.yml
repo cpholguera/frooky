@@ -32,7 +32,7 @@ jobs:
         with:
           gradle-version: wrapper
 
-      - name: Build Android target app
+      - name: Build Android target apps
         working-directory: tests/target-apps/android
         run: |
           if [ -n "${{ inputs.app_dir }}" ]; then

@@ -10,26 +10,31 @@ Make sure, that you have all the prerequisites met to compile Android or iOS app
 
 To compile them, go to either `tests/target-apps/<android|ios>/` and run:
 
-- `make build APP_DIR=<app-dir>` to build a custom app.
+- `make build TARGET_APP=<target-app-dir>` to build a custom app.
 - `make build` to build an empty [`mas-app-ios`](https://github.com/cpholguera/mas-app-ios) or [`mas-app-android`](https://github.com/cpholguera/mas-app-android) app.
 
-**Example 1:** Build an empty `mas-app-ios` app:
+> [!IMPORTANT]
+> The package name or app identifier is always `<target-app>.<original-id>`.
 
-```sh
-cd tests/target-apps/ios
-make build
-```
+This will compile the app with the app identifier `org.owasp.mastestapp.MASTestApp-iOS` and store it in `tests/target-apps/ios/dist/MASTestApp.app`.
 
-This will compile the app and store it in `tests/target-apps/ios/dist/MASTestApp.app`.
-
-**Example 2:** Build a custom `mas-app-android` app:
+**Example 1:** Build a custom `mas-app-android` app:
 
 ```sh
 cd tests/target-apps/android
-make build APP_DIR=./basic-parameter
+make build TARGET_APP=basic-parameter
 ```
 
-This will compile the app and store it in `tests/target-apps/android/dist/MASTestApp.apk`.
+This will compile the app with the package name `basic-parameter.org.owasp.mastestapp` and store it in `tests/target-apps/android/dist/basic-parameter.target-app.apk`.
+
+**Example 2:** Build all apps:
+
+```sh
+cd tests/target-apps/android
+make build-all
+```
+
+This will compile the app with the package name `basic-parameter.org.owasp.mastestapp` and store it in `tests/target-apps/android/dist/<target-app-name>.target-app.apk`.
 
 ## Installing Target Apps
 
@@ -43,11 +48,18 @@ To install the app follow these steps:
 
 2. **Install the binary**
 
-    Use the following command to install the generated target app on the running device:
+    Use the following command to install a generated target app on the running device:
 
     ```sh
     cd tests/target-apps/android
-    make build install
+    make install TARGET_APP=<target-app-dir>
+    ```
+
+    You can also install all apps using the following command:
+
+    ```sh
+    cd tests/target-apps/android
+    make install-all
     ```
 
 Now the app can be started by the testing frameworks.
