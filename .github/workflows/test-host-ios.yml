@@ -76,7 +76,7 @@ jobs:
 
       - name: Run iOS integration tests
         run: |
-          pytest tests/integration/ios 2>&1 | tee test-results.txt
+          python -m pytest tests/integration/ios 2>&1 | tee test-results.txt
           echo ${PIPESTATUS[0]} > exit-code.txt
 
       - name: Write summary and check result
