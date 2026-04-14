@@ -29,8 +29,8 @@ jobs:
       - name: Download MAS app Android artifact
         uses: actions/download-artifact@v8
         with:
-          name: target-app-android
-          path: target-app-android
+          name: target-apps-android
+          path: target-apps-android
 
       - name: Setup Agent Test Environment
         uses: ./.github/actions/setup-agent-test-env
@@ -59,7 +59,7 @@ jobs:
             .github/scripts/android/install-frida-server.sh
 
             echo "Installing target app"
-            adb install target-app-android/MASTestApp.apk
+            adb install target-apps-android/MASTestApp.apk
 
             echo "Running Android agent tests"
             npm --prefix frooky/agent run test:android -- --appIdentifier org.owasp.mastestapp 2>&1 | tee test-results.txt
