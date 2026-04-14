@@ -7,8 +7,8 @@ permissions:
   contents: read
 
 jobs:
-  build-host:
-    uses: ./.github/workflows/build-host.yml
+  verify-host:
+    uses: ./.github/workflows/verify-host.yml
 
   build-app-ios:
     uses: ./.github/workflows/build-app-ios.yml
@@ -19,7 +19,7 @@ jobs:
     name: Test host iOS
     runs-on: macos-26
     needs:
-      - build-host
+      - verify-host
       - build-app-ios
     timeout-minutes: 30
 
