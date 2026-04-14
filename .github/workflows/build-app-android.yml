@@ -47,4 +47,4 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: target-apps-android
-          path: tests/target-apps/android/dist
+          path: tests/target-apps/android/dist/*

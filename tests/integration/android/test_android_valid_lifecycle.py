@@ -21,7 +21,9 @@ class TestHookJavaMethod:
             ]
         }
 
-        run_frooky(hook_file)
+        target_app = "mastg-demo-0060"
+
+        run_frooky(hook_file, target_app)
 
         expected_pattern = {
             "class": "androidx.security.crypto.EncryptedSharedPreferences$Editor",

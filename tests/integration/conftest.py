@@ -49,10 +49,10 @@ def mastestapp_start_path(platform):
 
 
 @pytest.fixture
-def app_id(platform):
+def app_id(platform, target_name):
     """Start the app and return PID (Android) or app name (iOS)."""
     if platform == "android":
-        app_id = "org.owasp.mastestapp"
+        app_id = f"${target_name}.mastestapp"
 
         subprocess.run(['adb', 'wait-for-device'], check=True)
         subprocess.run(
@@ -79,12 +79,12 @@ def app_id(platform):
         return pid
 
     else:  # ios
-        app_id = "org.owasp.mastestapp.MASTestApp-iOS"
+        app_bundle_id= f"{app_id}.mastestapp"
         app_name = "MASTestApp"
 
         try:
             subprocess.run(
-                ['xcrun', 'simctl', 'launch', 'booted', app_id],
+                ['xcrun', 'simctl', 'launch', 'booted', app_bundle_id],
                 capture_output=True,
                 text=True,
                 check=True
@@ -92,7 +92,7 @@ def app_id(platform):
             return app_name
         except subprocess.CalledProcessError as e:
             raise RuntimeError(
-                f"Could not launch iOS app {app_name}: {e.stderr}") from e
+                f"Could not launch iOS app {app_bundle_id}: {e.stderr}") from e
 
 
 @pytest.fixture
@@ -138,14 +138,14 @@ def count_matched_events(output_file_path):
 def run_frooky(platform, output_file_path, app_id, mastestapp_start_path):
     """Factory fixture for running hook tests with Maestro."""
 
-    def _run_frooky(hook):
+    def _run_frooky(hook_file):
         temp_hook_path = None
         frooky_process = None
 
         # write the hooks into a temporary file
         fd, temp_hook_path = tempfile.mkstemp(suffix='.json', text=True)
         with os.fdopen(fd, 'w') as f:
-            json.dump(hook, f)
+            json.dump(hook_file, f)
 
         try:
             # run frooky as background process
