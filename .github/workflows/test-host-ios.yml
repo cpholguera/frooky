@@ -50,28 +50,27 @@ jobs:
 
       - name: Install and run all apps on simulator
         run: |
-          set -o pipefail
+          set -eo pipefail
 
-          for app in target-apps-ios/**/*.app; do
-            echo "=== Installing $app ==="
+          for app in target-apps-ios/*.target-app.app; do
+            TARGET_APP=$(basename "$app" .target-app.app)
+            APP_ID="${TARGET_APP//-/_}.mastestapp"
+
+            echo "=== Installing $app (bundle ID: $APP_ID) ==="
             xcrun simctl install booted "$app"
-
-            # Read bundle ID from the app's Info.plist
-            APP_ID=$(defaults read "$(pwd)/$app/Info.plist" CFBundleIdentifier)
-            echo "Launching $APP_ID"
 
             PID=$(xcrun simctl launch booted "$APP_ID" | awk '{print $2}')
             echo "Launched with PID $PID"
 
             for i in $(seq 1 10); do
               if kill -0 "$PID" 2>/dev/null; then
-                echo "App is running (PID $PID)."
+                echo "App $APP_ID is running (PID $PID)."
                 break
               fi
               echo "Attempt $i: app not running yet, retrying in 2s..."
               sleep 2
               if [ "$i" -eq 10 ]; then
-                echo "App $APP_ID did not start within the timeout."
+                echo "ERROR: App $APP_ID did not start within the timeout."
                 exit 1
               fi
             done
