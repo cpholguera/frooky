@@ -59,18 +59,21 @@ def app_id(platform):
             ['adb', 'shell', 'am', 'start', '-n', f'{app_id}/.MainActivity'],
             check=True
         )
-        time.sleep(5)
 
-        result = subprocess.run(
-            ['adb', 'shell', 'pidof', app_id],
-            capture_output=True,
-            text=True,
-            check=True
-        )
-
-        pid = result.stdout.strip()
-        if not pid:
-            pytest.fail(f"Could not find PID for Android app {app_id}")
+        # Poll until the app process is visible
+        deadline = time.monotonic() + 30
+        pid = None
+        while not pid:
+            if time.monotonic() > deadline:
+                pytest.fail(f"Timed out waiting for PID of Android app {app_id}")
+            result = subprocess.run(
+                ['adb', 'shell', 'pidof', app_id],
+                capture_output=True,
+                text=True
+            )
+            pid = result.stdout.strip()
+            if not pid:
+                time.sleep(0.5)
 
         return pid
 
@@ -85,8 +88,6 @@ def app_id(platform):
                 text=True,
                 check=True
             )
-            time.sleep(5)
-
             return app_name
         except subprocess.CalledProcessError as e:
             raise RuntimeError(
