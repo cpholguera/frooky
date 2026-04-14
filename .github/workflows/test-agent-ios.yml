@@ -61,15 +61,8 @@ jobs:
               echo "App is running (PID $PID)."
 
               echo "Running iOS agent tests"
-              npm --prefix frooky/agent run test:ios:local -- --appIdentifier $PID 2>&1 | tee test-results-ios.txt
-
-              cat test-results-ios.txt
-              
-              echo '```' >> $GITHUB_STEP_SUMMARY
-              cat test-results-ios.txt >> $GITHUB_STEP_SUMMARY
-              echo '```' >> $GITHUB_STEP_SUMMARY
-                
-              exit 0
+              npm --prefix frooky/agent run test:ios:local -- --appIdentifier $PID 2>&1 | tee test-results.txt
+              echo ${PIPESTATUS[0]} > exit-code.txt
             fi
             echo "Attempt $i: app not running yet, retrying in 2s..."
             sleep 2
@@ -77,6 +70,16 @@ jobs:
 
           echo "App did not start within the timeout."
           exit 1
+
+
+      - name: Write summary and check result
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat test-results.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+          exit_code=$(cat exit-code.txt)
+          exit $exit_code
 
       - name: Upload test results
         if: always()

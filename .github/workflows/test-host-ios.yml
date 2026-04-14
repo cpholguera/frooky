@@ -76,13 +76,17 @@ jobs:
 
       - name: Run iOS integration tests
         run: |
-          pytest tests/integration/ios 2>&1 | tee test-results-ios.txt
-          
-          cat test-results-ios.txt
+          pytest tests/integration/ios 2>&1 | tee test-results.txt
+          echo ${PIPESTATUS[0]} > exit-code.txt
 
+      - name: Write summary and check result
+        run: |
           echo '```' >> $GITHUB_STEP_SUMMARY
-          cat test-results-ios.txt >> $GITHUB_STEP_SUMMARY
+          cat test-results.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
+
+          exit_code=$(cat exit-code.txt)
+          exit $exit_code          
 
       - name: Upload test results
         if: always()

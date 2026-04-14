@@ -62,13 +62,18 @@ jobs:
             adb install target-app-android/MASTestApp.apk
 
             echo "Running Android agent tests"
-            npm --prefix frooky/agent run test:android -- --appIdentifier org.owasp.mastestapp 2>&1 | tee test-results-android.txt
+            npm --prefix frooky/agent run test:android -- --appIdentifier org.owasp.mastestapp 2>&1 | tee test-results.txt
 
-            cat test-results-android.txt
+            echo ${PIPESTATUS[0]} > exit-code.txt
 
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat test-results-android.txt >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
+      - name: Write summary and check result
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat test-results.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+          exit_code=$(cat exit-code.txt)
+          exit $exit_code
 
       - name: Upload test results
         if: always()

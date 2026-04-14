@@ -69,13 +69,17 @@ jobs:
 
       - name: Run Android integration tests
         run: |
-          pytest tests/integration/android  2>&1 | tee test-results-android.txt
-          
-          cat test-results-android.txt
-          
+          pytest tests/integration/android  2>&1 | tee test-results.txt
+          echo ${PIPESTATUS[0]} > exit-code.txt
+
+      - name: Write summary and check result
+        run: |
           echo '```' >> $GITHUB_STEP_SUMMARY
-          cat test-results-android.txt >> $GITHUB_STEP_SUMMARY
+          cat test-results.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
+
+          exit_code=$(cat exit-code.txt)
+          exit $exit_code
 
       - name: Upload test results
         if: always()
