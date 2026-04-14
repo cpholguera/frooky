@@ -76,7 +76,7 @@ jobs:
 
       - name: Run iOS integration tests
         run: |
-          pytest tests/integration/ios  > test-results-ios.txt
+          pytest tests/integration/ios 2>&1 | tee test-results-ios.txt
           
           cat test-results-ios.txt
 

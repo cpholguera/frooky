@@ -69,7 +69,7 @@ jobs:
 
       - name: Run Android integration tests
         run: |
-          pytest tests/integration/android  > test-results-android.txt
+          pytest tests/integration/android  2>&1 | tee test-results-android.txt
           
           cat test-results-android.txt
           

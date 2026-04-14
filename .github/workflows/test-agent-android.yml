@@ -62,7 +62,7 @@ jobs:
             adb install target-app-android/MASTestApp.apk
 
             echo "Running Android agent tests"
-            npm --prefix frooky/agent run test:android -- --appIdentifier org.owasp.mastestapp > test-results-android.txt
+            npm --prefix frooky/agent run test:android -- --appIdentifier org.owasp.mastestapp 2>&1 | tee test-results-android.txt
 
             cat test-results-android.txt
 
