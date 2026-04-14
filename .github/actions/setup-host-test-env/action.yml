@@ -14,10 +14,10 @@ runs:
         name: frooky-host
         path: dist
 
+    - name: Install frooky
+      shell: bash
+      run: python -m pip install dist/*.whl  
+
     - name: Install dev dependencies
       shell: bash
       run: python -m pip install ".[dev]"
-
-    - name: Install frooky
-      shell: bash
-      run: python -m pip install --force-reinstall dist/*.whl
