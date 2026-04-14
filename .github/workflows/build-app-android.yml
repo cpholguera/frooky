@@ -46,5 +46,5 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v7
         with:
-          name: target-app-android
+          name: target-apps-android
           path: tests/target-apps/android/dist
