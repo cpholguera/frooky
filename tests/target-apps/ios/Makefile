@@ -31,13 +31,11 @@ build: $(BUILD_DIR) $(DIST_DIR)
 			"$(CLONE_DIR)/MASTestApp/MastgTest.swift" && \
 		echo "Copied MastgTest.swift" || true
 
-	# Update bundle ID in the Info.plist
-	@/usr/libexec/PlistBuddy -c \
-		"Set :CFBundleIdentifier $(subst -,_,$(TARGET_APP)).mastestapp" \
-		"$(CLONE_DIR)/MASTestApp/Info.plist" && \
-		echo "Set CFBundleIdentifier to $(subst -,_,$(TARGET_APP)).mastestapp"
-
 	cp $(CLONE_DIR)/.github/Local.xcconfig.ci $(CLONE_DIR)/Local.xcconfig
+
+	@perl -i -pe 's|^(PRODUCT_BUNDLE_IDENTIFIER\s*=\s*).*|$${1}$(subst -,_,$(TARGET_APP)).mastestapp|' \
+		"$(CLONE_DIR)/Local.xcconfig" && \
+		echo "Set PRODUCT_BUNDLE_IDENTIFIER to $(subst -,_,$(TARGET_APP)).mastestapp"
 
 	cd $(CLONE_DIR) && \
 		IOS_SCHEME=$$(xcodebuild -list -json | jq -r '.project.targets[0]') && \
@@ -57,6 +55,7 @@ build: $(BUILD_DIR) $(DIST_DIR)
 	mkdir -p $(DIST_DIR)
 	cp -r $(IOS_APP_SRC)/*.app $(APP_DST)
 	@echo "iOS app available at: $(APP_DST)"
+
 
 build-all:
 	@for app in $(ALL_APPS); do \
