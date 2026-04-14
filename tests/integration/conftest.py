@@ -134,27 +134,61 @@ def count_matched_events(output_file_path):
     return _count_matched_events
 
 
-@pytest.fixture
-def run_frooky(platform, output_file_path, app_id, mastestapp_start_path):
-    """Factory fixture for running hook tests with Maestro."""
+def _start_app(platform, target_app):
+    app_id = f"{target_app.replace('-', '_')}.mastestapp"
 
-    def _run_frooky(hook_file):
+    if platform == "android":
+        subprocess.run(['adb', 'wait-for-device'], check=True)
+        subprocess.run(
+            ['adb', 'shell', 'am', 'start', '-n', f'{app_id}/org.owasp.mastestapp.MainActivity'],
+            check=True
+        )
+
+        deadline = time.monotonic() + 30
+        pid = None
+        while not pid:
+            if time.monotonic() > deadline:
+                pytest.fail(f"Timed out waiting for PID of Android app {app_id}")
+            result = subprocess.run(
+                ['adb', 'shell', 'pidof', app_id],
+                capture_output=True, text=True, check=False
+            )
+            pid = result.stdout.strip()
+            if not pid:
+                time.sleep(0.5)
+        return pid
+    else:  # ios
+        try:
+            result = subprocess.run(
+                ['xcrun', 'simctl', 'launch', 'booted', app_id],
+                capture_output=True, text=True, check=True
+            )
+            # stdout format: "com.example.App: 12345"
+            pid = int(result.stdout.strip().split(': ')[1])
+            return  pid
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(f"Could not launch iOS app {app_id}: {e.stderr}") from e
+
+
+@pytest.fixture
+def run_frooky(platform, output_file_path, mastestapp_start_path):
+    def _run_frooky(hook_file, target_app):
         temp_hook_path = None
         frooky_process = None
 
-        # write the hooks into a temporary file
+        # Start the app and get its identifier
+        target_app_pid = _start_app(platform, target_app)
+
         fd, temp_hook_path = tempfile.mkstemp(suffix='.json', text=True)
         with os.fdopen(fd, 'w') as f:
             json.dump(hook_file, f)
 
         try:
-            # run frooky as background process
-            # start Android with PID, and iOS with app name
             frooky_process = subprocess.Popen([
                 "frooky",
                 platform,
                 *(["-U"] if platform == "android" else []),
-                *(["-p"] if platform == "android" else ["-n"]), app_id,
+                "-p", str(target_app_pid),
                 "-o", output_file_path,
                 temp_hook_path
             ],
@@ -163,7 +197,6 @@ def run_frooky(platform, output_file_path, app_id, mastestapp_start_path):
                 stderr=subprocess.PIPE
             )
 
-            # wait until output.json has been written
             output_ready_timeout = 30
             deadline = time.monotonic() + output_ready_timeout
             while not os.path.isfile(output_file_path):
@@ -174,8 +207,6 @@ def run_frooky(platform, output_file_path, app_id, mastestapp_start_path):
                     raise RuntimeError(f"Frooky exited early: {stderr}")
                 time.sleep(0.5)
 
-            # Run maestro as foreground process and make sure we have enough time to run.
-            # This is especially important for iOS GitHub workflows, they can be slow.
             maestro_timeout = 600
             subprocess.run(
                 [

@@ -20,7 +20,9 @@ class TestHookNativeMethod:
             ]
         }
 
-        run_frooky(hook_file)
+        target_app = "mastg-demo-0067"
+
+        run_frooky(hook_file, target_app)
 
         expected_event = {
             "type": "objc-hook",

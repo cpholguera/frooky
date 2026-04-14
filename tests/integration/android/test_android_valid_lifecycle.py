@@ -58,7 +58,9 @@ class TestHookJavaMethod:
             ]
         }
 
-        run_frooky(hook_file)
+        target_app = "mastg-demo-0060"
+
+        run_frooky(hook_file, target_app)
 
         expected_event = {
             "class": "androidx.security.crypto.EncryptedSharedPreferences",
@@ -88,7 +90,7 @@ class TestHookJavaMethod:
     def test_hook_java_multiple_methods(self, run_frooky, count_matched_events):
         """Test hooking a single Java method in a real process."""
 
-        hook = {
+        hook_file = {
             "category": "STORAGE",
             "hooks": [
                 {
@@ -102,7 +104,9 @@ class TestHookJavaMethod:
             ]
         }
 
-        run_frooky(hook)
+        target_app = "mastg-demo-0060"
+
+        run_frooky(hook_file, target_app)
 
         expected_pattern_putString = {
             "class": "androidx.security.crypto.EncryptedSharedPreferences$Editor",
