@@ -70,16 +70,9 @@ jobs:
             echo "Installing Maestro drivers"
             maestro test --platform android .github/maestro/warmup-android.yaml || true
 
-      - name: Run Android integration tests
-        run: |
-          pytest tests/integration/android  --report-log=test-results.jsonl
-
-      - name: Write summary and check result
-        run: |
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          cat test-results.txt >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-
+            echo "Running Android test"
+            pytest tests/integration/android  --report-log=test-results.jsonl
+          
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v7
