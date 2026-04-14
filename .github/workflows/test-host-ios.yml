@@ -30,9 +30,8 @@ jobs:
       - name: Download all MAS app iOS artifacts
         uses: actions/download-artifact@v8
         with:
-          pattern: target-app-ios-*
+          name: target-apps-ios
           path: target-apps-ios
-          merge-multiple: false
 
       - name: Setup Host Test Environment
         uses: ./.github/actions/setup-host-test-env
