@@ -63,7 +63,6 @@ jobs:
             .github/scripts/android/install-frida-server.sh
 
             echo "Installing target apps"
-            .github/scripts/android/build-all-target-apps.sh
             for apk in target-apps-android/*.target-app.apk; do
               echo "=== Installing $apk ==="
               adb install -r "$apk"
