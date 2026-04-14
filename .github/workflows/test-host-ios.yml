@@ -74,6 +74,12 @@ jobs:
           echo "App did not start within the timeout."
           exit 1
 
+      - name: Debug frooky install
+        run: |
+          which frooky
+          frooky --version
+          python -c "import frooky; import importlib.resources as r; print(list(r.files('frooky').joinpath('agent/dist').iterdir()))"
+
       - name: Run iOS integration tests
         run: |
           pytest tests/integration/ios 2>&1 | tee test-results.txt
