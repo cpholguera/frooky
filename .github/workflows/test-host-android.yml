@@ -69,7 +69,7 @@ jobs:
 
       - name: Run Android integration tests
         run: |
-          pytest tests/integration/ios  --report-log=test-results.jsonl
+          pytest tests/integration/android  --report-log=test-results.jsonl
 
       - name: Write summary and check result
         run: |
