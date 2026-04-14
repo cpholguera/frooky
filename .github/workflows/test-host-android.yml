@@ -7,8 +7,8 @@ permissions:
   contents: read
 
 jobs:
-  verify-host:
-    uses: ./.github/workflows/verify-host.yml
+  build-host:
+    uses: ./.github/workflows/build-host.yml
 
   build-app-android:
     uses: ./.github/workflows/build-app-android.yml
@@ -19,7 +19,7 @@ jobs:
     name: Test host Android
     runs-on: ubuntu-latest
     needs:
-      - verify-host
+      - build-host
       - build-app-android
     timeout-minutes: 30
 
@@ -69,7 +69,7 @@ jobs:
 
       - name: Run Android integration tests
         run: |
-          python -m pytest tests/integration/android  2>&1 | tee test-results.txt
+          pytest tests/integration/android  2>&1 | tee test-results.txt
           echo ${PIPESTATUS[0]} > exit-code.txt
 
       - name: Write summary and check result
