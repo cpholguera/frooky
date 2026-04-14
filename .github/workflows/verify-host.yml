@@ -1,6 +1,7 @@
 name: Verify frooky host
 
 on:
+  workflow_call:
   push:
 
 permissions:
