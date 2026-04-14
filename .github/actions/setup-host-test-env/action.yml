@@ -20,4 +20,4 @@ runs:
 
     - name: Install dev dependencies
       shell: bash
-      run: python -m pip install "pytest>=8.0.0" "pytest-cov>=4.1.0" "pylint-pytest>=1.1.8"
+      run: python -m pip install "pytest>=8.0.0" "pytest-cov>=4.1.0" "pylint-pytest>=1.1.8" "pytest-reportlog>=1.0.0"
