@@ -20,7 +20,7 @@ class TestHookNativeMethod:
             ]
         }
 
-        target_app = "mastg-demo-0067"
+        target_app = "mastg-demo-0026"
 
         run_frooky(hook_file, target_app)
 
