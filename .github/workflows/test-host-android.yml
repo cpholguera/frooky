@@ -46,7 +46,7 @@ jobs:
         with:
           api-level: "34"
 
-      - name: Install Frida and app
+      - name: Install Frida and all apps
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -64,9 +64,20 @@ jobs:
             echo "Installing frida server"
             .github/scripts/android/install-frida-server.sh
 
-            echo "Installing target app"
-            adb install target-app-android/MASTestApp.apk
-            
+            echo "Installing target apps"
+            for apk in target-apps-android/*.target-app.apk; do
+              echo "=== Installing $apk ==="
+              adb install -r "$apk"
+            done
+
+            echo "Launching target apps"
+            for apk in target-apps-android/*.target-app.apk; do
+              TARGET_APP=$(basename "$apk" .target-app.apk)
+              APP_ID="${TARGET_APP//-/_}.mastestapp"
+              echo "=== Launching $APP_ID ==="
+              adb shell am start -n "$APP_ID/org.owasp.mastestapp.MainActivity"
+            done
+
             echo "Running Android test"
             pytest tests/integration/android  --report-log=test-results.jsonl
           

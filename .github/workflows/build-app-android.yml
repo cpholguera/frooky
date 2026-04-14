@@ -3,8 +3,8 @@ name: Build Android target app
 on:
   workflow_call:
     inputs:
-      app_dir:
-        description: "Optional path to a custom app. Will be pass as APP_DIR to make build"
+      target_app:
+        description: "Optional path to a custom target app. Will be pass as TARGET_APP to make build"
         required: false
         type: string
 
@@ -35,11 +35,11 @@ jobs:
       - name: Build Android target apps
         working-directory: tests/target-apps/android
         run: |
-          if [ -n "${{ inputs.app_dir }}" ]; then
-            echo "Building the custom app located in: ${{ inputs.app_dir }}"
-            make build APP_DIR=${{ inputs.app_dir }}
+          if [ -n "${{ inputs.target_app }}" ]; then
+            echo "Building the custom app target app: ${{ inputs.target_app }}"
+            make build TARGET_APP=${{ inputs.target_app }}
           else
-            echo "Building empty MAS Test App."
+            echo "Building all target apps"
             make build-all
           fi
 

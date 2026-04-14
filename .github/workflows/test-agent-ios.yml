@@ -29,8 +29,8 @@ jobs:
       - name: Download MAS app iOS artifact
         uses: actions/download-artifact@v8
         with:
-          name: target-app-ios
-          path: target-app-ios
+          name: target-apps-ios
+          path: target-apps-ios
 
       - name: Setup Agent Test Environment
         uses: ./.github/actions/setup-agent-test-env
@@ -43,8 +43,34 @@ jobs:
           xcrun simctl boot "$SIM_ID" || true
           xcrun simctl bootstatus "$SIM_ID" -b
 
-      - name: Install app on simulator
-        run: xcrun simctl install booted target-app-ios/MASTestApp.app
+      - name: Install and run all apps on simulator
+        run: |
+          set -eo pipefail
+
+          for app in target-apps-ios/*.target-app.app; do
+            TARGET_APP=$(basename "$app" .target-app.app)
+            APP_ID="${TARGET_APP//-/_}.mastestapp"
+
+            echo "=== Installing $app (bundle ID: $APP_ID) ==="
+            xcrun simctl install booted "$app"
+
+            PID=$(xcrun simctl launch booted "$APP_ID" | awk '{print $2}')
+            echo "Launched with PID $PID"
+
+            for i in $(seq 1 10); do
+              if kill -0 "$PID" 2>/dev/null; then
+                echo "App $APP_ID is running (PID $PID)."
+                break
+              fi
+              echo "Attempt $i: app not running yet, retrying in 2s..."
+              sleep 2
+              if [ "$i" -eq 10 ]; then
+                echo "ERROR: App $APP_ID did not start within the timeout."
+                exit 1
+              fi
+            done
+          done
+
 
       - name: Run tests
         shell: bash
