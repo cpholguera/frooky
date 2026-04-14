@@ -12,8 +12,6 @@ jobs:
 
   build-app-ios:
     uses: ./.github/workflows/build-app-ios.yml
-    with:
-      app_dir: "mastg-demo-0026"
 
   test-host-ios:
     name: Test host iOS

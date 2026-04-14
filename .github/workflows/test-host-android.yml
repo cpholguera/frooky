@@ -12,8 +12,6 @@ jobs:
 
   build-app-android:
     uses: ./.github/workflows/build-app-android.yml
-    with:
-      app_dir: "mastg-demo-0060"
 
   test-host-android:
     name: Test host Android
@@ -65,12 +63,13 @@ jobs:
             .github/scripts/android/install-frida-server.sh
 
             echo "Installing target apps"
+            .github/scripts/android/build-all-target-apps.sh
             for apk in target-apps-android/*.target-app.apk; do
               echo "=== Installing $apk ==="
               adb install -r "$apk"
             done
 
-            echo "Launching target apps"
+            echo "Launching all target apps"
             for apk in target-apps-android/*.target-app.apk; do
               TARGET_APP=$(basename "$apk" .target-app.apk)
               APP_ID="${TARGET_APP//-/_}.mastestapp"
