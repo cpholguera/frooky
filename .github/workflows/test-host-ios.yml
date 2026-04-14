@@ -52,6 +52,8 @@ jobs:
         run: |
           set -eo pipefail
 
+          ls -la target-apps-ios
+
           for app in target-apps-ios/*.target-app.app; do
             [ -d "$app" ] || { echo "No .app bundles found, skipping."; continue; }
 
