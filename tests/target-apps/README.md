@@ -4,33 +4,33 @@ Frooky uses target apps for testing features that must run in a real runtime env
 
 ## Building Target Apps
 
-These apps are located in the folder `tests/target-apps/<android|ios>/`. They must be in the form of a [MASTG-DEMO app](https://mas.owasp.org/MASTG/demos/). Hence, the app identifier for the Android app is `org.owasp.mastestapp` and for the iOS app `org.owasp.mastestapp.MASTestApp-iOS`.
+These apps are located in the folder `tests/target-apps/<android|ios>/`. They must be in the form of a [MASTG-DEMO app](https://mas.owasp.org/MASTG/demos/). For iOS the base app is [`mas-app-ios`](https://github.com/cpholguera/mas-app-ios) and for Android [`mas-app-android`](https://github.com/cpholguera/mas-app-android)
 
 Make sure, that you have all the prerequisites met to compile Android or iOS apps. For Android, you need to install [Android Studio](https://developer.android.com/studio), for iOS [Xcode](https://developer.apple.com/xcode/).
 
 To compile them, go to either `tests/target-apps/<android|ios>/` and run:
 
-- `make build TARGET_APP=<target-app-dir>` to build a custom app.
-- `make build` to build an empty [`mas-app-ios`](https://github.com/cpholguera/mas-app-ios) or [`mas-app-android`](https://github.com/cpholguera/mas-app-android) app.
+- `make build TARGET_APP=<target-app>` to build a custom app.
+- `make build-all` to build all apps in their subfolder.
 
 > [!IMPORTANT]
-> The package name or app identifier is always `<target-app>.<original-id>`.
+> The package name or app identifier is always `<target-app>`.
 
-This will compile the app with the app identifier `org.owasp.mastestapp.MASTestApp-iOS` and store it in `tests/target-apps/ios/dist/MASTestApp.app`.
+This will compile the app with the app identifier `<target-app>` and store it in `tests/target-apps/ios/dist/<target-app>.app` for iOS and `tests/target-apps/android/dist/<target-app>.apk` for Android.
 
-**Example 1:** Build a custom `mas-app-android` app:
+**Example 1:** Build a custom app based on `mas-app-android`:
 
 ```sh
 cd tests/target-apps/android
 make build TARGET_APP=basic-parameter
 ```
 
-This will compile the app with the package name `basic-parameter.org.owasp.mastestapp` and store it in `tests/target-apps/android/dist/basic-parameter.target-app.apk`.
+This will compile the app with the package name `basic_parameter.target_app` and store it in `tests/target-apps/android/dist/basic-parameter.apk`.
 
 **Example 2:** Build all apps:
 
 ```sh
-cd tests/target-apps/android
+cd tests/target-apps/ios
 make build-all
 ```
 
