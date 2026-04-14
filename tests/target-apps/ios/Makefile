@@ -1,22 +1,41 @@
 REPO_URL  := https://github.com/cpholguera/mas-app-ios
-BUILD_DIR := $(CURDIR)/build
 DIST_DIR  := $(CURDIR)/dist
-CLONE_DIR := $(BUILD_DIR)/mas-app-ios
+
+ifdef TARGET_APP
+BUILD_DIR   := $(CURDIR)/$(TARGET_APP)/build
+CLONE_DIR   := $(BUILD_DIR)/mas-app-ios
 DERIVED_DATA := $(BUILD_DIR)/DerivedData
-IOS_APP_SRC  := $(DERIVED_DATA)/Build/Products/Debug-iphonesimulator
-IOS_APP_DST  := $(DIST_DIR)/
+IOS_APP_SRC := $(DERIVED_DATA)/Build/Products/Debug-iphonesimulator
+APP_DST     := $(DIST_DIR)/$(TARGET_APP).target-app.app
+endif
 
 BUNDLE_ID := org.owasp.mastestapp.MASTestApp-iOS
 
-.PHONY: build install clean
+ALL_APPS := $(shell find . -maxdepth 1 -mindepth 1 -type d \
+	! -name dist ! -name '.*' \
+	-exec basename {} \;)
 
-build: clean $(BUILD_DIR) $(DIST_DIR)
-	git clone $(REPO_URL) $(CLONE_DIR)
+.PHONY: build build-all install install-all clean clean-all
 
-	@[ -f "$(APP_DIR)/MastgTest.swift" ] && \
-		cp -f "$(APP_DIR)/MastgTest.swift" \
+build: $(BUILD_DIR) $(DIST_DIR)
+	@[ -n "$(TARGET_APP)" ] || { echo "ERROR: TARGET_APP is required. Usage: make build TARGET_APP=<name>"; exit 1; }
+
+	@if [ ! -d "$(CLONE_DIR)/.git" ]; then \
+		git clone $(REPO_URL) $(CLONE_DIR); \
+	else \
+		echo "Repo already cloned, skipping git clone."; \
+	fi
+
+	@[ -f "$(TARGET_APP)/MastgTest.swift" ] && \
+		cp -f "$(TARGET_APP)/MastgTest.swift" \
 			"$(CLONE_DIR)/MASTestApp/MastgTest.swift" && \
 		echo "Copied MastgTest.swift" || true
+
+	# Update bundle ID in the Info.plist
+	@/usr/libexec/PlistBuddy -c \
+		"Set :CFBundleIdentifier $(subst -,_,$(TARGET_APP)).mastestapp" \
+		"$(CLONE_DIR)/MASTestApp/Info.plist" && \
+		echo "Set CFBundleIdentifier to $(subst -,_,$(TARGET_APP)).mastestapp"
 
 	cp $(CLONE_DIR)/.github/Local.xcconfig.ci $(CLONE_DIR)/Local.xcconfig
 
@@ -35,19 +54,40 @@ build: clean $(BUILD_DIR) $(DIST_DIR)
 			CODE_SIGNING_REQUIRED=NO \
 			CODE_SIGNING_ALLOWED=NO
 
-	mkdir -p $(IOS_APP_DST)
-	cp -r $(IOS_APP_SRC)/*.app $(IOS_APP_DST)/
-	@echo "iOS app available at: $(IOS_APP_DST)"
+	mkdir -p $(DIST_DIR)
+	cp -r $(IOS_APP_SRC)/*.app $(APP_DST)
+	@echo "iOS app available at: $(APP_DST)"
+
+build-all:
+	@for app in $(ALL_APPS); do \
+		echo "=== Building $$app ==="; \
+		$(MAKE) build TARGET_APP=$$app; \
+	done
 
 install:
-	xcrun simctl install booted $(DIST_DIR)/MASTestApp.app
-	xcrun simctl launch booted $(BUNDLE_ID)
+	@[ -n "$(TARGET_APP)" ] || { echo "ERROR: TARGET_APP is required. Usage: make install TARGET_APP=<name>"; exit 1; }
+	xcrun simctl install booted "$(APP_DST)"
+	xcrun simctl launch booted $(subst -,_,$(TARGET_APP)).mastestapp
+
+install-all:
+	@for app in $(ALL_APPS); do \
+		echo "=== Installing $$app ==="; \
+		$(MAKE) install TARGET_APP=$$app; \
+	done
+
+clean:
+	@[ -n "$(TARGET_APP)" ] || { echo "ERROR: TARGET_APP is required. Usage: make clean TARGET_APP=<name>"; exit 1; }
+	rm -rf $(BUILD_DIR)
+
+clean-all:
+	@for app in $(ALL_APPS); do \
+		echo "=== Cleaning $$app ==="; \
+		$(MAKE) clean TARGET_APP=$$app; \
+	done
+	rm -rf $(DIST_DIR)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
 $(DIST_DIR):
 	mkdir -p $(DIST_DIR)
-
-clean:
-	rm -rf $(BUILD_DIR) $(DIST_DIR)

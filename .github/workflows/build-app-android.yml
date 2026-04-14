@@ -40,11 +40,11 @@ jobs:
             make build APP_DIR=${{ inputs.app_dir }}
           else
             echo "Building empty MAS Test App."
-            make build
+            make build-all
           fi
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v7
         with:
           name: target-app-android
-          path: tests/target-apps/android/dist/MASTestApp.apk
+          path: tests/target-apps/android/dist

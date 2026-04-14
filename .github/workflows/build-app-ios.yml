@@ -21,14 +21,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Build target app iOS
+      - name: Build all target apps iOS
         working-directory: tests/target-apps/ios
         run: |
-          if [ -n "${{ inputs.app_dir }}" ]; then
-            make build APP_DIR=${{ inputs.app_dir }} GITHUB_ENV_FILE=$GITHUB_ENV
-          else
-            make build GITHUB_ENV_FILE=$GITHUB_ENV
-          fi
+          make build-all
 
       - name: Upload iOS artifact
         uses: actions/upload-artifact@v7
