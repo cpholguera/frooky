@@ -1,4 +1,0 @@
-appId: org.owasp.mastestapp.MASTestApp-iOS
----
-- launchApp:
-    stopApp: false

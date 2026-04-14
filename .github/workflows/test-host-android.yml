@@ -66,10 +66,7 @@ jobs:
 
             echo "Installing target app"
             adb install target-app-android/MASTestApp.apk
-
-            echo "Installing Maestro drivers"
-            maestro test --platform android .github/maestro/warmup-android.yaml || true
-
+            
             echo "Running Android test"
             pytest tests/integration/android  --report-log=test-results.jsonl
           
