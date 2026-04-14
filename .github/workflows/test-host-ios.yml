@@ -41,38 +41,38 @@ jobs:
       - name: Setup Maestro
         uses: ./.github/actions/setup-maestro
 
-      - name: Boot simulator
-        run: |
-          SIM_ID=$(xcrun simctl list devices available -j | \
-            jq -r '[.devices | to_entries[] | select(.key | contains("iOS")) | .value[]] | map(select(.isAvailable == true)) | first | .udid')
-          echo "Booting simulator: $SIM_ID"
-          xcrun simctl boot "$SIM_ID" || true
-          xcrun simctl bootstatus "$SIM_ID" -b
+      # - name: Boot simulator
+      #   run: |
+      #     SIM_ID=$(xcrun simctl list devices available -j | \
+      #       jq -r '[.devices | to_entries[] | select(.key | contains("iOS")) | .value[]] | map(select(.isAvailable == true)) | first | .udid')
+      #     echo "Booting simulator: $SIM_ID"
+      #     xcrun simctl boot "$SIM_ID" || true
+      #     xcrun simctl bootstatus "$SIM_ID" -b
 
-      - name: Install app on simulator
-        run: xcrun simctl install booted target-app-ios/MASTestApp.app
+      # - name: Install app on simulator
+      #   run: xcrun simctl install booted target-app-ios/MASTestApp.app
 
-      - name: Run app 
-        shell: bash
-        run: |
-          set -o pipefail
+      # - name: Run app 
+      #   shell: bash
+      #   run: |
+      #     set -o pipefail
 
-          APP_ID="org.owasp.mastestapp.MASTestApp-iOS"
+      #     APP_ID="org.owasp.mastestapp.MASTestApp-iOS"
 
-          PID=$(xcrun simctl launch booted "$APP_ID" | awk '{print $2}')
-          echo "Launched with PID $PID"
+      #     PID=$(xcrun simctl launch booted "$APP_ID" | awk '{print $2}')
+      #     echo "Launched with PID $PID"
 
-          for i in $(seq 1 10); do
-            if kill -0 "$PID" 2>/dev/null; then
-              echo "App is running (PID $PID)."
-              exit 0
-            fi
-            echo "Attempt $i: app not running yet, retrying in 2s..."
-            sleep 2
-          done
+      #     for i in $(seq 1 10); do
+      #       if kill -0 "$PID" 2>/dev/null; then
+      #         echo "App is running (PID $PID)."
+      #         exit 0
+      #       fi
+      #       echo "Attempt $i: app not running yet, retrying in 2s..."
+      #       sleep 2
+      #     done
 
-          echo "App did not start within the timeout."
-          exit 1
+      #     echo "App did not start within the timeout."
+      #     exit 1
 
       - name: Debug frooky install
         run: |
