@@ -160,11 +160,17 @@ def run_frooky(platform, output_file_path, app_id, mastestapp_start_path):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
-            time.sleep(5)
 
-            if frooky_process.poll() is not None:
-                _, stderr = frooky_process.communicate()
-                raise RuntimeError(f"Frooky failed to start: {stderr}")
+            # wait until output.json has been written
+            output_ready_timeout = 30
+            deadline = time.monotonic() + output_ready_timeout
+            while not os.path.isfile(output_file_path):
+                if time.monotonic() > deadline:
+                    raise RuntimeError("Frooky did not produce output file in time")
+                if frooky_process.poll() is not None:
+                    _, stderr = frooky_process.communicate()
+                    raise RuntimeError(f"Frooky exited early: {stderr}")
+                time.sleep(0.5)
 
             # Run maestro as foreground process and make sure we have enough time to run.
             # This is especially important for iOS GitHub workflows, they can be slow.
