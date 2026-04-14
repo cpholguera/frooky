@@ -69,7 +69,8 @@ def app_id(platform):
             result = subprocess.run(
                 ['adb', 'shell', 'pidof', app_id],
                 capture_output=True,
-                text=True
+                text=True,
+                check=False
             )
             pid = result.stdout.strip()
             if not pid:
