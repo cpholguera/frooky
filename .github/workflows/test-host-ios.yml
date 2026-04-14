@@ -48,11 +48,13 @@ jobs:
           xcrun simctl boot "$SIM_ID" || true
           xcrun simctl bootstatus "$SIM_ID" -b
 
-      - name: Install and run all apps on simulator
+      - name: Install and run all target apps on simulator
         run: |
           set -eo pipefail
 
           for app in target-apps-ios/*.target-app.app; do
+            [ -d "$app" ] || { echo "No .app bundles found, skipping."; continue; }
+
             TARGET_APP=$(basename "$app" .target-app.app)
             APP_ID="${TARGET_APP//-/_}.mastestapp"
 
@@ -75,6 +77,7 @@ jobs:
               fi
             done
           done
+
 
       - name: Run iOS integration tests
         run: |

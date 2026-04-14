@@ -55,6 +55,8 @@ jobs:
           script: |
             chmod +x .github/scripts/android/prep-device.sh
             chmod +x .github/scripts/android/install-frida-server.sh
+            chmod +x .github/scripts/android/install-target-apps.sh
+            chmod +x .github/scripts/android/launch-target-apps.sh
 
             echo "Starting adb as root"
             .github/scripts/android/prep-device.sh
@@ -63,19 +65,11 @@ jobs:
             .github/scripts/android/install-frida-server.sh
 
             echo "Installing target apps"
-            for apk in target-apps-android/*.target-app.apk; do
-              echo "=== Installing $apk ==="
-              adb install -r "$apk"
-            done
+            .github/scripts/android/install-target-apps.sh
 
             echo "Launching all target apps"
-            for apk in target-apps-android/*.target-app.apk; do
-              TARGET_APP=$(basename "$apk" .target-app.apk)
-              APP_ID="${TARGET_APP//-/_}.mastestapp"
-              echo "=== Launching $APP_ID ==="
-              adb shell am start -n "$APP_ID/org.owasp.mastestapp.MainActivity"
-            done
-
+            .github/scripts/android/launch-target-apps.sh
+            
             echo "Running Android test"
             pytest tests/integration/android  --report-log=test-results.jsonl
           
