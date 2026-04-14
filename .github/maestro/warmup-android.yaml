@@ -1,0 +1,4 @@
+appId: org.owasp.mastestapp
+---
+- launchApp:
+    stopApp: false

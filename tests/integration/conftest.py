@@ -179,6 +179,7 @@ def run_frooky(platform, output_file_path, app_id, mastestapp_start_path):
                 [
                     "maestro",
                     "test",
+                    "--no-reinstall-driver",
                     "--platform", platform,
                     str(mastestapp_start_path)
                 ],

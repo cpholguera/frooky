@@ -52,6 +52,9 @@ jobs:
       - name: Install app on simulator
         run: xcrun simctl install booted target-app-ios/MASTestApp.app
 
+      - name: Install Maestro drivers
+        run: maestro test --platform ios .github/maestro/warmup-ios.yaml || true
+
       - name: Run app 
         shell: bash
         run: |
