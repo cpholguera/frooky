@@ -10,20 +10,12 @@ class TestHookNativeMethod:
         """Test hooking a single iOS method in a real process."""
 
         hooks = {
-            "category": "STORAGE",
+            "category": "AUTH",
             "hooks": [
                 {
                     "native": True,
-                    "symbol": "open",
-                    "maxFrames": 5,
-                    "filterEventsByStacktrace": "MASTestApp",
-                    "args": [
-                        {
-                            "type": "string",
-                            "name": "path",
-                            "filter": ["Containers/Data/Application/"]
-                        }
-                    ]
+                    "symbol": "- canEvaluatePolicy:error:",
+                    "objClass": "LAContext"
                 }
             ]
         }
@@ -31,15 +23,10 @@ class TestHookNativeMethod:
         run_frooky(hooks)
 
         expected_event = {
-            "type": "native-hook",
-            "symbol": "open",
-            "inputParameters": [
-                    {
-                        "type": "string",
-                        "name": "path"
-                    }
-            ],
+            "type": "objc-hook",
+            "symbol": "- canEvaluatePolicy:error:",
+            "class": "LAContext"
         }
 
         assert count_matched_events(
-            expected_event) == 4, "Not the amount of expected matched events found."
+            expected_event) == 1, "Not the amount of expected matched events found."
