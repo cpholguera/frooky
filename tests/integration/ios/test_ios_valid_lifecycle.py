@@ -7,7 +7,7 @@ class TestHookNativeMethod:
     """Tests for handling errors on the target related to Java methods."""
 
     def test_hook_native(self, run_frooky, count_matched_events):
-        """Test hooking a single Java method in a real process."""
+        """Test hooking a single iOS method in a real process."""
 
         hooks = {
             "category": "STORAGE",
