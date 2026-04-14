@@ -9,7 +9,7 @@ class TestHookJavaMethod:
     def test_hook_java_single_method(self, run_frooky, count_matched_events):
         """Test hooking a single Java method in a real process."""
 
-        hook = {
+        hook_file = {
             "category": "STORAGE",
             "hooks": [
                 {
@@ -21,7 +21,7 @@ class TestHookJavaMethod:
             ]
         }
 
-        run_frooky(hook)
+        run_frooky(hook_file)
 
         expected_pattern = {
             "class": "androidx.security.crypto.EncryptedSharedPreferences$Editor",
@@ -34,7 +34,7 @@ class TestHookJavaMethod:
     def test_hook_java_single_method_overload(self, run_frooky, count_matched_events):
         """Test hooking single Java methods and one overload."""
 
-        hook = {
+        hook_file = {
             "category": "STORAGE",
             "hooks": [
                 {
@@ -56,7 +56,7 @@ class TestHookJavaMethod:
             ]
         }
 
-        run_frooky(hook)
+        run_frooky(hook_file)
 
         expected_event = {
             "class": "androidx.security.crypto.EncryptedSharedPreferences",

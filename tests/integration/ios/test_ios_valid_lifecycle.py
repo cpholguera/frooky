@@ -6,10 +6,10 @@ import pytest
 class TestHookNativeMethod:
     """Tests for handling errors on the target related to Java methods."""
 
-    def test_hook_native(self, run_frooky, count_matched_events):
+    def test_hook_ios_method(self, run_frooky, count_matched_events):
         """Test hooking a single iOS method in a real process."""
 
-        hooks = {
+        hook_file = {
             "category": "AUTH",
             "hooks": [
                 {
@@ -20,7 +20,7 @@ class TestHookNativeMethod:
             ]
         }
 
-        run_frooky(hooks)
+        run_frooky(hook_file)
 
         expected_event = {
             "type": "objc-hook",
