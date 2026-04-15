@@ -63,7 +63,7 @@ jobs:
             npm --prefix frooky/agent run test:android -- -i basic_parameter.frooky.target.app -o test-results.txt
 
             echo "Summarize test result"
-            cat test-results.txt >> "$GITHUB_STEP_SUMMARY"
+            cat frooky/agent/test-results.txt >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload test results
         if: always()
