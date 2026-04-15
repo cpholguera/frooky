@@ -54,7 +54,8 @@ jobs:
           for app in target-apps-ios/*.app; do
             [ -d "$app" ] || { echo "No .app bundles found, skipping."; continue; }
 
-            APP_ID=$(basename "$app")
+            TARGET_APP=$(basename "$app" ".app")
+            APP_ID=$(TARGET_APP).frooky.target.app
 
             echo "=== Installing $app (bundle ID: $APP_ID) ==="
             xcrun simctl install booted "$app"
