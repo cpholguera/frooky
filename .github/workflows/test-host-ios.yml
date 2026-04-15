@@ -55,7 +55,7 @@ jobs:
             [ -d "$app" ] || { echo "No .app bundles found, skipping."; continue; }
 
             TARGET_APP=$(basename "$app" ".app")
-            APP_ID=$(TARGET_APP).frooky.target.app
+            APP_ID="${TARGET_APP}.frooky.target.app"
 
             echo "=== Installing $app (bundle ID: $APP_ID) ==="
             xcrun simctl install booted "$app"
