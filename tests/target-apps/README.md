@@ -25,7 +25,7 @@ cd tests/target-apps/android
 make build TARGET_APP=basic-parameter
 ```
 
-This will compile the app with the package name `basic_parameter.target_app` and store it in `tests/target-apps/android/dist/basic-parameter.apk`.
+This will compile the app with the package name `basic_parameter.frooky.target.app` and store it in `tests/target-apps/android/dist/basic-parameter.apk`.
 
 **Example 2:** Build all apps:
 
@@ -34,7 +34,7 @@ cd tests/target-apps/ios
 make build-all
 ```
 
-This will compile the app with the package name `basic-parameter.org.owasp.mastestapp` and store it in `tests/target-apps/android/dist/<target-app-name>.target-app.apk`.
+This will compile the app with the package name `basic_parameter.frooky.target.app` and store it in `tests/target-apps/android/dist/<target-app-name>.target-app.apk`.
 
 ## Installing Target Apps
 
