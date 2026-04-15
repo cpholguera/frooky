@@ -60,7 +60,7 @@ jobs:
             .github/scripts/android/launch-target-apps.sh
 
             echo "Running Android agent tests"
-            npm --prefix frooky/agent run test:android -- -i basic_parameter.frooky.target.app --out test-results.txt
+            npm --prefix frooky/agent run test:android -- -i basic_parameter.frooky.target.app -o test-results.txt
 
       - name: Upload test results
         if: always()

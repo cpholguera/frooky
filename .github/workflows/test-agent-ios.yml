@@ -51,7 +51,7 @@ jobs:
 
       - name: Run tests
         shell: bash
-        run: npm --prefix frooky/agent run test:ios:local -- -i basic_parameter.frooky.target.app --out test-results.txt
+        run: npm --prefix frooky/agent run test:ios:local -- -i basic_parameter.frooky.target.app -o test-results.txt
 
       - name: Upload test results
         if: always()
