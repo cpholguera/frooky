@@ -42,23 +42,23 @@ To install the app follow these steps:
 
 1. **Prepare the target device**
 
-    Make sure the target device (physical Android or iOS device, or an emulator) is up and running and Frida is installed on them.
+    Make sure the target device (physical Android or iOS device, or an simulator/emulator) is up and running and Frida available.
 
-    For that you need root access to the device. If this is not possible, embed Frida as gadget into the binary. To simplify this process, use [Objection](https://github.com/sensepost/objection).
+    When using an iOS simulator, it is not necessary to install a dedicated Frida server, since Frida will hook a local process. Since Android uses an emulator, a Frida server needs to be installed on both the emulator and the physical device. For that you need root access to the device. If this is not possible, embed Frida as gadget into the binary. To simplify this process, use [Objection](https://github.com/sensepost/objection).
 
-2. **Install the binary**
+1. **Install the binary**
 
     Use the following command to install a generated target app on the running device:
 
     ```sh
-    cd tests/target-apps/android
+    cd tests/target-apps/<android|ios>
     make install TARGET_APP=<target-app-dir>
     ```
 
     You can also install all apps using the following command:
 
     ```sh
-    cd tests/target-apps/android
+    cd tests/target-apps/<android|ios>
     make install-all
     ```
 
