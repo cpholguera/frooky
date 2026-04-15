@@ -3,10 +3,10 @@ import pytest
 
 
 @pytest.mark.parametrize("platform", ["ios"], indirect=True)
-class TestHookNativeMethod:
+class TestValidHookFiles:
     """Tests for handling errors on the target related to Java methods."""
 
-    def test_hook_ios_method(self, run_frooky, count_matched_events):
+    def test_method(self, run_frooky, count_matched_events):
         """Test hooking a single iOS method in a real process."""
 
         hook_file = {

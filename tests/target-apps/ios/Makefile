@@ -1,21 +1,26 @@
-REPO_URL  := https://github.com/cpholguera/mas-app-ios
-DIST_DIR  := $(CURDIR)/dist
+REPO_URL     := https://github.com/cpholguera/mas-app-ios
+DIST_DIR     := $(CURDIR)/dist
 
 ifdef TARGET_APP
-BUILD_DIR   := $(CURDIR)/$(TARGET_APP)/build
-CLONE_DIR   := $(BUILD_DIR)/mas-app-ios
-DERIVED_DATA := $(BUILD_DIR)/DerivedData
-IOS_APP_SRC := $(DERIVED_DATA)/Build/Products/Debug-iphonesimulator
-APP_DST     := $(DIST_DIR)/$(TARGET_APP).target-app.app
-endif
+  _APP_ABS := $(realpath $(CURDIR)/$(TARGET_APP))
 
-BUNDLE_ID := org.owasp.mastestapp.MASTestApp-iOS
+  ifeq ($(filter $(CURDIR)/%,$(_APP_ABS)),)
+    $(error TARGET_APP "$(TARGET_APP)" must be a directory inside $(CURDIR))
+  endif
+
+  APP_ID       := $(subst -,_,$(TARGET_APP)).frooky.target.app
+  BUILD_DIR    := $(_APP_ABS)/build
+  CLONE_DIR    := $(BUILD_DIR)/mas-app-ios
+  DERIVED_DATA := $(BUILD_DIR)/derived-data
+  IOS_APP_SRC  := $(DERIVED_DATA)/Build/Products/Debug-iphonesimulator
+  APP_DST      := $(DIST_DIR)/$(TARGET_APP).app
+endif
 
 ALL_APPS := $(shell find . -maxdepth 1 -mindepth 1 -type d \
 	! -name dist ! -name '.*' \
 	-exec basename {} \;)
 
-.PHONY: build build-all install install-all clean clean-all
+.PHONY: build build-all install install-all uninstall uninstall-all clean clean-all
 
 build: $(BUILD_DIR) $(DIST_DIR)
 	@[ -n "$(TARGET_APP)" ] || { echo "ERROR: TARGET_APP is required. Usage: make build TARGET_APP=<name>"; exit 1; }
@@ -33,9 +38,14 @@ build: $(BUILD_DIR) $(DIST_DIR)
 
 	cp $(CLONE_DIR)/.github/Local.xcconfig.ci $(CLONE_DIR)/Local.xcconfig
 
-	@perl -i -pe 's|^(PRODUCT_BUNDLE_IDENTIFIER\s*=\s*).*|$${1}$(subst -,_,$(TARGET_APP)).mastestapp|' \
+	@perl -i -pe 's|^(PRODUCT_BUNDLE_IDENTIFIER\s*=\s*).*|$${1}$(APP_ID)|' \
 		"$(CLONE_DIR)/Local.xcconfig" && \
-		echo "Set PRODUCT_BUNDLE_IDENTIFIER to $(subst -,_,$(TARGET_APP)).mastestapp"
+		echo "Set PRODUCT_BUNDLE_IDENTIFIER to $(APP_ID)"
+
+	@[ -f "$(CLONE_DIR)/app/src/main/res/values/strings.xml" ] && \
+			perl -i -pe "s|<string name=\"app_name\">MASTestApp</string>|<string name=\"app_name\">frooky: $(TARGET_APP)</string>|" \
+					"$(CLONE_DIR)/app/src/main/res/values/strings.xml" && \
+			echo "Replaced app_name in strings.xml" || true
 
 	cd $(CLONE_DIR) && \
 		IOS_SCHEME=$$(xcodebuild -list -json | jq -r '.project.targets[0]') && \
@@ -56,7 +66,6 @@ build: $(BUILD_DIR) $(DIST_DIR)
 	cp -r $(IOS_APP_SRC)/*.app $(APP_DST)
 	@echo "iOS app available at: $(APP_DST)"
 
-
 build-all:
 	@for app in $(ALL_APPS); do \
 		echo "=== Building $$app ==="; \
@@ -64,9 +73,8 @@ build-all:
 	done
 
 install:
-	@[ -n "$(TARGET_APP)" ] || { echo "ERROR: TARGET_APP is required. Usage: make install TARGET_APP=<name>"; exit 1; }
+	@[ -n "$(TARGET_APP)" ] || { echo "ERROR: TARGET_APP is required. Usage: make install TARGET_APP=<name> where <name> is the folder name the MAS DEMO compatible test app is."; exit 1; }
 	xcrun simctl install booted "$(APP_DST)"
-	xcrun simctl launch booted $(subst -,_,$(TARGET_APP)).mastestapp
 
 install-all:
 	@for app in $(ALL_APPS); do \
@@ -74,8 +82,18 @@ install-all:
 		$(MAKE) install TARGET_APP=$$app; \
 	done
 
+uninstall:
+	@[ -n "$(TARGET_APP)" ] || { echo "ERROR: TARGET_APP is required. Usage: make uninstall TARGET_APP=<name> where <name> is the folder name the MAS DEMO compatible test app is."; exit 1; }
+	xcrun simctl uninstall booted "$(APP_ID)"
+
+uninstall-all:
+	@for app in $(ALL_APPS); do \
+		echo "=== Uninstalling $$app ==="; \
+		$(MAKE) uninstall TARGET_APP=$$app; \
+	done
+
 clean:
-	@[ -n "$(TARGET_APP)" ] || { echo "ERROR: TARGET_APP is required. Usage: make clean TARGET_APP=<name>"; exit 1; }
+	@[ -n "$(TARGET_APP)" ] || { echo "ERROR: TARGET_APP is required. Usage: make clean TARGET_APP=<name> where <name> is the folder name the MAS DEMO compatible test app is."; exit 1; }
 	rm -rf $(BUILD_DIR)
 
 clean-all:

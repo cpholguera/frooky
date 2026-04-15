@@ -52,11 +52,11 @@ def mastestapp_start_path(platform):
 def app_id(platform, target_name):
     """Start the app and return PID (Android) or app name (iOS)."""
     if platform == "android":
-        app_id = f"${target_name}.mastestapp"
+        app_bundle_id = f"${target_name.replace("-","_")}.frooky.target.app"
 
         subprocess.run(['adb', 'wait-for-device'], check=True)
         subprocess.run(
-            ['adb', 'shell', 'am', 'start', '-n', f'{app_id}/.MainActivity'],
+            ['adb', 'shell', 'am', 'start', '-n', f'{app_bundle_id}/.MainActivity'],
             check=True
         )
 
@@ -79,7 +79,7 @@ def app_id(platform, target_name):
         return pid
 
     else:  # ios
-        app_bundle_id= f"{app_id}.mastestapp"
+        app_bundle_id= f"{app_id}.frooky.target.app"
         app_name = "MASTestApp"
 
         try:
@@ -135,7 +135,7 @@ def count_matched_events(output_file_path):
 
 
 def _start_app(platform, target_app):
-    app_id = f"{target_app.replace('-', '_')}.mastestapp"
+    app_id = f"{target_app.replace('-', '_')}.frooky.target.app"
 
     if platform == "android":
         subprocess.run(['adb', 'wait-for-device'], check=True)
