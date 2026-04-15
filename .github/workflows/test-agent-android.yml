@@ -2,8 +2,8 @@ name: Test agent Android
 
 on:
   push:
-    paths:
-      - 'frooky/agent/**'
+    # paths:
+    #   - 'frooky/agent/**'
 
 permissions:
   contents: read
@@ -49,9 +49,6 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: |
-            chmod +x .github/scripts/android/prep-device.sh
-            chmod +x .github/scripts/android/install-frida-server.sh
-
             echo "Starting adb as root"
             .github/scripts/android/prep-device.sh
 

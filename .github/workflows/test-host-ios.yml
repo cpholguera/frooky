@@ -47,40 +47,16 @@ jobs:
           xcrun simctl boot "$SIM_ID" || true
           xcrun simctl bootstatus "$SIM_ID" -b
 
-      - name: Install and run all target apps on simulator
-        run: |
-          set -eo pipefail
-
-          for app in target-apps-ios/*.app; do
-            [ -d "$app" ] || { echo "No .app bundles found, skipping."; continue; }
-
-            TARGET_APP=$(basename "$app" ".app")
-            APP_ID="${TARGET_APP}.frooky.target.app"
-
-            echo "=== Installing $app (bundle ID: $APP_ID) ==="
-            xcrun simctl install booted "$app"
-
-            PID=$(xcrun simctl launch booted "$APP_ID" | awk '{print $2}')
-            echo "Launched with PID $PID"
-
-            for i in $(seq 1 10); do
-              if kill -0 "$PID" 2>/dev/null; then
-                echo "App $APP_ID is running (PID $PID)."
-                break
-              fi
-              echo "Attempt $i: app not running yet, retrying in 2s..."
-              sleep 2
-              if [ "$i" -eq 10 ]; then
-                echo "ERROR: App $APP_ID did not start within the timeout."
-                exit 1
-              fi
-            done
-          done
-
+      - name: Install all target apps on simulator
+        shell: bash
+        run: .github/scripts/ios/install-target-apps.sh
+          
+      - name: Launch all target apps on simulator
+        shell: bash
+        run: .github/scripts/ios/launch-target-apps.sh
 
       - name: Run iOS integration tests
-        run: |
-          pytest tests/integration/ios --report-log=test-results.jsonl
+        run: pytest tests/integration/ios --report-log=test-results.jsonl
 
       - name: Upload test results
         if: always()
