@@ -54,8 +54,7 @@ jobs:
           for app in target-apps-ios/*.app; do
             [ -d "$app" ] || { echo "No .app bundles found, skipping."; continue; }
 
-            TARGET_APP=$(basename "$app" ".app")
-            APP_ID="${TARGET_APP//-/_}.mastestapp"
+            APP_ID=$(basename "$app")
 
             echo "=== Installing $app (bundle ID: $APP_ID) ==="
             xcrun simctl install booted "$app"
