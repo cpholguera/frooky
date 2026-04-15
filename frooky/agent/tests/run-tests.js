@@ -28,6 +28,13 @@ if (help) {
 
 validateInput(argv);
 
+// empty outfile
+if (out) {
+  fs.unlink(out, (err) => {
+    if (err && err.code !== 'ENOENT') throw err;
+  });
+}
+
 const result = {
   _write(line) {
     if (out) {
