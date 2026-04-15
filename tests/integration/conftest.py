@@ -43,9 +43,9 @@ def platform(request):
 
 
 @pytest.fixture
-def mastestapp_start_path(platform):
+def maestro_flow_mastg_demo():
     """Returns a maestro flow which pushes the start button from the MAS test app"""
-    return Path(__file__).parent / "maestro" / f'{platform}-mastestapp-start.yaml'
+    return Path(__file__).parent / "maestro" / "mastg_demo.yaml"
 
 
 @pytest.fixture
@@ -171,7 +171,7 @@ def _start_app(platform, target_app):
 
 
 @pytest.fixture
-def run_frooky(platform, output_file_path, mastestapp_start_path):
+def run_frooky(platform, output_file_path, maestro_flow_mastg_demo):
     def _run_frooky(hook_file, target_app):
         temp_hook_path = None
         frooky_process = None
@@ -212,8 +212,9 @@ def run_frooky(platform, output_file_path, mastestapp_start_path):
                 [
                     "maestro",
                     "test",
+                    "--env", f"APP_ID={target_app.replace("-","_")}.frooky.target.app",
                     "--platform", platform,
-                    str(mastestapp_start_path)
+                    str(maestro_flow_mastg_demo)
                 ],
                 timeout=maestro_timeout,
                 check=True,
