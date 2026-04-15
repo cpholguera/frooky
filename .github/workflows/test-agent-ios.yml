@@ -47,8 +47,10 @@ jobs:
         run: |
           set -eo pipefail
 
-          for app in target-apps-ios/*.target-app.app; do
-            TARGET_APP=$(basename "$app" .target-app.app)
+          for app in target-apps-ios/*.app; do
+            [ -d "$app" ] || { echo "No .app bundles found, skipping."; continue; }
+
+            TARGET_APP=$(basename "$app")
             APP_ID="${TARGET_APP//-/_}.mastestapp"
 
             echo "=== Installing $app (bundle ID: $APP_ID) ==="
@@ -70,7 +72,6 @@ jobs:
               fi
             done
           done
-
 
       - name: Run tests
         shell: bash
