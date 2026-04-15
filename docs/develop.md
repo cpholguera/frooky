@@ -48,23 +48,92 @@ The host, on the other hand, serves as an integration test for the full applicat
 
 The following chapters describe how to write tests and target apps the tests should run against.
 
-### Building Target App
+### Building and Installing Target App
 
 Tests usually require a target app which implements the feature that should be tested.
 
 You find them in the folder `tests/target-apps`, together with [instructions](../tests/target-apps/README.md) how to build them.
 
-### Installing the Target App
-
-After building, the app must be installed manually on the device or simulator before running tests. This command will install and launch the app:
-
-```bash
-cd tests/target-apps/<android|ios>
-make install
-```
+After building, the app must be installed manually on the device or simulator before running tests. 
 
 > [!NOTE]
 > Before proceeding, make sure Frida is available on the target device (Android) or on the local machine (iOS Simulator).
+
+### Running Host Tests
+
+These tests are related to the frooky host.  Tests are implemented with pytest and live under `tests/`. They can be unit tests for the Python code, or integration tests, if you want to test the functionality end-to-end.
+
+#### Developing and Running Host Unit Tests
+
+The unit tests are located in `tests/unit`. They usually _don't_ require a target app, since they directly test Python code without the need to interact with a remote target.
+
+Run them using the following command:
+
+```sh
+pytest tests/unit
+```
+
+Write new tests using the official [`ptyest` documentation](https://docs.pytest.org/en/stable/).
+
+#### Developing and Running Host Integration Tests
+
+These tests often require a target device an a target app. Build and install them first according to their [documentation](../tests/target-apps/README.md)
+
+Run them all using the following command:
+
+```sh
+pytest tests/integration
+```
+
+If you only want to run them fro a certain platform use:
+
+```sh
+pytest tests/integration/android
+pytest tests/integration/ios
+```
+
+Since these integration test are the most complex one, lets have a look at the anatomy of one test:
+
+```python
+ def test_single_method(self, run_frooky, count_matched_events):
+     """Test hooking a single Java method in a real process."""
+
+     hook_file = {
+         "category": "STORAGE",
+         "hooks": [
+             {
+                 "class": "androidx.security.crypto.EncryptedSharedPreferences$Editor",
+                 "methods": [
+                     "putString"
+                 ]
+             }
+         ]
+     }
+
+     target_app = "mastg-demo-0060"
+
+     run_frooky(hook_file, target_app)
+
+     expected_pattern = {
+         "class": "androidx.security.crypto.EncryptedSharedPreferences$Editor",
+         "method": "putString",
+     }
+
+     assert count_matched_events(
+         expected_pattern) == 2, "Not the amount of expected matched events found."
+```
+
+The magic happens mostly in `run_frooky(hook_file, target_app)`. This will do the following:
+
+1. Run the `target_app` located in `tests/target-apps/<android|ios>/mastg-demo-0060` (make sure it is installed).
+2. Write the data in `hook_file` to a temporary `hook_file.yaml`
+3. Start frooky and attach to the `target_app`. The output file is located at `output.json`
+4. Using [maestro](https://maestro.dev/) to click the "Start" button and run the MAS DEMO
+
+After this function completes, we can access the file `output.json` and verify if it contains the expected results. This is done in the function `count_matched_events()` which tests if the actual produced output from the `output.json` file contains the subset defined in `expected_pattern`.
+
+> [!TIP]
+> Try to reuse the already existing target apps located in [`tests/target-apps`](../tests/target-apps/) before implementing new ones.
 
 ### Running Agent Tests
 
