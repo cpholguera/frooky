@@ -7,6 +7,12 @@ from pathlib import Path
 import json
 import pytest
 
+# Timeouts
+APP_START_TIMEOUT = 30
+FROOKY_OUTPUT_TIMEOUT = 30
+MAESTRO_TIMEOUT = 600
+FROOKY_TERMINATE_TIMEOUT = 5
+
 
 def _matches_subset_pattern_recursive(event, pattern):
     """
@@ -19,8 +25,7 @@ def _matches_subset_pattern_recursive(event, pattern):
         if not isinstance(event, dict):
             return False
         return all(
-            key in event and _matches_subset_pattern_recursive(
-                event[key], value)
+            key in event and _matches_subset_pattern_recursive(event[key], value)
             for key, value in pattern.items()
         )
     elif isinstance(pattern, list):
@@ -44,55 +49,8 @@ def platform(request):
 
 @pytest.fixture
 def maestro_flow_mastg_demo():
-    """Returns a maestro flow which pushes the start button from the MAS test app"""
+    """Returns a maestro flow which pushes the start button from the MAS test app."""
     return Path(__file__).parent / "maestro" / "mastg_demo.yaml"
-
-
-@pytest.fixture
-def app_id(platform, target_name):
-    """Start the app and return PID (Android) or app name (iOS)."""
-    if platform == "android":
-        app_bundle_id = f"${target_name.replace("-","_")}.frooky.target.app"
-
-        subprocess.run(['adb', 'wait-for-device'], check=True)
-        subprocess.run(
-            ['adb', 'shell', 'am', 'start', '-n', f'{app_bundle_id}/.MainActivity'],
-            check=True
-        )
-
-        # Poll until the app process is visible
-        deadline = time.monotonic() + 30
-        pid = None
-        while not pid:
-            if time.monotonic() > deadline:
-                pytest.fail(f"Timed out waiting for PID of Android app {app_id}")
-            result = subprocess.run(
-                ['adb', 'shell', 'pidof', app_id],
-                capture_output=True,
-                text=True,
-                check=False
-            )
-            pid = result.stdout.strip()
-            if not pid:
-                time.sleep(0.5)
-
-        return pid
-
-    else:  # ios
-        app_bundle_id= f"{app_id}.frooky.target.app"
-        app_name = "MASTestApp"
-
-        try:
-            subprocess.run(
-                ['xcrun', 'simctl', 'launch', 'booted', app_bundle_id],
-                capture_output=True,
-                text=True,
-                check=True
-            )
-            return app_name
-        except subprocess.CalledProcessError as e:
-            raise RuntimeError(
-                f"Could not launch iOS app {app_bundle_id}: {e.stderr}") from e
 
 
 @pytest.fixture
@@ -120,7 +78,7 @@ def count_matched_events(output_file_path):
     def _count_matched_events(expected_event):
         matched_events_counter = 0
 
-        with open(output_file_path, 'r', encoding="utf8") as f:
+        with open(output_file_path, "r", encoding="utf8") as f:
             for line in f:
                 try:
                     entry = json.loads(line)
@@ -135,39 +93,52 @@ def count_matched_events(output_file_path):
 
 
 def _start_app(platform, target_app):
-    app_id = f"{target_app.replace('-', '_')}.frooky.target.app"
+    app_bundle_id = "{}.frooky.target.app".format(target_app.replace("-", "_"))
 
     if platform == "android":
-        subprocess.run(['adb', 'wait-for-device'], check=True)
+        subprocess.run(["adb", "wait-for-device"], check=True)
         subprocess.run(
-            ['adb', 'shell', 'am', 'start', '-n', f'{app_id}/org.owasp.mastestapp.MainActivity'],
-            check=True
+            [
+                "adb", "shell", "am", "start", "-n",
+                "{}/org.owasp.mastestapp.MainActivity".format(app_bundle_id),
+            ],
+            check=True,
         )
 
-        deadline = time.monotonic() + 30
+        deadline = time.monotonic() + APP_START_TIMEOUT
         pid = None
         while not pid:
             if time.monotonic() > deadline:
-                pytest.fail(f"Timed out waiting for PID of Android app {app_id}")
+                pytest.fail(
+                    "Timed out waiting for PID of Android app {}".format(app_bundle_id)
+                )
             result = subprocess.run(
-                ['adb', 'shell', 'pidof', app_id],
-                capture_output=True, text=True, check=False
+                ["adb", "shell", "pidof", app_bundle_id],
+                capture_output=True,
+                text=True,
+                check=False,
             )
             pid = result.stdout.strip()
             if not pid:
                 time.sleep(0.5)
+
         return pid
+
     else:  # ios
         try:
             result = subprocess.run(
-                ['xcrun', 'simctl', 'launch', 'booted', app_id],
-                capture_output=True, text=True, check=True
+                ["xcrun", "simctl", "launch", "booted", app_bundle_id],
+                capture_output=True,
+                text=True,
+                check=True,
             )
             # stdout format: "com.example.App: 12345"
-            pid = int(result.stdout.strip().split(': ')[1])
-            return  pid
+            pid = int(result.stdout.strip().split(": ")[1])
+            return pid
         except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Could not launch iOS app {app_id}: {e.stderr}") from e
+            raise RuntimeError(
+                "Could not launch iOS app {}: {}".format(app_bundle_id, e.stderr)
+            ) from e
 
 
 @pytest.fixture
@@ -176,50 +147,53 @@ def run_frooky(platform, output_file_path, maestro_flow_mastg_demo):
         temp_hook_path = None
         frooky_process = None
 
-        # Start the app and get its identifier
         target_app_pid = _start_app(platform, target_app)
 
-        fd, temp_hook_path = tempfile.mkstemp(suffix='.json', text=True)
-        with os.fdopen(fd, 'w') as f:
+        app_bundle_id = "{}.frooky.target.app".format(target_app.replace("-", "_"))
+
+        fd, temp_hook_path = tempfile.mkstemp(suffix=".json", text=True)
+        with os.fdopen(fd, "w") as f:
             json.dump(hook_file, f)
 
         try:
-            frooky_process = subprocess.Popen([
-                "frooky",
-                platform,
-                *(["-U"] if platform == "android" else []),
-                "-p", str(target_app_pid),
-                "-o", output_file_path,
-                temp_hook_path
-            ],
+            frooky_process = subprocess.Popen(
+                [
+                    "frooky",
+                    platform,
+                    *(["-U"] if platform == "android" else []),
+                    "-p", str(target_app_pid),
+                    "-o", str(output_file_path),
+                    temp_hook_path,
+                ],
                 text=True,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
+                stderr=subprocess.PIPE,
             )
 
-            output_ready_timeout = 30
-            deadline = time.monotonic() + output_ready_timeout
+            deadline = time.monotonic() + FROOKY_OUTPUT_TIMEOUT
             while not os.path.isfile(output_file_path):
                 if time.monotonic() > deadline:
-                    raise RuntimeError("Frooky did not produce output file in time")
+                    stdout, stderr = frooky_process.communicate()
+                    raise RuntimeError(
+                        "Frooky did not produce output file in time. stderr: {}".format(stderr)
+                    )
                 if frooky_process.poll() is not None:
-                    _, stderr = frooky_process.communicate()
-                    raise RuntimeError(f"Frooky exited early: {stderr}")
+                    stdout, stderr = frooky_process.communicate()
+                    raise RuntimeError("Frooky exited early: {}".format(stderr))
                 time.sleep(0.5)
 
-            maestro_timeout = 600
             subprocess.run(
                 [
                     "maestro",
                     "test",
-                    "--env", f"APP_ID={target_app.replace("-","_")}.frooky.target.app",
+                    "--env", "APP_ID={}".format(app_bundle_id),
                     "--platform", platform,
-                    str(maestro_flow_mastg_demo)
+                    str(maestro_flow_mastg_demo),
                 ],
-                timeout=maestro_timeout,
+                timeout=MAESTRO_TIMEOUT,
                 check=True,
                 capture_output=True,
-                text=True
+                text=True,
             )
 
         finally:
@@ -229,7 +203,7 @@ def run_frooky(platform, output_file_path, maestro_flow_mastg_demo):
             if frooky_process:
                 frooky_process.terminate()
                 try:
-                    frooky_process.wait(timeout=5)
+                    frooky_process.wait(timeout=FROOKY_TERMINATE_TIMEOUT)
                 except subprocess.TimeoutExpired:
                     frooky_process.kill()
                     frooky_process.wait()
