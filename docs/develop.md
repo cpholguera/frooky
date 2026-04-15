@@ -128,7 +128,9 @@ The magic happens mostly in `run_frooky(hook_file, target_app)`. This will do th
 1. Run the `target_app` located in `tests/target-apps/<android|ios>/mastg-demo-0060` (make sure it is installed).
 2. Write the data in `hook_file` to a temporary `hook_file.yaml`
 3. Start frooky and attach to the `target_app`. The output file is located at `output.json`
-4. Using [maestro](https://maestro.dev/) to click the "Start" button and run the MAS DEMO
+4. Using [maestro](https://maestro.dev/) to automatically click the "Start" button and run the MAS DEMO:
+
+   ![maestro clicks start to run the app](./img/mastestapp.png)
 
 After this function completes, we can access the file `output.json` and verify if it contains the expected results. This is done in the function `count_matched_events()` which tests if the actual produced output from the `output.json` file contains the subset defined in `expected_pattern`.
 

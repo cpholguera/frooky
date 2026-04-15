@@ -42,10 +42,8 @@ build: $(BUILD_DIR) $(DIST_DIR)
 		"$(CLONE_DIR)/Local.xcconfig" && \
 		echo "Set PRODUCT_BUNDLE_IDENTIFIER to $(APP_ID)"
 
-	@[ -f "$(CLONE_DIR)/app/src/main/res/values/strings.xml" ] && \
-			perl -i -pe "s|<string name=\"app_name\">MASTestApp</string>|<string name=\"app_name\">frooky: $(TARGET_APP)</string>|" \
-					"$(CLONE_DIR)/app/src/main/res/values/strings.xml" && \
-			echo "Replaced app_name in strings.xml" || true
+	@printf '\nINFOPLIST_KEY_CFBundleDisplayName = frooky: %s\n' "$(TARGET_APP)" >> "$(CLONE_DIR)/Local.xcconfig" && \
+		echo "Set CFBundleDisplayName to frooky: $(TARGET_APP)"
 
 	cd $(CLONE_DIR) && \
 		IOS_SCHEME=$$(xcodebuild -list -json | jq -r '.project.targets[0]') && \
