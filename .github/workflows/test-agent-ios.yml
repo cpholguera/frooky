@@ -75,41 +75,11 @@ jobs:
       - name: Run tests
         shell: bash
         run: |
-          set -o pipefail
-
-          APP_ID="org.owasp.mastestapp.MASTestApp-iOS"
-
-          PID=$(xcrun simctl launch booted "$APP_ID" | awk '{print $2}')
-          echo "Launched with PID $PID"
-
-          for i in $(seq 1 10); do
-            if kill -0 "$PID" 2>/dev/null; then
-              echo "App is running (PID $PID)."
-
-              echo "Running iOS agent tests"
-              npm --prefix frooky/agent run test:ios:local -- --appIdentifier $PID 2>&1 | tee test-results.txt
-              echo ${PIPESTATUS[0]} > exit-code.txt
-            fi
-            echo "Attempt $i: app not running yet, retrying in 2s..."
-            sleep 2
-          done
-
-          echo "App did not start within the timeout."
-          exit 1
-
-
-      - name: Write summary and check result
-        run: |
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          cat test-results.txt >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-
-          exit_code=$(cat exit-code.txt)
-          exit $exit_code
+          npm --prefix frooky/agent run test:ios:local -- --out test-results.txt
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: test-results-ios
-          path: test-results-ios.txt
+          name: test-results
+          path: test-results.txt
