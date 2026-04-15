@@ -17,8 +17,6 @@ endif
 
 JAVA_HOME ?= $(shell java -XshowSettings:property -version 2>&1 | grep java.home | awk '{print $$3}')
 
-BUNDLE_ID := org.owasp.mastestapp
-
 ALL_APPS := $(shell find . -maxdepth 1 -mindepth 1 -type d \
 	! -name dist ! -name '.*' \
 	-exec basename {} \;)
