@@ -93,14 +93,14 @@ def count_matched_events(output_file_path):
 
 
 def _start_app(platform, target_app):
-    app_bundle_id = "{}.frooky.target.app".format(target_app.replace("-", "_"))
+    app_bundle_id = f"{target_app.replace('-', '_')}.frooky.target.app"
 
     if platform == "android":
         subprocess.run(["adb", "wait-for-device"], check=True)
         subprocess.run(
             [
                 "adb", "shell", "am", "start", "-n",
-                "{}/org.owasp.mastestapp.MainActivity".format(app_bundle_id),
+                f"{app_bundle_id}/org.owasp.mastestapp.MainActivity",
             ],
             check=True,
         )
@@ -110,7 +110,7 @@ def _start_app(platform, target_app):
         while not pid:
             if time.monotonic() > deadline:
                 pytest.fail(
-                    "Timed out waiting for PID of Android app {}".format(app_bundle_id)
+                    f"Timed out waiting for PID of Android app {app_bundle_id}"
                 )
             result = subprocess.run(
                 ["adb", "shell", "pidof", app_bundle_id],
@@ -137,7 +137,7 @@ def _start_app(platform, target_app):
             return pid
         except subprocess.CalledProcessError as e:
             raise RuntimeError(
-                "Could not launch iOS app {}: {}".format(app_bundle_id, e.stderr)
+                f"Could not launch iOS app {app_bundle_id}: {e.stderr}"
             ) from e
 
 
@@ -149,7 +149,7 @@ def run_frooky(platform, output_file_path, maestro_flow_mastg_demo):
 
         target_app_pid = _start_app(platform, target_app)
 
-        app_bundle_id = "{}.frooky.target.app".format(target_app.replace("-", "_"))
+        app_bundle_id = f"{target_app.replace('-', '_')}.frooky.target.app"
 
         fd, temp_hook_path = tempfile.mkstemp(suffix=".json", text=True)
         with os.fdopen(fd, "w") as f:
@@ -175,18 +175,18 @@ def run_frooky(platform, output_file_path, maestro_flow_mastg_demo):
                 if time.monotonic() > deadline:
                     stdout, stderr = frooky_process.communicate()
                     raise RuntimeError(
-                        "Frooky did not produce output file in time. stderr: {}".format(stderr)
+                        f"Frooky did not produce output file in time. stderr: {stderr}"
                     )
                 if frooky_process.poll() is not None:
                     stdout, stderr = frooky_process.communicate()
-                    raise RuntimeError("Frooky exited early: {}".format(stderr))
+                    raise RuntimeError(f"Frooky exited early: {stderr}")
                 time.sleep(0.5)
 
             subprocess.run(
                 [
                     "maestro",
                     "test",
-                    "--env", "APP_ID={}".format(app_bundle_id),
+                    "--env", f"APP_ID={app_bundle_id}",
                     "--platform", platform,
                     str(maestro_flow_mastg_demo),
                 ],
