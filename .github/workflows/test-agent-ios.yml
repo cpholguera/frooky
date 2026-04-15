@@ -11,8 +11,6 @@ permissions:
 jobs:
   build-app-ios:
     uses: ./.github/workflows/build-app-ios.yml
-    with:
-      app_dir: mastg-demo-0067
 
   test-agent-ios:
     name: Test agent iOS

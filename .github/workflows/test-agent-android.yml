@@ -11,8 +11,6 @@ permissions:
 jobs:
   build-app-android:
     uses: ./.github/workflows/build-app-android.yml
-    with:
-      app_dir: mastg-demo-0060
 
   test-agent-android:
     name: Test agent Android
