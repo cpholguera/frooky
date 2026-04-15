@@ -2,8 +2,8 @@ name: Test agent iOS
 
 on:
   push:
-    # paths:
-    #   - 'frooky/agent/**'
+    paths:
+      - 'frooky/agent/**'
 
 permissions:
   contents: read
@@ -65,4 +65,4 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: test-results
-          path: test-results.txt
+          path: frooky/agent/test-results.txt
