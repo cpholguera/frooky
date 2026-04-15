@@ -34,11 +34,7 @@ jobs:
       - name: Summarize test result
         if: always()
         run: |
-          jq -rn '
-            [inputs | select(.$report_type == "TestReport" and .when == "call")] |
-            .[] |
-            "- \(if .outcome == "passed" then "✅" elif .outcome == "failed" then "❌" else "⏭️" end) `\(.nodeid)` (\(.duration | . * 100 | round / 100)s)"
-          ' test-results.jsonl >> "$GITHUB_STEP_SUMMARY"
+            jq -rn '[inputs | select(."$report_type" == "TestReport" and .when == "call")] | .[] | "- \(if .outcome == "passed" then "✅" elif .outcome == "failed" then "❌" else "⏭️" end) \(.nodeid) (\(.duration | . * 100 | round / 100)s)"' test-results.jsonl  >> "$GITHUB_STEP_SUMMARY"  >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload test results
         if: always()
