@@ -1,1 +1,3 @@
-// stub, takes care of decoding an argument / return value (not the implementation itself)
+export interface Decoder {
+	decoder: (input: unknown) => unknown;
+}
