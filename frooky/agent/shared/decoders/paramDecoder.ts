@@ -1,10 +1,10 @@
 // argument
-export type Arg = {
-	name: string;
-	type: string;
+export type DecodedValue = {
+	name?: string;
+	type?: string;
 	value: unknown;
 };
 
 export interface ParamDecoder {
-	decode: (input: unknown, args?: Arg[]) => unknown;
+	decode: (input: unknown, args?: DecodedValue[]) => unknown;
 }

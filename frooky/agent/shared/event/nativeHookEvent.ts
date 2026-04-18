@@ -8,20 +8,16 @@ import { HookEvent } from "./hookEvent";
  */
 export class NativeHookEvent extends HookEvent {
 	/** Module the hooked function is located in. */
-	readonly module: string;
+	module: string;
 
 	/** Symbol of the hooked function. */
-	readonly symbol: string;
+	symbol: string;
 
-	constructor(
-		module: string,
-		symbol: string,
-		category: string,
-		stackTrace: string,
-		args?: unknown[],
-		returnValue?: unknown,
-	) {
-		super(category, stackTrace, args, returnValue);
+	/** Address of the hooked function. */
+	address?: NativePointer;
+
+	constructor(module: string, symbol: string) {
+		super("native");
 		this.module = module;
 		this.symbol = symbol;
 	}

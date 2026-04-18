@@ -1,13 +1,16 @@
 import Java from "frida-java-bridge";
+import { DEFAULT_STACK_TRACE_LIMIT } from "../../shared/config";
+import { HookEvent } from "../../shared/event/hookEvent";
 import type { MethodName } from "../../shared/hook/hook";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import type { Param, ParamType } from "../../shared/hook/parameter";
 import { uuidv4 } from "../../shared/utils";
+import { JavaHookEvent } from "../event/javaHookEvent";
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "./javaHook";
 
 // contains everything needed to hook one java method
 export interface JavaHookOp extends HookOp {
-	class: string;
+	javaClass: string;
 	methodName: MethodName;
 	params: Param[];
 	javaMethod: Java.Method;
@@ -31,10 +34,13 @@ function buildHookOpsForAllOverloads(
 		});
 
 		javaHookOps.push({
-			class: hook.javaClass,
+			javaClass: hook.javaClass,
 			methodName: methodDefinition.name,
 			params: params,
 			javaMethod: javaMethod,
+			stackTraceLimit: hook.stackTraceLimit ?? DEFAULT_STACK_TRACE_LIMIT,
+			eventFilter: hook.eventFilter,
+			category: hook.metadata?.category,
 		});
 	});
 }
@@ -54,10 +60,13 @@ function buildHookOpsForDeclaredOverloads(
 		try {
 			const javaMethod: Java.Method = handle.overload(...paramList);
 			javaHookOps.push({
-				class: hook.javaClass,
+				javaClass: hook.javaClass,
 				methodName: methodDefinition.name,
 				params: declaredOverload.params,
 				javaMethod: javaMethod,
+				stackTraceLimit: hook.stackTraceLimit ?? DEFAULT_STACK_TRACE_LIMIT,
+				eventFilter: hook.eventFilter,
+				category: hook.metadata?.category,
 			});
 		} catch (e) {
 			frooky.log.warn(
@@ -100,16 +109,16 @@ function registerHookOperation(javaHookOp: JavaHookOp) {
 	const System = Java.use("java.lang.System");
 
 	javaHookOp.javaMethod.implementation = function (...args: any[]) {
-		const st = Exception.$new().getStackTrace();
 		const stackTrace: string[] = [];
-		st.forEach((stElement: string, index: number) => {
-			if (index < 10) {
-				stackTrace.push(stElement.toString());
-			}
-			// if (hookEntry.maxFrames === -1 || index < hookEntry.maxFrames) {
-			//   stackTrace.push(stElement.toString());
-			// }
-		});
+
+		if (javaHookOp.stackTraceLimit > 0) {
+			const st = Exception.$new().getStackTrace();
+			st.forEach((stElement: string, index: number) => {
+				if (index < javaHookOp.stackTraceLimit) {
+					stackTrace.push(stElement.toString());
+				}
+			});
+		}
 
 		// const returnType = parseReturnValue(methodHeader);
 
@@ -125,26 +134,33 @@ function registerHookOperation(javaHookOp: JavaHookOp) {
 			}
 		}
 
-		const event = {
-			id: uuidv4(),
-			type: "hook",
-			time: new Date().toISOString(),
-			class: javaHookOp.class,
-			method: javaHookOp.methodName,
-			instanceId: instanceId,
-			stackTrace: stackTrace,
-			// inputParameters: decodeArguments(parameterTypes, arguments),
-		};
+		const event = new JavaHookEvent(javaHookOp.javaClass);
+		event.category = javaHookOp.category;
+		if (stackTrace.length > 0) {
+			event.stackTrace = stackTrace;
+		}
+
+		// = {
+		// 	id: uuidv4(),
+		// 	type: "hook",
+		// 	time: new Date().toISOString(),
+		// 	class: javaHookOp.class,
+		// 	method: javaHookOp.methodName,
+		// 	instanceId: instanceId,
+		// 	// inputParameters: decodeArguments(parameterTypes, arguments),
+		// };
+
+		// if (stackTrace.length > 0) {event }
 
 		try {
 			// call original method
 			const returnValue = javaHookOp.javaMethod.apply(this, args);
 			// event.returnValue = decodeArguments([returnType], [returnValue]);
-			send(event);
+			frooky.addEvent(event);
 			return returnValue;
 		} catch (e) {
 			// event.exception = e.toString();
-			send(event);
+			frooky.addEvent(event);
 			throw e;
 		}
 	};

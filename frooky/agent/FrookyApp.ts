@@ -1,8 +1,9 @@
 import type { FrookyConfig, Platform } from "frooky";
 import { pl } from "zod/v4/locales";
 import type { BaseEvent } from "./shared/event/baseEvent";
+import { startAsyncSender } from "./shared/event/eventSender";
 import type { HookEvent } from "./shared/event/hookEvent";
-import { LogEvent } from "./shared/event/logEvent";
+import type { LogEvent } from "./shared/event/logEvent";
 import type { SummaryEvent } from "./shared/event/summaryEvent";
 import type { HookRunner } from "./shared/hook/hookRunner";
 import { HookStore } from "./shared/hook/hookStore";
@@ -40,6 +41,9 @@ export class FrookyApp {
 		verbosity: number = 3,
 		logTo: logTo = "device",
 	) {
+		//initialize asynchronous sender
+		startAsyncSender(this.eventCache);
+
 		this.platform = platform;
 		this.platformHookRunner = platformHookRunner;
 		this.nativeHookRunner = new NativeHookRunner();
@@ -103,9 +107,9 @@ export class FrookyApp {
 	 * @param event - The event to cache.
 	 */
 	public addEvent(event: LogEvent | HookEvent | SummaryEvent): void {
-		if (!(event instanceof LogEvent)) {
-			this.log.info(`Adding event to event cache: ${event}`);
-		}
+		// if (!(event instanceof LogEvent)) {
+		// 	this.log.info(`Adding event to event cache: ${event}`);
+		// }
 		this.eventCache.push(event);
 	}
 }
