@@ -6,16 +6,18 @@ import { FrookyApp } from "../FrookyApp";
 import { JavaHookRunner } from "./hook/javaHookRunner";
 
 if (Java.available) {
-  rpc.exports = {
-    runFrookyAgent(frookyConfig: FrookyConfig) {
-      globalThis.frooky = new FrookyApp("Android", new JavaHookRunner());
-      frooky.loadFrookyConfig(frookyConfig);
+	rpc.exports = {
+		runFrookyAgent(frookyConfig: FrookyConfig) {
+			globalThis.frooky = new FrookyApp("Android", new JavaHookRunner());
+			frooky.loadFrookyConfig(frookyConfig);
 
-      Java.perform(() => {
-        frooky.executeHookOperations();
-      });
-    },
-  };
+			Java.perform(() => {
+				frooky.executeHookOperations();
+			});
+		},
+	};
 } else {
-  console.error("[!] The agent is not run on an Android device. Make sure to run this version of the frooky agent on Android.");
+	console.error(
+		"[!] The agent is not run on an Android device. Make sure to run this version of the frooky agent on Android.",
+	);
 }
