@@ -1,6 +1,6 @@
 import type { Hook, HookMetadata, NativeHook, Platform } from "frooky";
 import { isJavaHook, isNativeHook, isObjcHook } from "frooky";
-import z from "zod";
+import { z } from "zod";
 import {
 	type JavaHookInput,
 	normalizeJavaHook,
@@ -43,16 +43,21 @@ export function validateHooks(
 		}
 
 		try {
-			if (platform !== "Android") {
-				throw new Error(
-					`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(hook)}`,
-				);
-			}
 			if (isJavaHook(hook)) {
+				if (platform !== "Android") {
+					throw new Error(
+						`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(hook)}`,
+					);
+				}
 				javaHookInputSchema.parse(hook as JavaHookInput);
 				const javaHook = normalizeJavaHook(hook);
 				result.validHooks.push(javaHook);
 			} else if (isObjcHook(hook)) {
+				if (platform !== "iOS") {
+					throw new Error(
+						`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(hook)}`,
+					);
+				}
 				objcHookInputSchema.parse(hook as ObjcHookInput);
 				const objcHook = normalizeObjcHook(hook);
 				result.validHooks.push(objcHook);
