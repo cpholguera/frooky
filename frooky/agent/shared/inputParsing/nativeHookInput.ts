@@ -33,6 +33,7 @@ export type NativeSymbol = SymbolName | SymbolDefinitionInput;
  * @discriminator {type}
  */
 export interface NativeHookInput extends Omit<NativeHook, "functions"> {
+	type: "native";
 	functions: NativeSymbol[];
 }
 

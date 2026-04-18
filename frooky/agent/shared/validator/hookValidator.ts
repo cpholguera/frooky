@@ -5,7 +5,10 @@ import {
 	type JavaHookInput,
 	normalizeJavaHook,
 } from "../inputParsing/javaHookInput";
-import { normalizeNativeHook } from "../inputParsing/nativeHookInput";
+import {
+	type NativeHookInput,
+	normalizeNativeHook,
+} from "../inputParsing/nativeHookInput";
 import {
 	normalizeObjcHook,
 	type ObjcHookInput,
@@ -49,8 +52,10 @@ export function validateHooks(
 						`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(hook)}`,
 					);
 				}
-				javaHookInputSchema.parse(hook as JavaHookInput);
-				const javaHook = normalizeJavaHook(hook);
+				const javaHookInput = hook as JavaHookInput;
+				javaHookInput.type = "java";
+				javaHookInputSchema.parse(javaHookInput);
+				const javaHook = normalizeJavaHook(javaHookInput);
 				result.validHooks.push(javaHook);
 			} else if (isObjcHook(hook)) {
 				if (platform !== "iOS") {
@@ -58,12 +63,16 @@ export function validateHooks(
 						`Skipped the following hook, as it is not compatible with ${platform}: \n${prettyPrintHook(hook)}`,
 					);
 				}
-				objcHookInputSchema.parse(hook as ObjcHookInput);
-				const objcHook = normalizeObjcHook(hook);
+				const objcHookInput = hook as ObjcHookInput;
+				objcHookInput.type = "objc";
+				objcHookInputSchema.parse(objcHookInput);
+				const objcHook = normalizeObjcHook(objcHookInput);
 				result.validHooks.push(objcHook);
 			} else if (isNativeHook(hook)) {
-				nativeHookInputSchema.parse(hook as NativeHook);
-				const nativeHook = normalizeNativeHook(hook);
+				const nativeHookInput = hook as NativeHookInput;
+				nativeHookInput.type = "native";
+				nativeHookInputSchema.parse(nativeHookInput);
+				const nativeHook = normalizeNativeHook(nativeHookInput);
 				result.validHooks.push(nativeHook);
 			} else {
 				throw new Error(

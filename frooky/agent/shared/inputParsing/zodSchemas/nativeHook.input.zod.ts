@@ -11,5 +11,6 @@ export const symbolDefinitionInputSchema = symbolDefinitionSchema.omit({ "params
 export const nativeSymbolSchema = z.union([symbolNameSchema, symbolDefinitionInputSchema]);
 
 export const nativeHookInputSchema = nativeHookSchema.omit({ "functions": true }).extend({
+    type: z.literal("native"),
     functions: z.array(nativeSymbolSchema)
 });
