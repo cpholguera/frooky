@@ -30,6 +30,7 @@ export type ObjcMethodInput = MethodName | ObjcMethodDefinitionInput;
  */
 
 export interface ObjcHookInput extends Omit<ObjcHook, "methods"> {
+	type: "objc";
 	methods: ObjcMethodInput[];
 }
 

@@ -14,5 +14,6 @@ export const objcMethodDefinitionInputSchema = z.object({
 export const objcMethodInputSchema = z.union([methodNameSchema, objcMethodDefinitionInputSchema]);
 
 export const objcHookInputSchema = objcHookSchema.omit({ "methods": true }).extend({
+    type: z.literal("objc"),
     methods: z.array(objcMethodInputSchema)
 });

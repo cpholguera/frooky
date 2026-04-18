@@ -1,4 +1,5 @@
 import type { FrookyConfig, Platform } from "frooky";
+import { pl } from "zod/v4/locales";
 import type { BaseEvent } from "./shared/event/baseEvent";
 import type { HookEvent } from "./shared/event/hookEvent";
 import { LogEvent } from "./shared/event/logEvent";
@@ -64,7 +65,7 @@ export class FrookyApp {
 		this.log.info("Loading frooky configuration.");
 
 		// validating frooky config
-		const hookParsingResult = validateFrookyConfig(frookyConfig);
+		const hookParsingResult = validateFrookyConfig(frookyConfig, this.platform);
 		this.log.info("Adding valid hook and their metadata to the hook store.");
 
 		// adding valid metadata and hooks to the hook store

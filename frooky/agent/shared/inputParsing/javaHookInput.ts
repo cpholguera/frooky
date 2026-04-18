@@ -48,6 +48,7 @@ export type JavaMethod = MethodName | JavaMethodDefinitionInput;
  */
 
 export interface JavaHookInput extends Omit<JavaHook, "methods"> {
+	type: "java";
 	methods: JavaMethod[];
 }
 
