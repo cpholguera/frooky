@@ -38,5 +38,5 @@ export interface Hook {
 	/**
 	 * Stack trace filters to apply.
 	 */
-	eventFilter?: string[];
+	eventFilter?: [string];
 }

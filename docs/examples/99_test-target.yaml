@@ -8,6 +8,34 @@ hooks:
   # - javaClass: android.content.Intent 
   #   methods:
   #     - putExtra
+
+  - javaClass: org.owasp.mastestapp.MastgTest
+    stackTraceLimit: 0
+    methods:
+      - passString
+      - passBoolean
+      - passByte
+      - passShort
+      - passInt
+      - passLong
+      - passFloat
+      - passDouble
+      - passChar
+      - passBigInteger
+      - passBigDecimal
+      - passList
+      - passMap
+      - passSet
+      - passEnum
+      - passStringArray
+      - passBooleanArray
+      - passByteArray
+      - passShortArray
+      - passIntArray
+      - passLongArray
+      - passFloatArray
+      - passDoubleArray
+      - passCharArray
   
 
   # - javaClass: androidx.security.crypto.EncryptedSharedPreferences$Editor
@@ -15,19 +43,19 @@ hooks:
   #     - putString
   #     - putStringSet
 
-  # overloads with different ways of param declaration (t)
-  - javaClass: android.content.Intent 
-    methods:
-      - name: $init
-        overloads:
-          - params:
-            - android.content.Intent
-          - params: 
-            - [ android.content.Context, packageContext]
-            - [ java.lang.Class, cls]
-          - params:
-            - { type: java.lang.String, name: action}
-            - android.net.Uri
+  # # overloads with different ways of param declaration (t)
+  # - javaClass: android.content.Intent 
+  #   methods:
+  #     - name: $init
+  #       overloads:
+  #         - params:
+  #           - android.content.Intent
+  #         - params: 
+  #           - [ android.content.Context, packageContext]
+  #           - [ java.lang.Class, cls]
+  #         - params:
+  #           - { type: java.lang.String, name: action}
+  #           - android.net.Uri
           
         
   

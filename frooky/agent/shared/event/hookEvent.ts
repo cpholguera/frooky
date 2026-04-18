@@ -1,3 +1,4 @@
+import type { DecodedValue } from "../decoders/paramDecoder";
 import { BaseEvent } from "./baseEvent";
 
 /**
@@ -13,34 +14,31 @@ export abstract class HookEvent extends BaseEvent {
 	readonly type = "hook" as const;
 
 	/**
+	 * The sub type.
+	 */
+	readonly subType: string;
+
+	/**
 	 * The category grouping this hook belongs to,
 	 * as defined in the hook configuration.
 	 */
-	readonly category: string;
+	category?: string;
 
 	/** Stack trace captured at the point of interception. */
-	readonly stackTrace: string;
+	stackTrace?: string[];
 
 	/**
-	 * Decoded input arguments passed to the hooked function / method.
+	 * Decoded input argument values passed to the hooked function / method.
 	 */
-	readonly args?: unknown[];
+	args?: DecodedValue[];
 
 	/**
 	 * Decoded return value from the hooked function / method.
 	 */
-	readonly returnValue?: unknown;
+	returnValue?: DecodedValue;
 
-	constructor(
-		category: string,
-		stackTrace: string,
-		args?: unknown[],
-		returnValue?: unknown,
-	) {
+	constructor(subType: string) {
 		super();
-		this.category = category;
-		this.stackTrace = stackTrace;
-		this.args = args;
-		this.returnValue = returnValue;
+		this.subType = subType;
 	}
 }

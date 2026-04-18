@@ -4,6 +4,9 @@ import type { Hook } from "frooky";
 // Hook Operation
 // Contains all information to hook one method or function
 export interface HookOp {
+	stackTraceLimit: number;
+	eventFilter?: [string];
+	category?: string;
 	module?: string;
 	moduleAddress?: NativePointer;
 }
