@@ -1,5 +1,3 @@
-import { Hook } from "../hook/hook";
+import type { Hook } from "../hook/hook";
 
-export function resolveDecoders(hook: Hook) {
-  
-}
+export function resolveDecoders(hook: Hook) {}

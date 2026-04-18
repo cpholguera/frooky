@@ -1,4 +1,9 @@
-import type { ParamDefinition, ParamName, ParamOptions, ParamType } from "../hook/parameter";
+import type {
+	ParamDefinition,
+	ParamName,
+	ParamOptions,
+	ParamType,
+} from "../hook/parameter";
 
 /**
  * Extended parameter type for YAML input parsing.
@@ -17,27 +22,36 @@ import type { ParamDefinition, ParamName, ParamOptions, ParamType } from "../hoo
  *
  * @public
  */
-export type ParamInput = ParamType | ParamDefinition | [ParamType, ParamName] | [ParamType, ParamOptions] | [ParamType, ParamName, ParamOptions];
+export type ParamInput =
+	| ParamType
+	| ParamDefinition
+	| [ParamType, ParamName]
+	| [ParamType, ParamOptions]
+	| [ParamType, ParamName, ParamOptions];
 
 export function normalizeParam(input: ParamInput): ParamDefinition {
-  if (typeof input === "string") {
-    return { type: input };
-  }
+	if (typeof input === "string") {
+		return { type: input };
+	}
 
-  // Check array before plain object, since arrays are also objects
-  if (Array.isArray(input)) {
-    const [first, second, third] = input;
+	// Check array before plain object, since arrays are also objects
+	if (Array.isArray(input)) {
+		const [first, second, third] = input;
 
-    if (input.length === 3) {
-      return { type: first, name: second as string, options: third as ParamOptions };
-    }
+		if (input.length === 3) {
+			return {
+				type: first,
+				name: second as string,
+				options: third as ParamOptions,
+			};
+		}
 
-    if (typeof second === "object") {
-      return { type: first, options: second };
-    }
+		if (typeof second === "object") {
+			return { type: first, options: second };
+		}
 
-    return { type: first, name: second };
-  }
+		return { type: first, name: second };
+	}
 
-  return input as ParamDefinition;
+	return input as ParamDefinition;
 }

@@ -7,10 +7,10 @@ import type { Param } from "../../shared/hook/parameter";
  * @public
  */
 export interface JavaOverload {
-  /**
-   * Parameter definitions for this overload.
-   */
-  params: Param[];
+	/**
+	 * Parameter definitions for this overload.
+	 */
+	params: Param[];
 }
 
 /**
@@ -19,15 +19,15 @@ export interface JavaOverload {
  * @public
  */
 export interface JavaMethodDefinition {
-  /**
-   * Method name.
-   */
-  name: MethodName;
+	/**
+	 * Method name.
+	 */
+	name: MethodName;
 
-  /**
-   * Explicit overload definitions.
-   */
-  overloads?: JavaOverload[];
+	/**
+	 * Explicit overload definitions.
+	 */
+	overloads?: JavaOverload[];
 }
 
 /**
@@ -44,18 +44,18 @@ export type JavaMethod = JavaMethodDefinition;
  * @discriminator {type}
  */
 export interface JavaHook extends Hook {
-  /**
-   * Fully qualified Java class name.
-   */
-  javaClass: string;
+	/**
+	 * Fully qualified Java class name.
+	 */
+	javaClass: string;
 
-  /**
-   * Methods to hook on the target class.
-   */
-  methods: JavaMethod[];
+	/**
+	 * Methods to hook on the target class.
+	 */
+	methods: JavaMethod[];
 }
 
 // Type guard function
 export function isJavaHook(h: Hook): h is JavaHook {
-  return "javaClass" in h;
+	return "javaClass" in h;
 }

@@ -1,4 +1,8 @@
-import type { JavaHook, JavaMethodDefinition, JavaOverload } from "../../android/hook/javaHook";
+import type {
+	JavaHook,
+	JavaMethodDefinition,
+	JavaOverload,
+} from "../../android/hook/javaHook";
 import type { MethodName } from "../hook/hook";
 import { normalizeParam, type ParamInput } from "./parameterInput";
 
@@ -8,10 +12,10 @@ import { normalizeParam, type ParamInput } from "./parameterInput";
  * @public
  */
 export interface JavaOverloadInput extends Omit<JavaOverload, "params"> {
-  /**
-   * Parameter definitions for this overload.
-   */
-  params: ParamInput[];
+	/**
+	 * Parameter definitions for this overload.
+	 */
+	params: ParamInput[];
 }
 
 /**
@@ -19,11 +23,12 @@ export interface JavaOverloadInput extends Omit<JavaOverload, "params"> {
  *
  * @public
  */
-export interface JavaMethodDefinitionInput extends Omit<JavaMethodDefinition, "overloads"> {
-  /**
-   * Explicit overload definitions.
-   */
-  overloads?: JavaOverloadInput[];
+export interface JavaMethodDefinitionInput
+	extends Omit<JavaMethodDefinition, "overloads"> {
+	/**
+	 * Explicit overload definitions.
+	 */
+	overloads?: JavaOverloadInput[];
 }
 
 /**
@@ -43,30 +48,32 @@ export type JavaMethod = MethodName | JavaMethodDefinitionInput;
  */
 
 export interface JavaHookInput extends Omit<JavaHook, "methods"> {
-  methods: JavaMethod[];
+	methods: JavaMethod[];
 }
 
 function normalizeOverload(input: JavaOverloadInput): JavaOverload {
-  return {
-    ...input,
-    params: input.params.map(normalizeParam),
-  };
+	return {
+		...input,
+		params: input.params.map(normalizeParam),
+	};
 }
 
-function normalizeMethod(input: JavaMethodDefinitionInput | string): JavaMethodDefinition {
-  if (typeof input === "string") {
-    return { name: input };
-  }
+function normalizeMethod(
+	input: JavaMethodDefinitionInput | string,
+): JavaMethodDefinition {
+	if (typeof input === "string") {
+		return { name: input };
+	}
 
-  return {
-    ...input,
-    overloads: input.overloads?.map(normalizeOverload),
-  };
+	return {
+		...input,
+		overloads: input.overloads?.map(normalizeOverload),
+	};
 }
 
 export function normalizeJavaHook(input: JavaHookInput): JavaHook {
-  return {
-    ...input,
-    methods: input.methods.map(normalizeMethod),
-  };
+	return {
+		...input,
+		methods: input.methods.map(normalizeMethod),
+	};
 }
