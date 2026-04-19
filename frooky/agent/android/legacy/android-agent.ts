@@ -1,18 +1,8 @@
 import Java from "frida-java-bridge";
-import type { JavaHook, JavaOverload, NativeHook, NativeSymbol } from "frooky";
-import type { NativeHookEntry } from "../../shared/hook/nativeHookRunner.js";
+import type { JavaOverload, NativeHook, NativeSymbol } from "frooky";
+import { DEFAULT_STACK_TRACE_LIMIT } from "../../shared/config.js";
+import type { NativeHookOp } from "../../shared/hook/nativeHookRunner.js";
 import { uuidv4 } from "../../shared/utils.js";
-import type { JavaHookEntry } from "../hook/javaHookRunner.js";
-import { decodeArguments } from "./android-decoder.js";
-
-/**
- * Decodes the type of the return value of a Java method.
- * @param {string} methodHeader - Java method (e.g., "function setBlockModes([Ljava.lang.String;): android.security.keystore.KeyGenParameterSpec$Builder")
- * @returns {string} The decoded parameter types (e.g., "android.security.keystore.KeyGenParameterSpec$Builder")
- */
-function parseReturnValue(methodHeader) {
-  return methodHeader.split(":")[1].trim();
-}
 
 // /**
 //  * Checks if a hook definition is for a native function.
@@ -37,8 +27,8 @@ function parseReturnValue(methodHeader) {
 ////////
 //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ///////
-export function resolveNativeSymbol(hook: NativeHook): NativeHookEntry[] {
-  const nativeEntry: NativeHookEntry[] = [];
+export function resolveNativeSymbol(hook: NativeHook): NativeHookOp[] {
+  const nativeEntry: NativeHookOp[] = [];
   const errors: string[] = [];
 
   try {
@@ -48,6 +38,7 @@ export function resolveNativeSymbol(hook: NativeHook): NativeHookEntry[] {
       try {
         if (typeof s === "string") {
           nativeEntry.push({
+            stackTraceLimit: hook.stackTraceLimit ?? DEFAULT_STACK_TRACE_LIMIT,
             module: hook.module,
             moduleAddress: mod.base,
             symbol: s,
@@ -55,6 +46,7 @@ export function resolveNativeSymbol(hook: NativeHook): NativeHookEntry[] {
           });
         } else {
           nativeEntry.push({
+            stackTraceLimit: hook.stackTraceLimit ?? DEFAULT_STACK_TRACE_LIMIT,
             module: hook.module,
             moduleAddress: mod.base,
             symbol: s.symbol,
@@ -73,8 +65,8 @@ export function resolveNativeSymbol(hook: NativeHook): NativeHookEntry[] {
   return nativeEntry;
 }
 
-export function registerNativeHooks(hookEntries: NativeHookEntry[]) {
-  hookEntries.forEach((hookEntry: NativeHookEntry) => {
+export function registerNativeHooks(hookEntries: NativeHookOp[]) {
+  hookEntries.forEach((hookEntry: NativeHookOp) => {
     registerNativeHook(hookEntry, "FROOKY");
   });
 }
@@ -99,7 +91,7 @@ export function registerNativeHooks(hookEntries: NativeHookEntry[]) {
 // }
 //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ///////
-export function registerNativeHook(hookEntry: NativeHookEntry, category: string = "FROOKY") {
+export function registerNativeHook(hookEntry: NativeHookOp, category: string = "FROOKY") {
   // let maxFrames = typeof hook.maxFrames === 'number' ? hook.maxFrames : 8;
   const maxFrames = 10;
 
@@ -223,292 +215,3 @@ export function registerNativeHook(hookEntry: NativeHookEntry, category: string 
     },
   });
 }
-
-// /**
-//  * Overloads a method. If the method is called, the parameters and the return value are decoded and together with a stack trace send back to the frida.re client.
-//  * @param {string} clazz - Java class (e.g., "android.security.keystore.KeyGenParameterSpec$Builder").
-//  * @param {string} method - Name of the method which should be overloaded (e.g., "setBlockModes").
-//  * @param {number} overloadIndex - If there are overloaded methods available, this number represents them (e.g., 0 for the first one)
-//  * @param {string} categoryName - OWASP MAS category for easier identification (e.g., "CRYPTO")
-//  * @param {number} maxFrames - Maximum number of stack frames to capture (default is 8, set to -1 for unlimited frames).
-//  */
-// ////////
-// //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// ///////
-// ////////
-// //////// Works as before, but needs to be refactored later
-// ///////
-// ////////
-// //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// ///////
-// export function registerHook(hookEntries: JavaHookEntry[]) {
-//   const Exception = Java.use("java.lang.Exception");
-//   const System = Java.use("java.lang.System");
-
-//   hookEntries.forEach((hookEntry: JavaHookEntry) => {
-//     let toHook;
-//     if (typeof hookEntry.method === "string") {
-//       toHook = Java.use(hookEntry.class)[hookEntry.method];
-//     } else {
-//       toHook = Java.use(hookEntry.class)[hookEntry.method.name];
-//     }
-
-//     const methodHeader = toHook.overloads[hookEntry.overloadIndex].toString();
-
-//     toHook.overloads[hookEntry.overloadIndex].implementation = function () {
-//       const st = Exception.$new().getStackTrace();
-//       const stackTrace = [];
-//       st.forEach((stElement, index) => {
-//         if (hookEntry.maxFrames === -1 || index < hookEntry.maxFrames) {
-//           stackTrace.push(stElement.toString());
-//         }
-//       });
-
-//       const parameterTypes = parseParameterTypes(methodHeader);
-//       const returnType = parseReturnValue(methodHeader);
-
-//       let instanceId;
-//       if (this && this.$className && typeof this.$h === "undefined") {
-//         instanceId = "static";
-//       } else {
-//         try {
-//           instanceId = System.identityHashCode(this);
-//         } catch (e) {
-//           console.error("Error in identityHashCode", e);
-//           instanceId = "error";
-//         }
-//       }
-
-//       const event = {
-//         id: uuidv4(),
-//         type: "hook",
-//         time: new Date().toISOString(),
-//         class: hookEntry.class,
-//         method: hookEntry.method,
-//         instanceId: instanceId,
-//         stackTrace: stackTrace,
-//         inputParameters: decodeArguments(parameterTypes, arguments),
-//       };
-
-//       try {
-//         const returnValue = this[hookEntry.method].apply(this, arguments);
-//         event.returnValue = decodeArguments([returnType], [returnValue]);
-//         send(event);
-//         return returnValue;
-//       } catch (e) {
-//         event.exception = e.toString();
-//         send(event);
-//         throw e;
-//       }
-//     };
-//   });
-// }
-
-/**
- * Builds a normalized list of hook operations for a single hook definition.
- * Each operation contains clazz, method, overloadIndex, and args array (decoded parameter types).
- * This centralizes selection logic used for both summary emission and hook registration.
- *
- * The function supports several hook configuration scenarios:
- * - If both `methods` and `overloads` are specified, the configuration is considered invalid and no operations are returned.
- * - If a single `method` and an explicit list of `overloads` are provided, only those overloads are considered.
- * - If only `methods` is provided, all overloads for each method are included.
- * - If only `method` is provided, all overloads for that method are included.
- * - If neither is provided, or if the configuration is invalid, no operations are returned.
- *
- * Error handling:
- * - If an explicit overload is not found, it is skipped and not included in the operations.
- * - If an exception occurs during processing, it is logged and the function returns the operations collected so far.
- *
- * @param {object} hook - Hook definition object. Supported formats:
- *   - { class: string, method: string }
- *   - { class: string, methods: string[] }
- *   - { class: string, method: string, overloads: Array<{ args: string[] }> }
- * @returns {{operations: Array<{clazz:string, method:string, overloadIndex:number, args:string[]}>, count:number}}
- *
- * @example
- * // Hook all overloads of a single method
- * buildHookOperations({ class: "android.net.Uri", method: "parse" });
- *
- * @example
- * // Hook all overloads of multiple methods
- * buildHookOperations({ class: "android.net.Uri", methods: ["parse", "toString"] });
- *
- * @example
- * // Hook specific overloads of a method
- * buildHookOperations({
- *   class: "android.net.Uri",
- *   method: "parse",
- *   overloads: [
- *     { args: ["java.lang.String"] },
- *     { args: ["android.net.Uri"] }
- *   ]
- * });
- *
- * @example
- * // Invalid configuration: both methods and overloads
- * buildHookOperations({
- *   class: "android.net.Uri",
- *   methods: ["parse"],
- *   overloads: [{ args: ["java.lang.String"] }]
- * });
- * // Returns { operations: [], count: 0 }
- */
-
-////////
-//////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-///////
-////////
-//////// Works as before, but needs to be refactored later
-///////
-////////
-//////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-///////
-
-// /**
-//  * Takes an array of objects usually defined in the `hooks.js` file of a DEMO and loads all classes and functions stated in there.
-//  * @param {[object]} hook - Contains a list of objects which contains all methods which will be overloaded.
-//  *   Basic format: {class: "android.security.keystore.KeyGenParameterSpec$Builder", methods: ["setBlockModes"]}
-//  *   With overloads: {class: "android.content.ContentResolver", method: "insert", overloads: [{args: ["android.net.Uri", "android.content.ContentValues"]}]}
-//  * @param {string} categoryName - OWASP MAS category for easier identification (e.g., "CRYPTO")
-//  * @param {{operations: Array<{clazz:string, method:string, overloadIndex:number, args:string[]}>, count:number}} [cachedOperations] - Optional pre-computed hook operations to avoid redundant processing.
-//  */
-// function registerAllHooks(hook, categoryName, cachedOperations) {
-//   if (hook.methods && hook.overloads && hook.overloads.length > 0) {
-//     console.error(`Invalid hook configuration for ${hook.class}: 'overloads' is only supported with a singular 'method', not with 'methods'.`);
-//     return;
-//   }
-//   let built = cachedOperations || buildHookOperations(hook);
-//   built.operations.forEach((op) => {
-//     try {
-//       registerHook(op.clazz, op.method, op.overloadIndex, categoryName, hook.maxFrames);
-//     } catch (err) {
-//       console.error(err);
-//       console.error(`Problem when overloading ${op.clazz}:${op.method}#${op.overloadIndex}`);
-//     }
-//   });
-// }
-
-// export function runFrookyAgent(target) {
-// // Main execution: separate native hooks from Java hooks
-// // Separate hooks into native and Java categories
-// let nativeHooks = [];
-// let javaHooks = [];
-// target.hooks.forEach((hook) => {
-//   if (isNativeHook(hook)) {
-//     nativeHooks.push(hook);
-//   } else {
-//     javaHooks.push(hook);
-//   }
-// });
-
-// // Prepare native summary upfront without attaching hooks yet
-// let nativeHooksSummary = [];
-// let nativeErrors = [];
-// nativeHooks.forEach((hook) => {
-//   try {
-//     // Attempt to resolve symbol to surface errors early, but do not attach
-//     let addr = resolveNativeSymbol(hook);
-//     if (!addr) {
-//       nativeErrors.push("Failed to resolve native symbol '" + hook.symbol + "'" + (hook.module ? " in module '" + hook.module + "'" : ""));
-//     }
-//     nativeHooksSummary.push({
-//       module: hook.module || "<global>",
-//       symbol: hook.symbol
-//     });
-//   } catch (e) {
-//     let errMsg = "Failed to resolve native hook for symbol '" + hook.symbol + "': " + e;
-//     console.error(errMsg);
-//     nativeErrors.push(errMsg);
-//   }
-// });
-
-// Register hooks inside Java.perform, but only after emitting both summaries
-// Enter Java.perform to allow Java stack augmentation (even if only native hooks)
-// Java.perform(() => {
-//   const delay = 1000
-
-//   setTimeout(() => {
-// // Pre-compute hook operations once to avoid redundant processing
-// let hookOperationsCache = [];
-// javaHooks.forEach((hook) => {
-//   hookOperationsCache.push({
-//     hook: hook,
-//     built: buildHookOperations(hook)
-//   });
-// });
-
-// 1) Emit native summary
-// if (nativeHooks.length > 0) {
-//   let nativeSummary = {
-//     type: "native-summary",
-//     hooks: nativeHooksSummary,
-//     totalHooks: nativeHooksSummary.length,
-//     errors: nativeErrors,
-//     totalErrors: nativeErrors.length
-//   };
-//   send(nativeSummary);
-// }
-
-// // 2) Emit an initial summary of all overloads that will be hooked
-// try {
-//   // Aggregate map nested by class then method
-//   let aggregate = {};
-//   let totalHooks = 0;
-//   let errors = [];
-//   let totalErrors = 0;
-//   hookOperationsCache.forEach((cached) => {
-//     totalHooks += cached.built.count;
-//     if (cached.built.errors && cached.built.errors.length) {
-//       Array.prototype.push.apply(errors, cached.built.errors);
-//       totalErrors += cached.built.errors.length;
-//     }
-//     cached.built.operations.forEach((op) => {
-//       if (!aggregate[op.clazz]) {
-//         aggregate[op.clazz] = {};
-//       }
-//       if (!aggregate[op.clazz][op.method]) {
-//         aggregate[op.clazz][op.method] = [];
-//       }
-//       aggregate[op.clazz][op.method].push(op.args);
-//     });
-//   });
-
-//   let hooks = [];
-//   for (let clazz in aggregate) {
-//     if (!aggregate.hasOwnProperty(clazz)) continue;
-//     let methodsMap = aggregate[clazz];
-//     for (let methodName in methodsMap) {
-//       if (!methodsMap.hasOwnProperty(methodName)) continue;
-//       let entries = methodsMap[methodName].map(function (argsArr) {
-//         return { args: argsArr };
-//       });
-//       hooks.push({ class: clazz, method: methodName, overloads: entries });
-//     }
-//   }
-
-//   let summary = { type: "summary", hooks: hooks, totalHooks: totalHooks, errors: errors, totalErrors: totalErrors };
-//   send(summary);
-// } catch (e) {
-//   // If summary fails, don't block hooking
-//   console.error("Summary generation failed, but hooking will continue. Error:", e);
-// }
-
-// 3) Now that both summaries were emitted, attach native hooks
-// if (nativeHooks.length > 0) {
-//   nativeHooks.forEach((hook) => {
-//     try {
-//       registerNativeHook(hook, target.category);
-//     } catch (e) {
-//       console.error("Failed to register native hook after summary for symbol '" + hook.symbol + "': " + e);
-//     }
-//   });
-// }
-
-// 4) Register Java hooks using cached operations
-// hookOperationsCache.forEach((cached) => {
-//   registerAllHooks(cached.hook, target.category, cached.built);
-// });
-//     }, delay);
-//   });
-// };
