@@ -89,9 +89,9 @@ export const JavaDecoder: Decoder = {
         };
       }
 
-      // Complex Java instance.
+      // Decode all complex java types such as "lang.java.Integer", "java.util.Date", "my.app.MyClass" etc.
       // If the actual implementation is different from the parameter type, we set the implementation type
-      // This happens when an interface is used in the method signature but the actual implementation is different
+      // This happens when an interface is used in the parameter declaration but the actual implementation is different
       const implementationType = input.$className;
       if (param.type !== implementationType) {
         param.implementationType = implementationType;
