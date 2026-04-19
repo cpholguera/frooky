@@ -23,7 +23,7 @@ const registry: Record<string, Decoder> = {
 const FallbackJavaDecoder: Decoder = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => {
     return {
-      type: param.implementationType,
+      type: param.implementationType ?? param.type,
       name: param.name,
       value: input.toString(),
     };

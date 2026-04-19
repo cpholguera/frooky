@@ -26,7 +26,7 @@ export function decodeIterable(iterable: Java.Wrapper, param: Param, elementDeco
   }
 
   return {
-    type: param.implementationType,
+    type: param.implementationType ?? param.type,
     name: param.name,
     value: values,
   };

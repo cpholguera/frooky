@@ -94,7 +94,7 @@ export interface ParamDefinition {
    * Frida-compatible type if the implementation e.g. "android.security.keystore.KeyGenParameterSpec".
    * Cannot be an interface. Will be used when decoding arguments or return values based on this parameter definition.
    */
-  implementationType: ParamType;
+  implementationType?: ParamType;
   /** Optional human-readable name for the parameter, e.g. `"username"`. */
   name?: ParamName;
   /** Optional decoder options controlling when and how the parameter is decoded. */
