@@ -64,6 +64,13 @@ hooks:
           - params:
             - [int, flags, { decoder: android.content.IntentFlagDecoder }]
 
+
+  - javaClass: java.security.KeyPairGenerator
+    stackTraceLimit: 0
+    methods:
+      - initialize
+
+
   # # overloads with different ways of param declaration (t)
   # - javaClass: android.content.Intent 
   #   methods:
