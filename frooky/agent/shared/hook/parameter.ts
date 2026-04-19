@@ -98,6 +98,8 @@ export interface ParamDefinition {
   name?: ParamName;
   /** Optional decoder options controlling when and how the parameter is decoded. */
   options?: ParamOptions;
+  /** Optional decoder. Is set the first time a value of this parameter type is decoded */
+  decoder?: Decoder;
 }
 
 /**
