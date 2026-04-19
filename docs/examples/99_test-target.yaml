@@ -70,43 +70,31 @@ hooks:
     methods:
       - initialize
 
-
-  # # overloads with different ways of param declaration (t)
-  # - javaClass: android.content.Intent 
-  #   methods:
-  #     - name: $init
-  #       overloads:
-  #         - params:
-  #           - android.content.Intent
-  #         - params: 
-  #           - [ android.content.Context, packageContext]
-  #           - [ java.lang.Class, cls]
-  #         - params:
-  #           - { type: java.lang.String, name: action}
-  #           - android.net.Uri
+  # overloads with different ways of param declaration (t)
+  - javaClass: android.content.Intent 
+    methods:
+      - name: $init
+        overloads:
+          - params:
+            - android.content.Intent
+          - params: 
+            - [ android.content.Context, packageContext]
+            - [ java.lang.Class, cls]
+          - params:
+            - { type: java.lang.String, name: action}
+            - android.net.Uri
                   
-  # - javaClass: android.content.Intent 
-  #   methods:
-  #     - name: setFlags
-  #       overloads:
-  #         - params:
-  #           - [int, flags, { decoder: android.content.IntentFlagDecoder }]
- 
-  # - javaClass: android.app.Activity 
-  #   methods:
-  #     - startActivity
+  - javaClass: android.app.Activity 
+    methods:
+      - startActivity
 
-  # - module: libcrypto.so
-  #   functions:
-  #     - X509_new
-  #     - symbol: RSA_parse_public_key
-  #     - EVP_EncryptUpdate
-  #     - HMAC
-  #     - RSA_public_encrypt
-  #     - EVP_DecryptUpdate
-  #     - EVP_DigestUpdate
+  - module: libcrypto.so
+    functions:
+      - X509_new
+      - symbol: RSA_parse_public_key
+      - EVP_EncryptUpdate
+      - HMAC
+      - RSA_public_encrypt
+      - EVP_DecryptUpdate
+      - EVP_DigestUpdate
 
-  # - module: libc.so
-  #   functions:
-  #     - open
-  #     - close

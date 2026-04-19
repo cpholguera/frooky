@@ -63,7 +63,7 @@ function buildHookOpsForDeclaredOverloads(hook: JavaHook, handle: Java.MethodDis
   });
 }
 
-// builds a list of JavaHookOp. Each JavaHookOp contains all information to hook ONE java method
+// builds a list of java hook operations. Each JavaHookOp contains all information to hook ONE java method
 function buildHookOperations(hook: JavaHook): JavaHookOp[] {
   if (!hook.methods) {
     frooky.log.warn(`Java hook did not specify an methods.`);
@@ -103,6 +103,7 @@ export function registerHookOperation(javaHookOp: JavaHookOp) {
   };
 }
 
+// builds hook operations and registers them
 export class JavaHookRunner implements HookRunner {
   executeHooking(hooks: JavaHook[]): void {
     frooky.log.info(`Executing Android hook operations`);
