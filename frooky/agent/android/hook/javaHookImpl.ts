@@ -55,11 +55,11 @@ export function decodeArgs(args: Java.Wrapper[], params?: Param[]): DecodedValue
   return decodedArgs;
 }
 
-export function buildAndDispatchEvent(javaHookOp: JavaHookOp, decodedArgs: DecodedValue[], stackTrace: string[], fieldType: FieldType): void {
+export function buildAndDispatchEvent(javaHookOp: JavaHookOp, decodedArgs: DecodedValue[], returnValue: DecodedValue, stackTrace: string[], fieldType: FieldType): void {
   const event = new JavaHookEvent(javaHookOp.javaClass, javaHookOp.methodName, fieldType);
   event.category = javaHookOp.category;
   event.stackTrace = stackTrace;
   event.args = decodedArgs;
-  // event.returnValue = decodedReturnValue;
+  event.returnValue = returnValue;
   frooky.addEvent(event);
 }

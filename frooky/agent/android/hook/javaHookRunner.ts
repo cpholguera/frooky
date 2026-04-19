@@ -95,8 +95,8 @@ export function registerHookOperation(javaHookOp: JavaHookOp) {
     const decodedArgs = decodeArgs(args, javaHookOp.params);
     try {
       const returnValue = javaHookOp.javaMethod.apply(this, args);
-      // const decodedReturnValue = JavaDecoder.decode(returnValue, { type: javaHookOp.javaMethod.returnType.className ?? "void" });
-      buildAndDispatchEvent(javaHookOp, decodedArgs, stackTrace, fieldType);
+      const decodedReturnValue = JavaDecoder.decode(returnValue, { type: javaHookOp.javaMethod.returnType.className ?? "void" });
+      buildAndDispatchEvent(javaHookOp, decodedArgs, decodedReturnValue, stackTrace, fieldType);
       return returnValue;
     } catch (e) {
       frooky.log.error(`Error during the execution of ${javaHookOp.javaClass}.${javaHookOp.methodName}: ${e}`);
