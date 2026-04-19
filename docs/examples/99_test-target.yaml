@@ -55,6 +55,13 @@ hooks:
       - putString
       - putStringSet
 
+  - javaClass: android.content.Intent 
+    methods:
+      - name: setFlags
+        overloads:
+          - params:
+            - [int, flags, { decoder: android.content.IntentFlagDecoder }]
+
   # # overloads with different ways of param declaration (t)
   # - javaClass: android.content.Intent 
   #   methods:
