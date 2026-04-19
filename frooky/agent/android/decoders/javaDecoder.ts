@@ -65,7 +65,7 @@ export const JavaDecoder: Decoder = {
     }
 
     if (input == null) {
-      return { type: param.type, name: param.name, value: null };
+      return { type: param.implementationType, name: param.name, value: null };
     }
 
     const javaScriptType = typeof input;
@@ -73,7 +73,7 @@ export const JavaDecoder: Decoder = {
     if (javaScriptType === "object") {
       if (param.type[0] === "[") {
         return {
-          type: param.type,
+          type: param.implementationType,
           name: param.name,
           value: decodeJavaArray(input, param),
         };
@@ -81,14 +81,20 @@ export const JavaDecoder: Decoder = {
 
       if (param.type === "long") {
         return {
-          type: param.type,
+          type: param.implementationType,
           name: param.name,
           value: decodeLong(input),
         };
       }
 
-      // Complex Java instance
-      return getJavaInstanceDecoder(param.type).decode(input, param);
+      // Complex Java instance.
+      // If the actual implementation is different from the parameter type, we overwrite the implementation type
+      // This happens when an interface is used in the method signature but the actual implementation is different
+      const implementationType = input.$className;
+      if (param.type !== implementationType) {
+        param.implementationType = implementationType;
+      }
+      return getJavaInstanceDecoder(param.implementationType).decode(input, param);
     }
 
     // Primitive JS value (already converted by Frida): number, boolean, string etc.

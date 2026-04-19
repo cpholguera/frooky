@@ -39,7 +39,6 @@ function loadIntentFlags(): Array<{ name: string; value: number }> {
 
 export const android_content_IntentFlagDecoder: Decoder = {
   decode: (input) => {
-    console.log(typeof input);
     const bitmask = Number(input) >>> 0;
 
     const flags = loadIntentFlags();

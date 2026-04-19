@@ -3,6 +3,7 @@ import { java_util_MapDecoder } from "../../build/decoders/java/util/MapDecoder"
 import type { DecodedValue, Decoder } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
 import { android_content_IntentFlagDecoder } from "./android/content/IntentFlagDecoder";
+import { android_security_keystore_KeyGenParameterSpecDecoder } from "./android/security/keytore/KeyGenParameterSpecDecoder";
 import { java_util_CollectionDecoder } from "./java/util/CollectionDecoder";
 
 /*
@@ -13,6 +14,7 @@ const registry: Record<string, Decoder> = {
   "java.util.Set": java_util_CollectionDecoder,
   "java.util.List": java_util_CollectionDecoder,
   "java.util.Map": java_util_MapDecoder,
+  "android.security.keystore.KeyGenParameterSpec": android_security_keystore_KeyGenParameterSpecDecoder,
 
   // built it custom decoders
   "android.content.IntentFlagDecoder": android_content_IntentFlagDecoder,
@@ -21,7 +23,7 @@ const registry: Record<string, Decoder> = {
 const FallbackJavaDecoder: Decoder = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => {
     return {
-      type: param.type,
+      type: param.implementationType,
       name: param.name,
       value: input.toString(),
     };

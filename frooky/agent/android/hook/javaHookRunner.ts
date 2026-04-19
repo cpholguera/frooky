@@ -21,7 +21,7 @@ function buildHookOpsForAllOverloads(hook: JavaHook, handle: Java.MethodDispatch
     const params: Param[] = [];
     javaMethod.argumentTypes.forEach((t: Java.Type) => {
       if (t.className) {
-        params.push({ type: t.className });
+        params.push({ type: t.className, implementationType: t.className });
       } else {
         frooky.log.warn(`No Frida type name for the VM type ${t.name} found.`);
       }
@@ -94,7 +94,7 @@ export function registerHookOperation(javaHookOp: JavaHookOp) {
     const decodedArgs = decodeArgs(args, javaHookOp.params);
     try {
       const returnValue = javaHookOp.javaMethod.apply(this, args);
-      const decodedReturnValue = JavaDecoder.decode(returnValue, { type: javaHookOp.javaMethod.returnType.className ?? "void" });
+      const decodedReturnValue = JavaDecoder.decode(returnValue, { type: javaHookOp.javaMethod.returnType.className ?? "void", implementationType: javaHookOp.javaMethod.returnType.className ?? "void" });
       buildAndDispatchEvent(javaHookOp, decodedArgs, decodedReturnValue, stackTrace, fieldType);
       return returnValue;
     } catch (e) {

@@ -84,8 +84,17 @@ export interface ParamOptions {
  * @public
  */
 export interface ParamDefinition {
-  /** Frida-compatible type of the parameter, e.g. `"java.lang.String"` or `"int"`. */
+  /**
+   * Frida-compatible type of the parameter, e.g. `"java.lang.String"` or `"int"`.
+   * Can be an interface. Will only be used when overloading explicit methods.
+   *
+   */
   type: ParamType;
+  /**
+   * Frida-compatible type if the implementation e.g. "android.security.keystore.KeyGenParameterSpec".
+   * Cannot be an interface. Will be used when decoding arguments or return values based on this parameter definition.
+   */
+  implementationType: ParamType;
   /** Optional human-readable name for the parameter, e.g. `"username"`. */
   name?: ParamName;
   /** Optional decoder options controlling when and how the parameter is decoded. */
