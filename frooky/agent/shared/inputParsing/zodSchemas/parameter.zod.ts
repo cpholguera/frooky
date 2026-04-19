@@ -12,10 +12,13 @@ export const paramOptionsSchema = z.object({
     decoderArgs: z.array(z.string()).optional()
 });
 
+const decoderSchema = z.any();
+
 export const paramDefinitionSchema = z.object({
     type: paramTypeSchema,
     name: paramNameSchema.optional(),
-    options: paramOptionsSchema.optional()
+    options: paramOptionsSchema.optional(),
+    decoder: decoderSchema.optional()
 });
 
 export const paramSchema = paramDefinitionSchema;

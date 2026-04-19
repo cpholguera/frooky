@@ -68,11 +68,13 @@ hooks:
   #         - params:
   #           - { type: java.lang.String, name: action}
   #           - android.net.Uri
-          
-        
+                  
   # - javaClass: android.content.Intent 
   #   methods:
-  #     - putExtra
+  #     - name: setFlags
+  #       overloads:
+  #         - params:
+  #           - [int, flags, { decoder: android.content.IntentFlagDecoder }]
  
   # - javaClass: android.app.Activity 
   #   methods:
