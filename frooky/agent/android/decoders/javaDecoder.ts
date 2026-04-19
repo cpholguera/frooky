@@ -59,29 +59,31 @@ function decodeJavaArray(input: Java.Wrapper, param: Param): unknown[] {
 
 export const JavaDecoder: Decoder = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => {
+    // use the custom decoder if set
     if (param.options?.decoder) {
-      // lookup custom decoder
       return getJavaInstanceDecoder(param.options.decoder).decode(input, param);
     }
 
+    // it no input is set, return null
     if (input == null) {
       return { type: param.implementationType ?? param.type, name: param.name, value: null };
     }
 
     const javaScriptType = typeof input;
-
     if (javaScriptType === "object") {
+      // primitive java arrays
       if (param.type[0] === "[") {
         return {
-          type: param.implementationType ?? param.type,
+          type: param.type,
           name: param.name,
           value: decodeJavaArray(input, param),
         };
       }
 
+      // long is converted to an object
       if (param.type === "long") {
         return {
-          type: param.implementationType ?? param.type,
+          type: param.type,
           name: param.name,
           value: decodeLong(input),
         };
@@ -94,7 +96,7 @@ export const JavaDecoder: Decoder = {
       if (param.type !== implementationType) {
         param.implementationType = implementationType;
       }
-      return getJavaInstanceDecoder(param.implementationType ?? param.type).decode(input, param);
+      return getJavaInstanceDecoder(implementationType).decode(input, param);
     }
 
     // Primitive JS value (already converted by Frida): number, boolean, string etc.
