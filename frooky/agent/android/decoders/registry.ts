@@ -1,11 +1,13 @@
 import type Java from "frida-java-bridge";
 import type { DecodedValue, Decoder } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
-import { IteratorDecoder } from "./java/util/IteratorDecoder";
+import { CollectionDecoder } from "./java/util/CollectionDecoder";
+import { MapDecoder } from "./java/util/MapDecoder";
 
 const registry: Record<string, Decoder> = {
-  "java.util.Set": IteratorDecoder,
-  "java.util.List": IteratorDecoder,
+  "java.util.Set": CollectionDecoder,
+  "java.util.List": CollectionDecoder,
+  "java.util.Map": MapDecoder,
 };
 
 const fallbackDecoder: Decoder = {
