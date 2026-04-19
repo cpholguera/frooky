@@ -1,6 +1,5 @@
 import { HookEvent } from "../../shared/event/hookEvent";
-
-export type JavaMemberType = "class" | "instance";
+import type { FieldType } from "../hook/javaHookImpl";
 
 /**
  * Class representing a java hook event
@@ -11,14 +10,13 @@ export type JavaMemberType = "class" | "instance";
 export class JavaHookEvent extends HookEvent {
   readonly javaClass: string;
   readonly method: string;
-  readonly memberType: JavaMemberType;
-  instanceId?: number;
+  readonly fieldType: FieldType;
 
-  constructor(javaClass: string, method: string, memberType: JavaMemberType) {
+  constructor(javaClass: string, method: string, fieldType: FieldType) {
     super();
     this.type += "-java";
     this.javaClass = javaClass;
     this.method = method;
-    this.memberType = memberType;
+    this.fieldType = fieldType;
   }
 }

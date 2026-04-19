@@ -1,8 +1,9 @@
 import Java from "frida-java-bridge";
+import { de } from "zod/locales";
 import type { DecodedValue } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
 import { JavaDecoder } from "../decoders/javaDecoder";
-import { JavaHookEvent, type JavaMemberType } from "../event/javaHookEvent";
+import { JavaHookEvent } from "../event/javaHookEvent";
 import type { JavaHookOp } from "./javaHookRunner";
 
 export type FieldType = {
@@ -34,29 +35,31 @@ export function buildStackTrace(limit: number): string[] {
  * @param args - The actual argument values passed to the method
  * @param params- The optional frooky parameters for additional context information
  */
-export function decodeValues(args: Java.Wrapper[], params?: Param[]): DecodedValue[] | undefined {
-  if (args.length === 0) return;
+export function decodeArgs(args: Java.Wrapper[], params?: Param[]): DecodedValue[] {
+  if (args.length === 0) {
+    throw Error("Empty args passed");
+  }
   if (args.length !== params?.length) {
     throw Error("The actual argument length does not match the declared frooky parameter length");
   }
 
-  const decoded: DecodedValue[] = [];
+  const decodedArgs: DecodedValue[] = [];
   try {
-    args.forEach((arg, i) => {
-      decoded.push(JavaDecoder.decode(arg, params[i]));
+    args.forEach((arg: Java.Wrapper, i: number) => {
+      console.log(`decoding ARG  ${i}`);
+      decodedArgs.push(JavaDecoder.decode(arg, params[i]));
     });
   } catch (e) {
     frooky.log.error(`Error decoding input parameter: ${e}`);
   }
-  return decoded;
+  return decodedArgs;
 }
 
-export function buildAndDispatchEvent(javaHookOp: JavaHookOp, memberType: JavaMemberType, instanceId: number | undefined, stackTrace: string[] | undefined, decodedArgs: DecodedValue[]): void {
-  const event = new JavaHookEvent(javaHookOp.javaClass, javaHookOp.methodName, memberType);
+export function buildAndDispatchEvent(javaHookOp: JavaHookOp, decodedArgs: DecodedValue[], stackTrace: string[], fieldType: FieldType): void {
+  const event = new JavaHookEvent(javaHookOp.javaClass, javaHookOp.methodName, fieldType);
   event.category = javaHookOp.category;
-  event.instanceId = instanceId;
   event.stackTrace = stackTrace;
   event.args = decodedArgs;
-
+  // event.returnValue = decodedReturnValue;
   frooky.addEvent(event);
 }
