@@ -4,12 +4,12 @@ import type { Param } from "../../../../shared/hook/parameter";
 import { JavaDecoder } from "../../javaDecoder";
 import { decodeIterable } from "../lang/IterableDecoder";
 
-export const MapDecoder: Decoder = {
+export const java_util_MapDecoder: Decoder = {
   decode: (input, param) => {
     const map = input.entrySet ? input : Java.cast(input, Java.use("java.util.Map"));
     const entrySet = map.entrySet();
 
-    // Cache the Map.Entry class once per call - note the '$' (inner class)
+    // Cache the Map.Entry class once per call
     const MapEntry = Java.use("java.util.Map$Entry");
 
     return decodeIterable(entrySet, param, (entry) => {

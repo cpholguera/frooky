@@ -37,7 +37,7 @@ function defaultElementDecoder(element: Java.Wrapper): DecodedValue {
   return JavaDecoder.decode(element, { type: elementType } as Param);
 }
 
-export const IterableDecoder: Decoder = {
+export const java_lang_IterableDecoder: Decoder = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => {
     const iterable = input.iterator ? input : Java.cast(input, Java.use("java.lang.Iterable"));
     return decodeIterable(iterable, param);
