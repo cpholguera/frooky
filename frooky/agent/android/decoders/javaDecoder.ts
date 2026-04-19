@@ -1,19 +1,32 @@
-import type Java from "frida-java-bridge";
 import type { Decoder } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
 
 export const javaDecoder: Decoder = {
-  decode: (input: Java.Field, param: Param) => {
-    if (!param.decoder) {
-      // lookup the decoder
-
-      console.log("DECODER");
-      console.log(JSON.stringify(param, null, 2));
-      console.log(typeof input);
-      console.log(JSON.stringify(input, null, 2));
-      return { value: input.toString() };
+  decode: (input: unknown, param: Param) => {
+    const javaScriptType = typeof input;
+    if (javaScriptType === "object") {
+      // test for the primitive long type
+      if (param.type === "long") {
+        return {
+          type: param.type,
+          name: param.name,
+          value: input,
+        };
+      } else {
+        // decode complex java type
+        return {
+          type: param.type,
+          name: param.name,
+          value: input,
+        };
+      }
     } else {
-      return param.decoder.decode();
+      // primitive java type AND java.lang.String already converted to matching javascript type
+      return {
+        type: param.type,
+        name: param.name,
+        value: input,
+      };
     }
   },
 };

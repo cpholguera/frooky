@@ -1,15 +1,10 @@
 import Java from "frida-java-bridge";
 import { DEFAULT_STACK_TRACE_LIMIT } from "../../shared/config";
-import type { DecodedValue } from "../../shared/decoders/decoder";
-import { HookEvent } from "../../shared/event/hookEvent";
 import type { MethodName } from "../../shared/hook/hook";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import type { Param, ParamType } from "../../shared/hook/parameter";
-import { uuidv4 } from "../../shared/utils";
-import { javaDecoder } from "../decoders/javaDecoder";
-import { JavaHookEvent, type JavaMemberType } from "../event/javaHookEvent";
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "./javaHook";
-import { buildAndDispatchEvent, buildStackTrace, decodeHookArguments, resolveJavaMemberType } from "./javaHookImpl";
+import { buildFieldType, buildStackTrace, decodeArguments } from "./javaHookImpl";
 
 // contains everything needed to hook one java method
 export interface JavaHookOp extends HookOp {
@@ -93,10 +88,13 @@ function buildHookOperations(hook: JavaHook): JavaHookOp[] {
 // actually hooks the java method
 export function registerHookOperation(javaHookOp: JavaHookOp) {
   javaHookOp.javaMethod.implementation = function (...args: any[]) {
-    if (javaHookOp.stackTraceLimit > 0) {
-    }
+    const stackTrace = javaHookOp.stackTraceLimit > 0 ? buildStackTrace(javaHookOp.stackTraceLimit) : [];
+    const fieldType = buildFieldType(this);
+    const decodedArgs = decodeArguments(args, javaHookOp.params);
 
-    const decodedArgs = decodeHookArguments(args, javaHookOp.params);
+    // console.log(JSON.stringify(stackTrace, null, 2));
+    // console.log(JSON.stringify(fieldType, null, 2));
+    console.log(JSON.stringify(decodedArgs, null, 2));
 
     try {
       const returnValue = javaHookOp.javaMethod.apply(this, args);
@@ -110,7 +108,6 @@ export function registerHookOperation(javaHookOp: JavaHookOp) {
       return returnValue;
     } catch (e) {
       frooky.log.error(`Error during the execution of ${javaHookOp.javaClass}.${javaHookOp.methodName}: ${e}`);
-      throw e;
     }
   };
 }

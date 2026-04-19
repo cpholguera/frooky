@@ -17,7 +17,7 @@ export class NativeHookEvent extends HookEvent {
   address?: NativePointer;
 
   constructor(module: string, symbol: string) {
-    super("native");
+    super();
     this.module = module;
     this.symbol = symbol;
   }
