@@ -51,11 +51,13 @@ hooks:
       - passEnum
 
   - javaClass: androidx.security.crypto.EncryptedSharedPreferences$Editor
+    stackTraceLimit: 0
     methods:
       - putString
       - putStringSet
 
   - javaClass: android.content.Intent 
+    stackTraceLimit: 0
     methods:
       - name: setFlags
         overloads:
