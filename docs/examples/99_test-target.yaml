@@ -56,6 +56,20 @@ hooks:
       - putString
       - putStringSet
 
+  # 3 different overloads with different ways of param declaration 
+  - javaClass: android.content.Intent 
+    methods:
+      - name: $init
+        overloads:
+          - params:
+            - android.content.Intent
+          - params: 
+            - [ android.content.Context, packageContext]
+            - [ java.lang.Class, cls]
+          - params:
+            - { type: java.lang.String, name: action}
+            - android.net.Uri
+
   - javaClass: android.content.Intent 
     stackTraceLimit: 0
     methods:
@@ -69,20 +83,6 @@ hooks:
     stackTraceLimit: 0
     methods:
       - initialize
-
-  # overloads with different ways of param declaration (t)
-  - javaClass: android.content.Intent 
-    methods:
-      - name: $init
-        overloads:
-          - params:
-            - android.content.Intent
-          - params: 
-            - [ android.content.Context, packageContext]
-            - [ java.lang.Class, cls]
-          - params:
-            - { type: java.lang.String, name: action}
-            - android.net.Uri
                   
   - javaClass: android.app.Activity 
     methods:
