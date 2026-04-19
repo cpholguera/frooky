@@ -38,7 +38,7 @@ function decodeJavaArray(input: Java.Wrapper, param: Param): unknown[] {
         }
         return out;
       }
-      // "Lfully.qualified.ClassName;" -> strip L and ;
+      // "Lfully.qualified.ClassName;" -> strip L ;
       const className = element.startsWith("L") && element.endsWith(";") ? element.substring(1, element.length - 1) : element;
 
       for (let i = 0; i < len; i++) {
@@ -72,7 +72,7 @@ export const JavaDecoder: Decoder = {
     const javaScriptType = typeof input;
     if (javaScriptType === "object") {
       // primitive java arrays
-      if (param.type[0] === "[") {
+      if (param.type.startsWith("[")) {
         return {
           type: param.type,
           name: param.name,
