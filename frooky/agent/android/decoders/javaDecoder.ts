@@ -9,8 +9,8 @@ function decodeLong(input: any): string | number {
 }
 
 // Decode a Java array based on its JNI type signature (e.g. "[I", "[Z", "[Ljava.lang.String;")
-function decodeJavaArray(input: Java.Wrapper, type: string, param: Param): unknown[] {
-  const element = type.substring(1); // strip leading '['
+function decodeJavaArray(input: Java.Wrapper, param: Param): unknown[] {
+  const element = param.type.substring(1); // strip leading '['
   const len = input.length;
   const out: unknown[] = new Array(len);
 
@@ -72,7 +72,7 @@ export const JavaDecoder: Decoder = {
         return {
           type: param.type,
           name: param.name,
-          value: decodeJavaArray(input, param.type, param),
+          value: decodeJavaArray(input, param),
         };
       }
 
