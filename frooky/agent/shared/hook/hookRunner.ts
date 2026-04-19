@@ -4,13 +4,13 @@ import type { Hook } from "frooky";
 // Hook Operation
 // Contains all information to hook one method or function
 export interface HookOp {
-	stackTraceLimit: number;
-	eventFilter?: [string];
-	category?: string;
-	module?: string;
-	moduleAddress?: NativePointer;
+  stackTraceLimit: number;
+  eventFilter?: [string];
+  category?: string;
+  module?: string;
+  moduleAddress?: NativePointer;
 }
 
 export interface HookRunner {
-	executeHooking(hooks: Hook[]): void;
+  executeHooking(hooks: Hook[]): void;
 }

@@ -8,9 +8,9 @@ import { normalizeParam, type ParamInput } from "./parameterInput";
  * @public
  */
 export interface ObjcMethodDefinitionInput {
-	name: MethodName;
-	returnType?: ReturnType;
-	params?: ParamInput[];
+  name: MethodName;
+  returnType?: ReturnType;
+  params?: ParamInput[];
 }
 
 /**
@@ -30,24 +30,24 @@ export type ObjcMethodInput = MethodName | ObjcMethodDefinitionInput;
  */
 
 export interface ObjcHookInput extends Omit<ObjcHook, "methods"> {
-	type: "objc";
-	methods: ObjcMethodInput[];
+  type: "objc";
+  methods: ObjcMethodInput[];
 }
 
 function normalizeObjcMethod(input: ObjcMethodInput): ObjcMethodDefinition {
-	if (typeof input === "string") {
-		return { name: input };
-	}
+  if (typeof input === "string") {
+    return { name: input };
+  }
 
-	return {
-		...input,
-		params: input.params?.map(normalizeParam),
-	};
+  return {
+    ...input,
+    params: input.params?.map(normalizeParam),
+  };
 }
 
 export function normalizeObjcHook(input: ObjcHookInput): ObjcHook {
-	return {
-		...input,
-		methods: input.methods.map(normalizeObjcMethod),
-	};
+  return {
+    ...input,
+    methods: input.methods.map(normalizeObjcMethod),
+  };
 }
