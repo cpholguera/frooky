@@ -50,10 +50,10 @@ hooks:
       - passSet
       - passEnum
 
-  # - javaClass: androidx.security.crypto.EncryptedSharedPreferences$Editor
-  #   methods:
-  #     - putString
-  #     - putStringSet
+  - javaClass: androidx.security.crypto.EncryptedSharedPreferences$Editor
+    methods:
+      - putString
+      - putStringSet
 
   # # overloads with different ways of param declaration (t)
   # - javaClass: android.content.Intent 
