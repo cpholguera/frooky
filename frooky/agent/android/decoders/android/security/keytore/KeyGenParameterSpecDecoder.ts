@@ -64,7 +64,7 @@ export const android_security_keystore_KeyGenParameterSpecDecoder: Decoder = {
     }
 
     return {
-      type: param.implementationType,
+      type: param.implementationType ?? param.type,
       value,
     };
   },

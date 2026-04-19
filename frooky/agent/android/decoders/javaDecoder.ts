@@ -65,7 +65,7 @@ export const JavaDecoder: Decoder = {
     }
 
     if (input == null) {
-      return { type: param.implementationType, name: param.name, value: null };
+      return { type: param.implementationType ?? param.type, name: param.name, value: null };
     }
 
     const javaScriptType = typeof input;
@@ -73,7 +73,7 @@ export const JavaDecoder: Decoder = {
     if (javaScriptType === "object") {
       if (param.type[0] === "[") {
         return {
-          type: param.implementationType,
+          type: param.implementationType ?? param.type,
           name: param.name,
           value: decodeJavaArray(input, param),
         };
@@ -81,7 +81,7 @@ export const JavaDecoder: Decoder = {
 
       if (param.type === "long") {
         return {
-          type: param.implementationType,
+          type: param.implementationType ?? param.type,
           name: param.name,
           value: decodeLong(input),
         };
@@ -94,7 +94,7 @@ export const JavaDecoder: Decoder = {
       if (param.type !== implementationType) {
         param.implementationType = implementationType;
       }
-      return getJavaInstanceDecoder(param.implementationType).decode(input, param);
+      return getJavaInstanceDecoder(param.implementationType ?? param.type).decode(input, param);
     }
 
     // Primitive JS value (already converted by Frida): number, boolean, string etc.
