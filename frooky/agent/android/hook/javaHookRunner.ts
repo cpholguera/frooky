@@ -98,8 +98,7 @@ export function registerHookOperation(javaHookOp: JavaHookOp) {
 
     try {
       const returnValue = javaHookOp.javaMethod.apply(this, args);
-      const decodedReturnValue = decodeValues([returnValue], [{ type: javaHookOp.javaMethod.returnType.className }]);
-      console.log(JSON.stringify(decodedReturnValue, null, 2));
+      const decodedReturnValue = decodeValues([returnValue], [{ type: javaHookOp.javaMethod.returnType.className ?? "void" }]);
       // buildAndDispatchEvent(
       // 	javaHookOp,
       // 	memberType,
