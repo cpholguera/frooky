@@ -28,21 +28,21 @@ hooks:
   - javaClass: org.owasp.mastestapp.MastgTest
     stackTraceLimit: 0
     methods:
-      - passBigInteger
-      - passBigDecimal
-      - passList
-      - passMap
+      # - passBigInteger
+      # - passBigDecimal
+      # - passList
+      # - passMap
       - passSet
-      - passEnum
-      - passStringArray
-      - passBooleanArray
-      - passByteArray
-      - passShortArray
-      - passIntArray
-      - passLongArray
-      - passFloatArray
-      - passDoubleArray
-      - passCharArray
+      # - passEnum
+      # - passStringArray
+      # - passBooleanArray
+      # - passByteArray
+      # - passShortArray
+      # - passIntArray
+      # - passLongArray
+      # - passFloatArray
+      # - passDoubleArray
+      # - passCharArray
 
   # - javaClass: androidx.security.crypto.EncryptedSharedPreferences$Editor
   #   methods:

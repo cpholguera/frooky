@@ -1,7 +1,7 @@
 import Java from "frida-java-bridge";
 import type { DecodedValue } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
-import { javaDecoder } from "../decoders/javaDecoder";
+import { JavaDecoder } from "../decoders/javaDecoder";
 import { JavaHookEvent, type JavaMemberType } from "../event/javaHookEvent";
 import type { JavaHookOp } from "./javaHookRunner";
 
@@ -43,7 +43,7 @@ export function decodeArguments(args: unknown[], params?: Param[]): DecodedValue
   const decoded: DecodedValue[] = [];
   try {
     args.forEach((arg, i) => {
-      decoded.push(javaDecoder.decode(arg, params[i]));
+      decoded.push(JavaDecoder.decode(arg, params[i]));
     });
   } catch (e) {
     frooky.log.error(`Error decoding input parameter: ${e}`);

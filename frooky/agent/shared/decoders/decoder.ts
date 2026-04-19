@@ -1,3 +1,6 @@
+import type Java from "frida-java-bridge";
+import type { Param } from "../hook/parameter";
+
 // decoded values
 export type DecodedValue = {
   name?: string;
@@ -7,5 +10,5 @@ export type DecodedValue = {
 };
 
 export type Decoder = {
-  decode: (...args: any[]) => DecodedValue;
+  decode: (input: Java.Wrapper, param: Param) => DecodedValue;
 };
