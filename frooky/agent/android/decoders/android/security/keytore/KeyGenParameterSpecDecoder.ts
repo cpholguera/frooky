@@ -40,6 +40,16 @@ const getters = [
 // Cache class wrapper at module scope (avoid re-resolving per call)
 let KeyGenParameterSpec: Java.Wrapper | null = null;
 
+function stripPrefix(name: string): string {
+  if (name.startsWith("get") && name.length > 3) {
+    return name[3].toLowerCase() + name.slice(4);
+  }
+  if (name.startsWith("is") && name.length > 2) {
+    return name[2].toLowerCase() + name.slice(3);
+  }
+  return name;
+}
+
 export const android_security_keystore_KeyGenParameterSpecDecoder: Decoder = {
   decode: (spec, param) => {
     if (!KeyGenParameterSpec) {
@@ -57,9 +67,9 @@ export const android_security_keystore_KeyGenParameterSpecDecoder: Decoder = {
       }
       try {
         const raw = fn.call(typedSpec);
-        value[name] = JavaDecoder.decode(raw, { type: fn.returnType.className ?? "void", implementationType: fn.returnType.className ?? "void" });
+        value[stripPrefix(name)] = JavaDecoder.decode(raw, { type: fn.returnType.className ?? "void", implementationType: fn.returnType.className ?? "void" });
       } catch (e) {
-        value[name] = `Error when decoding : ${e}>`;
+        value[stripPrefix(name)] = `Error when decoding : ${e}>`;
       }
     }
 
