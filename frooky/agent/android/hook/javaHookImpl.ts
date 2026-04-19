@@ -1,5 +1,4 @@
 import Java from "frida-java-bridge";
-import { de } from "zod/locales";
 import type { DecodedValue } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
 import { JavaDecoder } from "../decoders/javaDecoder";
