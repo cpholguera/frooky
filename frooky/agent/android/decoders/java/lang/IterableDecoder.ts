@@ -7,8 +7,6 @@ import { JavaDecoder } from "../../javaDecoder";
 
 /**
  * Decode any java.lang.Iterable by walking its iterator().
- * Other decoders (List, Set, Map) delegate here after projecting
- * their contents into an Iterable view.
  */
 export function decodeIterable(iterable: Java.Wrapper, param: Param, elementDecoder: (element: Java.Wrapper) => DecodedValue = defaultElementDecoder): DecodedValue {
   const values: DecodedValue[] = [];

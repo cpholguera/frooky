@@ -4,7 +4,7 @@ import type { MethodName } from "../../shared/hook/hook";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import type { Param, ParamType } from "../../shared/hook/parameter";
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "./javaHook";
-import { buildFieldType, buildStackTrace, decodeArguments } from "./javaHookImpl";
+import { buildFieldType, buildStackTrace, decodeValues } from "./javaHookImpl";
 
 // contains everything needed to hook one java method
 export interface JavaHookOp extends HookOp {
@@ -90,14 +90,16 @@ export function registerHookOperation(javaHookOp: JavaHookOp) {
   javaHookOp.javaMethod.implementation = function (...args: any[]) {
     const stackTrace = javaHookOp.stackTraceLimit > 0 ? buildStackTrace(javaHookOp.stackTraceLimit) : [];
     const fieldType = buildFieldType(this);
-    const decodedArgs = decodeArguments(args, javaHookOp.params);
+    const decodedArgs = decodeValues(args, javaHookOp.params);
 
     // console.log(JSON.stringify(stackTrace, null, 2));
     // console.log(JSON.stringify(fieldType, null, 2));
-    console.log(JSON.stringify(decodedArgs, null, 2));
+    // console.log(JSON.stringify(decodedArgs, null, 2));
 
     try {
       const returnValue = javaHookOp.javaMethod.apply(this, args);
+      const decodedReturnValue = decodeValues([returnValue], [{ type: javaHookOp.javaMethod.returnType.className }]);
+      console.log(JSON.stringify(decodedReturnValue, null, 2));
       // buildAndDispatchEvent(
       // 	javaHookOp,
       // 	memberType,
