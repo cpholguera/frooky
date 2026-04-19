@@ -5,44 +5,50 @@ metadata:
   platform: Android
 
 hooks:
-  #   # java primitive types
-  # - javaClass: org.owasp.mastestapp.MastgTest
-  #   stackTraceLimit: 0
-  #   methods:
-  #     - passBoolean
-  #     - passByte
-  #     - passShort
-  #     - passInt
-  #     - passLong
-  #     - passFloat
-  #     - passDouble
-  #     - passChar
+    # java primitive types
+  - javaClass: org.owasp.mastestapp.MastgTest
+    stackTraceLimit: 0
+    methods:
+      - passBoolean
+      - passByte
+      - passShort
+      - passInt
+      - passLong
+      - passFloat
+      - passDouble
+      - passChar
 
-  #   # java types which are converted to "string" type in javascript
-  # - javaClass: org.owasp.mastestapp.MastgTest
-  #   stackTraceLimit: 0
-  #   methods:
-  #     - passString
+    # java types which are converted to "string" type in javascript
+  - javaClass: org.owasp.mastestapp.MastgTest
+    stackTraceLimit: 0
+    methods:
+      - passString
+
+
+  # primitive java arrays
+  - javaClass: org.owasp.mastestapp.MastgTest
+    stackTraceLimit: 0
+    methods:
+      - passStringArray
+      - passBooleanArray
+      - passByteArray
+      - passShortArray
+      - passIntArray
+      - passLongArray
+      - passFloatArray
+      - passDoubleArray
+      - passCharArray
 
   # complex common java types
   - javaClass: org.owasp.mastestapp.MastgTest
     stackTraceLimit: 0
     methods:
       - passBigInteger
-      # - passBigDecimal
-      # - passList
-      # - passMap
-  #     - passSet
-  #     - passEnum
-  #     - passStringArray
-  #     - passBooleanArray
-  #     - passByteArray
-  #     - passShortArray
-  #     - passIntArray
-  #     - passLongArray
-  #     - passFloatArray
-  #     - passDoubleArray
-  #     - passCharArray
+      - passBigDecimal
+      - passList
+      - passMap
+      - passSet
+      - passEnum
 
   # - javaClass: androidx.security.crypto.EncryptedSharedPreferences$Editor
   #   methods:
