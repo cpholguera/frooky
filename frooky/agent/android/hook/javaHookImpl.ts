@@ -1,43 +1,30 @@
-import type Java from "frida-java-bridge";
+import Java from "frida-java-bridge";
 import type { DecodedValue } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
 import { javaDecoder } from "../decoders/javaDecoder";
 import { JavaHookEvent, type JavaMemberType } from "../event/javaHookEvent";
 import type { JavaHookOp } from "./javaHookRunner";
 
-// export function resolveJavaMemberType(
-// 	context: Java.Wrapper,
-// 	System: Java.Wrapper,
-// ): {
-// 	memberType: JavaMemberType;
-// 	instanceId: number | undefined;
-// } {
-// 	if (context?.$className && typeof context.$h === "undefined") {
-// 		return { memberType: "class", instanceId: undefined };
-// 	}
+export type FieldType = {
+  fieldType: "static" | "instance";
+  instanceId?: number;
+};
 
-// 	let instanceId: number | undefined;
-// 	try {
-// 		instanceId = System.identityHashCode(context);
-// 	} catch (e) {
-// 		frooky.log.error(`Error in identityHashCode: ${e}`);
-// 	}
-// 	return { memberType: "instance", instanceId };
-// }
+export function buildFieldType(method: Java.Wrapper): FieldType {
+  const fieldType = method === null ? "static" : "instance";
+  const instanceId = fieldType === "instance" ? method.hashCode() : undefined;
+  return { fieldType, instanceId };
+}
 
-export function buildStackTrace(limit: number, Exception: Java.Wrapper): string[] | undefined {
-  // TODO: REturn BAC
-
-  if (limit <= 0) return;
-
+export function buildStackTrace(limit: number): string[] {
   const stackTrace: string[] = [];
 
-  Exception.$new()
-    .getStackTrace()
-    .forEach((el: any, i: number) => {
-      if (i < limit) stackTrace.push(el.toString());
-    });
+  const fridaStackTrace = Java.backtrace({ limit: limit });
 
+  for (const frame of fridaStackTrace.frames) {
+    stackTrace.push(`${frame.className}.${frame.methodName} (${frame.fileName}:${frame.lineNumber})`);
+  }
+  1;
   return stackTrace;
 }
 
@@ -45,12 +32,12 @@ export function buildStackTrace(limit: number, Exception: Java.Wrapper): string[
  * Decodes the arguments passed to this method
  *
  * @param args - The actual argument values passed to the method
- * @param params- The optional frooky parameters for additional information
+ * @param params- The optional frooky parameters for additional context information
  */
-export function decodeHookArguments(args: Java.Field[], params?: Param[]): DecodedValue[] | undefined {
+export function decodeArguments(args: unknown[], params?: Param[]): DecodedValue[] | undefined {
   if (args.length === 0) return;
   if (args.length !== params?.length) {
-    throw Error("The actual argument length does not match the declared frooky parameters");
+    throw Error("The actual argument length does not match the declared frooky parameter length");
   }
 
   const decoded: DecodedValue[] = [];

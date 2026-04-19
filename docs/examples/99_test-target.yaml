@@ -5,38 +5,44 @@ metadata:
   platform: Android
 
 hooks:
-  # - javaClass: android.content.Intent 
+  #   # java primitive types
+  # - javaClass: org.owasp.mastestapp.MastgTest
+  #   stackTraceLimit: 0
   #   methods:
-  #     - putExtra
+  #     - passBoolean
+  #     - passByte
+  #     - passShort
+  #     - passInt
+  #     - passLong
+  #     - passFloat
+  #     - passDouble
+  #     - passChar
 
+  #   # java types which are converted to "string" type in javascript
+  # - javaClass: org.owasp.mastestapp.MastgTest
+  #   stackTraceLimit: 0
+  #   methods:
+  #     - passString
+
+  # complex common java types
   - javaClass: org.owasp.mastestapp.MastgTest
     stackTraceLimit: 0
     methods:
-      # - passString
-      # - passBoolean
-      # - passByte
-      # - passShort
-      - passInt
-      # - passLong
-      # - passFloat
-      # - passDouble
-      # - passChar
-      # - passBigInteger
-      # - passBigDecimal
-      # - passList
-      # - passMap
-      # - passSet
-      # - passEnum
-      # - passStringArray
-      # - passBooleanArray
-      # - passByteArray
-      # - passShortArray
-      # - passIntArray
-      # - passLongArray
-      # - passFloatArray
-      # - passDoubleArray
-      # - passCharArray
-  
+      - passBigInteger
+      - passBigDecimal
+      - passList
+      - passMap
+      - passSet
+      - passEnum
+      - passStringArray
+      - passBooleanArray
+      - passByteArray
+      - passShortArray
+      - passIntArray
+      - passLongArray
+      - passFloatArray
+      - passDoubleArray
+      - passCharArray
 
   # - javaClass: androidx.security.crypto.EncryptedSharedPreferences$Editor
   #   methods:
@@ -58,7 +64,9 @@ hooks:
   #           - android.net.Uri
           
         
-  
+  # - javaClass: android.content.Intent 
+  #   methods:
+  #     - putExtra
  
   # - javaClass: android.app.Activity 
   #   methods:
