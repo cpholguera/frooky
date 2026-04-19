@@ -1,9 +1,10 @@
+import type Java from "frida-java-bridge";
 import type { DecodedValue, Decoder } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
 import { getJavaInstanceDecoder } from "./registry";
 
 export const JavaDecoder: Decoder = {
-  decode: (input: unknown, param: Param): DecodedValue => {
+  decode: (input: Java.Wrapper, param: Param): DecodedValue => {
     const javaScriptType = typeof input;
     if (javaScriptType === "object") {
       // test for frida arrays like "[Ljava.lang.String", "[Z", "[I" etc. or the primitive long java type which is an object in javascript

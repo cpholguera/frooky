@@ -1,7 +1,7 @@
 import type Java from "frida-java-bridge";
 import type { DecodedValue, Decoder } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
-import { SetDecoder } from "./java/util/Set";
+import { SetDecoder } from "./java/util/SetDecoder";
 
 const registry: Record<string, Decoder> = {
   "java.util.Set": SetDecoder,

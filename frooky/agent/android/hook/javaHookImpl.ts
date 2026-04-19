@@ -34,7 +34,7 @@ export function buildStackTrace(limit: number): string[] {
  * @param args - The actual argument values passed to the method
  * @param params- The optional frooky parameters for additional context information
  */
-export function decodeArguments(args: unknown[], params?: Param[]): DecodedValue[] | undefined {
+export function decodeArguments(args: Java.Wrapper[], params?: Param[]): DecodedValue[] | undefined {
   if (args.length === 0) return;
   if (args.length !== params?.length) {
     throw Error("The actual argument length does not match the declared frooky parameter length");
