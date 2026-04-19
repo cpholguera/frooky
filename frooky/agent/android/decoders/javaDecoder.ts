@@ -4,7 +4,7 @@ import type { Param } from "../../shared/hook/parameter";
 import { getJavaInstanceDecoder } from "./registry";
 
 // Decode a Java long (arrives as an object wrapping a 64-bit value in Frida)
-function decodeLong(input: any): string | number {
+function decodeLong(input: Java.Wrapper): string | number {
   return input?.toString?.() ?? String(input);
 }
 
@@ -34,7 +34,7 @@ function decodeJavaArray(input: Java.Wrapper, param: Param): unknown[] {
       if (element.startsWith("[")) {
         // nested array
         for (let i = 0; i < len; i++) {
-          out[i] = input[i] == null ? null : decodeJavaArray(input[i], element, param);
+          out[i] = input[i] == null ? null : decodeJavaArray(input[i], param);
         }
         return out;
       }
@@ -59,8 +59,6 @@ function decodeJavaArray(input: Java.Wrapper, param: Param): unknown[] {
 
 export const JavaDecoder: Decoder = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => {
-    frooky.log.info(`JavaDecoder.decode called with ${JSON.stringify(param, null, 2)}\n`);
-
     if (input == null) {
       return { type: param.type, name: param.name, value: null };
     }
