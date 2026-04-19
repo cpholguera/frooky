@@ -13,7 +13,7 @@ const registry: Record<string, Decoder> = {
   "java.util.Map": MapDecoder,
 };
 
-const fallbackJavaDecoder: Decoder = {
+const FallbackJavaDecoder: Decoder = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => {
     return {
       type: param.type,
@@ -24,5 +24,5 @@ const fallbackJavaDecoder: Decoder = {
 };
 
 export function getJavaInstanceDecoder(type: string): Decoder {
-  return registry[type] ?? fallbackJavaDecoder;
+  return registry[type] ?? FallbackJavaDecoder;
 }

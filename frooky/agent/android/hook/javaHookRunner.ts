@@ -1,6 +1,5 @@
 import Java from "frida-java-bridge";
 import { DEFAULT_STACK_TRACE_LIMIT } from "../../shared/config";
-import type { DecodedValue } from "../../shared/decoders/decoder";
 import type { MethodName } from "../../shared/hook/hook";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import type { Param, ParamType } from "../../shared/hook/parameter";
