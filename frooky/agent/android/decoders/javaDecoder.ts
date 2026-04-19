@@ -88,7 +88,7 @@ export const JavaDecoder: Decoder = {
       }
 
       // Complex Java instance.
-      // If the actual implementation is different from the parameter type, we overwrite the implementation type
+      // If the actual implementation is different from the parameter type, we set the implementation type
       // This happens when an interface is used in the method signature but the actual implementation is different
       const implementationType = input.$className;
       if (param.type !== implementationType) {
