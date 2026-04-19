@@ -45,7 +45,6 @@ export function decodeArgs(args: Java.Wrapper[], params?: Param[]): DecodedValue
   const decodedArgs: DecodedValue[] = [];
   try {
     args.forEach((arg: Java.Wrapper, i: number) => {
-      console.log(`decoding ARG  ${i}`);
       decodedArgs.push(JavaDecoder.decode(arg, params[i]));
     });
   } catch (e) {
