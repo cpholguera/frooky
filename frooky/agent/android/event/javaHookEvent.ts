@@ -1,5 +1,7 @@
 import { HookEvent } from "../../shared/event/hookEvent";
 
+export type JavaMemberType = "class" | "instance";
+
 /**
  * Class representing a java hook event
  *
@@ -7,10 +9,16 @@ import { HookEvent } from "../../shared/event/hookEvent";
  * ```
  */
 export class JavaHookEvent extends HookEvent {
-	readonly javaClass: string;
+  readonly javaClass: string;
+  readonly method: string;
+  readonly memberType: JavaMemberType;
+  instanceId?: number;
 
-	constructor(javaClass: string) {
-		super("java");
-		this.javaClass = javaClass;
-	}
+  constructor(javaClass: string, method: string, memberType: JavaMemberType) {
+    super();
+    this.type += "-java";
+    this.javaClass = javaClass;
+    this.method = method;
+    this.memberType = memberType;
+  }
 }

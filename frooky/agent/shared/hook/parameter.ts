@@ -1,3 +1,5 @@
+import type { Decoder } from "../decoders/decoder";
+
 /**
  * Specifies when a decoder should be applied during function execution.
  *
@@ -38,23 +40,23 @@ export type ParamName = string;
  * @public
  */
 export interface ParamOptions {
-	/**
-	 * When the decoder should be applied.
-	 *
-	 * @defaultValue "enter"
-	 * @example [ "exit" ]
-	 * @example [ "both" ]
-	 */
-	decodeAt?: DecodeAt;
+  /**
+   * When the decoder should be applied.
+   *
+   * @defaultValue "enter"
+   * @example [ "exit" ]
+   * @example [ "both" ]
+   */
+  decodeAt?: DecodeAt;
 
-	/**
-	 * Extra arguments passed to the decoder. They must be a valid parameter name.
-	 *
-	 * @example [ "username" ]
-	 * @example [ "ctxPointer" ]
-	 * @example [ "inBuffer", "bufferLength" ]
-	 */
-	decoderArgs?: string[];
+  /**
+   * Extra arguments passed to the decoder. They must be a valid parameter name.
+   *
+   * @example [ "username" ]
+   * @example [ "ctxPointer" ]
+   * @example [ "inBuffer", "bufferLength" ]
+   */
+  decoderArgs?: string[];
 }
 
 /**
@@ -75,12 +77,14 @@ export interface ParamOptions {
  * @public
  */
 export interface ParamDefinition {
-	/** Frida-compatible type of the parameter, e.g. `"java.lang.String"` or `"int"`. */
-	type: ParamType;
-	/** Optional human-readable name for the parameter, e.g. `"username"`. */
-	name?: ParamName;
-	/** Optional decoder options controlling when and how the parameter is decoded. */
-	options?: ParamOptions;
+  /** Frida-compatible type of the parameter, e.g. `"java.lang.String"` or `"int"`. */
+  type: ParamType;
+  /** Optional human-readable name for the parameter, e.g. `"username"`. */
+  name?: ParamName;
+  /** Optional decoder options controlling when and how the parameter is decoded. */
+  options?: ParamOptions;
+  /** Optional decoder if set, frooky will use this decode and skip decoder lookup. */
+  decoder?: Decoder;
 }
 
 /**

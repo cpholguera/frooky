@@ -1,8 +1,4 @@
-import type {
-	NativeHook,
-	SymbolDefinition,
-	SymbolName,
-} from "../hook/nativeHook";
+import type { NativeHook, SymbolDefinition, SymbolName } from "../hook/nativeHook";
 import { normalizeParam, type ParamInput } from "./parameterInput";
 
 export type { SymbolName };
@@ -12,9 +8,8 @@ export type { SymbolName };
  *
  * @public
  */
-export interface SymbolDefinitionInput
-	extends Omit<SymbolDefinition, "params"> {
-	params?: ParamInput[];
+export interface SymbolDefinitionInput extends Omit<SymbolDefinition, "params"> {
+  params?: ParamInput[];
 }
 
 /**
@@ -33,30 +28,28 @@ export type NativeSymbol = SymbolName | SymbolDefinitionInput;
  * @discriminator {type}
  */
 export interface NativeHookInput extends Omit<NativeHook, "functions"> {
-	type: "native";
-	functions: NativeSymbol[];
+  type: "native";
+  functions: NativeSymbol[];
 }
 
-function normalizeSymbolDefinition(
-	input: SymbolDefinitionInput,
-): SymbolDefinition {
-	return {
-		...input,
-		params: input.params?.map(normalizeParam),
-	};
+function normalizeSymbolDefinition(input: SymbolDefinitionInput): SymbolDefinition {
+  return {
+    ...input,
+    params: input.params?.map(normalizeParam),
+  };
 }
 
 function normalizeSymbol(input: NativeSymbol): SymbolDefinition {
-	if (typeof input === "string") {
-		return { symbol: input };
-	}
+  if (typeof input === "string") {
+    return { symbol: input };
+  }
 
-	return normalizeSymbolDefinition(input);
+  return normalizeSymbolDefinition(input);
 }
 
 export function normalizeNativeHook(input: NativeHookInput): NativeHook {
-	return {
-		...input,
-		functions: input.functions.map(normalizeSymbol),
-	};
+  return {
+    ...input,
+    functions: input.functions.map(normalizeSymbol),
+  };
 }
