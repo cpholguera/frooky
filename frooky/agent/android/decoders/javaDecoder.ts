@@ -96,6 +96,8 @@ export const JavaDecoder: Decoder = {
       if (param.type !== implementationType) {
         param.implementationType = implementationType;
       }
+      console.log(param.type);
+      console.log(implementationType);
       return getJavaInstanceDecoder(implementationType).decode(input, param);
     }
 

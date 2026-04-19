@@ -11,9 +11,9 @@ import { java_util_CollectionDecoder } from "./java/util/CollectionDecoder";
  */
 const registry: Record<string, Decoder> = {
   // type decoders
-  "java.util.Set": java_util_CollectionDecoder,
-  "java.util.List": java_util_CollectionDecoder,
-  "java.util.Map": java_util_MapDecoder,
+  "java.util.LinkedHashSet": java_util_CollectionDecoder,
+  "java.util.Arrays$ArrayList": java_util_CollectionDecoder,
+  "java.util.Collections$SingletonMap": java_util_MapDecoder,
   "android.security.keystore.KeyGenParameterSpec": android_security_keystore_KeyGenParameterSpecDecoder,
 
   // built it custom decoders
