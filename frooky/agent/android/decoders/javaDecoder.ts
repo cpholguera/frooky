@@ -59,6 +59,11 @@ function decodeJavaArray(input: Java.Wrapper, param: Param): unknown[] {
 
 export const JavaDecoder: Decoder = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => {
+    if (param.options?.decoder) {
+      // lookup custom decoder
+      return getJavaInstanceDecoder(param.options.decoder).decode(input, param);
+    }
+
     if (input == null) {
       return { type: param.type, name: param.name, value: null };
     }

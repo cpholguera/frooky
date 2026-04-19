@@ -8,17 +8,15 @@ export const paramTypeSchema = z.string();
 export const paramNameSchema = z.string();
 
 export const paramOptionsSchema = z.object({
+    decoder: z.string().optional(),
     decodeAt: decodeAtSchema.optional(),
     decoderArgs: z.array(z.string()).optional()
 });
 
-const decoderSchema = z.any();
-
 export const paramDefinitionSchema = z.object({
     type: paramTypeSchema,
     name: paramNameSchema.optional(),
-    options: paramOptionsSchema.optional(),
-    decoder: decoderSchema.optional()
+    options: paramOptionsSchema.optional()
 });
 
 export const paramSchema = paramDefinitionSchema;

@@ -41,6 +41,13 @@ export type ParamName = string;
  */
 export interface ParamOptions {
   /**
+   * Overwrites the standard decoder lookup and uses the custom decoder.
+   *
+   * @example [ "android.content.IntentFlagDecoder." ]
+   */
+  decoder?: string;
+
+  /**
    * When the decoder should be applied.
    *
    * @defaultValue "enter"
@@ -83,8 +90,6 @@ export interface ParamDefinition {
   name?: ParamName;
   /** Optional decoder options controlling when and how the parameter is decoded. */
   options?: ParamOptions;
-  /** Optional decoder if set, frooky will use this decode and skip decoder lookup. */
-  decoder?: Decoder;
 }
 
 /**
