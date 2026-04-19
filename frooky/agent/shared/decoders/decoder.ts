@@ -3,10 +3,10 @@ import type { Param } from "../hook/parameter";
 
 // decoded values
 export type DecodedValue = {
+  type: string;
   name?: string;
-  type?: string;
   error?: Error;
-  value: unknown;
+  value?: unknown;
 };
 
 export type Decoder = {

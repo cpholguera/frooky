@@ -1,10 +1,12 @@
 import Java from "frida-java-bridge";
 import { DEFAULT_STACK_TRACE_LIMIT } from "../../shared/config";
+import type { DecodedValue } from "../../shared/decoders/decoder";
 import type { MethodName } from "../../shared/hook/hook";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import type { Param, ParamType } from "../../shared/hook/parameter";
+import { JavaDecoder } from "../decoders/javaDecoder";
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "./javaHook";
-import { buildFieldType, buildStackTrace, decodeValues } from "./javaHookImpl";
+import { buildAndDispatchEvent, buildFieldType, buildStackTrace, decodeArgs } from "./javaHookImpl";
 
 // contains everything needed to hook one java method
 export interface JavaHookOp extends HookOp {
@@ -87,25 +89,14 @@ function buildHookOperations(hook: JavaHook): JavaHookOp[] {
 
 // actually hooks the java method
 export function registerHookOperation(javaHookOp: JavaHookOp) {
-  javaHookOp.javaMethod.implementation = function (...args: any[]) {
+  javaHookOp.javaMethod.implementation = function (...args: Java.Wrapper[]) {
     const stackTrace = javaHookOp.stackTraceLimit > 0 ? buildStackTrace(javaHookOp.stackTraceLimit) : [];
-    const fieldType = buildFieldType(this);
-    const decodedArgs = decodeValues(args, javaHookOp.params);
-
-    // console.log(JSON.stringify(stackTrace, null, 2));
-    // console.log(JSON.stringify(fieldType, null, 2));
-    // console.log(JSON.stringify(decodedArgs, null, 2));
-
+    const fieldType = buildFieldType(this as Java.Wrapper);
+    const decodedArgs = decodeArgs(args, javaHookOp.params);
     try {
       const returnValue = javaHookOp.javaMethod.apply(this, args);
-      const decodedReturnValue = decodeValues([returnValue], [{ type: javaHookOp.javaMethod.returnType.className ?? "void" }]);
-      // buildAndDispatchEvent(
-      // 	javaHookOp,
-      // 	memberType,
-      // 	instanceId,
-      // 	Java.backtrace({ limit: javaHookOp.stackTraceLimit }),
-      // 	decodedArgs,
-      // );
+      // const decodedReturnValue = JavaDecoder.decode(returnValue, { type: javaHookOp.javaMethod.returnType.className ?? "void" });
+      buildAndDispatchEvent(javaHookOp, decodedArgs, stackTrace, fieldType);
       return returnValue;
     } catch (e) {
       frooky.log.error(`Error during the execution of ${javaHookOp.javaClass}.${javaHookOp.methodName}: ${e}`);

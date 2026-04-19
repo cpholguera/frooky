@@ -3,28 +3,96 @@ import type { DecodedValue, Decoder } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
 import { getJavaInstanceDecoder } from "./registry";
 
+// Decode a Java long (arrives as an object wrapping a 64-bit value in Frida)
+function decodeLong(input: any): string | number {
+  return input?.toString?.() ?? String(input);
+}
+
+// Decode a Java array based on its JNI type signature (e.g. "[I", "[Z", "[Ljava.lang.String;")
+function decodeJavaArray(input: Java.Wrapper, type: string, param: Param): unknown[] {
+  const element = type.substring(1); // strip leading '['
+  const len = input.length;
+  const out: unknown[] = new Array(len);
+
+  switch (element) {
+    case "Z": // boolean[]
+    case "B": // byte[]
+    case "C": // char[]
+    case "S": // short[]
+    case "I": // int[]
+    case "F": // float[]
+    case "D": // double[]
+      for (let i = 0; i < len; i++) out[i] = input[i];
+      return out;
+
+    case "J": // long[]
+      for (let i = 0; i < len; i++) out[i] = decodeLong(input[i]);
+      return out;
+
+    default: {
+      // Object array: "[Ljava.lang.String;" or nested "[[I"
+      if (element.startsWith("[")) {
+        // nested array
+        for (let i = 0; i < len; i++) {
+          out[i] = input[i] == null ? null : decodeJavaArray(input[i], element, param);
+        }
+        return out;
+      }
+      // "Lfully.qualified.ClassName;" -> strip L and ;
+      const className = element.startsWith("L") && element.endsWith(";") ? element.substring(1, element.length - 1) : element;
+
+      for (let i = 0; i < len; i++) {
+        const el = input[i];
+        if (el == null) {
+          out[i] = null;
+        } else if (className === "java.lang.String") {
+          out[i] = el.toString();
+        } else {
+          // recurse through the registry for complex instance types
+          out[i] = getJavaInstanceDecoder(className).decode(el, { ...param, type: className });
+        }
+      }
+      return out;
+    }
+  }
+}
+
 export const JavaDecoder: Decoder = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => {
+    frooky.log.info(`JavaDecoder.decode called with ${JSON.stringify(param, null, 2)}\n`);
+
+    if (input == null) {
+      return { type: param.type, name: param.name, value: null };
+    }
+
     const javaScriptType = typeof input;
+
     if (javaScriptType === "object") {
-      // test for frida arrays like "[Ljava.lang.String", "[Z", "[I" etc. or the primitive long java type which is an object in javascript
-      if (param.type[0] === "[" || param.type === "long") {
+      if (param.type[0] === "[") {
         return {
           type: param.type,
           name: param.name,
-          value: input,
+          value: decodeJavaArray(input, param.type, param),
         };
-      } else {
-        // decode complex java instances like "java.util.Set", "java.util.Map", "my.custom.class" etc.
-        return getJavaInstanceDecoder(param.type).decode(input, param);
       }
-    } else {
-      // primitive java type AND java.lang.String already converted to matching javascript type
-      return {
-        type: param.type,
-        name: param.name,
-        value: input,
-      };
+
+      if (param.type === "long") {
+        return {
+          type: param.type,
+          name: param.name,
+          value: decodeLong(input),
+        };
+      }
+
+      // Complex Java instance
+      return getJavaInstanceDecoder(param.type).decode(input, param);
     }
+
+    // Primitive JS value (already converted by Frida): number, boolean, string etc.
+    return {
+      type: param.type,
+      name: param.name,
+      value: input,
+    };
   },
 };
