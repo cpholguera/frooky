@@ -3,7 +3,6 @@ import { DEFAULT_STACK_TRACE_LIMIT } from "../../shared/config";
 import type { MethodName } from "../../shared/hook/hook";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import type { Param, ParamType } from "../../shared/hook/parameter";
-import { Profiler } from "../../utils/Profiler";
 import { JavaDecoder } from "../decoders/javaDecoder";
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "./javaHook";
 import { buildAndDispatchEvent, buildFieldType, buildStackTrace, decodeArgs } from "./javaHookImpl";
