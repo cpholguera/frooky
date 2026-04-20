@@ -7,15 +7,15 @@ export const symbolNameSchema = z.string();
 
 const paramSchema = z.any();
 
-export const symbolDefinitionSchema = z.object({
+export const nativeFunctionDefinitionSchema = z.object({
     symbol: symbolNameSchema,
     returnType: returnTypeSchema.optional(),
     params: z.array(paramSchema).optional()
 });
 
-export const nativeSymbolSchema = symbolDefinitionSchema;
+export const nativeFunctionSchema = nativeFunctionDefinitionSchema;
 
 export const nativeHookSchema = hookSchema.extend({
     module: z.string(),
-    functions: z.array(nativeSymbolSchema)
+    functions: z.array(nativeFunctionSchema)
 });
