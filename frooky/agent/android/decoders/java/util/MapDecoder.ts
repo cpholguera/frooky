@@ -4,7 +4,7 @@ import type { Param } from "../../../../shared/hook/parameter";
 import { JavaDecoder } from "../../javaDecoder";
 import { decodeIterable } from "../lang/IterableDecoder";
 
-export const java_util_MapDecoder: Decoder = {
+export const MapDecoder: Decoder = {
   decode: (input, param) => {
     const map = input.entrySet ? input : Java.cast(input, Java.use("java.util.Map"));
     const entrySet = map.entrySet();
