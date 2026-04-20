@@ -20,7 +20,7 @@ function loadIntentFlags() {
   return flags;
 }
 
-export const android_content_IntentFlagDecoder: Decoder = {
+export const IntentFlagDecoder: Decoder = {
   decode: (input) => {
     const bitmask = Number(input) >>> 0;
 
