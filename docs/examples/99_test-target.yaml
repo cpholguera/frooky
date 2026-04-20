@@ -98,6 +98,21 @@ hooks:
       - EVP_DecryptUpdate
       - EVP_DigestUpdate
 
-  - module: libnative-lib.so
+  - module: libprimitives.so
     functions:
-      - Java_org_owasp_mastestapp_MastgTest_stringFromJNI
+      - pass_bool
+      - pass_char
+      - pass_schar
+      - pass_uchar
+      - pass_short
+      - pass_ushort
+      - pass_int
+      - pass_uint
+      - pass_long
+      - pass_ulong
+      - pass_llong
+      - pass_ullong
+      - pass_float
+      - pass_double
+      - pass_ldouble
+      - pass_wchar
