@@ -13,7 +13,7 @@ export type SymbolName = string;
  *
  * @public
  */
-export interface SymbolDefinition {
+export interface NativeFunctionDefinition {
   symbol: SymbolName;
   returnType?: ReturnType;
   params?: Param[];
@@ -24,7 +24,7 @@ export interface SymbolDefinition {
  *
  * @public
  */
-export type NativeSymbol = SymbolDefinition;
+export type NativeFunction = NativeFunctionDefinition;
 
 /**
  * Native hook configuration.
@@ -41,7 +41,7 @@ export interface NativeHook extends Hook {
   /**
    * Symbol to hook on the target module.
    */
-  functions: NativeSymbol[];
+  functions: NativeFunction[];
 }
 
 export function isNativeHook(h: Hook): h is NativeHook {

@@ -1,5 +1,5 @@
 import Java from "frida-java-bridge";
-import type { JavaOverload, NativeHook, NativeSymbol } from "frooky";
+import type { JavaOverload, NativeFunction, NativeHook } from "frooky";
 import { DEFAULT_STACK_TRACE_LIMIT } from "../../shared/config.js";
 import type { NativeHookOp } from "../../shared/hook/nativeHookRunner.js";
 import { uuidv4 } from "../../shared/utils.js";
@@ -27,43 +27,6 @@ import { uuidv4 } from "../../shared/utils.js";
 ////////
 //////// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ///////
-export function resolveNativeSymbol(hook: NativeHook): NativeHookOp[] {
-  const nativeEntry: NativeHookOp[] = [];
-  const errors: string[] = [];
-
-  try {
-    const mod = Process.getModuleByName(hook.module);
-
-    hook.functions.forEach((s: NativeSymbol) => {
-      try {
-        if (typeof s === "string") {
-          nativeEntry.push({
-            stackTraceLimit: hook.stackTraceLimit ?? DEFAULT_STACK_TRACE_LIMIT,
-            module: hook.module,
-            moduleAddress: mod.base,
-            symbol: s,
-            symbolAddress: mod.getExportByName(s),
-          });
-        } else {
-          nativeEntry.push({
-            stackTraceLimit: hook.stackTraceLimit ?? DEFAULT_STACK_TRACE_LIMIT,
-            module: hook.module,
-            moduleAddress: mod.base,
-            symbol: s.symbol,
-            symbolAddress: mod.getExportByName(s.symbol),
-          });
-        }
-      } catch (e) {
-        errors.push(e as string);
-        console.error("Failed to resolve native symbol '" + s + "'" + (hook.module ? " in module '" + hook.module + "'" : "") + ": " + e);
-      }
-    });
-  } catch (e) {
-    console.error("Failed to get module '" + hook.module + "': " + e);
-  }
-
-  return nativeEntry;
-}
 
 export function registerNativeHooks(hookEntries: NativeHookOp[]) {
   hookEntries.forEach((hookEntry: NativeHookOp) => {
