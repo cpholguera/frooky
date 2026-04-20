@@ -98,3 +98,6 @@ hooks:
       - EVP_DecryptUpdate
       - EVP_DigestUpdate
 
+  - module: libnative-lib.so
+    functions:
+      - Java_org_owasp_mastestapp_MastgTest_stringFromJNI
