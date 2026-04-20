@@ -51,6 +51,10 @@ build: $(BUILD_DIR) $(DIST_DIR)
 			cp "$(TARGET_APP)/AndroidManifest.xml" "$(CLONE_DIR)/app/src/main/AndroidManifest.xml" && \
 			echo "Replaced AndroidManifest.xml" || true
 
+	@[ -f "$(TARGET_APP)/native" ] && \
+			cp "$(TARGET_APP)/native/**" "$(CLONE_DIR)/native" && \
+			echo "Copied native source code." || true
+
 	@[ -f "$(CLONE_DIR)/app/src/main/res/values/strings.xml" ] && \
 			perl -i -pe "s|<string name=\"app_name\">MASTestApp</string>|<string name=\"app_name\">frooky: $(TARGET_APP)</string>|" \
 					"$(CLONE_DIR)/app/src/main/res/values/strings.xml" && \
