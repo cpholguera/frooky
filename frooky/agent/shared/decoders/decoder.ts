@@ -10,5 +10,9 @@ export type DecodedValue = {
 };
 
 export type Decoder = {
-  decode: (input: Java.Wrapper, param: Param) => DecodedValue;
+  // decodes an input value, 
+  // param contains additional information about the value such as name or type
+  // quickDecode is an optional flag, if set, we TRY to minimize Frida <-> Bridge <-> Platform calls 
+  // at cost of less information. This will always SKIP fetching the stacktrace
+  decode: (input: Java.Wrapper, param: Param, quickDecode?: boolean) => DecodedValue;
 };
