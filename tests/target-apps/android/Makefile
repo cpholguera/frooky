@@ -45,15 +45,20 @@ build: $(BUILD_DIR) $(DIST_DIR)
 	@[ -f "$(TARGET_APP)/build.gradle.kts.libs" ] && \
 		perl -i -pe "s|// ADD_LIBS_HERE|$$(cat "$(TARGET_APP)/build.gradle.kts.libs")|" \
 			"$(CLONE_DIR)/app/build.gradle.kts" && \
-		echo "Replaced libs in build.gradle.kts" || true
+		echo "Added libs in build.gradle.kts" || true
+
+	@[ -f "$(TARGET_APP)/build.gradle.kts.sections" ] && \
+		perl -i -pe "s|// ADD_SECTIONS_HERE|$$(cat "$(TARGET_APP)/build.gradle.kts.sections")|" \
+			"$(CLONE_DIR)/app/build.gradle.kts" && \
+		echo "Added section in build.gradle.kts" || true
 
 	@[ -f "$(TARGET_APP)/AndroidManifest.xml" ] && \
 			cp "$(TARGET_APP)/AndroidManifest.xml" "$(CLONE_DIR)/app/src/main/AndroidManifest.xml" && \
 			echo "Replaced AndroidManifest.xml" || true
 
-	@[ -f "$(TARGET_APP)/native" ] && \
-			cp "$(TARGET_APP)/native/**" "$(CLONE_DIR)/native" && \
-			echo "Copied native source code." || true
+	@[ -d "$(TARGET_APP)/cpp" ] && \
+			cp -R "$(TARGET_APP)/cpp" "$(CLONE_DIR)/app/cpp" && \
+			echo "Copied native source code folder." || true
 
 	@[ -f "$(CLONE_DIR)/app/src/main/res/values/strings.xml" ] && \
 			perl -i -pe "s|<string name=\"app_name\">MASTestApp</string>|<string name=\"app_name\">frooky: $(TARGET_APP)</string>|" \

@@ -4,17 +4,17 @@ import android.content.Context
 
 class MastgTest(private val context: Context) {
 
-    static {
-        System.loadLibrary("native-lib");
+    companion object {
+        init {
+            System.loadLibrary("native-lib")
+        }
     }
 
+    external fun stringFromJNI(): String
+
     fun mastgTest(): String {
-        val r = DemoResults("basic-native")f
-
-
-        r.add(Status.PASS, "Loaded native library and ran various functions.")
-
-
+        val r = DemoResults("basic-native")
+        r.add(Status.PASS, "Loaded native library and ran various functions: ${stringFromJNI()}")
         return r.toJson()
     }
 }
