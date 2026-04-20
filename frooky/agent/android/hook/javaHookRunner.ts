@@ -89,17 +89,17 @@ function buildHookOperations(hook: JavaHook): JavaHookOp[] {
 // actually hooks the java method
 export function registerHookOperation(javaHookOp: JavaHookOp) {
   javaHookOp.javaMethod.implementation = function (...args: Java.Wrapper[]) {
-    const stackTrace = javaHookOp.stackTraceLimit > 0 ? buildStackTrace(javaHookOp.stackTraceLimit) : [];
-    const fieldType = buildFieldType(this as Java.Wrapper);
-    const decodedArgs = decodeArgs(args, javaHookOp.params);
+    const returnValue = javaHookOp.javaMethod.apply(this, args);
     try {
-      const returnValue = javaHookOp.javaMethod.apply(this, args);
       const decodedReturnValue = JavaDecoder.decode(returnValue, { type: javaHookOp.javaMethod.returnType.className ?? "void", implementationType: javaHookOp.javaMethod.returnType.className ?? "void" });
+      const stackTrace = javaHookOp.stackTraceLimit > 0 ? buildStackTrace(javaHookOp.stackTraceLimit) : [];
+      const fieldType = buildFieldType(this as Java.Wrapper);
+      const decodedArgs = decodeArgs(args, javaHookOp.params);
       buildAndDispatchEvent(javaHookOp, decodedArgs, decodedReturnValue, stackTrace, fieldType);
-      return returnValue;
     } catch (e) {
       frooky.log.error(`Error during the execution of ${javaHookOp.javaClass}.${javaHookOp.methodName}: ${e}`);
     }
+    return returnValue;
   };
 }
 
