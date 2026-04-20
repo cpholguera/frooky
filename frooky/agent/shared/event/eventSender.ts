@@ -10,13 +10,10 @@ export function startAsyncSender(eventCache: BaseEvent[], sendInterval: number =
     return; // already running
   }
 
-  senderInterval = setInterval(async () => {
-    if (eventCache.length === 0) {
-      return;
-    }
+  senderInterval = setInterval(() => {
+    if (eventCache.length === 0) return;
 
-    const eventsToSend = [...eventCache];
-    eventCache.length = 0;
+    const eventsToSend = eventCache.splice(0, eventCache.length);
 
     try {
       send(eventsToSend);
