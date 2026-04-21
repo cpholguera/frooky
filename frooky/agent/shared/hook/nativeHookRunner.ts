@@ -19,9 +19,10 @@ export function registerNativeHookOps(nativeHookOp: NativeHookOp) {
       console.log("ENTER")
        // collect the stack trace from Frida
       const stackTrace = nativeHookOp.stackTraceLimit > 0 ? buildNativeStackTrace(this.context, nativeHookOp.stackTraceLimit): [];
-       // decode the arguments passed to the method
+      // decode the arguments passed to the method
+      const decodedArgs = decodeNativeArgs(args, nativeHookOp.params);
 
-       const decodedArgs = decodeNativeArgs(args, nativeHookOp.params);
+      console.log(decodedArgs)
 
     },
     onLeave: function(args){
