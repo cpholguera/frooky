@@ -89,12 +89,18 @@ function buildJavaHookOps(hook: JavaHook): JavaHookOp[] {
 // actually hooks the java method
 export function registerJavaHookOps(javaHookOp: JavaHookOp) {
   javaHookOp.javaMethod.implementation = function (...args: Java.Wrapper[]) {
+    // call the original implementation
     const returnValue = javaHookOp.javaMethod.apply(this, args);
     try {
+      // decode the return value
       const decodedReturnValue = JavaDecoder.decode(returnValue, { type: javaHookOp.javaMethod.returnType.className ?? "void", implementationType: javaHookOp.javaMethod.returnType.className ?? "void" });
+      // collect the stack trace from Frida
       const stackTrace = javaHookOp.stackTraceLimit > 0 ? buildStackTrace(javaHookOp.stackTraceLimit) : [];
+      // collect the field type and (optional) instance hash 
       const fieldType = buildFieldType(this as Java.Wrapper);
+      // decode the arguments passed to the method
       const decodedArgs = decodeArgs(args, javaHookOp.params);
+      // create a frooky hook event and send it to the event cache
       buildAndDispatchEvent(javaHookOp, decodedArgs, decodedReturnValue, stackTrace, fieldType);
     } catch (e) {
       frooky.log.error(`Error during the execution of ${javaHookOp.javaClass}.${javaHookOp.methodName}: ${e}`);
