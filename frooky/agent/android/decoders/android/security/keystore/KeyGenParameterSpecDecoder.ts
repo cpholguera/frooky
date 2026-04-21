@@ -50,7 +50,7 @@ function stripPrefix(name: string): string {
   return name;
 }
 
-export const KeyGenParameterSpecDecoder: Decoder = {
+export const KeyGenParameterSpecDecoder: Decoder<Java.Wrapper> = {
   decode: (spec, param) => {
     if (!KeyGenParameterSpec) {
       KeyGenParameterSpec = Java.use("android.security.keystore.KeyGenParameterSpec");

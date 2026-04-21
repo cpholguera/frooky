@@ -51,7 +51,7 @@ function buildElementParam(param: Param): Param {
   return elementParam;
 }
 
-export const ArrayDecoder: Decoder = {
+export const ArrayDecoder: Decoder<Java.Wrapper> = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => {
     const elementParam = buildElementParam(param);
     const len = input.length;
