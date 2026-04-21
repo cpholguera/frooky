@@ -1,41 +1,44 @@
-import type { NativeFunctionDefinition, NativeHook, Param, SymbolName } from "frooky";
+import type { NativeFunctionDefinition, NativeHook, Param, ParamType, SymbolName } from "frooky";
 import { DEFAULT_STACK_TRACE_LIMIT } from "../config";
-import { uuidv4 } from "../utils";
-import type { HookOp, HookRunner } from "./hookRunner";
-import { buildNativeStackTrace, decodeNativeArgs } from "./nativeHookImpl";
+import type { DecodedValue } from "../decoders/decoder";
 import { NativeDecoder } from "../decoders/nativeDecoder";
+import type { HookOp, HookRunner } from "./hookRunner";
+import { buildAndDispatchEvent, buildNativeStackTrace, decodeNativeArgs } from "./nativeHookImpl";
 
 export interface NativeHookOp extends HookOp {
+  module: string;
   symbol: SymbolName;
   symbolAddress: NativePointer;
+  returnType: Param;
   params: Param[];
 }
 
-
 // actually hooks the native function
 export function registerNativeHookOps(nativeHookOp: NativeHookOp) {
+  let stackTrace: string[];
+  let decodedArgs: DecodedValue[];
+  let decodedReturnValue: DecodedValue;
+
   Interceptor.attach(nativeHookOp.symbolAddress, {
-    onEnter: function (args: InvocationArguments) {
-      console.log("ENTER")
-       // collect the stack trace from Frida
-      const stackTrace = nativeHookOp.stackTraceLimit > 0 ? buildNativeStackTrace(this.context, nativeHookOp.stackTraceLimit): [];
+    onEnter: function (args: NativePointer[]) {
+      console.log("OnEnter");
+      // collect the stack trace from Frida
+      stackTrace = nativeHookOp.stackTraceLimit > 0 ? buildNativeStackTrace(this.context, nativeHookOp.stackTraceLimit) : [];
       // decode the arguments passed to the method
-      const decodedArgs = decodeNativeArgs(args, nativeHookOp.params);
-
-      console.log(decodedArgs)
-
+      decodedArgs = decodeNativeArgs(args, nativeHookOp.params);
     },
-    onLeave: function(args){
-      console.log("EXIT")
-       // decode the return value
-
+    onLeave: (returnValue: InvocationReturnValue) => {
+      // decode the return value
+      if (nativeHookOp.returnType) {
+        decodedReturnValue = NativeDecoder.decode(returnValue, nativeHookOp.returnType);
+      } else {
+        decodedReturnValue = { type: "void", value: null };
+      }
       // create a frooky hook event and send it to the event cache
-
-    }
-  })
+      buildAndDispatchEvent(nativeHookOp, decodedArgs, decodedReturnValue, stackTrace);
+    },
+  });
 }
-
-
 
 /**
  * Registers a native function hook using Frida's Interceptor API.
@@ -94,18 +97,20 @@ export function registerNativeHook(hookEntry: NativeHookOp, category: string = "
         }
       }
 
-      // Filtering uses full stacks before truncation
-      // if (hook.filterEventsByStacktrace) {
-      //   let combinedFull = (fullJavaStack && fullJavaStack.length ? fullJavaStack : fullNativeStack);
-      //   let needle = hook.filterEventsByStacktrace;
-      //   let found = false;
-      //   for (let k = 0; k < combinedFull.length; k++) {
-      //     if (combinedFull[k].indexOf(needle) !== -1) { found = true; break; }
-      //   }
-      //   if (!found) {
-      //     return; // suppress event
-      //   }
-      // }
+      if (hook.filterEventsByStacktrace) {
+        const combinedFull = fullJavaStack && fullJavaStack.length ? fullJavaStack : fullNativeStack;
+        const needle = hook.filterEventsByStacktrace;
+        let found = false;
+        for (let k = 0; k < combinedFull.length; k++) {
+          if (combinedFull[k].indexOf(needle) !== -1) {
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          return; // suppress event
+        }
+      }
 
       // Apply maxFrames truncation only for emission. If filtering was used, emit full stack to ensure visibility of matching frame.
       function _truncate(arr) {
@@ -117,49 +122,60 @@ export function registerNativeHook(hookEntry: NativeHookOp, category: string = "
       }
       const effectiveStack = fullJavaStack && fullJavaStack.length ? _truncate(fullJavaStack) : _truncate(fullNativeStack);
 
-      // // Decode native args: if descriptors provided, decode only those; else auto decode up to 5
-      // let decodedArgs = [];
-      // try {
-      //   let descriptors = Array.isArray(hook.args) ? hook.args : [];
-      //   if (descriptors.length > 0) {
-      //     for (let ai = 0; ai < descriptors.length; ai++) {
-      //       let p = args[ai];
-      //       if (p === undefined) break;
-      //       decodedArgs.push(decodeArgByDescriptor(p, ai, descriptors[ai]));
-      //     }
-      //   } else {
-      //     // Auto mode
-      //     let autoCount = 5;
-      //     for (let aj = 0; aj < autoCount; aj++) {
-      //       let p2 = args[aj];
-      //       if (p2 === undefined) break;
-      //       let fallbackVal = null;
-      //       try {
-      //         try { fallbackVal = p2.readCString(); } catch (e1) {
-      //           try { fallbackVal = p2.toInt32(); } catch (e2) {
-      //             try { let bufF = Memory.readByteArray(p2, 64); fallbackVal = bufF ? _arrayBufferToHex(bufF) : p2.toString(); } catch (e3) { fallbackVal = p2.toString(); }
-      //           }
-      //         }
-      //       } catch (eF) { fallbackVal = "<error: " + eF + ">"; }
-      //       decodedArgs.push({ name: "args[" + aj + "]", type: "auto", value: fallbackVal });
-      //     }
-      //   }
-      // } catch (eDec) {
-      //   decodedArgs = [{ name: "args", type: "auto", value: "<arg-decode-error: " + eDec + ">" }];
-      // }
+      // Decode native args: if descriptors provided, decode only those; else auto decode up to 5
+      let decodedArgs = [];
+      try {
+        const descriptors = Array.isArray(hook.args) ? hook.args : [];
+        if (descriptors.length > 0) {
+          for (let ai = 0; ai < descriptors.length; ai++) {
+            const p = args[ai];
+            if (p === undefined) break;
+            decodedArgs.push(decodeArgByDescriptor(p, ai, descriptors[ai]));
+          }
+        } else {
+          // Auto mode
+          const autoCount = 5;
+          for (let aj = 0; aj < autoCount; aj++) {
+            const p2 = args[aj];
+            if (p2 === undefined) break;
+            let fallbackVal = null;
+            try {
+              try {
+                fallbackVal = p2.readCString();
+              } catch (e1) {
+                try {
+                  fallbackVal = p2.toInt32();
+                } catch (e2) {
+                  try {
+                    const bufF = Memory.readByteArray(p2, 64);
+                    fallbackVal = bufF ? _arrayBufferToHex(bufF) : p2.toString();
+                  } catch (e3) {
+                    fallbackVal = p2.toString();
+                  }
+                }
+              }
+            } catch (eF) {
+              fallbackVal = "<error: " + eF + ">";
+            }
+            decodedArgs.push({ name: "args[" + aj + "]", type: "auto", value: fallbackVal });
+          }
+        }
+      } catch (eDec) {
+        decodedArgs = [{ name: "args", type: "auto", value: "<arg-decode-error: " + eDec + ">" }];
+      }
 
-      // // Apply per-arg filters (if present) before emitting
-      // try {
-      //   let descriptors2 = Array.isArray(hook.args) ? hook.args : [];
-      //   if (!filtersPass(decodedArgs, descriptors2)) {
-      //     if (hook.debug === true) {
-      //       send({ type: 'native-filter-suppressed', symbol: hook.symbol, args: decodedArgs });
-      //     }
-      //     return; // suppress event when filters don't match
-      //   }
-      // } catch (eFilt) {
-      //   // If filtering fails, default to emitting
-      // }
+      // Apply per-arg filters (if present) before emitting
+      try {
+        const descriptors2 = Array.isArray(hook.args) ? hook.args : [];
+        if (!filtersPass(decodedArgs, descriptors2)) {
+          if (hook.debug === true) {
+            send({ type: "native-filter-suppressed", symbol: hook.symbol, args: decodedArgs });
+          }
+          return; // suppress event when filters don't match
+        }
+      } catch (eFilt) {
+        // If filtering fails, default to emitting
+      }
 
       const event = {
         id: uuidv4(),
@@ -196,6 +212,7 @@ function buildNativeHookOps(hook: NativeHook): NativeHookOp[] {
           symbol: fn.symbol,
           symbolAddress: module.getExportByName(fn.symbol),
           params: [],
+          returnType: fn.returnType ?? { type: "void" },
         });
       } catch (e) {
         frooky.log.error(`Failed to resolve native symbol '${fn.symbol}'${hook.module ? ` in module '${hook.module}'` : ""}: ${e}`);

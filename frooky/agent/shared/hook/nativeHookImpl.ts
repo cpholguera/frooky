@@ -1,40 +1,41 @@
-import { DecodedValue } from "../decoders/decoder";
+import type { DecodedValue } from "../decoders/decoder";
 import { NativeDecoder } from "../decoders/nativeDecoder";
-import { Param } from "./parameter";
+import { NativeHookEvent } from "../event/nativeHookEvent";
+import type { NativeHookOp } from "./nativeHookRunner";
+import type { Param } from "./parameter";
 
 export function buildNativeStackTrace(ctx: CpuContext, limit: number): string[] {
   const stackTrace: string[] = [];
+  try {
+    const btFull = Thread.backtrace(ctx, Backtracer.FUZZY);
+    for (let i = 0; i < limit; i++) {
       try {
-        const btFull = Thread.backtrace(ctx, Backtracer.FUZZY);
-        for (let i = 0; i < btFull.length; i++) {
-          try {
-            stackTrace.push(DebugSymbol.fromAddress(btFull[i]).toString());
-          } catch (e) {
-            stackTrace.push(btFull[i].toString());
-          }
-        }
+        stackTrace.push(DebugSymbol.fromAddress(btFull[i]).toString());
       } catch (e) {
-        frooky.log.warn("Native backtrace unavailable: " + e + "");
+        frooky.log.error(`Error during stack trace capture: ${e}`);
       }
+    }
+  } catch (e) {
+    frooky.log.warn(`Native backtrace unavailable: ${e}`);
+  }
   return stackTrace;
 }
 
-
-export function decodeNativeArgs(args: InvocationArguments, params: Param[]): DecodedValue[]{
-  if (args.length === 0) {
-    throw Error("Empty args passed");
-  }
-  if (args.length !== params?.length) {
-    throw Error("The actual argument length does not match the declared frooky parameter length");
-  }
+export function decodeNativeArgs(args: NativePointer[], params: Param[]): DecodedValue[] {
   const decodedArgs: DecodedValue[] = [];
-  try {
-    args.forEach((arg: NativePointer, i: number) => {
-      decodedArgs.push(NativeDecoder.decode(arg, params[i]));
+  if (params.length > 0) {
+    params.forEach((param: Param, i: number) => {
+      decodedArgs.push(NativeDecoder.decode(args[i], param));
     });
-  } catch (e) {
-    frooky.log.error(`Error decoding input parameter: ${e}`);
   }
   return decodedArgs;
+}
 
+export function buildAndDispatchEvent(nativeHookOp: NativeHookOp, decodedArgs: DecodedValue[], returnValue: DecodedValue, stackTrace: string[]): void {
+  const event = new NativeHookEvent(nativeHookOp.module, nativeHookOp.symbol);
+  event.category = nativeHookOp.category;
+  event.stackTrace = stackTrace;
+  event.args = decodedArgs;
+  event.returnValue = returnValue;
+  frooky.addEvent(event);
 }

@@ -1,4 +1,4 @@
-import type { Param } from "../hook/parameter";
+import type { Param, ParamType } from "../hook/parameter";
 import type { Hook, ReturnType } from "./hook";
 
 /**
@@ -15,7 +15,7 @@ export type SymbolName = string;
  */
 export interface NativeFunctionDefinition {
   symbol: SymbolName;
-  returnType?: ReturnType;
+  returnType?: Param;
   params?: Param[];
 }
 
