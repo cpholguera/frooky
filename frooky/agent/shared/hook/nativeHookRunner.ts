@@ -2,6 +2,8 @@ import type { NativeFunctionDefinition, NativeHook, Param, SymbolName } from "fr
 import { DEFAULT_STACK_TRACE_LIMIT } from "../config";
 import { uuidv4 } from "../utils";
 import type { HookOp, HookRunner } from "./hookRunner";
+import { buildNativeStackTrace, decodeNativeArgs } from "./nativeHookImpl";
+import { NativeDecoder } from "../decoders/nativeDecoder";
 
 export interface NativeHookOp extends HookOp {
   symbol: SymbolName;
@@ -9,11 +11,30 @@ export interface NativeHookOp extends HookOp {
   params: Param[];
 }
 
-export function registerNativeHooks(hookEntries: NativeHookOp[]) {
-  hookEntries.forEach((hookEntry: NativeHookOp) => {
-    registerNativeHook(hookEntry, "FROOKY");
-  });
+
+// actually hooks the native function
+export function registerNativeHookOps(nativeHookOp: NativeHookOp) {
+  Interceptor.attach(nativeHookOp.symbolAddress, {
+    onEnter: function (args: InvocationArguments) {
+      console.log("ENTER")
+       // collect the stack trace from Frida
+      const stackTrace = nativeHookOp.stackTraceLimit > 0 ? buildNativeStackTrace(this.context, nativeHookOp.stackTraceLimit): [];
+       // decode the arguments passed to the method
+
+       const decodedArgs = decodeNativeArgs(args, nativeHookOp.params);
+
+    },
+    onLeave: function(args){
+      console.log("EXIT")
+       // decode the return value
+
+      // create a frooky hook event and send it to the event cache
+
+    }
+  })
 }
+
+
 
 /**
  * Registers a native function hook using Frida's Interceptor API.
@@ -196,6 +217,8 @@ export class NativeHookRunner implements HookRunner {
     });
     frooky.log.info(`Hook operations for the following hook built: ${JSON.stringify(nativeHookOps, null, 2)}`);
     frooky.log.info(`Run native hooking`);
-    registerNativeHooks(nativeHookOps);
+    nativeHookOps.forEach((nativeHookOp: NativeHookOp) => {
+      registerNativeHookOps(nativeHookOp);
+    });
   }
 }

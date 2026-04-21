@@ -4,7 +4,7 @@ import type { Param } from "../../shared/hook/parameter";
 import { ArrayDecoder } from "./arrayDecoder";
 import { getJavaInstanceDecoder } from "./registry";
 
-const LongDecoder: Decoder = {
+const LongDecoder: Decoder<Java.Wrapper> = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => ({
     type: param.type,
     name: param.name,
@@ -12,7 +12,7 @@ const LongDecoder: Decoder = {
   }),
 };
 
-const PrimitiveDecoder: Decoder = {
+const PrimitiveDecoder: Decoder<Java.Wrapper>  = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => ({
     type: param.type,
     name: param.name,
@@ -25,7 +25,7 @@ const PrimitiveDecoder: Decoder = {
  * Called only on the first invocation for a given Param; the result is cached
  * on `param.decoder` so subsequent calls skip this dispatch entirely.
  */
-function resolveDecoder(input: Java.Wrapper, param: Param): Decoder {
+function resolveDecoder(input: Java.Wrapper, param: Param): Decoder<Java.Wrapper>  {
   // Custom decoder override via options
   const custom = param.options?.decoder;
   if (custom) {
@@ -56,8 +56,8 @@ function resolveDecoder(input: Java.Wrapper, param: Param): Decoder {
   return PrimitiveDecoder;
 }
 
-export const JavaDecoder: Decoder = {
-  decode: (input: Java.Wrapper, param: Param): DecodedValue => {
+export const JavaDecoder: Decoder<Java.Wrapper> = {
+  decode: (input: Java.Wrapper, param: Param): DecodedValue=> {
     // Null input: no resolution needed, don't cache (we have no type signal)
     if (input == null) {
       return { type: param.implementationType ?? param.type, name: param.name, value: null };
