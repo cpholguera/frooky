@@ -16,7 +16,7 @@ export function buildFieldType(method: Java.Wrapper): FieldType {
   return { fieldType, instanceId };
 }
 
-export function buildStackTrace(limit: number): string[] {
+export function buildJavaStackTrace(limit: number): string[] {
   const stackTrace: string[] = [];
 
   const fridaStackTrace = Java.backtrace({ limit: limit });

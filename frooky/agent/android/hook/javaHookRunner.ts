@@ -5,7 +5,7 @@ import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import type { Param, ParamType } from "../../shared/hook/parameter";
 import { JavaDecoder } from "../decoders/javaDecoder";
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "./javaHook";
-import { buildAndDispatchEvent, buildFieldType, buildStackTrace, decodeArgs } from "./javaHookImpl";
+import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeArgs } from "./javaHookImpl";
 
 // contains everything needed to hook one java method
 export interface JavaHookOp extends HookOp {
@@ -95,7 +95,7 @@ export function registerJavaHookOps(javaHookOp: JavaHookOp) {
       // decode the return value
       const decodedReturnValue = JavaDecoder.decode(returnValue, { type: javaHookOp.javaMethod.returnType.className ?? "void", implementationType: javaHookOp.javaMethod.returnType.className ?? "void" });
       // collect the stack trace from Frida
-      const stackTrace = javaHookOp.stackTraceLimit > 0 ? buildStackTrace(javaHookOp.stackTraceLimit) : [];
+      const stackTrace = javaHookOp.stackTraceLimit > 0 ? buildJavaStackTrace(javaHookOp.stackTraceLimit) : [];
       // collect the field type and (optional) instance hash 
       const fieldType = buildFieldType(this as Java.Wrapper);
       // decode the arguments passed to the method
