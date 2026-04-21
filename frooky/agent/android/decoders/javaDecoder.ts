@@ -12,7 +12,7 @@ const LongDecoder: Decoder<Java.Wrapper> = {
   }),
 };
 
-const PrimitiveDecoder: Decoder<Java.Wrapper>  = {
+const PrimitiveDecoder: Decoder<Java.Wrapper> = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => ({
     type: param.type,
     name: param.name,
@@ -25,7 +25,7 @@ const PrimitiveDecoder: Decoder<Java.Wrapper>  = {
  * Called only on the first invocation for a given Param; the result is cached
  * on `param.decoder` so subsequent calls skip this dispatch entirely.
  */
-function resolveDecoder(input: Java.Wrapper, param: Param): Decoder<Java.Wrapper>  {
+function resolveDecoder(input: Java.Wrapper, param: Param): Decoder<Java.Wrapper> {
   // Custom decoder override via options
   const custom = param.options?.decoder;
   if (custom) {
@@ -57,7 +57,7 @@ function resolveDecoder(input: Java.Wrapper, param: Param): Decoder<Java.Wrapper
 }
 
 export const JavaDecoder: Decoder<Java.Wrapper> = {
-  decode: (input: Java.Wrapper, param: Param): DecodedValue=> {
+  decode: (input: Java.Wrapper, param: Param): DecodedValue => {
     // Null input: no resolution needed, don't cache (we have no type signal)
     if (input == null) {
       return { type: param.implementationType ?? param.type, name: param.name, value: null };

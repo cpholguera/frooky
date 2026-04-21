@@ -20,7 +20,7 @@ function loadIntentFlags() {
   return flags;
 }
 
-export const IntentFlagDecoder: Decoder = {
+export const IntentFlagDecoder: Decoder<Java.Wrapper> = {
   decode: (input) => {
     const bitmask = Number(input) >>> 0;
 
