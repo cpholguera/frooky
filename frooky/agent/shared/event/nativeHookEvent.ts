@@ -18,6 +18,7 @@ export class NativeHookEvent extends HookEvent {
 
   constructor(module: string, symbol: string) {
     super();
+    this.type += "-native";
     this.module = module;
     this.symbol = symbol;
   }

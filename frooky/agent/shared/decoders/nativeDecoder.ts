@@ -2,7 +2,7 @@ import type { DecodedValue, Decoder } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
 
 export const NativeDecoder: Decoder<NativePointer> = {
-  decode: (input: NativePointer , param: Param, quickDecode=false): DecodedValue => {
+  decode: (input: NativePointer, param: Param, quickDecode = false): DecodedValue => {
     // Null input: no resolution needed, don't cache (we have no type signal)
     if (input == null) {
       return { type: param.implementationType ?? param.type, name: param.name, value: null };
@@ -14,12 +14,9 @@ export const NativeDecoder: Decoder<NativePointer> = {
       return cached.decode(input, param);
     }
 
-    return {type: "void", value: null };
+    return { type: "void", value: null };
 
-    console.log("DECODING native value")
-    
-
-    // // Try to guess the type at runtime and return 
+    // // Try to guess the type at runtime and return
     // if (!quickDecode){
     //   const decoder = resolveDecoder(input, param);
     //   param.decoder = decoder;
