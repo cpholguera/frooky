@@ -4,18 +4,18 @@ import { z } from "zod";
 import {
 	type JavaHookInput,
 	normalizeJavaHook,
-} from "../inputParsing/javaHookInput";
+} from "../hookFileParsing/javaHookInput";
 import {
 	type NativeHookInput,
 	normalizeNativeHook,
-} from "../inputParsing/nativeHookInput";
+} from "../hookFileParsing/nativeHookInput";
 import {
 	normalizeObjcHook,
 	type ObjcHookInput,
-} from "../inputParsing/objcHookInput";
-import { javaHookInputSchema } from "../inputParsing/zodSchemas/javaHook.input.zod";
-import { nativeHookInputSchema } from "../inputParsing/zodSchemas/nativeHook.input.zod";
-import { objcHookInputSchema } from "../inputParsing/zodSchemas/objcHook.input.zod";
+} from "../hookFileParsing/objcHookInput";
+import { javaHookInputSchema } from "../hookFileParsing/zodSchemas/javaHook.input.zod";
+import { nativeHookInputSchema } from "../hookFileParsing/zodSchemas/nativeHook.input.zod";
+import { objcHookInputSchema } from "../hookFileParsing/zodSchemas/objcHook.input.zod";
 import { prettyPrintHook } from "../utils";
 
 export interface HookValidatorResult {
