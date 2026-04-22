@@ -99,10 +99,20 @@ hooks:
       - EVP_DigestUpdate
 
   - module: libprimitives.so
+    stackTraceLimit: 0
     functions:
-      - pass_bool
-      - pass_char
-      - pass_schar
+      - symbol: pass_bool
+        returnType: void
+        params:
+          - [bool, boolInput]
+      - symbol: pass_char
+        returnType: void
+        params:
+          - char
+      - symbol: pass_schar
+        returnType: void
+        params:
+          - {type: schar, name: scharInput}
       - pass_uchar
       - pass_short
       - pass_ushort
