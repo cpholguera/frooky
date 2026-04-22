@@ -4,20 +4,20 @@ import { normalizeParam, type ParamInput } from "./parameterInput";
 export type { SymbolName };
 
 /**
- * Expanded Native method definition with YAML-parsed parameters.
+ * Expanded Native function definition with YAML-parsed parameters.
  *
  * @public
  */
-export interface SymbolDefinitionInput extends Omit<NativeFunctionDefinition, "params"> {
+export interface NativeFunctionDefinitionInput extends Omit<NativeFunctionDefinition, "params"> {
   params?: ParamInput[];
 }
 
 /**
- * Native method selector — either a simple method name or a detailed YAML definition.
+ * Native method selector - either a simple method name or a detailed YAML definition.
  *
  * @public
  */
-export type NativeSymbol = SymbolName | SymbolDefinitionInput;
+export type NativeSymbol = SymbolName | NativeFunctionDefinitionInput;
 
 /**
  * Native hook configuration for YAML parsing.
@@ -32,7 +32,7 @@ export interface NativeHookInput extends Omit<NativeHook, "functions"> {
   functions: NativeSymbol[];
 }
 
-function normalizeSymbolDefinition(input: SymbolDefinitionInput): NativeFunctionDefinition {
+function normalizeFunctionDefinition(input: NativeFunctionDefinitionInput): NativeFunctionDefinition {
   return {
     ...input,
     params: input.params?.map(normalizeParam),
@@ -43,8 +43,7 @@ function normalizeSymbol(input: NativeSymbol): NativeFunctionDefinition {
   if (typeof input === "string") {
     return { symbol: input };
   }
-
-  return normalizeSymbolDefinition(input);
+  return normalizeFunctionDefinition(input);
 }
 
 export function normalizeNativeHook(input: NativeHookInput): NativeHook {
