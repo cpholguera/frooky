@@ -106,13 +106,13 @@ hooks:
         params:
           - [bool, boolInput]
       - symbol: pass_char
-        returnType: void
         params:
           - char
       - symbol: pass_schar
-        returnType: void
         params:
           - {type: schar, name: scharInput}
+      - symbol: pass_uchar
+        params: [uchar]
       - pass_uchar
       - pass_short
       - pass_ushort
