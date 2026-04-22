@@ -21,7 +21,6 @@ export function registerNativeHookOps(nativeHookOp: NativeHookOp) {
 
   Interceptor.attach(nativeHookOp.symbolAddress, {
     onEnter: function (args: NativePointer[]) {
-      console.log("OnEnter");
       // collect the stack trace from Frida
       stackTrace = nativeHookOp.stackTraceLimit > 0 ? buildNativeStackTrace(this.context, nativeHookOp.stackTraceLimit) : [];
       // decode the arguments passed to the method
@@ -211,7 +210,7 @@ function buildNativeHookOps(hook: NativeHook): NativeHookOp[] {
           module: hook.module,
           symbol: fn.symbol,
           symbolAddress: module.getExportByName(fn.symbol),
-          params: [],
+          params: fn.params ?? [],
           returnType: fn.returnType ?? { type: "void" },
         });
       } catch (e) {
@@ -226,6 +225,9 @@ function buildNativeHookOps(hook: NativeHook): NativeHookOp[] {
 
 export class NativeHookRunner implements HookRunner {
   executeHooking(hooks: NativeHook[]): void {
+
+    console.log("execute Hooking ")
+    console.log(JSON.stringify(hooks, null, 2))
     var nativeHookOps: NativeHookOp[] = [];
 
     frooky.log.info(`Executing native hook operations`);
