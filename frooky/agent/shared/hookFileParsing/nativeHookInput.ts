@@ -36,6 +36,7 @@ function normalizeFunctionDefinition(input: NativeFunctionDefinitionInput): Nati
   return {
     ...input,
     params: input.params?.map(normalizeParam),
+    returnType: input.returnType ? normalizeParam(input.returnType) : undefined
   };
 }
 

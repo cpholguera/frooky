@@ -1,10 +1,9 @@
-import type Java from "frida-java-bridge";
+import Java from "frida-java-bridge";
 import type { DecodedValue, Decoder } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
-import { ArrayDecoder } from "./arrayDecoder";
-import { getJavaInstanceDecoder } from "./registry";
+import { javaDecoderRegistry } from "./javaDecoderRegistry";
 
-const LongDecoder: Decoder<Java.Wrapper> = {
+export const JavaLongDecoder: Decoder<Java.Wrapper> = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => ({
     type: param.type,
     name: param.name,
@@ -20,26 +19,30 @@ const PrimitiveDecoder: Decoder<Java.Wrapper> = {
   }),
 };
 
+const FallbackJavaDecoder: Decoder<Java.Wrapper> = {
+  decode: (input: Java.Wrapper, param: Param): DecodedValue => {
+    return {
+      type: param.implementationType ?? param.type,
+      name: param.name,
+      value: input.toString(),
+    };
+  },
+};
+
 /**
  * Resolve the concrete Decoder for `input` under `param`.
  * Called only on the first invocation for a given Param; the result is cached
  * on `param.decoder` so subsequent calls skip this dispatch entirely.
  */
-function resolveDecoder(input: Java.Wrapper, param: Param): Decoder<Java.Wrapper> {
-  // Custom decoder override via options
-  const custom = param.options?.decoder;
-  if (custom) {
-    return getJavaInstanceDecoder(custom);
-  }
-
+function resolveJavaDecoder(input: Java.Wrapper, param: Param): Decoder<Java.Wrapper> {
   // Java array
   if (param.type.startsWith("[")) {
-    return ArrayDecoder;
+    return javaDecoderRegistry["JavaArrayDecoder"]
   }
 
   // long arrives as a wrapper object
   if (param.type === "long") {
-    return LongDecoder;
+    return javaDecoderRegistry["JavaLongDecoder"]
   }
 
   // Object types: use the actual runtime class so interface-typed params are
@@ -49,7 +52,7 @@ function resolveDecoder(input: Java.Wrapper, param: Param): Decoder<Java.Wrapper
     if (param.type !== implementationType) {
       param.implementationType = implementationType;
     }
-    return getJavaInstanceDecoder(implementationType);
+    return javaDecoderRegistry[implementationType]
   }
 
   // Primitive JS value (already converted by Frida)
@@ -58,19 +61,19 @@ function resolveDecoder(input: Java.Wrapper, param: Param): Decoder<Java.Wrapper
 
 export const JavaDecoder: Decoder<Java.Wrapper> = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => {
-    // Null input: no resolution needed, don't cache (we have no type signal)
-    if (input == null) {
+    // No input: no resolution needed, don't cache
+    if (input == undefined) {
       return { type: param.implementationType ?? param.type, name: param.name, value: null };
     }
 
-    // Fast path: a decoder was already resolved for this Param
-    const cached = param.decoder;
-    if (cached) {
-      return cached.decode(input, param);
+    // A decoder was already resolved for this Param
+    const cachedDecoder = param.decoder;
+    if (cachedDecoder) {
+      return cachedDecoder.decode(input, param);
     }
 
-    // Slow path: resolve once, cache on the Param, and delegate
-    const decoder = resolveDecoder(input, param);
+    // Resolve once and cache it
+    const decoder = resolveJavaDecoder(input, param);
     param.decoder = decoder;
     return decoder.decode(input, param);
   },

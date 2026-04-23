@@ -114,15 +114,15 @@ hooks:
       - symbol: pass_uchar
         params: [uchar]
       - pass_uchar
-      - pass_short
-      - pass_ushort
-      - pass_int
-      - pass_uint
-      - pass_long
-      - pass_ulong
-      - pass_llong
-      - pass_ullong
-      - pass_float
-      - pass_double
-      - pass_ldouble
-      - pass_wchar
+      # - pass_short
+      # - pass_ushort
+      # - pass_int
+      # - pass_uint
+      # - pass_long
+      # - pass_ulong
+      # - pass_llong
+      # - pass_ullong
+      # - pass_float
+      # - pass_double
+      # - pass_ldouble
+      # - pass_wchar
