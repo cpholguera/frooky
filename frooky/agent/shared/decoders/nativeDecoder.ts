@@ -29,9 +29,9 @@ const basicTypeDecoderMap: Record<string, Decoder<NativePointer>> = {
 const FallbackNativeDecoder: Decoder<NativePointer> = {
   decode: (input: NativePointer, param: Param): DecodedValue => {
     return {
-      type: param.implementationType ?? param.type,
+      type: param.type,
       name: param.name,
-      value: "<NO-DECODER-IMPLEMENTED>"
+      value: input
     };
   },
 };
