@@ -1,7 +1,7 @@
 import type { DecodedValue, Decoder } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
 
-const typeDecoderMap: Record<string, Decoder<NativePointer>> = {
+const basicTypeDecoderMap: Record<string, Decoder<NativePointer>> = {
   "int8_t":         { decode: (input, param) => ({ type: param.type, value: input.readS8() }) },
   "uint8_t":        { decode: (input, param) => ({ type: param.type, value: input.readU8() }) },
   "int16_t":        { decode: (input, param) => ({ type: param.type, value: input.readS16() }) },
@@ -41,7 +41,7 @@ const FallbackNativeDecoder: Decoder<NativePointer> = {
  * on `param.decoder` so subsequent calls skip this dispatch entirely.
  */
 function resolveNativeDecoder(param: Param): Decoder<NativePointer> {
-  const decoder = typeDecoderMap[param.type];
+  const decoder = basicTypeDecoderMap[param.type];
   if (!decoder) {
     return FallbackNativeDecoder;
   } else 
