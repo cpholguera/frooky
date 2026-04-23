@@ -1,6 +1,5 @@
 import type { DecodedValue, Decoder } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
-import { nativeDecoderRegistry } from "./nativeDecoderRegistry";
 
 const typeDecoderMap: Record<string, Decoder<NativePointer>> = {
   "int8_t":         { decode: (input, param) => ({ type: param.type, value: input.readS8() }) },
@@ -52,9 +51,6 @@ function resolveNativeDecoder(param: Param): Decoder<NativePointer> {
 
 export const NativeDecoder: Decoder<NativePointer> = {
   decode: (input: NativePointer, param: Param, quickDecode = false): DecodedValue => {
-    console.log("NATIVE DECODER: ")
-    console.log(JSON.stringify(param, null, 2))
-
     // a decoder was already resolved for this Param
     const cachedDecoder = param.decoder;
     if (cachedDecoder) {
@@ -64,7 +60,6 @@ export const NativeDecoder: Decoder<NativePointer> = {
     // Resolve the decoder from the frooky parameter declaration and cache it
       const decoder = resolveNativeDecoder(param);
       param.decoder = decoder;
-      console.log(decoder)
       return decoder.decode(input, param, quickDecode);
   },
 };
