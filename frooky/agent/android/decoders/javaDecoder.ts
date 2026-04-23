@@ -34,7 +34,7 @@ const FallbackJavaDecoder: Decoder<Java.Wrapper> = {
  * Called only on the first invocation for a given Param; the result is cached
  * on `param.decoder` so subsequent calls skip this dispatch entirely.
  */
-function resolveJavaDecoder(input: Java.Wrapper, param: Param): Decoder<Java.Wrapper> {
+function lookupJavaDecoder(input: Java.Wrapper, param: Param): Decoder<Java.Wrapper> {
   // Java array
   if (param.type.startsWith("[")) {
     return javaDecoderRegistry["JavaArrayDecoder"]
@@ -73,7 +73,7 @@ export const JavaDecoder: Decoder<Java.Wrapper> = {
     }
 
     // Resolve once and cache it
-    const decoder = resolveJavaDecoder(input, param);
+    const decoder = lookupJavaDecoder(input, param);
     param.decoder = decoder;
     return decoder.decode(input, param);
   },

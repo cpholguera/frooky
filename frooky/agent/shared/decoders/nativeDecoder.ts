@@ -40,7 +40,7 @@ const FallbackNativeDecoder: Decoder<NativePointer> = {
  * Called only on the first invocation for a given Param; the result is cached
  * on `param.decoder` so subsequent calls skip this dispatch entirely.
  */
-function resolveNativeDecoder(param: Param): Decoder<NativePointer> {
+function lookupNativeDecoder(param: Param): Decoder<NativePointer> {
   const decoder = basicTypeDecoderMap[param.type];
   if (!decoder) {
     return FallbackNativeDecoder;
@@ -58,7 +58,7 @@ export const NativeDecoder: Decoder<NativePointer> = {
     }
     
     // Resolve the decoder from the frooky parameter declaration and cache it
-      const decoder = resolveNativeDecoder(param);
+      const decoder = lookupNativeDecoder(param);
       param.decoder = decoder;
       return decoder.decode(input, param, quickDecode);
   },
