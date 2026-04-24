@@ -1,4 +1,4 @@
-import { type Hook, isJavaHook, isNativeHook, isObjcHook, type JavaMethod, type NativeFunction, type ObjcMethod } from "frooky";
+import { type Hook, isJavaHook, isNativeHook, isObjcHook, type JavaMethod, type NativeFrookyFunction, type ObjcMethod } from "frooky";
 
 /**
  * Generates a v4 UUID
@@ -113,7 +113,7 @@ export function prettyPrintHook(hook: Hook, short: boolean = true): string {
       });
     }
     if (isNativeHook(hook)) {
-      hook.functions.forEach((f: NativeFunction, index: number) => {
+      hook.functions.forEach((f: NativeFrookyFunction, index: number) => {
         const prefix = index === 0 ? "- " : "  ";
         result += typeof f === "string" ? `${prefix}${hook.module}: ${f}\n` : `${prefix}${hook.module}: ${f.symbol}\n`;
       });

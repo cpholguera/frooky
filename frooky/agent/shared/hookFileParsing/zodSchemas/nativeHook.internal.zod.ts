@@ -7,15 +7,15 @@ export const symbolNameSchema = z.string();
 
 const paramSchema = z.any();
 
-export const nativeFunctionDefinitionSchema = z.object({
+export const nativeFrookyFunctionDefinitionSchema = z.object({
     symbol: symbolNameSchema,
     returnType: paramSchema.optional(),
     params: z.array(paramSchema).optional()
 });
 
-export const nativeFunctionSchema = nativeFunctionDefinitionSchema;
+export const nativeFrookyFunctionSchema = nativeFrookyFunctionDefinitionSchema;
 
 export const nativeHookSchema = hookSchema.extend({
     module: z.string(),
-    functions: z.array(nativeFunctionSchema)
+    functions: z.array(nativeFrookyFunctionSchema)
 });

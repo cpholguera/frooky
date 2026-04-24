@@ -47,6 +47,7 @@ export interface JavaHookInput extends Omit<JavaHook, "methods"> {
   methods: JavaMethod[];
 }
 
+// will return a JavaOverload for any form of JavaOverloadInput
 function normalizeOverload(input: JavaOverloadInput): JavaOverload {
   return {
     ...input,
@@ -54,6 +55,7 @@ function normalizeOverload(input: JavaOverloadInput): JavaOverload {
   };
 }
 
+// will return a JavaMethodDefinition for any form of JavaMethodDefinitionInput or a simple method string
 function normalizeMethod(input: JavaMethodDefinitionInput | string): JavaMethodDefinition {
   if (typeof input === "string") {
     return { name: input };
@@ -65,6 +67,7 @@ function normalizeMethod(input: JavaMethodDefinitionInput | string): JavaMethodD
   };
 }
 
+// will return a JavaHook for any form of JavaHookInput
 export function normalizeJavaHook(input: JavaHookInput): JavaHook {
   return {
     ...input,

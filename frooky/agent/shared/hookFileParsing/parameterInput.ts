@@ -19,6 +19,7 @@ import type { ParamDefinition, ParamName, ParamOptions, ParamType } from "../hoo
  */
 export type ParamInput = ParamType | ParamDefinition | [ParamType, ParamName] | [ParamType, ParamOptions] | [ParamType, ParamName, ParamOptions];
 
+// returns a normalized ParamDefinition from any type of ParamInput
 export function normalizeParam(input: ParamInput): ParamDefinition {
   if (typeof input === "string") {
     return { type: input };
@@ -26,21 +27,21 @@ export function normalizeParam(input: ParamInput): ParamDefinition {
 
   // Check array before plain object, since arrays are also objects
   if (Array.isArray(input)) {
-    const [first, second, third] = input;
+    const [paramType, paramNameOrParamOptions, paramOptions] = input;
 
     if (input.length === 3) {
       return {
-        type: first,
-        name: second as string,
-        options: third as ParamOptions,
+        type: paramType,
+        name: paramNameOrParamOptions as string,
+        options: paramOptions as ParamOptions,
       };
     }
 
-    if (typeof second === "object") {
-      return { type: first, options: second };
+    if (typeof paramNameOrParamOptions === "object") {
+      return { type: paramType, options: paramNameOrParamOptions };
     }
 
-    return { type: first, name: second };
+    return { type: paramType, name: paramNameOrParamOptions };
   }
 
   return input as ParamDefinition;
