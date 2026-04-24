@@ -98,34 +98,69 @@ hooks:
       - EVP_DecryptUpdate
       - EVP_DigestUpdate
 
+
+# pass by value
   - module: libprimitives.so
     stackTraceLimit: 0
     functions:
       - symbol: pass_bool
-        returnType: void
-        params:
-          - [bool, boolInput]
+        params: [bool]
       - symbol: pass_char
-        params:
-          - char
+        params: [char]
       - symbol: pass_schar
-        params:
-          - {type: schar, name: scharInput}
+        params: [schar]
       - symbol: pass_uchar
         params: [uchar]
-      - pass_uchar
-      - pass_short
-      - pass_ushort
-      - pass_int
+      - symbol: pass_short
+        params: [short]
+      - symbol: pass_ushort
+        params: [ushort]
       - symbol: pass_int
         params: [int]
-      - pass_uint
-      - pass_long
-      - pass_ulong
-      - pass_llong
-      - pass_ullong
+      - symbol: pass_uint
+        params: [uint]
+      - symbol: pass_long
+        params: [long]
+      - symbol: pass_ulong
+        params: [ulong]
+      - symbol: pass_llong
+        params: [llong]
+      - symbol: pass_ullong
+        params: [ullong]
       - symbol: pass_float
         params: [float]
-      - pass_double
-      - pass_ldouble
-      - pass_wchar
+      - symbol: pass_double
+        params: [double]
+
+# pass by reference
+  - module: libprimitives.so
+    stackTraceLimit: 0
+    functions:
+      - symbol: pass_bool_ref
+        params: [bool*]
+      - symbol: pass_char_ref
+        params: [char*]
+      - symbol: pass_schar_ref
+        params: [schar*]
+      - symbol: pass_uchar_ref
+        params: [uchar*]
+      - symbol: pass_short_ref
+        params: [short*]
+      - symbol: pass_ushort_ref
+        params: [ushort*]
+      - symbol: pass_int_ref
+        params: [int*]
+      - symbol: pass_uint_ref
+        params: [uint*]
+      - symbol: pass_long_ref
+        params: [long*]
+      - symbol: pass_ulong_ref
+        params: [ulong *]
+      - symbol: pass_llong_ref
+        params: [llong *]
+      - symbol: pass_ullong_ref
+        params: [ullong *]
+      - symbol: pass_float_ref
+        params: [float *]
+      - symbol: pass_double_ref
+        params: [double *]

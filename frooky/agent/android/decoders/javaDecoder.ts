@@ -1,4 +1,4 @@
-import Java from "frida-java-bridge";
+import type Java from "frida-java-bridge";
 import type { DecodedValue, Decoder } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
 import { javaDecoderRegistry } from "./javaDecoderRegistry";
@@ -37,12 +37,12 @@ const FallbackJavaDecoder: Decoder<Java.Wrapper> = {
 function lookupJavaDecoder(input: Java.Wrapper, param: Param): Decoder<Java.Wrapper> {
   // Java array
   if (param.type.startsWith("[")) {
-    return javaDecoderRegistry["JavaArrayDecoder"]
+    return javaDecoderRegistry.JavaArrayDecoder;
   }
 
   // long arrives as a wrapper object
   if (param.type === "long") {
-    return javaDecoderRegistry["JavaLongDecoder"]
+    return javaDecoderRegistry.JavaLongDecoder;
   }
 
   // Object types: use the actual runtime class so interface-typed params are
@@ -52,7 +52,7 @@ function lookupJavaDecoder(input: Java.Wrapper, param: Param): Decoder<Java.Wrap
     if (param.type !== implementationType) {
       param.implementationType = implementationType;
     }
-    return javaDecoderRegistry[implementationType]
+    return javaDecoderRegistry[implementationType] ?? FallbackJavaDecoder;
   }
 
   // Primitive JS value (already converted by Frida)
@@ -62,7 +62,7 @@ function lookupJavaDecoder(input: Java.Wrapper, param: Param): Decoder<Java.Wrap
 export const JavaDecoder: Decoder<Java.Wrapper> = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => {
     // No input: no resolution needed, don't cache
-    if (input == undefined) {
+    if (input === undefined) {
       return { type: param.implementationType ?? param.type, name: param.name, value: null };
     }
 
