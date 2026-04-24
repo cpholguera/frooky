@@ -1,5 +1,5 @@
-import type { Param, ParamType } from "../hook/parameter";
-import type { Hook, ReturnType } from "./hook";
+import type { Param } from "../hook/parameter";
+import type { Hook } from "./hook";
 
 /**
  * Name of a native function method.
@@ -13,7 +13,7 @@ export type SymbolName = string;
  *
  * @public
  */
-export interface NativeFunctionDefinition {
+export interface NativeFrookyFunctionDefinition {
   symbol: SymbolName;
   returnType?: Param;
   params?: Param[];
@@ -24,7 +24,7 @@ export interface NativeFunctionDefinition {
  *
  * @public
  */
-export type NativeFunction = NativeFunctionDefinition;
+export type NativeFrookyFunction = NativeFrookyFunctionDefinition;
 
 /**
  * Native hook configuration.
@@ -41,7 +41,7 @@ export interface NativeHook extends Hook {
   /**
    * Symbol to hook on the target module.
    */
-  functions: NativeFunction[];
+  functions: NativeFrookyFunction[];
 }
 
 export function isNativeHook(h: Hook): h is NativeHook {

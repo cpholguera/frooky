@@ -34,6 +34,7 @@ export interface ObjcHookInput extends Omit<ObjcHook, "methods"> {
   methods: ObjcMethodInput[];
 }
 
+// returns a normalized ObjcMethodDefinition from any type of ObjcMethodInput
 function normalizeObjcMethod(input: ObjcMethodInput): ObjcMethodDefinition {
   if (typeof input === "string") {
     return { name: input };

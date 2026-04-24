@@ -1,4 +1,4 @@
-import type { NativeFunctionDefinition, NativeHook, Param, ParamType, SymbolName } from "frooky";
+import type { NativeFrookyFunctionDefinition, NativeHook, Param, ParamType, SymbolName } from "frooky";
 import { DEFAULT_STACK_TRACE_LIMIT } from "../config";
 import type { DecodedValue } from "../decoders/decoder";
 import { NativeDecoder } from "../decoders/nativeDecoder";
@@ -45,7 +45,7 @@ function buildNativeHookOps(hook: NativeHook): NativeHookOp[] {
   try {
     const module = Process.getModuleByName(hook.module);
 
-    hook.functions.forEach((fn: NativeFunctionDefinition) => {
+    hook.functions.forEach((fn: NativeFrookyFunctionDefinition) => {
       try {
         nativeHHookOps.push({
           stackTraceLimit: hook.stackTraceLimit ?? DEFAULT_STACK_TRACE_LIMIT,
@@ -67,9 +67,8 @@ function buildNativeHookOps(hook: NativeHook): NativeHookOp[] {
 
 export class NativeHookRunner implements HookRunner {
   executeHooking(hooks: NativeHook[]): void {
-
-    console.log("execute Hooking ")
-    console.log(JSON.stringify(hooks, null, 2))
+    console.log("execute Hooking ");
+    console.log(JSON.stringify(hooks, null, 2));
     var nativeHookOps: NativeHookOp[] = [];
 
     frooky.log.info(`Executing native hook operations`);

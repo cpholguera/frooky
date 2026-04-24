@@ -1,4 +1,4 @@
-import type { NativeFunctionDefinition, NativeHook, SymbolName } from "../hook/nativeHook";
+import type { NativeFrookyFunctionDefinition, NativeHook, SymbolName } from "../hook/nativeHook";
 import { normalizeParam, type ParamInput } from "./parameterInput";
 
 export type { SymbolName };
@@ -8,7 +8,7 @@ export type { SymbolName };
  *
  * @public
  */
-export interface NativeFunctionDefinitionInput extends Omit<NativeFunctionDefinition, "params"> {
+export interface NativeFunctionDefinitionInput extends Omit<NativeFrookyFunctionDefinition, "params"> {
   params?: ParamInput[];
 }
 
@@ -17,7 +17,7 @@ export interface NativeFunctionDefinitionInput extends Omit<NativeFunctionDefini
  *
  * @public
  */
-export type NativeSymbol = SymbolName | NativeFunctionDefinitionInput;
+export type NativeFrookyFunction = SymbolName | NativeFunctionDefinitionInput;
 
 /**
  * Native hook configuration for YAML parsing.
@@ -29,18 +29,18 @@ export type NativeSymbol = SymbolName | NativeFunctionDefinitionInput;
  */
 export interface NativeHookInput extends Omit<NativeHook, "functions"> {
   type: "native";
-  functions: NativeSymbol[];
+  functions: NativeFrookyFunction[];
 }
 
-function normalizeFunctionDefinition(input: NativeFunctionDefinitionInput): NativeFunctionDefinition {
+function normalizeFunctionDefinition(input: NativeFunctionDefinitionInput): NativeFrookyFunctionDefinition {
   return {
     ...input,
     params: input.params?.map(normalizeParam),
-    returnType: input.returnType ? normalizeParam(input.returnType) : undefined
+    returnType: input.returnType ? normalizeParam(input.returnType) : undefined,
   };
 }
 
-function normalizeSymbol(input: NativeSymbol): NativeFunctionDefinition {
+function normalizeSymbol(input: NativeFrookyFunction): NativeFrookyFunctionDefinition {
   if (typeof input === "string") {
     return { symbol: input };
   }
