@@ -32,6 +32,18 @@ jobs:
         with:
           gradle-version: wrapper
 
+      - name: Set up Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r27d
+          add-to-path: true
+          link-to-sdk: true
+          local-cache: true
+
+      - name: Install CMake via Android SDK
+        run: |
+          sdkmanager "cmake;4.3.1"
+
       - name: Build Android target apps
         working-directory: tests/target-apps/android
         run: |
