@@ -1,7 +1,7 @@
 import type Java from "frida-java-bridge";
 import type { DecodedValue, Decoder } from "../../shared/decoders/decoder";
-import type { Param } from "../../shared/hook/parameter";
-import { JavaDecoder } from "./javaDecoder";
+import type { JavaParam } from "../hook/javaParameter";
+import { lookupJavaDecoder } from "./javaDecoderLookup";
 
 /**
  * Convert a JNI array element signature into a Param-compatible `type` string.
@@ -43,23 +43,28 @@ function elementTypeFromSignature(element: string): string {
   return element;
 }
 
-function buildElementParam(param: Param): Param {
+function buildElementParam(param: JavaParam): JavaParam {
   const element = param.type.substring(1); // strip leading '['
-  const elementParam: Param = { ...param, type: elementTypeFromSignature(element) };
+  const elementParam: JavaParam = { ...param, type: elementTypeFromSignature(element) };
   elementParam.decoder = undefined;
   elementParam.implementationType = undefined;
   return elementParam;
 }
 
-export const JavaArrayDecoder: Decoder<Java.Wrapper> = {
-  decode: (input: Java.Wrapper, param: Param): DecodedValue => {
+export const JavaArrayDecoder: Decoder<Java.Wrapper, JavaParam> = {
+  decode: (input: Java.Wrapper, param: JavaParam): DecodedValue => {
     const elementParam = buildElementParam(param);
     const len = input.length;
     const out = new Array(len);
 
     for (let i = 0; i < len; i++) {
       const el = input[i];
-      out[i] = el == null ? null : JavaDecoder.decode(el, elementParam).value;
+      if (el == null) {
+        out[i] = null;
+        continue;
+      }
+      // decoder lookup is only done once, since it is cached in elementParam
+      out[i] = lookupJavaDecoder(el, elementParam).decode(el, elementParam).value;
     }
 
     return {

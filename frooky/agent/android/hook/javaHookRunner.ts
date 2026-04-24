@@ -3,9 +3,10 @@ import { DEFAULT_STACK_TRACE_LIMIT } from "../../shared/config";
 import type { MethodName } from "../../shared/hook/hook";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import type { Param, ParamType } from "../../shared/hook/parameter";
-import { JavaDecoder } from "../decoders/javaDecoder";
+import { lookupJavaDecoder } from "../decoders/javaDecoderLookup";
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "./javaHook";
 import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeArgs } from "./javaHookImpl";
+import type { JavaParam } from "./javaParameter";
 
 // contains everything needed to hook one java method
 export interface JavaHookOp extends HookOp {
@@ -18,7 +19,7 @@ export interface JavaHookOp extends HookOp {
 // builds JavaHookOps fro ALL overloads of a certain method
 function buildHookOpsForAllOverloads(hook: JavaHook, handle: Java.MethodDispatcher, methodDefinition: JavaMethodDefinition, javaHookOps: JavaHookOp[]): void {
   handle.overloads.forEach((javaMethod: Java.Method) => {
-    const params: Param[] = [];
+    const params: JavaParam[] = [];
     javaMethod.argumentTypes.forEach((t: Java.Type) => {
       if (t.className) {
         params.push({ type: t.className, implementationType: t.className });
@@ -93,10 +94,12 @@ export function registerJavaHookOps(javaHookOp: JavaHookOp) {
     const returnValue = javaHookOp.javaMethod.apply(this, args);
     try {
       // decode the return value
-      const decodedReturnValue = JavaDecoder.decode(returnValue, { type: javaHookOp.javaMethod.returnType.className ?? "void", implementationType: javaHookOp.javaMethod.returnType.className ?? "void" });
+      const returnValueType = { type: javaHookOp.javaMethod.returnType.className ?? "void", implementationType: javaHookOp.javaMethod.returnType.className ?? "void" };
+      const returnValueDecoder = lookupJavaDecoder(returnValue, returnValueType);
+      const decodedReturnValue = returnValueDecoder.decode(returnValue, returnValueType);
       // collect the stack trace from Frida
       const stackTrace = javaHookOp.stackTraceLimit > 0 ? buildJavaStackTrace(javaHookOp.stackTraceLimit) : [];
-      // collect the field type and (optional) instance hash 
+      // collect the field type and (optional) instance hash
       const fieldType = buildFieldType(this as Java.Wrapper);
       // decode the arguments passed to the method
       const decodedArgs = decodeArgs(args, javaHookOp.params);

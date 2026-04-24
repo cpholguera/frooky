@@ -3,12 +3,13 @@ import Java from "frida-java-bridge";
 import { DECODER_MAX_ELEMENTS } from "../../../../shared/config";
 import type { DecodedValue, Decoder } from "../../../../shared/decoders/decoder";
 import type { Param } from "../../../../shared/hook/parameter";
-import { JavaDecoder } from "../../javaDecoder";
+import type { JavaParam } from "../../../hook/javaParameter";
+import { lookupJavaDecoder } from "../../javaDecoderLookup";
 
 /**
  * Decode any java.lang.Iterable by walking its iterator().
  */
-export function decodeIterable(iterable: Java.Wrapper, param: Param, elementDecoder: (element: Java.Wrapper) => DecodedValue = defaultElementDecoder): DecodedValue {
+export function decodeIterable(iterable: Java.Wrapper, param: JavaParam, elementDecoder: (element: Java.Wrapper) => DecodedValue = defaultElementDecoder): DecodedValue {
   const values: DecodedValue[] = [];
   const iterator = iterable.iterator();
 
@@ -34,10 +35,11 @@ export function decodeIterable(iterable: Java.Wrapper, param: Param, elementDeco
 
 function defaultElementDecoder(element: Java.Wrapper): DecodedValue {
   const elementType = element == null ? "java.lang.Object" : (element.$className ?? "java.lang.Object");
-  return JavaDecoder.decode(element, { type: elementType } as Param);
+  const decoder = lookupJavaDecoder(element, { type: elementType });
+  return decoder.decode(element, { type: elementType });
 }
 
-export const IterableDecoder: Decoder<Java.Wrapper> = {
+export const IterableDecoder: Decoder<Java.Wrapper, JavaParam> = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => {
     const iterable = input.iterator ? input : Java.cast(input, Java.use("java.lang.Iterable"));
     return decodeIterable(iterable, param);
