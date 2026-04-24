@@ -85,21 +85,16 @@ export interface ParamOptions {
  */
 export interface ParamDefinition {
   /**
-   * Frida-compatible type of the parameter, e.g. `"java.lang.String"` or `"int"`.
-   * Can be primitive types, arrays, interfaces or classes.
+   * Type of the parameter declared in the frooky file.
+   * Can be fundamental, primitive, array, interfaces or classes.
    */
   type: ParamType;
-  /**
-   * Frida-compatible type for complex java objects.
-   * Will be automatically set, if type is different from the runtime class name of the object.
-   */
-  implementationType?: ParamType;
-  /** Optional human-readable name for the parameter, e.g. `"username"`. */
+  /** Optional name for the parameter, e.g. `"username"`. */
   name?: ParamName;
   /** Optional decoder options controlling when and how the parameter is decoded. */
   options?: ParamOptions;
   /** Optional decoder. Is set the first time a value of this parameter type is decoded */
-  decoder?: Decoder<any>;
+  decoder?: Decoder<any, Param>;
 }
 
 /**

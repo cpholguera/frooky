@@ -2,6 +2,7 @@ import type { DecodedValue } from "../decoders/decoder";
 import { NativeDecoder } from "../decoders/nativeDecoder";
 import { NativeHookEvent } from "../event/nativeHookEvent";
 import type { NativeHookOp } from "./nativeHookRunner";
+import type { NativeParam } from "./nativeParameter";
 import type { Param } from "./parameter";
 
 export function buildNativeStackTrace(ctx: CpuContext, limit: number): string[] {
@@ -21,10 +22,10 @@ export function buildNativeStackTrace(ctx: CpuContext, limit: number): string[] 
   return stackTrace;
 }
 
-export function decodeNativeArgs(args: NativePointer[], params: Param[]): DecodedValue[] {
+export function decodeNativeArgs(args: NativePointer[], params: NativeParam[]): DecodedValue[] {
   const decodedArgs: DecodedValue[] = [];
   if (params.length > 0) {
-    params.forEach((param: Param, i: number) => {
+    params.forEach((param: NativeParam, i: number) => {
       decodedArgs.push(NativeDecoder.decode(args[i], param));
     });
   }

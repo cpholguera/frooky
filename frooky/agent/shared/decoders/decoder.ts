@@ -1,5 +1,3 @@
-import type { Param } from "../hook/parameter";
-
 // decoded values
 export type DecodedValue = {
   type: string;
@@ -8,10 +6,10 @@ export type DecodedValue = {
   value?: unknown;
 };
 
-export type Decoder<TInput> = {
-  // decodes an input value, 
+export type Decoder<TInput, TParam> = {
+  // decodes an input value,
   // param contains additional information about the value such as name or type
-  // quickDecode is an optional flag, if set, we TRY to minimize Frida <-> Bridge <-> Platform calls 
+  // quickDecode is an optional flag, if set, we TRY to minimize Frida <-> Bridge <-> Platform calls
   // at cost of less information.
-  decode: (input: TInput, param: Param, quickDecode?: boolean) => DecodedValue;
+  decode: (input: TInput, param: TParam, quickDecode?: boolean) => DecodedValue;
 };

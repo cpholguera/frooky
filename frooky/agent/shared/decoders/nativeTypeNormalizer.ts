@@ -1,6 +1,8 @@
+import type { NativeParam } from "../hook/nativeParameter";
 import type { Param } from "../hook/parameter";
 
-export type FundamentalType = "void" | "int" | "uint" | "long" | "ulong" | "char" | "uchar" | "size_t" | "ssize_t" | "float" | "double" | "int8" | "uint8" | "int16" | "uint16" | "int32" | "uint32" | "int64" | "uint64" | "bool";
+export const FUNDAMENTAL_TYPES = ["void", "int", "uint", "long", "ulong", "char", "uchar", "size_t", "ssize_t", "float", "double", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64", "bool"] as const;
+export type FundamentalType = (typeof FUNDAMENTAL_TYPES)[number];
 
 export interface NativeType {
   type: "pointer" | FundamentalType;
@@ -99,6 +101,15 @@ const FUNDAMENTAL_TYPE_ALIASES: Record<string, NativeType> = {
   double: t("double"),
 };
 
+// todo
+function createPointerType(normalizedType: string, param: Param): NativeType {
+  return {
+    type: "pointer",
+    pointee: "char",
+    depth: 2,
+  };
+}
+
 /**
  * Normalizes a C/C++ type string into a canonical key for lookup and comparison.
  * Handles pointer declarations by removing spaces around `*` and collapsing
@@ -112,15 +123,6 @@ const FUNDAMENTAL_TYPE_ALIASES: Record<string, NativeType> = {
  * normalize("char* ")       // "char*"
  * normalize("unsigned char **") // "unsigned char**"
  */
-
-function createPointerType(normalizedType: string, param: Param): NativeType {
-  return {
-    type: "pointer",
-    pointee: "char",
-    depth: 2,
-  };
-}
-
 function normalizePointerTypes(type: string): string {
   return type
     .trim()
@@ -129,11 +131,11 @@ function normalizePointerTypes(type: string): string {
     .replace(/\s+/g, " ");
 }
 
-export function normalizeNativeType(param: Param): NativeType {
-  const normalizedType = normalizePointerTypes(param.type);
+export function normalizeNativeType(nativeParam: NativeParam): NativeType {
+  const normalizedType = normalizePointerTypes(nativeParam.type);
   if (normalizedType.endsWith("*")) {
     // type pointer
-    return createPointerType(normalizedType, param);
+    return createPointerType(normalizedType, nativeParam);
   } else {
     // fundamental type or invalid type
     return FUNDAMENTAL_TYPE_ALIASES[normalizedType];

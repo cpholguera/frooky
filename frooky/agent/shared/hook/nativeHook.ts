@@ -1,5 +1,6 @@
 import type { Param } from "../hook/parameter";
 import type { Hook } from "./hook";
+import type { NativeParam } from "./nativeParameter";
 
 /**
  * Name of a native function method.
@@ -15,8 +16,8 @@ export type SymbolName = string;
  */
 export interface NativeFrookyFunctionDefinition {
   symbol: SymbolName;
-  returnType?: Param;
-  params?: Param[];
+  returnType?: NativeParam;
+  params?: NativeParam[];
 }
 
 /**
