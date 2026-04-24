@@ -104,63 +104,119 @@ hooks:
     stackTraceLimit: 0
     functions:
       - symbol: pass_bool
-        params: [bool]
+        params:
+          - [bool, falseBool]
+          - [bool, trueBool]
       - symbol: pass_char
-        params: [char]
+        params:
+          - [char, minAscii]
+          - [char, maxAscii]
       - symbol: pass_schar
-        params: [schar]
+        params:
+          - [schar, minSchar]
+          - [schar, maxSchar]
       - symbol: pass_uchar
-        params: [uchar]
+        params:
+          - [uchar, minUchar]
+          - [uchar, maxUchar]
       - symbol: pass_short
-        params: [short]
+        params:
+          - [short, minShort]
+          - [short, maxShort]
       - symbol: pass_ushort
-        params: [ushort]
+        params:
+          - [ushort, minUshort]
+          - [ushort, maxUshort]
       - symbol: pass_int
-        params: [int]
+        params:
+          - [int, minInt]
+          - [int, maxInt]
       - symbol: pass_uint
-        params: [uint]
+        params:
+          - [uint, minUint]
+          - [uint, maxUint]
       - symbol: pass_long
-        params: [long]
+        params:
+          - [long, minLong]
+          - [long, maxLong]
       - symbol: pass_ulong
-        params: [ulong]
+        params:
+          - [ulong, minUlong]
+          - [ulong, maxUlong]
       - symbol: pass_llong
-        params: [llong]
+        params:
+          - [llong, minLlong]
+          - [llong, maxLlong]
       - symbol: pass_ullong
-        params: [ullong]
+        params:
+          - [ullong, minUllong]
+          - [ullong, maxUllong]
       - symbol: pass_float
-        params: [float]
+        params:
+          - [float, minFloat]
+          - [float, maxFloat]
       - symbol: pass_double
-        params: [double]
+        params:
+          - [double, minDouble]
+          - [double, maxDouble]
 
 # pass by reference
   - module: libprimitives.so
     stackTraceLimit: 0
     functions:
       - symbol: pass_bool_ref
-        params: [bool*]
+        params:
+          - [bool*, falseBoolRef]
+          - [bool*, trueBoolRef]
       - symbol: pass_char_ref
-        params: [char*]
+        params:
+          - [char*, minAsciiRef]
+          - [char*, maxAsciiRef]
       - symbol: pass_schar_ref
-        params: [schar*]
+        params:
+          - [schar*, minScharRef]
+          - [schar*, maxScharRef]
       - symbol: pass_uchar_ref
-        params: [uchar*]
+        params:
+          - [uchar*, minUcharRef]
+          - [uchar*, maxUcharRef]
       - symbol: pass_short_ref
-        params: [short*]
+        params:
+          - [short*, minShortRef]
+          - [short*, maxShortRef]
       - symbol: pass_ushort_ref
-        params: [ushort*]
+        params:
+          - [ushort*, minUshortRef]
+          - [ushort*, maxUshortRef]
       - symbol: pass_int_ref
-        params: [int*]
+        params:
+          - [int*, minIntRef]
+          - [int*, maxIntRef]
       - symbol: pass_uint_ref
-        params: [uint*]
+        params:
+          - [uint*, minUintRef]
+          - [uint*, maxUintRef]
       - symbol: pass_long_ref
-        params: [long*]
+        params:
+          - [long*, minLongRef]
+          - [long*, maxLongRef]
       - symbol: pass_ulong_ref
-        params: [ulong *]
+        params:
+          - [ulong*, minUlongRef]
+          - [ulong*, maxUlongRef]
       - symbol: pass_llong_ref
-        params: [llong *]
+        params:
+          - [llong*, minLlongRef]
+          - [llong*, maxLlongRef]
       - symbol: pass_ullong_ref
-        params: [ullong *]
+        params:
+          - [ullong*, minUllongRef]
+          - [ullong*, maxUllongRef]
       - symbol: pass_float_ref
-        params: [float *]
+        params:
+          - [float*, minFloatRef]
+          - [float*, maxFloatRef]
       - symbol: pass_double_ref
-        params: [double *]
+        params:
+          - [double*, minDoubleRef]
+          - [double*, maxDoubleRef]
