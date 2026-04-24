@@ -42,7 +42,7 @@ jobs:
 
       - name: Install CMake via Android SDK
         run: |
-          sdkmanager "cmake;3.31.6"
+          ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager "cmake;3.31.6"
 
       - name: Build Android target apps
         working-directory: tests/target-apps/android
