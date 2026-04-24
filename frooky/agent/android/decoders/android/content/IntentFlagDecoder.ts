@@ -1,5 +1,5 @@
 import Java from "frida-java-bridge";
-import type { Decoder } from "../../../../shared/decoders/decoder";
+import type { BaseDecoder } from "../../../../shared/decoders/baseDecoder";
 import type { JavaParam } from "../../../hook/javaParameter";
 
 // Cache so we only reflect once
@@ -21,7 +21,7 @@ function loadIntentFlags() {
   return flags;
 }
 
-export const IntentFlagDecoder: Decoder<Java.Wrapper, JavaParam> = {
+export const IntentFlagDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
   decode: (input) => {
     const bitmask = Number(input) >>> 0;
 

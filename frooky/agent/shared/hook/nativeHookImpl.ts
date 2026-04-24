@@ -1,4 +1,4 @@
-import type { DecodedValue } from "../decoders/decoder";
+import type { DecodedValue } from "../decoders/baseDecoder";
 import { NativeDecoder } from "../decoders/nativeDecoder";
 import { NativeHookEvent } from "../event/nativeHookEvent";
 import type { NativeHookOp } from "./nativeHookRunner";

@@ -1,4 +1,4 @@
-import type { Decoder } from "../decoders/decoder";
+import type { BaseDecoder } from "../decoders/baseDecoder";
 
 /**
  * Specifies when a decoder should be applied during function execution.
@@ -94,7 +94,7 @@ export interface ParamDefinition {
   /** Optional decoder options controlling when and how the parameter is decoded. */
   options?: ParamOptions;
   /** Optional decoder. Is set the first time a value of this parameter type is decoded */
-  decoder?: Decoder<any, Param>;
+  decoder?: BaseDecoder<any, Param>;
 }
 
 /**

@@ -1,6 +1,6 @@
-import type { DecodedValue, Decoder } from "../../shared/decoders/decoder";
 import type { Param } from "../../shared/hook/parameter";
 import type { NativeParam } from "../hook/nativeParameter";
+import type { DecodedValue, Decoder } from "./baseDecoder";
 import { getNativeDecoder } from "./nativeDecoderRegistry";
 import { normalizeNativeType } from "./nativeTypeNormalizer";
 
