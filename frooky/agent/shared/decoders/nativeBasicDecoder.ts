@@ -1,5 +1,16 @@
 import type { NativeParam } from "../hook/nativeParameter";
-import type { DecodedValue, Decoder } from "./baseDecoder";
+import type { Param } from "../hook/parameter";
+import type { BaseDecoder, DecodedValue } from "./baseDecoder";
+
+export const FallbackNativeDecoder: BaseDecoder<NativePointer, NativeParam> = {
+  decode: (input: NativePointer, param: Param): DecodedValue => {
+    return {
+      type: param.type,
+      name: param.name,
+      value: `<NO DECODER FOUND> ptr: ${input}`,
+    };
+  },
+};
 
 function decodeChar(input: NativePointer): number {
   const raw = input.toInt32() & 0xff;
@@ -13,7 +24,7 @@ function decodeInt16(input: NativePointer): number {
   return raw & 0x8000 ? raw - 0x10000 : raw;
 }
 
-export const NativeFundamentalDecoder: Decoder<NativePointer, NativeParam> = {
+export const NativeFundamentalValueDecoder: BaseDecoder<NativePointer, NativeParam> = {
   decode: (input: NativePointer, param: NativeParam): DecodedValue => {
     let value: number | bigint | boolean | null;
     switch (param.nativeType?.type) {
