@@ -1,4 +1,4 @@
-import type { DecodedValue } from "../decoders/decoder";
+import type { DecodedValue } from "../decoders/baseDecoder";
 import { BaseEvent } from "./baseEvent";
 
 /**

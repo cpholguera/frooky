@@ -1,6 +1,6 @@
 import type { NativeFrookyFunctionDefinition, NativeHook, SymbolName } from "frooky";
 import { DEFAULT_STACK_TRACE_LIMIT } from "../config";
-import type { DecodedValue } from "../decoders/decoder";
+import type { DecodedValue } from "../decoders/baseDecoder";
 import { NativeDecoder } from "../decoders/nativeDecoder";
 import type { HookOp, HookRunner } from "./hookRunner";
 import { buildAndDispatchEvent, buildNativeStackTrace, decodeNativeArgs } from "./nativeHookImpl";

@@ -1,7 +1,7 @@
 import Java from "frida-java-bridge";
-import type { Decoder } from "../../../../../shared/decoders/decoder";
+import type { BaseDecoder } from "../../../../../shared/decoders/baseDecoder";
 import type { JavaParam } from "../../../../hook/javaParameter";
-import { lookupJavaDecoder } from "../../../javaDecoderLookup";
+import { JavaDecoder } from "../../../javaDecoder";
 
 const getters = [
   "getAlgorithmParameterSpec",
@@ -51,7 +51,7 @@ function stripPrefix(name: string): string {
   return name;
 }
 
-export const KeyGenParameterSpecDecoder: Decoder<Java.Wrapper, JavaParam> = {
+export const KeyGenParameterSpecDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
   decode: (spec, param) => {
     if (!KeyGenParameterSpec) {
       KeyGenParameterSpec = Java.use("android.security.keystore.KeyGenParameterSpec");
@@ -69,8 +69,7 @@ export const KeyGenParameterSpecDecoder: Decoder<Java.Wrapper, JavaParam> = {
       try {
         const raw = fn.call(typedSpec);
         const type = { type: fn.returnType.className ?? "void", implementationType: fn.returnType.className ?? "void" };
-        const decoder = lookupJavaDecoder(raw, type);
-        value[stripPrefix(name)] = decoder.decode(raw, type);
+        value[stripPrefix(name)] = JavaDecoder.decode(raw, type);
       } catch (e) {
         value[stripPrefix(name)] = `Error when decoding : ${e}>`;
       }

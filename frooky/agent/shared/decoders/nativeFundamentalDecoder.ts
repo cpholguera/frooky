@@ -1,5 +1,5 @@
 import type { NativeParam } from "../hook/nativeParameter";
-import type { DecodedValue, Decoder } from "./decoder";
+import type { DecodedValue, Decoder } from "./baseDecoder";
 
 function decodeChar(input: NativePointer): number {
   const raw = input.toInt32() & 0xff;

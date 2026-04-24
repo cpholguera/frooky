@@ -3,7 +3,7 @@ import { DEFAULT_STACK_TRACE_LIMIT } from "../../shared/config";
 import type { MethodName } from "../../shared/hook/hook";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import type { Param, ParamType } from "../../shared/hook/parameter";
-import { lookupJavaDecoder } from "../decoders/javaDecoderLookup";
+import { JavaDecoder } from "../decoders/javaDecoder";
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "./javaHook";
 import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeArgs } from "./javaHookImpl";
 import type { JavaParam } from "./javaParameter";
@@ -95,8 +95,7 @@ export function registerJavaHookOps(javaHookOp: JavaHookOp) {
     try {
       // decode the return value
       const returnValueType = { type: javaHookOp.javaMethod.returnType.className ?? "void", implementationType: javaHookOp.javaMethod.returnType.className ?? "void" };
-      const returnValueDecoder = lookupJavaDecoder(returnValue, returnValueType);
-      const decodedReturnValue = returnValueDecoder.decode(returnValue, returnValueType);
+      const decodedReturnValue = JavaDecoder.decode(returnValue, returnValueType);
       // collect the stack trace from Frida
       const stackTrace = javaHookOp.stackTraceLimit > 0 ? buildJavaStackTrace(javaHookOp.stackTraceLimit) : [];
       // collect the field type and (optional) instance hash
