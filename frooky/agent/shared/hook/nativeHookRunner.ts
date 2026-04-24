@@ -1,16 +1,17 @@
-import type { NativeFrookyFunctionDefinition, NativeHook, Param, SymbolName } from "frooky";
+import type { NativeFrookyFunctionDefinition, NativeHook, SymbolName } from "frooky";
 import { DEFAULT_STACK_TRACE_LIMIT } from "../config";
 import type { DecodedValue } from "../decoders/decoder";
 import { NativeDecoder } from "../decoders/nativeDecoder";
 import type { HookOp, HookRunner } from "./hookRunner";
 import { buildAndDispatchEvent, buildNativeStackTrace, decodeNativeArgs } from "./nativeHookImpl";
+import type { NativeParam } from "./nativeParameter";
 
 export interface NativeHookOp extends HookOp {
   module: string;
   symbol: SymbolName;
   symbolAddress: NativePointer;
-  returnType: Param;
-  params: Param[];
+  params: NativeParam[];
+  returnType: NativeParam;
 }
 
 // actually hooks the native function
@@ -39,7 +40,7 @@ export function registerNativeHookOps(nativeHookOp: NativeHookOp) {
   });
 }
 
-// builds a list of native hook operations. Each NativeHookOp contains all information to hook ONE java method
+// builds a list of native hook operations. Each NativeHookOp contains all information to hook ONE native function
 function buildNativeHookOps(hook: NativeHook): NativeHookOp[] {
   const nativeHHookOps: NativeHookOp[] = [];
   try {
@@ -67,8 +68,6 @@ function buildNativeHookOps(hook: NativeHook): NativeHookOp[] {
 
 export class NativeHookRunner implements HookRunner {
   executeHooking(hooks: NativeHook[]): void {
-    console.log("execute Hooking ");
-    console.log(JSON.stringify(hooks, null, 2));
     var nativeHookOps: NativeHookOp[] = [];
 
     frooky.log.info(`Executing native hook operations`);
