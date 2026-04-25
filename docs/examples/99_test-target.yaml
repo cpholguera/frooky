@@ -100,123 +100,134 @@ hooks:
 
 
 # pass by value
-  - module: libprimitives.so
+  - module: libreceiveFundamentalValue.so
     stackTraceLimit: 0
     functions:
-      - symbol: pass_bool
+      - symbol: receive_bool
         params:
           - [bool, falseBool]
           - [bool, trueBool]
-      - symbol: pass_char
+      - symbol: receive_char
         params:
           - [char, minAscii]
           - [char, maxAscii]
-      - symbol: pass_schar
+      - symbol: receive_schar
         params:
           - [schar, minSchar]
           - [schar, maxSchar]
-      - symbol: pass_uchar
+      - symbol: receive_uchar
         params:
           - [uchar, minUchar]
           - [uchar, maxUchar]
-      - symbol: pass_short
+      - symbol: receive_short
         params:
           - [short, minShort]
           - [short, maxShort]
-      - symbol: pass_ushort
+      - symbol: receive_ushort
         params:
           - [ushort, minUshort]
           - [ushort, maxUshort]
-      - symbol: pass_int
+      - symbol: receive_int
         params:
           - [int, minInt]
           - [int, maxInt]
-      - symbol: pass_uint
+      - symbol: receive_uint
         params:
           - [uint, minUint]
           - [uint, maxUint]
-      - symbol: pass_long
+      - symbol: receive_long
         params:
           - [long, minLong]
           - [long, maxLong]
-      - symbol: pass_ulong
+      - symbol: receive_ulong
         params:
           - [ulong, minUlong]
           - [ulong, maxUlong]
-      - symbol: pass_llong
+      - symbol: receive_llong
         params:
           - [llong, minLlong]
           - [llong, maxLlong]
-      - symbol: pass_ullong
+      - symbol: receive_ullong
         params:
           - [ullong, minUllong]
           - [ullong, maxUllong]
-      - symbol: pass_float
+      - symbol: receive_float
         params:
           - [float, minFloat]
           - [float, maxFloat]
-      - symbol: pass_double
+      - symbol: receive_double
         params:
           - [double, minDouble]
           - [double, maxDouble]
 
 # pass by reference
-  - module: libprimitives.so
+  - module: libreceiveFundamentalReference.so
     stackTraceLimit: 0
     functions:
-      - symbol: pass_bool_ref
+      - symbol: receive_bool_ref
         params:
           - [bool*, falseBoolRef]
           - [bool*, trueBoolRef]
-      - symbol: pass_char_ref
+      - symbol: receive_char_ref
         params:
           - [char*, minAsciiRef]
           - [char*, maxAsciiRef]
-      - symbol: pass_schar_ref
+      - symbol: receive_schar_ref
         params:
           - [schar*, minScharRef]
           - [schar*, maxScharRef]
-      - symbol: pass_uchar_ref
+      - symbol: receive_uchar_ref
         params:
           - [uchar*, minUcharRef]
           - [uchar*, maxUcharRef]
-      - symbol: pass_short_ref
+      - symbol: receive_short_ref
         params:
           - [short*, minShortRef]
           - [short*, maxShortRef]
-      - symbol: pass_ushort_ref
+      - symbol: receive_ushort_ref
         params:
           - [ushort*, minUshortRef]
           - [ushort*, maxUshortRef]
-      - symbol: pass_int_ref
+      - symbol: receive_int_ref
         params:
           - [int*, minIntRef]
           - [int*, maxIntRef]
-      - symbol: pass_uint_ref
+      - symbol: receive_uint_ref
         params:
           - [uint*, minUintRef]
           - [uint*, maxUintRef]
-      - symbol: pass_long_ref
+      - symbol: receive_long_ref
         params:
           - [long*, minLongRef]
           - [long*, maxLongRef]
-      - symbol: pass_ulong_ref
+      - symbol: receive_ulong_ref
         params:
           - [ulong*, minUlongRef]
           - [ulong*, maxUlongRef]
-      - symbol: pass_llong_ref
+      - symbol: receive_llong_ref
         params:
           - [llong*, minLlongRef]
           - [llong*, maxLlongRef]
-      - symbol: pass_ullong_ref
+      - symbol: receive_ullong_ref
         params:
           - [ullong*, minUllongRef]
           - [ullong*, maxUllongRef]
-      - symbol: pass_float_ref
+      - symbol: receive_float_ref
         params:
           - [float*, minFloatRef]
           - [float*, maxFloatRef]
-      - symbol: pass_double_ref
+      - symbol: receive_double_ref
         params:
           - [double*, minDoubleRef]
           - [double*, maxDoubleRef]
+
+# pass by reference
+  - module: libreceiveString.so
+    stackTraceLimit: 0
+    functions:
+      - symbol: receive_cstring
+        params:
+          - [char *, string]
+      - symbol: receive_utf8
+        params:
+          - [ char, string]
