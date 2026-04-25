@@ -1,0 +1,6 @@
+# This flow instructs maestro to wait until the MASTG DEMO app is loaded and then click "Start"
+# More information about the MASTG DEMO app can be found here: https://mas.owasp.org/MASTG/demos/
+appId: ${APP_ID}
+---
+- assertVisible: "OWASP MAS"
+- tapOn: "Start"

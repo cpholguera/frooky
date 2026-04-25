@@ -3,8 +3,8 @@ name: Build target app iOS
 on:
   workflow_call:
     inputs:
-      app_dir:
-        description: "Optional path to a custom app. Will be pass as APP_DIR to make build"
+      target_app:
+        description: "Optional path to a custom target app. Will be pass as TARGET_APP to make build"
         required: false
         type: string
 
@@ -21,17 +21,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Build target app iOS
+      - name: Build all target apps iOS
         working-directory: tests/target-apps/ios
         run: |
-          if [ -n "${{ inputs.app_dir }}" ]; then
-            make build APP_DIR=${{ inputs.app_dir }} GITHUB_ENV_FILE=$GITHUB_ENV
+          if [ -n "${{ inputs.target_app }}" ]; then
+            echo "Building the custom app target app: ${{ inputs.target_app }}"
+            make build TARGET_APP=${{ inputs.target_app }}
           else
-            make build GITHUB_ENV_FILE=$GITHUB_ENV
+            echo "Building all target apps"
+            make build-all
           fi
 
       - name: Upload iOS artifact
         uses: actions/upload-artifact@v7
         with:
-          name: target-app-ios
-          path: tests/target-apps/ios/dist/
+          name: target-apps-ios
+          path: tests/target-apps/ios/dist/**

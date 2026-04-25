@@ -2,6 +2,8 @@
   "recommendations": [
     "biomejs.biome",
     "charliermarsh.ruff",
-    "DavidAnson.vscode-markdownlint"
+    "DavidAnson.vscode-markdownlint",
+    "ms-vscode.cpptools",
+    "fwcd.kotlin",
   ]
 }
