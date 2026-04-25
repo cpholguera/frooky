@@ -6,7 +6,7 @@ import { KeyGenParameterSpecDecoder } from "./android/security/keystore/KeyGenPa
 import { CollectionDecoder } from "./java/util/CollectionDecoder";
 import { MapDecoder } from "./java/util/MapDecoder";
 import { JavaArrayDecoder } from "./javaArrayDecoder";
-import { FallbackJavaDecoder, JavaLongDecoder, PrimitiveDecoder } from "./javaBasicDecoder";
+import { JavaFallbackDecoder, JavaLongDecoder, JavaPrimitiveDecoder } from "./javaBasicDecoder";
 
 /*
  * This is the registry for non-primitive java decoders.
@@ -49,10 +49,10 @@ export const JavaDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
       // this happens when the declaration is an interface
       // we store the actual implementation type of the object
       param.implementationType = input.$className;
-      param.decoder = javaDecoderRegistry[param.implementationType] ?? FallbackJavaDecoder;
+      param.decoder = javaDecoderRegistry[param.implementationType] ?? JavaFallbackDecoder;
     } else {
       // Primitive JS value (already converted by Frida)
-      param.decoder = PrimitiveDecoder;
+      param.decoder = JavaPrimitiveDecoder;
     }
     return param.decoder.decode(input, param, quickDecode);
   },

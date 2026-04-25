@@ -1,8 +1,6 @@
 import type { NativeParam } from "../hook/nativeParameter";
 import type { Param } from "../hook/parameter";
-
-export const FUNDAMENTAL_TYPES = ["void", "int", "uint", "long", "ulong", "char", "uchar", "size_t", "ssize_t", "float", "double", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64", "bool"] as const;
-export type FundamentalType = (typeof FUNDAMENTAL_TYPES)[number];
+import type { FundamentalType } from "./nativeDecoder";
 
 export interface NativeType {
   type: "pointer" | FundamentalType;
@@ -10,7 +8,7 @@ export interface NativeType {
   depth?: number;
 }
 
-// small helper
+// tiny little helper
 function t(type: FundamentalType): NativeType {
   return { type };
 }
@@ -101,43 +99,58 @@ const FUNDAMENTAL_TYPE_ALIASES: Record<string, NativeType> = {
   double: t("double"),
 };
 
-// todo
-function createPointerType(normalizedType: string, param: Param): NativeType {
+/**
+ * Constructs a {@link NativeType} representing a C/C++ pointer type from a
+ * normalized type string (e.g. `"char*"`, `"unsigned char**"`).
+ *
+ * The base type (left of the first `*`) is resolved through
+ * {@link FUNDAMENTAL_TYPE_ALIASES} to its canonical form. Unknown base types
+ * (e.g. struct names) are passed through as-is.
+ *
+ * @param normalizedType - A normalized pointer type string as produced by
+ *   {@link normalizePointerTypes}, e.g. `"char*"` or `"unsigned char**"`.
+ * @param param - The original {@link Param} associated with this type.
+ * @returns A {@link NativeType} with `type: "pointer"`, a resolved `pointee`,
+ *   and a `depth` equal to the number of indirection levels.
+ *
+ * @example
+ * createPointerType("char*", param)
+ * // { type: "pointer", pointee: "char", depth: 1 }
+ *
+ * createPointerType("unsigned char**", param)
+ * // { type: "pointer", pointee: "uchar", depth: 2 }
+ *
+ * createPointerType("SomeStruct*", param)
+ * // { type: "pointer", pointee: "SomeStruct", depth: 1 }
+ */
+function createPointerType(normalizedType: string): NativeType {
+  // Count pointer depth and extract base type
+  const starIndex = normalizedType.indexOf("*");
+  const baseType = normalizedType.slice(0, starIndex).trim();
+  const depth = (normalizedType.match(/\*/g) ?? []).length;
+
+  // Resolve the base type through aliases
+  const resolvedBase = FUNDAMENTAL_TYPE_ALIASES[baseType];
+  const pointee: string = resolvedBase ? resolvedBase.type : baseType;
+
   return {
     type: "pointer",
-    pointee: "char",
-    depth: 2,
+    pointee,
+    depth,
   };
 }
 
-/**
- * Normalizes a C/C++ type string into a canonical key for lookup and comparison.
- * Handles pointer declarations by removing spaces around `*` and collapsing
- * remaining whitespace (e.g. for multi-word types like `unsigned char`).
- *
- * @param type - The C/C++ type string to normalize.
- * @returns The normalized type string.
- *
- * @example
- * normalize("char *")       // "char*"
- * normalize("char* ")       // "char*"
- * normalize("unsigned char **") // "unsigned char**"
- */
-function normalizePointerTypes(type: string): string {
-  return type
+export function normalizeNativeType(nativeParam: NativeParam): NativeType {
+  const normalizedNativeType = nativeParam.type
     .trim()
     .toLowerCase()
-    .replace(/\s*\*\s*/g, "*")
-    .replace(/\s+/g, " ");
-}
-
-export function normalizeNativeType(nativeParam: NativeParam): NativeType {
-  const normalizedType = normalizePointerTypes(nativeParam.type);
-  if (normalizedType.endsWith("*")) {
+    .replace(/\s*\*\s*/g, "*") // remove spaces around *
+    .replace(/\s+/g, " "); // remove consecutive whitespace
+  if (normalizedNativeType.endsWith("*")) {
     // type pointer
-    return createPointerType(normalizedType, nativeParam);
+    return createPointerType(normalizedNativeType);
   } else {
     // fundamental type or invalid type
-    return FUNDAMENTAL_TYPE_ALIASES[normalizedType];
+    return FUNDAMENTAL_TYPE_ALIASES[normalizedNativeType];
   }
 }

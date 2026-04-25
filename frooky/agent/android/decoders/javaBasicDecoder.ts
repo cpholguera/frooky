@@ -11,7 +11,7 @@ export const JavaLongDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
   }),
 };
 
-export const PrimitiveDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
+export const JavaPrimitiveDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
   decode: (input: Java.Wrapper, param: Param): DecodedValue => ({
     type: param.type,
     name: param.name,
@@ -19,7 +19,7 @@ export const PrimitiveDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
   }),
 };
 
-export const FallbackJavaDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
+export const JavaFallbackDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
   decode: (input: Java.Wrapper, param: JavaParam): DecodedValue => {
     return {
       type: param.implementationType ?? param.type,
