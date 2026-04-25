@@ -3,12 +3,24 @@ import type { BaseDecoder, DecodedValue } from "./baseDecoder";
 import type { FundamentalType } from "./nativeDecoder";
 import { NativeFallbackDecoder } from "./nativeFallbackDecoder";
 
-const referenceDecoders: Record<FundamentalType, (input: NativePointer) => null | number | boolean> = {
+const referenceDecoders: Record<FundamentalType, (input: NativePointer) => null | number | boolean | string> = {
   void: () => null,
   bool: (input) => input.readU8() !== 0,
-  char: (input) => input.readS8(),
+  char: (input) => {    // TODO: May be replaced in the future by a better string decoder
+    try {
+      return input.readUtf8String()
+    } catch (e){
+      return input.readS8()
+    }
+  },      
   int8: (input) => input.readS8(),
-  uchar: (input) => input.readU8(),
+  uchar: (input) => {    // TODO: May be replaced in the future by a better string decoder
+    try {
+      return input.readUtf8String()
+    } catch (e){
+      return input.readS8()
+    }
+  },    
   uint8: (input) => input.readU8(),
   int16: (input) => input.readS16(),
   uint16: (input) => input.readU16(),
