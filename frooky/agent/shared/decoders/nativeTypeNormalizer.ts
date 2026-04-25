@@ -141,6 +141,7 @@ function createPointerType(normalizedType: string): NativeType {
 }
 
 export function normalizeNativeType(nativeParam: NativeParam): NativeType {
+  // basic normalization
   const normalizedNativeType = nativeParam.type
     .trim()
     .toLowerCase()
