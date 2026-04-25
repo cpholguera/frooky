@@ -6,25 +6,21 @@ class MastgTest(private val context: Context) {
 
     companion object {
         init {
-            System.loadLibrary("fundamentalTypes")
-            System.loadLibrary("stringTypes")
+            System.loadLibrary("receiveFundamentalValue")
+            System.loadLibrary("receiveFundamentalReference")
+            System.loadLibrary("receiveString")
         }
     }
 
-    external fun passFundamentalValueJNI(): String
-    external fun passStringTypesJNI(): String
+    external fun receiveFundamentalValueJNI(): String
+    external fun receiveFundamentalReferenceJNI(): String
+    external fun receiveStringsJNI(): String
 
     fun mastgTest(): String {
         val r = DemoResults("basic-native")
-        r.add(
-                Status.PASS,
-                "Loaded native library and ran functions which receive fundamental types by value: ${passFundamentalValueJNI()}"
-        )
-
-        r.add(
-                Status.PASS,
-                "Loaded native library and ran various functions: ${passStringTypesJNI()}"
-        )
+        r.add(Status.PASS, "${receiveFundamentalValueJNI()}")
+        r.add(Status.PASS, "${receiveFundamentalReferenceJNI()}")
+        r.add(Status.PASS, "${receiveStringsJNI()}")
 
         return r.toJson()
     }
