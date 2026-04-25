@@ -60,5 +60,5 @@ Java_org_owasp_mastestapp_MastgTest_receiveFundamentalReferenceJNI(JNIEnv *env, 
     receive_double_ref(&minD, &maxD);
     receive_ldouble_ref(&minLd, &maxLd);
 
-    return (*env)->NewStringUTF(env, "Called functions with primitives received by reference (e.g. void receive_bool_ref(bool *minValue, bool *maxValue)).");
+    return (*env)->NewStringUTF(env, "Called functions with primitives received by reference (e.g. void receive_int(int *minValue, int *maxValue)).");
 }

@@ -44,5 +44,5 @@ Java_org_owasp_mastestapp_MastgTest_receiveFundamentalValueJNI(JNIEnv *env, jobj
     receive_double(-1.7976931348623157e308, 1.7976931348623157e308);
     receive_ldouble(-1.18973149535723176e4932L, 1.18973149535723176e4932L);
 
-    return (*env)->NewStringUTF(env, "Called functions with primitives received by value (e.g. void receive_bool(bool minValue, bool maxValue)).");
+    return (*env)->NewStringUTF(env, "Called functions with primitives received by value (e.g. void receive_int(int minValue, int maxValue)).");
 }
