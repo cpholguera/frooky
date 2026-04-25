@@ -7,7 +7,7 @@ export const NativeFallbackDecoder: BaseDecoder<NativePointer, NativeParam> = {
     return {
       type: param.type,
       name: param.name,
-      value: `<NO DECODER FOUND> ptr: ${input}`,
+      value: input.toString(),
     };
   },
 };

@@ -2,6 +2,7 @@ import type { NativeParam } from "../hook/nativeParameter";
 import type { BaseDecoder, DecodedValue } from "./baseDecoder";
 import { NativeFallbackDecoder } from "./nativeFallbackDecoder";
 import { NativeReferenceDecoder } from "./nativeReferenceDecoder";
+import { NativeStringDecoder } from "./nativeStringDecoder";
 import { normalizeNativeType } from "./nativeTypeNormalizer";
 import { NativeValueDecoder } from "./nativeValueDecoder";
 
@@ -16,7 +17,7 @@ const nativeDecoderRegistry: Record<string, BaseDecoder<NativePointer, NativePar
   ...Object.fromEntries(FUNDAMENTAL_TYPES.map((type) => [type, NativeValueDecoder])),
   // fundamental reference decoder
   pointer: NativeReferenceDecoder,
-  // other complex decoders
+  // other complex decoders  
 };
 
 export const NativeDecoder: BaseDecoder<NativePointer, NativeParam> = {

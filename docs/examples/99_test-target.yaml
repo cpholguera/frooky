@@ -230,4 +230,4 @@ hooks:
           - [char *, string]
       - symbol: receive_utf8
         params:
-          - [ char, string]
+          - [ char *, string]
