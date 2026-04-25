@@ -1,31 +1,29 @@
 package org.owasp.mastestapp
 
-import java.math.BigDecimal
-import java.math.BigInteger
-
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.security.KeyPairGenerator
 
 class MastgTest(private val context: Context) {
     fun initRsaKeyPair(): String {
-        val keyPairGenerator = KeyPairGenerator.getInstance(
-            KeyProperties.KEY_ALGORITHM_RSA,
-            "AndroidKeyStore"
-        )
+        val keyPairGenerator =
+                KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore")
 
         // Define what the key can be used for and how
-        val spec = KeyGenParameterSpec.Builder(
-            "TestKeyPair",
-            KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
-        )
-            .setKeySize(2048)
-            .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
-            .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
-            .build()
+        val spec =
+                KeyGenParameterSpec.Builder(
+                                "TestKeyPair",
+                                KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
+                        )
+                        .setKeySize(2048)
+                        .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
+                        .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+                        .build()
 
         keyPairGenerator.initialize(spec)
 
@@ -33,18 +31,17 @@ class MastgTest(private val context: Context) {
     }
 
     fun buildIntentWithFlags(): String {
-        val securityFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
-                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION or
-                Intent.FLAG_GRANT_PREFIX_URI_PERMISSION or
-                Intent.FLAG_ACTIVITY_NEW_TASK or
-                Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val securityFlags =
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                        Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION or
+                        Intent.FLAG_GRANT_PREFIX_URI_PERMISSION or
+                        Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK
 
         Intent(Intent.ACTION_VIEW, Uri.EMPTY).apply {
             setPackage("org.owasp.mastestapp")
-            setFlags(
-                securityFlags
-            )
+            setFlags(securityFlags)
         }
         return "Intent with various flags sent. Binary masked integer is: $securityFlags"
     }
@@ -66,7 +63,12 @@ class MastgTest(private val context: Context) {
     fun passMap(arg: Map<String, String>) {}
     fun passSet(arg: Set<String>) {}
 
-    enum class Direction { NORTH, SOUTH, EAST, WEST }
+    enum class Direction {
+        NORTH,
+        SOUTH,
+        EAST,
+        WEST
+    }
     fun passEnum(arg: Direction) {}
 
     // Arrays

@@ -3,6 +3,7 @@
     "biomejs.biome",
     "charliermarsh.ruff",
     "DavidAnson.vscode-markdownlint",
-    "ms-vscode.cpptools"
+    "ms-vscode.cpptools",
+    "fwcd.kotlin",
   ]
 }

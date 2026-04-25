@@ -20,12 +20,21 @@
     "editor.defaultFormatter": "ms-vscode.cpptools",
     "editor.formatOnSave": true
   },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true
+  },
+  "[kotlin]": {
+    "editor.defaultFormatter": "fwcd.kotlin",
+    "editor.formatOnSave": true
+  },
   "editor.codeActionsOnSave": {
     "source.fixAll.biome": "explicit",
     "source.organizeImports.biome": "explicit"
   },
   "biome.enabled": true, 
   "biome.configurationPath": "./biome.json",
+  "kotlin.diagnostics.enabled": false,
   "C_Cpp.errorSquiggles": "disabled",
   "cSpell.words": [
     "JNIEXPORT",
