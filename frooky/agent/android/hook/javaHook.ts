@@ -1,5 +1,5 @@
 import type { Hook, MethodName } from "../../shared/hook/hook";
-import type { Param } from "../../shared/hook/parameter";
+import type { Param } from "../../shared/hook/param";
 
 /**
  * Describes a specific Java method overload.
@@ -53,9 +53,4 @@ export interface JavaHook extends Hook {
    * Methods to hook on the target class.
    */
   methods: JavaMethod[];
-}
-
-// Type guard function
-export function isJavaHook(h: Hook): h is JavaHook {
-  return "javaClass" in h;
 }

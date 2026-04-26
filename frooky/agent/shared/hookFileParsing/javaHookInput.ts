@@ -1,5 +1,5 @@
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "../../android/hook/javaHook";
-import type { MethodName } from "../hook/hook";
+import type { Hook, MethodName } from "../hook/hook";
 import { normalizeParam, type ParamInput } from "./parameterInput";
 
 /**
@@ -46,6 +46,12 @@ export interface JavaHookInput extends Omit<JavaHook, "methods"> {
   type: "java";
   methods: JavaMethod[];
 }
+
+// Type guard function
+export function isJavaHook(h: Hook): h is JavaHook {
+  return "javaClass" in h;
+}
+
 
 // will return a JavaOverload for any form of JavaOverloadInput
 function normalizeOverload(input: JavaOverloadInput): JavaOverload {

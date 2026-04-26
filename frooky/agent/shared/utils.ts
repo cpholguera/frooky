@@ -1,4 +1,7 @@
-import { type Hook, isJavaHook, isNativeHook, isObjcHook, type JavaMethod, type NativeFrookyFunction, type ObjcMethod } from "frooky";
+import { type Hook,type JavaMethod, type ObjcMethod } from "frooky";
+import { isJavaHook } from "./hookFileParsing/javaHookInput";
+import { isObjcHook } from "./hookFileParsing/objcHookInput";
+import { isNativeHook, NativeFrookyFunction } from "./hookFileParsing/nativeHookInput";
 
 /**
  * Generates a v4 UUID

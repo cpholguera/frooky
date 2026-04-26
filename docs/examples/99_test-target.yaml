@@ -221,7 +221,7 @@ hooks:
           - [double*, minDoubleRef]
           - [double*, maxDoubleRef]
 
-# pass by reference
+# null terminated strings
   - module: libreceiveString.so
     stackTraceLimit: 0
     functions:

@@ -4,5 +4,4 @@ export * from "./ios/hook/objcHook.ts";
 // export the rest
 export * from "./shared/frookyConfig";
 export * from "./shared/hook/hook.ts";
-export * from "./shared/hook/nativeHook.ts";
-export * from "./shared/hook/parameter.ts";
+export * from "./shared/hook/param.ts";

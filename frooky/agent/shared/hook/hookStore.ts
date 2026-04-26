@@ -1,5 +1,11 @@
-import { type Hook, isJavaHook, isNativeHook, isObjcHook, type JavaHook, type NativeHook, type ObjcHook } from "frooky";
+import { JavaHook } from "../../android/hook/javaHook";
+import { ObjcHook } from "../../ios/hook/objcHook";
+import { NativeHook } from "../../native/hook/nativeHook";
 import { prettyPrintHook } from "../../shared/utils";
+import { isJavaHook } from "../hookFileParsing/javaHookInput";
+import { isNativeHook } from "../hookFileParsing/nativeHookInput";
+import { isObjcHook } from "../hookFileParsing/objcHookInput";
+import { Hook } from "./hook";
 
 export class HookStore {
   private hooks: Hook[] = [];

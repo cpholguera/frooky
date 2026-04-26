@@ -1,5 +1,5 @@
 import type { NativeType } from "../decoders/nativeTypeNormalizer";
-import type { Param } from "./parameter";
+import type { Param } from "../../shared/hook/param";
 
 /**
  * Represents a native parameter

@@ -83,7 +83,7 @@ export interface ParamOptions {
  *
  * @public
  */
-export interface ParamDefinition {
+export interface Param {
   /**
    * Type of the parameter declared in the frooky file.
    * Can be fundamental, primitive, array, interfaces or classes.
@@ -94,14 +94,5 @@ export interface ParamDefinition {
   /** Optional decoder options controlling when and how the parameter is decoded. */
   options?: ParamOptions;
   /** Optional decoder. Is set the first time a value of this parameter type is decoded */
-  decoder?: BaseDecoder<any, Param>;
+  decoder?: BaseDecoder<any, any>;
 }
-
-/**
- * Parameter definition intended for the internal usage
- *
- * @example { type: "java.lang.String", name: "value", options: { decodeAt: "exit" } }
- *
- * @public
- */
-export type Param = ParamDefinition;

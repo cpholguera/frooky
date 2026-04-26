@@ -2,7 +2,7 @@ import Java from "frida-java-bridge";
 import { DEFAULT_STACK_TRACE_LIMIT } from "../../shared/config";
 import type { MethodName } from "../../shared/hook/hook";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
-import type { Param, ParamType } from "../../shared/hook/parameter";
+import type { Param, ParamType } from "../../shared/hook/param";
 import { JavaDecoder } from "../decoders/javaDecoder";
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "./javaHook";
 import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeArgs } from "./javaHookImpl";

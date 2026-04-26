@@ -1,9 +1,8 @@
-import type { DecodedValue } from "../decoders/baseDecoder";
+import { DecodedValue } from "../../shared/decoders/baseDecoder";
 import { NativeDecoder } from "../decoders/nativeDecoder";
 import { NativeHookEvent } from "../event/nativeHookEvent";
 import type { NativeHookOp } from "./nativeHookRunner";
-import type { NativeParam } from "./nativeParameter";
-import type { Param } from "./parameter";
+import { NativeParam } from "./nativeParam";
 
 export function buildNativeStackTrace(ctx: CpuContext, limit: number): string[] {
   const stackTrace: string[] = [];

@@ -1,5 +1,5 @@
 import type { ObjcHook, ObjcMethodDefinition } from "../../ios/hook/objcHook";
-import type { MethodName, ReturnType } from "../hook/hook";
+import type { Hook, MethodName, ReturnType } from "../hook/hook";
 import { normalizeParam, type ParamInput } from "./parameterInput";
 
 /**
@@ -33,6 +33,13 @@ export interface ObjcHookInput extends Omit<ObjcHook, "methods"> {
   type: "objc";
   methods: ObjcMethodInput[];
 }
+
+
+// Type guard function
+export function isObjcHook(h: Hook): h is ObjcHook {
+  return "objcClass" in h;
+}
+
 
 // returns a normalized ObjcMethodDefinition from any type of ObjcMethodInput
 function normalizeObjcMethod(input: ObjcMethodInput): ObjcMethodDefinition {

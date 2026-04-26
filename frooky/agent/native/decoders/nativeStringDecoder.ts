@@ -1,5 +1,5 @@
-import { NativeParam } from "../hook/nativeParameter";
-import { BaseDecoder, DecodedValue } from "./baseDecoder";
+import { NativeParam } from "../hook/nativeParam";
+import { BaseDecoder, DecodedValue } from "../../shared/decoders/baseDecoder";
 
 export const NativeStringDecoder: BaseDecoder<NativePointer, NativeParam> = {
   decode: (input: NativePointer, param: NativeParam): DecodedValue => {

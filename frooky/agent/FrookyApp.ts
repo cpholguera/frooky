@@ -6,9 +6,9 @@ import type { LogEvent } from "./shared/event/logEvent";
 import type { SummaryEvent } from "./shared/event/summaryEvent";
 import type { HookRunner } from "./shared/hook/hookRunner";
 import { HookStore } from "./shared/hook/hookStore";
-import { NativeHookRunner } from "./shared/hook/nativeHookRunner";
 import { Logger, type logTo } from "./shared/logger";
 import { validateFrookyConfig } from "./shared/validator/configValidator";
+import { NativeHookRunner } from "./native/hook/nativeHookRunner";
 
 declare global {
   var frooky: FrookyApp;

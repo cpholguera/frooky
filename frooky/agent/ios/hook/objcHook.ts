@@ -1,5 +1,5 @@
 import type { Hook, MethodName, ReturnType } from "../../shared/hook/hook";
-import type { Param } from "../../shared/hook/parameter";
+import type { Param } from "../../shared/hook/param";
 
 /**
  * Expanded Objective-C method definition with name and optional overloads.
@@ -34,9 +34,4 @@ export interface ObjcHook extends Hook {
    * Methods to hook on the target class.
    */
   methods: ObjcMethod[];
-}
-
-// Type guard function
-export function isObjcHook(h: Hook): h is ObjcHook {
-  return "objcClass" in h;
 }

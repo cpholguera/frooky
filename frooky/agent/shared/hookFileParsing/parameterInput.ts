@@ -1,4 +1,4 @@
-import type { ParamDefinition, ParamName, ParamOptions, ParamType } from "../hook/parameter";
+import type { ParamDefinition, ParamName, ParamOptions, ParamType } from "../hook/param";
 
 /**
  * Extended parameter type for YAML input parsing.

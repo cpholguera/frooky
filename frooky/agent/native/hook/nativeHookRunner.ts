@@ -1,10 +1,10 @@
-import type { NativeFrookyFunctionDefinition, NativeHook, SymbolName } from "frooky";
-import { DEFAULT_STACK_TRACE_LIMIT } from "../config";
-import type { DecodedValue } from "../decoders/baseDecoder";
+import { DEFAULT_STACK_TRACE_LIMIT } from "../../shared/config";
+import { DecodedValue } from "../../shared/decoders/baseDecoder";
+import { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import { NativeDecoder } from "../decoders/nativeDecoder";
-import type { HookOp, HookRunner } from "./hookRunner";
+import { NativeFrookyFunctionDefinition, NativeHook, SymbolName } from "./nativeHook";
 import { buildAndDispatchEvent, buildNativeStackTrace, decodeNativeArgs } from "./nativeHookImpl";
-import type { NativeParam } from "./nativeParameter";
+import { NativeParam } from "./nativeParam";
 
 export interface NativeHookOp extends HookOp {
   module: string;
@@ -54,7 +54,7 @@ function buildNativeHookOps(hook: NativeHook): NativeHookOp[] {
           symbol: fn.symbol,
           symbolAddress: module.getExportByName(fn.symbol),
           params: fn.params ?? [],
-          returnType: fn.returnType ?? { type: "void" },
+          returnType: fn.returnType ?? { type: "void", name: undefined },
         });
       } catch (e) {
         frooky.log.error(`Failed to resolve native symbol '${fn.symbol}'${hook.module ? ` in module '${hook.module}'` : ""}: ${e}`);

@@ -1,4 +1,5 @@
-import type { NativeFrookyFunctionDefinition, NativeHook, SymbolName } from "../hook/nativeHook";
+import { NativeFrookyFunctionDefinition, NativeHook, SymbolName } from "../../native/hook/nativeHook";
+import { Hook } from "../hook/hook";
 import { normalizeParam, type ParamInput } from "./parameterInput";
 
 export type { SymbolName };
@@ -30,6 +31,11 @@ export type NativeFrookyFunction = SymbolName | NativeFunctionDefinitionInput;
 export interface NativeHookInput extends Omit<NativeHook, "functions"> {
   type: "native";
   functions: NativeFrookyFunction[];
+}
+
+// Type guard function
+export function isNativeHook(h: Hook): h is NativeHook {
+  return "functions" in h;
 }
 
 function normalizeFunctionDefinition(input: NativeFunctionDefinitionInput): NativeFrookyFunctionDefinition {
