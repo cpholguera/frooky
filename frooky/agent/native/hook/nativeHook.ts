@@ -30,7 +30,6 @@ export type NativeFrookyFunction = NativeFrookyFunctionDefinition;
  * Native hook configuration.
  *
  * @public
- * @discriminator {type}
  */
 export interface NativeHook extends Hook {
   /**

@@ -48,5 +48,10 @@ export default [
         "name": "nativeHook_yaml_parsing",
         "input": "shared/hookFileParsing/nativeHookInput.ts",
         "output": "shared/hookFileParsing/zodSchemas/nativeHook.input.zod.ts"
+    },
+    {
+        "name": "frooky_config",
+        "input": "shared/frookyConfig.ts",
+        "output": "shared/hookFileParsing/zodSchemas/frookyConfig.zod.ts"
     }
 ]

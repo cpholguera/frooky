@@ -13,9 +13,9 @@ export const javaMethodDefinitionInputSchema = javaMethodDefinitionSchema.omit({
     overloads: z.array(javaOverloadInputSchema).optional()
 });
 
-export const javaMethodSchema = z.union([methodNameSchema, javaMethodDefinitionInputSchema]);
+export const javaMethodInputSchema = z.union([methodNameSchema, javaMethodDefinitionInputSchema]);
 
 export const javaHookInputSchema = javaHookSchema.omit({ "methods": true }).extend({
     type: z.literal("java"),
-    methods: z.array(javaMethodSchema)
+    methods: z.array(javaMethodInputSchema)
 });

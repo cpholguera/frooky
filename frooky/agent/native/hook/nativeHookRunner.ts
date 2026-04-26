@@ -1,10 +1,9 @@
-import { DEFAULT_STACK_TRACE_LIMIT } from "../../shared/config";
-import { DecodedValue } from "../../shared/decoders/decodedValue";
-import { HookOp, HookRunner } from "../../shared/hook/hookRunner";
+import type { DecodedValue } from "../../shared/decoders/decodedValue";
+import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import { NativeDecoder } from "../decoders/nativeDecoder";
-import { NativeFrookyFunctionDefinition, NativeHook, SymbolName } from "./nativeHook";
+import type { NativeFrookyFunctionDefinition, NativeHook, SymbolName } from "./nativeHook";
 import { buildAndDispatchEvent, buildNativeStackTrace, decodeNativeArgs } from "./nativeHookImpl";
-import { NativeParam } from "./nativeParam";
+import type { NativeParam } from "./nativeParam";
 
 export interface NativeHookOp extends HookOp {
   module: string;
@@ -23,7 +22,7 @@ export function registerNativeHookOps(nativeHookOp: NativeHookOp) {
   Interceptor.attach(nativeHookOp.symbolAddress, {
     onEnter: function (args: NativePointer[]) {
       // collect the stack trace from Frida
-      stackTrace = nativeHookOp.stackTraceLimit > 0 ? buildNativeStackTrace(this.context, nativeHookOp.stackTraceLimit) : [];
+      stackTrace = nativeHookOp.settings.stackTraceLimit > 0 ? buildNativeStackTrace(this.context, nativeHookOp.settings.stackTraceLimit) : [];
       // decode the arguments passed to the method
       decodedArgs = decodeNativeArgs(args, nativeHookOp.params);
     },

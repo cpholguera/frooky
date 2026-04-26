@@ -35,6 +35,41 @@ export type ParamType = string;
 export type ParamName = string;
 
 /**
+ * Decoder settings.
+ *
+ * @public
+ */
+export type DecoderSettings = {
+  /**
+   * Maximum recursion depth for nested structure decoding.
+   *
+   * @example 10
+   */
+  maxRecursion?: number;
+
+  /**
+   * Maximum number of elements to decode in a collection or buffer.
+   *
+   * @example 1000
+   */
+  decodeLimit?: number;
+
+  /**
+   * When enabled, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime.
+   *
+   * @defaultValue false
+   */
+  magicDecode?: boolean;
+
+  /**
+   * When enabled, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
+   *
+   * @defaultValue false
+   */
+  fastDecode?: boolean;
+};
+
+/**
  * Decoder options for a parameter.
  *
  * @public
@@ -43,7 +78,7 @@ export interface ParamOptions {
   /**
    * Overwrites the standard decoder lookup and uses the custom decoder.
    *
-   * @example [ "android.content.IntentFlagDecoder." ]
+   * @example "android.content.IntentFlagDecoder."
    */
   decoder?: string;
 
@@ -51,19 +86,26 @@ export interface ParamOptions {
    * When the decoder should be applied.
    *
    * @defaultValue "enter"
-   * @example [ "exit" ]
-   * @example [ "both" ]
+   * @example "exit"
+   * @example "both"
    */
   decodeAt?: DecodeAt;
 
   /**
    * Extra arguments passed to the decoder. They must be a valid parameter name.
    *
-   * @example [ "username" ]
    * @example [ "ctxPointer" ]
    * @example [ "inBuffer", "bufferLength" ]
    */
   decoderArgs?: string[];
+
+  /**
+   * Settings applied when running the decoder.
+   *
+   * @example {maxRecursion: 0, magicDecode: true}
+   * @example {fastDecode: true}
+   */
+  decoderSettings?: DecoderSettings;
 }
 
 /**

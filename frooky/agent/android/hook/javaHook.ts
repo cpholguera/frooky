@@ -41,7 +41,6 @@ export type JavaMethod = JavaMethodDefinition;
  * Native hook configuration.
  *
  * @public
- * @discriminator {type}
  */
 export interface JavaHook extends Hook {
   /**

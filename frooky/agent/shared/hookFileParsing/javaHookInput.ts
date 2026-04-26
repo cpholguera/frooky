@@ -31,7 +31,7 @@ export interface JavaMethodDefinitionInput extends Omit<JavaMethodDefinition, "o
  *
  * @public
  */
-export type JavaMethod = MethodName | JavaMethodDefinitionInput;
+export type JavaMethodInput = MethodName | JavaMethodDefinitionInput;
 
 /**
  * Native hook configuration.
@@ -44,7 +44,7 @@ export type JavaMethod = MethodName | JavaMethodDefinitionInput;
 
 export interface JavaHookInput extends Omit<JavaHook, "methods"> {
   type: "java";
-  methods: JavaMethod[];
+  methods: JavaMethodInput[];
 }
 
 // Type guard function

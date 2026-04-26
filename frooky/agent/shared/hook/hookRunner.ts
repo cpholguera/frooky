@@ -1,12 +1,11 @@
 // stub, implements shared hook resolver functions
-import type { Hook } from "frooky";
+import type { Hook, HookMetadata, HookSettings } from "frooky";
 
 // Hook Operation
 // Contains all information to hook one method or function
 export interface HookOp {
-  stackTraceLimit: number;
-  eventFilter?: [string];
-  category?: string;
+  settings: HookSettings;
+  metadata?: HookMetadata;
   module?: string;
   moduleAddress?: NativePointer;
 }

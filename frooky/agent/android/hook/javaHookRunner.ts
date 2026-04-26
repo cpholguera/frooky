@@ -1,5 +1,4 @@
 import Java from "frida-java-bridge";
-import { DEFAULT_STACK_TRACE_LIMIT } from "../../shared/config";
 import type { MethodName } from "../../shared/hook/hook";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import type { Param, ParamType } from "../../shared/hook/param";
@@ -14,58 +13,47 @@ export interface JavaHookOp extends HookOp {
   methodName: MethodName;
   params: Param[];
   javaMethod: Java.Method;
-  options: {
-    fastDecode: boolean;
-    magicDecode: boolean;
-  };
 }
 
-// builds JavaHookOps fro ALL overloads of a certain method
-function buildHookOpsForAllOverloads(hook: JavaHook, handle: Java.MethodDispatcher, methodDefinition: JavaMethodDefinition, javaHookOps: JavaHookOp[]): void {
-  handle.overloads.forEach((javaMethod: Java.Method) => {
-    const params: JavaParam[] = [];
-    javaMethod.argumentTypes.forEach((t: Java.Type) => {
-      if (t.className) {
-        params.push({ type: t.className, implementationType: t.className });
-      } else {
-        frooky.log.warn(`No Frida type name for the VM type ${t.name} found.`);
+function pushHookOp(hook: JavaHook, methodDefinition: JavaMethodDefinition, params: JavaParam[], javaMethod: Java.Method, javaHookOps: JavaHookOp[]): void {
+  javaHookOps.push({
+    metadata: hook.metadata,
+    settings: hook.settings,
+    javaClass: hook.javaClass,
+    methodName: methodDefinition.name,
+    params,
+    javaMethod,
+  });
+}
+
+function buildParamsFromArgumentTypes(argTypes: Java.Type[]): JavaParam[] {
+  return argTypes.reduce((params: JavaParam[], t: Java.Type) => {
+    if (t.className) {
+      params.push({ type: t.className, implementationType: t.className });
+    } else {
+      frooky.log.warn(`No Frida type name for the VM type ${t.name} found.`);
+    }
+    return params;
+  }, []);
+}
+
+function buildHookOps(hook: JavaHook, handle: Java.MethodDispatcher, methodDefinition: JavaMethodDefinition, javaHookOps: JavaHookOp[]): void {
+  if (methodDefinition.overloads?.length) {
+    // Only hook explicitly declared overloads
+    methodDefinition.overloads.forEach((declaredOverload: JavaOverload) => {
+      const paramList: ParamType[] = declaredOverload.params.map((p: Param) => p.type);
+      try {
+        pushHookOp(hook, methodDefinition, declaredOverload.params, handle.overload(...paramList), javaHookOps);
+      } catch (e) {
+        frooky.log.warn(`Failed to get overload for method '${methodDefinition.name}' in class '${hook.javaClass}': ${e}.`);
       }
     });
-
-    javaHookOps.push({
-      javaClass: hook.javaClass,
-      methodName: methodDefinition.name,
-      params: params,
-      javaMethod: javaMethod,
-      stackTraceLimit: hook.stackTraceLimit ?? DEFAULT_STACK_TRACE_LIMIT,
-      eventFilter: hook.eventFilter,
-      category: hook.metadata?.category,
+  } else {
+    // Hook all overloads
+    handle.overloads.forEach((javaMethod: Java.Method) => {
+      pushHookOp(hook, methodDefinition, buildParamsFromArgumentTypes(javaMethod.argumentTypes), javaMethod, javaHookOps);
     });
-  });
-}
-
-// only builds JavaHookOps for overloads which are explicitly declared
-function buildHookOpsForDeclaredOverloads(hook: JavaHook, handle: Java.MethodDispatcher, methodDefinition: JavaMethodDefinition, javaHookOps: JavaHookOp[]): void {
-  methodDefinition.overloads?.forEach((declaredOverload: JavaOverload) => {
-    const paramList: ParamType[] = [];
-    declaredOverload.params.forEach((p: Param) => {
-      paramList.push(p.type);
-    });
-    try {
-      const javaMethod: Java.Method = handle.overload(...paramList);
-      javaHookOps.push({
-        javaClass: hook.javaClass,
-        methodName: methodDefinition.name,
-        params: declaredOverload.params,
-        javaMethod: javaMethod,
-        stackTraceLimit: hook.stackTraceLimit ?? DEFAULT_STACK_TRACE_LIMIT,
-        eventFilter: hook.eventFilter,
-        category: hook.metadata?.category,
-      });
-    } catch (e) {
-      frooky.log.warn(`Failed to get overload for method '${methodDefinition.name}' in class '${hook.javaClass}': ${e}.`);
-    }
-  });
+  }
 }
 
 // builds a list of java hook operations. Each JavaHookOp contains all information to hook ONE java method
@@ -79,11 +67,7 @@ function buildJavaHookOps(hook: JavaHook): JavaHookOp[] {
   for (const method of hook.methods) {
     try {
       const handle: Java.MethodDispatcher = Java.use(hook.javaClass)[method.name];
-      if (!method.overloads) {
-        buildHookOpsForAllOverloads(hook, handle, method, hookOps);
-      } else {
-        buildHookOpsForDeclaredOverloads(hook, handle, method, hookOps);
-      }
+      buildHookOps(hook, handle, method, hookOps);
     } catch (e) {
       frooky.log.warn(`Failed to resolve method '${method.name}' in class '${hook.javaClass}': ${e}.`);
     }

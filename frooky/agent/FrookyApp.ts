@@ -1,4 +1,5 @@
 import type { FrookyConfig, Platform } from "frooky";
+import { NativeHookRunner } from "./native/hook/nativeHookRunner";
 import type { BaseEvent } from "./shared/event/baseEvent";
 import { startAsyncSender } from "./shared/event/eventSender";
 import type { HookEvent } from "./shared/event/hookEvent";
@@ -8,7 +9,6 @@ import type { HookRunner } from "./shared/hook/hookRunner";
 import { HookStore } from "./shared/hook/hookStore";
 import { Logger, type logTo } from "./shared/logger";
 import { validateFrookyConfig } from "./shared/validator/configValidator";
-import { NativeHookRunner } from "./native/hook/nativeHookRunner";
 
 declare global {
   var frooky: FrookyApp;

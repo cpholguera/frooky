@@ -22,7 +22,6 @@ export type ObjcMethod = ObjcMethodDefinition;
 /**
  * Objective-C hook configuration.
  * @public
- * @discriminator {type}
  */
 export interface ObjcHook extends Hook {
   /**

@@ -1,4 +1,32 @@
-import type { HookMetadata, HookSettings } from "../frookyConfig";
+import type { HookMetadata } from "../frookyConfig";
+import type { DecoderSettings } from "./param";
+
+/**
+ * Metadata that describes a hook collection.
+ *
+ * @public
+ */
+export interface HookSettings {
+  /**
+   * Sets stackTraceLimit to the given value for all hooks.
+   */
+  stackTraceLimit?: number;
+
+  /**
+   * If set, disables the stack trace.
+   */
+  disableStacktrace?: boolean;
+
+  /**
+   * Stack trace filters to apply.
+   */
+  eventFilter?: string[];
+
+  /**
+   * Stack trace filters to apply.
+   */
+  decoderSettings?: DecoderSettings;
+}
 
 /**
  * Frida-compatible type for a return value used with Native and Objective-C hooks

@@ -1,4 +1,4 @@
-import type { Hook } from "frooky";
+import type { Hook, HookSettings } from "frooky";
 
 /**
  * Target platform for hooks.
@@ -39,53 +39,9 @@ export interface HookMetadata {
   author?: string;
 
   /**
-   * Semantic version of the hook collection.
-   *
-   * @example "1.0.0"
+   * Version of the hook collection.
    */
-  version?: string;
-}
-
-/**
- * Metadata that describes a hook collection.
- *
- * @public
- */
-export interface HookSettings {
-  /**
-   * Sets stackTraceLimit to the given value for all hooks.
-   */
-  stackTraceLimit?: number;
-
-  /**
-   * If set, disables the stack trace.
-   */
-  disableStacktrace?: boolean;
-
-  /**
-   * If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrips.
-   */
-  fastDecode?: boolean;
-
-  /**
-   * If set, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime.
-   */
-  magicDecode?: boolean;
-
-  /**
-   * Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
-   */
-  decoderMaxRecursion?: number;
-
-  /**
-   * Sets the limit of how many elements of enumerable data structures, such as arrays, lists, dictionaries etc. are decoded.
-   */
-  decoderMaxElements?: number;
-
-  /**
-   * Stack trace filters to apply.
-   */
-  eventFilter?: [string];
+  version?: string | number;
 }
 
 /**
