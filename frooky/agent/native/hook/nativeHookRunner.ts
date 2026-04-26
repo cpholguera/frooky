@@ -1,5 +1,5 @@
 import { DEFAULT_STACK_TRACE_LIMIT } from "../../shared/config";
-import { DecodedValue } from "../../shared/decoders/baseDecoder";
+import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import { NativeDecoder } from "../decoders/nativeDecoder";
 import { NativeFrookyFunctionDefinition, NativeHook, SymbolName } from "./nativeHook";
