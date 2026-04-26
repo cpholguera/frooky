@@ -4,12 +4,14 @@ metadata:
   author: frooky dev
   platform: Android
 
-
-# global settings for the hooks in this hook file
-settings:
-  disableStacktrace: false      # sets stackTraceLimit to 0 for all hooks
-  fastDecode: false             # if enabled, the decoders are instructed to skip some steps for performance reasons
-  magicDecode: true             # if enabled, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime
+# global settings for the hooks in this hook file.
+globalSettings:
+  stackTraceLimit: 10           # Sets stackTraceLimit to 10 for all hooks
+  disableStacktrace: false      # If set, disables the stack trace 
+  fastDecode: false             # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
+  magicDecode: true             # If set, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime
+  decoderMaxRecursion: 10       # Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
+  decoderMaxElements: 1000      # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
 
 hooks:
     # java primitive types
@@ -45,7 +47,8 @@ hooks:
       - receiveFloatArray
       - receiveDoubleArray
       - receiveCharArray
-      - receiveNestedArray
+      - receiveNestedPrimitivesArray
+      - receiveNestedObjectArray
 
   # complex common java types
   - javaClass: org.owasp.mastestapp.MastgTest

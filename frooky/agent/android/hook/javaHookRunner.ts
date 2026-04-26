@@ -14,6 +14,10 @@ export interface JavaHookOp extends HookOp {
   methodName: MethodName;
   params: Param[];
   javaMethod: Java.Method;
+  options: {
+    fastDecode: boolean;
+    magicDecode: boolean;
+  };
 }
 
 // builds JavaHookOps fro ALL overloads of a certain method

@@ -1,4 +1,4 @@
-import type { HookMetadata } from "../frookyConfig";
+import type { HookMetadata, HookSettings } from "../frookyConfig";
 
 /**
  * Frida-compatible type for a return value used with Native and Objective-C hooks
@@ -31,12 +31,7 @@ export interface Hook {
   metadata?: HookMetadata;
 
   /**
-   * Maximum number of stack frames to capture.
+   * Settings applied to this hook
    */
-  stackTraceLimit?: number;
-
-  /**
-   * Stack trace filters to apply.
-   */
-  eventFilter?: [string];
+  settings?: HookSettings;
 }
