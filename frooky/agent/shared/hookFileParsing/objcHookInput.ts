@@ -1,6 +1,6 @@
 import type { ObjcHook, ObjcMethodDefinition } from "../../ios/hook/objcHook";
 import type { Hook, MethodName, ReturnType } from "../hook/hook";
-import { normalizeParam, type ParamInput } from "./parameterInput";
+import { normalizeParam, type ParamInput } from "./paramInput";
 
 /**
  * Expanded Objective-C method definition with name and optional overloads.

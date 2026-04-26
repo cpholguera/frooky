@@ -2,7 +2,7 @@
 import { z } from "zod";
 
 import { hookSchema, methodNameSchema } from "./hook.zod";
-import { paramSchema } from "./parameter.zod";
+import { paramSchema } from "./param.zod";
 
 export const javaOverloadSchema = z.object({
     params: z.array(paramSchema)

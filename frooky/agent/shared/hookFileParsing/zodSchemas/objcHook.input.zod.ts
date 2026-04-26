@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { objcHookSchema } from "./objcHook.zod";
 import { methodNameSchema, returnTypeSchema } from "./hook.zod";
-import { paramInputSchema } from "./parameter.input.zod";
+import { paramInputSchema } from "./param.input.zod";
 
 export const objcMethodDefinitionInputSchema = z.object({
     name: methodNameSchema,

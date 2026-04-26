@@ -5,12 +5,12 @@ import { hookSchema } from "./hook.zod";
 
 export const symbolNameSchema = z.string();
 
-const paramSchema = z.any();
+const nativeParamSchema = z.any();
 
 export const nativeFrookyFunctionDefinitionSchema = z.object({
     symbol: symbolNameSchema,
-    returnType: paramSchema.optional(),
-    params: z.array(paramSchema).optional()
+    returnType: nativeParamSchema.optional(),
+    params: z.array(nativeParamSchema).optional()
 });
 
 export const nativeFrookyFunctionSchema = nativeFrookyFunctionDefinitionSchema;

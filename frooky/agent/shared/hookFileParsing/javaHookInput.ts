@@ -1,6 +1,6 @@
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "../../android/hook/javaHook";
 import type { Hook, MethodName } from "../hook/hook";
-import { normalizeParam, type ParamInput } from "./parameterInput";
+import { normalizeParam, type ParamInput } from "./paramInput";
 
 /**
  * Describes a specific Java method overload.

@@ -5,14 +5,14 @@
  */
 export default [
     {
-        "name": "parameter",
-        "input": "shared/hook/parameter.ts",
-        "output": "shared/hookFileParsing/zodSchemas/parameter.zod.ts"
+        "name": "param",
+        "input": "shared/hook/param.ts",
+        "output": "shared/hookFileParsing/zodSchemas/param.zod.ts"
     },
     {
-        "name": "parameter_yaml_parsing",
-        "input": "shared/hookFileParsing/parameterInput.ts",
-        "output": "shared/hookFileParsing/zodSchemas/parameter.input.zod.ts"
+        "name": "param_yaml_parsing",
+        "input": "shared/hookFileParsing/paramInput.ts",
+        "output": "shared/hookFileParsing/zodSchemas/param.input.zod.ts"
     },
     {
         "name": "hook",
@@ -41,7 +41,7 @@ export default [
     },
     {
         "name": "nativeHook",
-        "input": "shared/hook/nativeHook.ts",
+        "input": "native/hook/nativeHook.ts",
         "output": "shared/hookFileParsing/zodSchemas/nativeHook.internal.zod.ts"
     },
     {

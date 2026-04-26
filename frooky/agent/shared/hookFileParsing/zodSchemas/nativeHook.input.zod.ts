@@ -2,7 +2,7 @@
 import { z } from "zod";
 
 import { nativeFrookyFunctionDefinitionSchema, nativeHookSchema, symbolNameSchema } from "./nativeHook.internal.zod";
-import { paramInputSchema } from "./parameter.input.zod";
+import { paramInputSchema } from "./param.input.zod";
 
 export const nativeFunctionDefinitionInputSchema = nativeFrookyFunctionDefinitionSchema.omit({ "params": true }).extend({
     params: z.array(paramInputSchema).optional()
