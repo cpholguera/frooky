@@ -18,16 +18,16 @@ import type { Param, ParamName, ParamOptions, ParamType } from "../hook/param";
 export type ParamInput = ParamType | [ParamType, ParamOptions] | [ParamType, ParamName] | [ParamType, ParamName, ParamOptions] | Param;
 
 // returns a normalized ParamDefinition from any type of ParamInput
-export function normalizeParam(input: ParamInput): Param {
-  if (typeof input === "string") {
-    return { type: input };
+export function normalizeParam(param: ParamInput): Param {
+  if (typeof param === "string") {
+    return { type: param };
   }
 
   // Check array before plain object, since arrays are also objects
-  if (Array.isArray(input)) {
-    const [paramType, paramNameOrParamOptions, paramOptions] = input;
+  if (Array.isArray(param)) {
+    const [paramType, paramNameOrParamOptions, paramOptions] = param;
 
-    if (input.length === 3) {
+    if (param.length === 3) {
       return {
         type: paramType,
         name: paramNameOrParamOptions as string,
@@ -42,5 +42,5 @@ export function normalizeParam(input: ParamInput): Param {
     return { type: paramType, name: paramNameOrParamOptions };
   }
 
-  return input as Param;
+  return param as Param;
 }
