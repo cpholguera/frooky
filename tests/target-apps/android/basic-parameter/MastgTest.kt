@@ -81,7 +81,12 @@ class MastgTest(private val context: Context) {
     fun receiveFloatArray(arg: FloatArray) {}
     fun receiveDoubleArray(arg: DoubleArray) {}
     fun receiveCharArray(arg: CharArray) {}
-    fun receiveNestedArray(arg: Array<Array<Array<String>>>) {} // nested array with depth of 3
+    fun receiveNestedObjectArray(
+            arg: Array<Array<Array<String>>>
+    ) {} // nested array of objects with depth of 3
+    fun receiveNestedPrimitivesArray(
+            arg: Array<Array<IntArray>>
+    ) {} // nested array of integer primitives with depth of 3
 
     fun mastgTest(): String {
         val r = DemoResults("basic-parameter")
@@ -169,14 +174,23 @@ class MastgTest(private val context: Context) {
         receiveSet(set)
         r.add(Status.PASS, set.toString())
 
-        val nested =
+        val nestedObjects =
                 arrayOf(
                         arrayOf(arrayOf("a", "b", "c"), arrayOf("d", "e", "f")),
                         arrayOf(arrayOf("g", "h", "i"), arrayOf("j", "k", "l"))
                 )
 
-        receiveNestedArray(nested)
-        r.add(Status.PASS, nested.toString())
+        receiveNestedObjectArray(nestedObjects)
+        r.add(Status.PASS, nestedObjects.toString())
+
+        val nestedPrimitives =
+                arrayOf(
+                        arrayOf(intArrayOf(1, 2, 3), intArrayOf(4, 5, 6)),
+                        arrayOf(intArrayOf(7, 8, 9), intArrayOf(10, 11, 12))
+                )
+
+        receiveNestedPrimitivesArray(nestedPrimitives)
+        r.add(Status.PASS, nestedPrimitives.toString())
 
         val longIntegerArray = Array(100) { it + 1 }.toIntArray()
         receiveIntArray(longIntegerArray)
