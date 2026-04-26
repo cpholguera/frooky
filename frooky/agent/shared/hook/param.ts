@@ -67,32 +67,25 @@ export interface ParamOptions {
 }
 
 /**
- * Canonical definition of a parameter to be decoded during function hooking.
+ * Normalized parameter descriptor used internally during function hooking.
  *
- * This is the normalized form used internally. If you are providing parameters
- * as input, you may also use the shorthand {@link ParamInput} forms, which are
+ * For input, prefer the shorthand {@link ParamInput} forms, which are
  * automatically normalized via {@link normalizeParam}.
  *
  * @example
- * // Minimal – type only
  * { type: "java.lang.String" }
- *
  * @example
- * // With name and options
  * { type: "java.lang.String", name: "username", options: { decodeAt: "exit" } }
  *
  * @public
  */
 export interface Param {
-  /**
-   * Type of the parameter declared in the frooky file.
-   * Can be fundamental, primitive, array, interfaces or classes.
-   */
+  /** Declared parameter type (primitive, array, class, interface, or native type). */
   type: ParamType;
-  /** Optional name for the parameter, e.g. `"username"`. */
+  /** Optional parameter name, e.g. `"username"` or `"age"`. */
   name?: ParamName;
-  /** Optional decoder options controlling when and how the parameter is decoded. */
+  /** Controls when and how the parameter is decoded. */
   options?: ParamOptions;
-  /** Optional decoder. Is set the first time a value of this parameter type is decoded */
-  decoder?: BaseDecoder<any, any>;
+  /** Cached decoder, resolved on first decode of this parameter type. */
+  decoder?: BaseDecoder<unknown, Param>;
 }

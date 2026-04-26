@@ -59,7 +59,7 @@ export const JavaArrayDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
       const elementParam: JavaParam = {
         ...param,
         type: elementType,
-        implementationType: undefined,    // resfds
+        implementationType: undefined,
         decoder: undefined,
       };
       const len = input.length;

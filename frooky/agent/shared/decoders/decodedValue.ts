@@ -1,9 +1,13 @@
+/**
+ * Represents the result of a decode operation.
+ */
 export type DecodedValue = {
-  // type of the decoded value
+  /** The resolved type name of the decoded value. */
   type: string;
-  // optional name, usually from the frooky declaration
+  /** Parameter name, typically sourced from the frooky hook declaration. */
   name?: string;
-  // error in case the value could not be decoded
+  /** Populated when decoding fails. */
   error?: Error;
+  /** The decoded value; absent if decoding failed. */
   value?: unknown;
 };
