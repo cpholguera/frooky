@@ -1,23 +1,21 @@
 import type { Param, ParamName, ParamOptions, ParamType } from "../hook/param";
 
 /**
- * Extended parameter type for YAML input parsing.
+ * Flexible input format for defining a parameter in YAML configuration.
  *
- * The following examples all describe the same parameter:
+ * Accepts any of the following forms:
  *
- * 1. As a simple type.
- * 2. As a tuple of [type, options].
- * 3. As a tuple of [type, name, options].
- * 4. As a structured object with type, name, and options.
- *
- * @example "java.lang.String"
- * @example ["java.lang.String", { decodeAt: "exit" }]
- * @example ["java.lang.String", "value", { decodeAt: "exit" }]
- * @example { type: "java.lang.String", name: "value", options: { decodeAt: "exit" } }
+ * | Form                  | Type                                   | Example                                                                      |
+ * |-----------------------|----------------------------------------|------------------------------------------------------------------------------|
+ * | Type only             | `ParamType`                            | `"java.lang.String"`                                                         |
+ * | Type + options        | `[ParamType, ParamOptions]`            | `["java.lang.String", { decodeAt: "exit" }]`                                 |
+ * | Type + name           | `[ParamType, ParamName]`               | `["java.lang.String", "value"]`                                              |
+ * | Type + name + options | `[ParamType, ParamName, ParamOptions]` | `["java.lang.String", "value", { decodeAt: "exit" }]`                        |
+ * | Structured object     | `Param`                                | `{ type: "java.lang.String", name: "value", options: { decodeAt: "exit" } }` |
  *
  * @public
  */
-export type ParamInput = ParamType | Param | [ParamType, ParamName] | [ParamType, ParamOptions] | [ParamType, ParamName, ParamOptions];
+export type ParamInput = ParamType | [ParamType, ParamOptions] | [ParamType, ParamName] | [ParamType, ParamName, ParamOptions] | Param;
 
 // returns a normalized ParamDefinition from any type of ParamInput
 export function normalizeParam(input: ParamInput): Param {
