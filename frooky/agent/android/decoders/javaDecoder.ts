@@ -1,6 +1,6 @@
 import type Java from "frida-java-bridge";
 import type { BaseDecoder, DecodedValue } from "../../shared/decoders/baseDecoder";
-import type { JavaParam } from "../hook/javaParameter";
+import type { JavaParam } from "../hook/javaParam";
 import { IntentFlagDecoder } from "./android/content/IntentFlagDecoder";
 import { KeyGenParameterSpecDecoder } from "./android/security/keystore/KeyGenParameterSpecDecoder";
 import { CollectionDecoder } from "./java/util/CollectionDecoder";

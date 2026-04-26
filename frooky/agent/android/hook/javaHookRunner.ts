@@ -6,7 +6,7 @@ import type { Param, ParamType } from "../../shared/hook/param";
 import { JavaDecoder } from "../decoders/javaDecoder";
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "./javaHook";
 import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeArgs } from "./javaHookImpl";
-import type { JavaParam } from "./javaParameter";
+import type { JavaParam } from "./javaParam";
 
 // contains everything needed to hook one java method
 export interface JavaHookOp extends HookOp {

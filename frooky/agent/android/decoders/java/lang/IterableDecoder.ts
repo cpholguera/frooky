@@ -3,7 +3,7 @@ import Java from "frida-java-bridge";
 import { DECODER_MAX_ELEMENTS } from "../../../../shared/config";
 import type { BaseDecoder, DecodedValue } from "../../../../shared/decoders/baseDecoder";
 import type { Param } from "../../../../shared/hook/param";
-import type { JavaParam } from "../../../hook/javaParameter";
+import type { JavaParam } from "../../../hook/javaParam";
 import { JavaDecoder } from "../../javaDecoder";
 
 /**
