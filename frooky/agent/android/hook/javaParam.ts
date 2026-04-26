@@ -1,4 +1,4 @@
-import { Param, ParamType } from "../../shared/hook/param";
+import type { Param, ParamType } from "../../shared/hook/param";
 
 /**
  * Canonical definition of a parameter to be decoded during function hooking.

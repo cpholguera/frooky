@@ -1,5 +1,6 @@
-import { BaseDecoder, DecodedValue } from "../../shared/decoders/baseDecoder";
-import { NativeParam } from "../hook/nativeParam";
+import type { BaseDecoder } from "../../shared/decoders/baseDecoder";
+import type { DecodedValue } from "../../shared/decoders/decodedValue";
+import type { NativeParam } from "../hook/nativeParam";
 import type { FundamentalType } from "./nativeDecoder";
 import { NativeFallbackDecoder } from "./nativeFallbackDecoder";
 

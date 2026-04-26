@@ -1,7 +1,8 @@
 // iterableDecoder.ts
 import Java from "frida-java-bridge";
 import { DECODER_MAX_ELEMENTS } from "../../../../shared/config";
-import type { BaseDecoder, DecodedValue } from "../../../../shared/decoders/baseDecoder";
+import type { BaseDecoder } from "../../../../shared/decoders/baseDecoder";
+import type { DecodedValue } from "../../../../shared/decoders/decodedValue";
 import type { Param } from "../../../../shared/hook/param";
 import type { JavaParam } from "../../../hook/javaParam";
 import { JavaDecoder } from "../../javaDecoder";

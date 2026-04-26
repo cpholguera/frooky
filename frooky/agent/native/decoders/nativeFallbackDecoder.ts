@@ -1,5 +1,6 @@
+import type { BaseDecoder } from "../../shared/decoders/baseDecoder";
+import type { DecodedValue } from "../../shared/decoders/decodedValue";
 import type { NativeParam } from "../hook/nativeParam";
-import type { BaseDecoder, DecodedValue } from "../../shared/decoders/baseDecoder";
 
 export const NativeFallbackDecoder: BaseDecoder<NativePointer, NativeParam> = {
   decode: (input: NativePointer, param: NativeParam): DecodedValue => {

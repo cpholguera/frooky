@@ -1,5 +1,6 @@
 import Java from "frida-java-bridge";
-import type { BaseDecoder, DecodedValue } from "../../../../shared/decoders/baseDecoder";
+import type { BaseDecoder } from "../../../../shared/decoders/baseDecoder";
+import type { DecodedValue } from "../../../../shared/decoders/decodedValue";
 import type { JavaParam } from "../../../hook/javaParam";
 import { JavaDecoder } from "../../javaDecoder";
 import { decodeIterable } from "../lang/IterableDecoder";

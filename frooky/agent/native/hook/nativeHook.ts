@@ -1,5 +1,5 @@
 import type { Hook } from "../../shared/hook/hook";
-import { NativeParam } from "./nativeParam";
+import type { NativeParam } from "./nativeParam";
 
 /**
  * Name of a native function method.
@@ -43,4 +43,3 @@ export interface NativeHook extends Hook {
    */
   functions: NativeFrookyFunction[];
 }
-
