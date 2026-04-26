@@ -4,6 +4,13 @@ metadata:
   author: frooky dev
   platform: Android
 
+
+# global settings for the hooks in this hook file
+settings:
+  disableStacktrace: false      # sets stackTraceLimit to 0 for all hooks
+  fastDecode: false             # if enabled, the decoders are instructed to skip some steps for performance reasons
+  magicDecode: true             # if enabled, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime
+
 hooks:
     # java primitive types
   - javaClass: org.owasp.mastestapp.MastgTest
