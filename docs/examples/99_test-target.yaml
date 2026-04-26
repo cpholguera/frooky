@@ -16,46 +16,47 @@ hooks:
   - javaClass: org.owasp.mastestapp.MastgTest
     stackTraceLimit: 0
     methods:
-      - passBoolean
-      - passByte
-      - passShort
-      - passInt
-      - passLong
-      - passFloat
-      - passDouble
-      - passChar
+      - receiveBoolean
+      - receiveByte
+      - receiveShort
+      - receiveInt
+      - receiveLong
+      - receiveFloat
+      - receiveDouble
+      - receiveChar
 
     # java types which are converted to "string" type in javascript
   - javaClass: org.owasp.mastestapp.MastgTest
     stackTraceLimit: 0
     methods:
-      - passString
+      - receiveString
 
 
   # primitive java arrays
   - javaClass: org.owasp.mastestapp.MastgTest
     stackTraceLimit: 0
     methods:
-      - passStringArray
-      - passBooleanArray
-      - passByteArray
-      - passShortArray
-      - passIntArray
-      - passLongArray
-      - passFloatArray
-      - passDoubleArray
-      - passCharArray
+      - receiveStringArray
+      - receiveBooleanArray
+      - receiveByteArray
+      - receiveShortArray
+      - receiveIntArray
+      - receiveLongArray
+      - receiveFloatArray
+      - receiveDoubleArray
+      - receiveCharArray
+      - receiveNestedArray
 
   # complex common java types
   - javaClass: org.owasp.mastestapp.MastgTest
     stackTraceLimit: 0
     methods:
-      - passBigInteger
-      - passBigDecimal
-      - passList
-      - passMap
-      - passSet
-      - passEnum
+      - receiveBigInteger
+      - receiveBigDecimal
+      - receiveList
+      - receiveMap
+      - receiveSet
+      - receiveEnum
 
   - javaClass: androidx.security.crypto.EncryptedSharedPreferences$Editor
     stackTraceLimit: 0
@@ -106,7 +107,7 @@ hooks:
       - EVP_DigestUpdate
 
 
-# pass by value
+# decode arguments passed by value
   - module: libreceiveFundamentalValue.so
     stackTraceLimit: 0
     functions:
@@ -167,7 +168,7 @@ hooks:
           - [double, minDouble]
           - [double, maxDouble]
 
-# pass by reference
+# decode arguments passed by reference
   - module: libreceiveFundamentalReference.so
     stackTraceLimit: 0
     functions:
@@ -228,7 +229,7 @@ hooks:
           - [double*, minDoubleRef]
           - [double*, maxDoubleRef]
 
-# null terminated strings
+# decode argument: null terminated string 
   - module: libreceiveString.so
     stackTraceLimit: 0
     functions:
