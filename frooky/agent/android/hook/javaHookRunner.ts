@@ -41,6 +41,15 @@ function buildHookOps(hook: JavaHook, handle: Java.MethodDispatcher, methodDefin
   if (methodDefinition.overloads?.length) {
     // Only hook explicitly declared overloads
     methodDefinition.overloads.forEach((declaredOverload: JavaOverload) => {
+      if (hook.settings?.decoderSettings) {
+        declaredOverload.params.forEach((param: JavaParam) => {
+          param.options = param.options ?? {};
+          param.options.decoderSettings = {
+            ...hook.settings?.decoderSettings,
+            ...param.options.decoderSettings,
+          };
+        });
+      }
       const paramList: ParamType[] = declaredOverload.params.map((p: Param) => p.type);
       try {
         pushHookOp(hook, methodDefinition, declaredOverload.params, handle.overload(...paramList), javaHookOps);

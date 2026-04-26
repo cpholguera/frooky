@@ -32,7 +32,7 @@ hooks:
       - name: receiveString
         overloads:
           - params:
-            - [java.lang.String, receivedString, {decoderSettings: {magicDecode: true}}]
+            - [java.lang.String, receivedString, {decoderSettings: {magicDecode: false}}]
 
 
   # primitive java arrays
