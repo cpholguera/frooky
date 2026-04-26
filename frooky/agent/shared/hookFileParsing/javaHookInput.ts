@@ -52,7 +52,6 @@ export function isJavaHook(h: Hook): h is JavaHook {
   return "javaClass" in h;
 }
 
-
 // will return a JavaOverload for any form of JavaOverloadInput
 function normalizeOverload(input: JavaOverloadInput): JavaOverload {
   return {

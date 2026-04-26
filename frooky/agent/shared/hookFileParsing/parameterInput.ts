@@ -1,4 +1,4 @@
-import type { ParamDefinition, ParamName, ParamOptions, ParamType } from "../hook/param";
+import type { Param, ParamName, ParamOptions, ParamType } from "../hook/param";
 
 /**
  * Extended parameter type for YAML input parsing.
@@ -17,10 +17,10 @@ import type { ParamDefinition, ParamName, ParamOptions, ParamType } from "../hoo
  *
  * @public
  */
-export type ParamInput = ParamType | ParamDefinition | [ParamType, ParamName] | [ParamType, ParamOptions] | [ParamType, ParamName, ParamOptions];
+export type ParamInput = ParamType | Param | [ParamType, ParamName] | [ParamType, ParamOptions] | [ParamType, ParamName, ParamOptions];
 
 // returns a normalized ParamDefinition from any type of ParamInput
-export function normalizeParam(input: ParamInput): ParamDefinition {
+export function normalizeParam(input: ParamInput): Param {
   if (typeof input === "string") {
     return { type: input };
   }
@@ -44,5 +44,5 @@ export function normalizeParam(input: ParamInput): ParamDefinition {
     return { type: paramType, name: paramNameOrParamOptions };
   }
 
-  return input as ParamDefinition;
+  return input as Param;
 }

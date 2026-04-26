@@ -1,5 +1,5 @@
-import { NativeFrookyFunctionDefinition, NativeHook, SymbolName } from "../../native/hook/nativeHook";
-import { Hook } from "../hook/hook";
+import type { NativeFrookyFunctionDefinition, NativeHook, SymbolName } from "../../native/hook/nativeHook";
+import type { Hook } from "../hook/hook";
 import { normalizeParam, type ParamInput } from "./parameterInput";
 
 export type { SymbolName };
