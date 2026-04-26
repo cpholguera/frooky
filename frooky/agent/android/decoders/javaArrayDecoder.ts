@@ -49,7 +49,6 @@ export const JavaArrayDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
     const signature = param.implementationType ?? param.type;
     const elementSignature = signature.startsWith("[") ? signature.substring(1) : signature;
     const elementType = elementTypeFromSignature(elementSignature);
-
     let value: unknown[];
 
     if (PRIMITIVE_TYPES.has(elementType)) {
@@ -60,7 +59,8 @@ export const JavaArrayDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
       const elementParam: JavaParam = {
         ...param,
         type: elementType,
-        decoder: undefined, // prevent inheriting parent's cached decoder
+        implementationType: undefined,    // resfds
+        decoder: undefined,
       };
       const len = input.length;
       value = new Array(len);
