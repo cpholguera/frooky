@@ -13,17 +13,12 @@ export interface HookSettings {
   stackTraceLimit?: number;
 
   /**
-   * If set, disables the stack trace.
-   */
-  disableStacktrace?: boolean;
-
-  /**
    * Stack trace filters to apply.
    */
   eventFilter?: string[];
 
   /**
-   * Stack trace filters to apply.
+   * Decoder specific settings.
    */
   decoderSettings?: DecoderSettings;
 }

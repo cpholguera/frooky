@@ -7,7 +7,6 @@ metadata:
 # global settings for the hooks in this hook file.
 globalSettings:
   stackTraceLimit: 10           # Sets stackTraceLimit to 10 for all hooks
-  disableStacktrace: false      # If set, disables the stack trace 
   decoderSettings:
     fastDecode: false             # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
     magicDecode: true             # If set, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime
@@ -30,7 +29,10 @@ hooks:
     # java types which are converted to "string" type in javascript
   - javaClass: org.owasp.mastestapp.MastgTest
     methods:
-      - receiveString
+      - name: receiveString
+        overloads:
+          - params:
+            - [java.lang.String, receivedString, {decoderSettings: {magicDecode: true}}]
 
 
   # primitive java arrays
