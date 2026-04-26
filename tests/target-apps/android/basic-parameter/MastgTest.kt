@@ -47,21 +47,21 @@ class MastgTest(private val context: Context) {
     }
 
     // Single types
-    fun passString(arg: String) {}
-    fun passBoolean(arg: Boolean) {}
-    fun passByte(arg: Byte) {}
-    fun passShort(arg: Short) {}
-    fun passInt(arg: Int) {}
-    fun passLong(arg: Long) {}
-    fun passFloat(arg: Float) {}
-    fun passDouble(arg: Double) {}
-    fun passChar(arg: Char) {}
+    fun receiveString(arg: String) {}
+    fun receiveBoolean(arg: Boolean) {}
+    fun receiveByte(arg: Byte) {}
+    fun receiveShort(arg: Short) {}
+    fun receiveInt(arg: Int) {}
+    fun receiveLong(arg: Long) {}
+    fun receiveFloat(arg: Float) {}
+    fun receiveDouble(arg: Double) {}
+    fun receiveChar(arg: Char) {}
 
-    fun passBigInteger(arg: BigInteger) {}
-    fun passBigDecimal(arg: BigDecimal) {}
-    fun passList(arg: List<String>) {}
-    fun passMap(arg: Map<String, String>) {}
-    fun passSet(arg: Set<String>) {}
+    fun receiveBigInteger(arg: BigInteger) {}
+    fun receiveBigDecimal(arg: BigDecimal) {}
+    fun receiveList(arg: List<String>) {}
+    fun receiveMap(arg: Map<String, String>) {}
+    fun receiveSet(arg: Set<String>) {}
 
     enum class Direction {
         NORTH,
@@ -69,106 +69,120 @@ class MastgTest(private val context: Context) {
         EAST,
         WEST
     }
-    fun passEnum(arg: Direction) {}
+    fun receiveEnum(arg: Direction) {}
 
     // Arrays
-    fun passStringArray(arg: Array<String>) {}
-    fun passBooleanArray(arg: BooleanArray) {}
-    fun passByteArray(arg: ByteArray) {}
-    fun passShortArray(arg: ShortArray) {}
-    fun passIntArray(arg: IntArray) {}
-    fun passLongArray(arg: LongArray) {}
-    fun passFloatArray(arg: FloatArray) {}
-    fun passDoubleArray(arg: DoubleArray) {}
-    fun passCharArray(arg: CharArray) {}
+    fun receiveStringArray(arg: Array<String>) {}
+    fun receiveBooleanArray(arg: BooleanArray) {}
+    fun receiveByteArray(arg: ByteArray) {}
+    fun receiveShortArray(arg: ShortArray) {}
+    fun receiveIntArray(arg: IntArray) {}
+    fun receiveLongArray(arg: LongArray) {}
+    fun receiveFloatArray(arg: FloatArray) {}
+    fun receiveDoubleArray(arg: DoubleArray) {}
+    fun receiveCharArray(arg: CharArray) {}
+    fun receiveNestedArray(arg: Array<Array<Array<String>>>) {} // nested array with depth of 3
 
     fun mastgTest(): String {
         val r = DemoResults("basic-parameter")
 
-        passString("Test String")
+        receiveString("Test String")
         r.add(Status.PASS, "Test String")
 
-        passBoolean(true)
+        receiveBoolean(true)
         r.add(Status.PASS, true.toString())
 
-        passByte(127)
+        receiveByte(127)
         r.add(Status.PASS, 127.toString())
 
-        passShort(32767)
+        receiveShort(32767)
         r.add(Status.PASS, 32767.toString())
 
-        passInt(2147483647)
+        receiveInt(2147483647)
         r.add(Status.PASS, 2147483647.toString())
 
-        passLong(9223372036854775807L)
+        receiveLong(9223372036854775807L)
         r.add(Status.PASS, 9223372036854775807L.toString())
 
-        passFloat(3.14f)
+        receiveFloat(3.14f)
         r.add(Status.PASS, 3.14f.toString())
 
-        passDouble(3.141592653589793)
+        receiveDouble(3.141592653589793)
         r.add(Status.PASS, 3.141592653589793.toString())
 
-        passChar('A')
+        receiveChar('A')
         r.add(Status.PASS, 'A'.toString())
 
         val stringArray = arrayOf("a", "b", "c")
-        passStringArray(stringArray)
+        receiveStringArray(stringArray)
         r.add(Status.PASS, stringArray.joinToString())
 
         val boolArray = booleanArrayOf(true, false)
-        passBooleanArray(boolArray)
+        receiveBooleanArray(boolArray)
         r.add(Status.PASS, boolArray.joinToString())
 
         val byteArray = byteArrayOf(1, 2, 3)
-        passByteArray(byteArray)
+        receiveByteArray(byteArray)
         r.add(Status.PASS, byteArray.joinToString())
 
         val shortArray = shortArrayOf(1, 2, 3)
-        passShortArray(shortArray)
+        receiveShortArray(shortArray)
         r.add(Status.PASS, shortArray.joinToString())
 
         val intArray = intArrayOf(1, 2, 3)
-        passIntArray(intArray)
+        receiveIntArray(intArray)
         r.add(Status.PASS, intArray.joinToString())
 
         val longArray = longArrayOf(1L, 2L, 3L)
-        passLongArray(longArray)
+        receiveLongArray(longArray)
         r.add(Status.PASS, longArray.joinToString())
 
         val floatArray = floatArrayOf(1.1f, 2.2f)
-        passFloatArray(floatArray)
+        receiveFloatArray(floatArray)
         r.add(Status.PASS, floatArray.joinToString())
 
         val doubleArray = doubleArrayOf(1.1, 2.2)
-        passDoubleArray(doubleArray)
+        receiveDoubleArray(doubleArray)
         r.add(Status.PASS, doubleArray.joinToString())
 
         val charArray = charArrayOf('x', 'y', 'z')
-        passCharArray(charArray)
+        receiveCharArray(charArray)
         r.add(Status.PASS, charArray.joinToString())
 
         val bigInt = BigInteger("123456789012345678901234567890")
-        passBigInteger(bigInt)
+        receiveBigInteger(bigInt)
         r.add(Status.PASS, bigInt.toString())
 
         val bigDec = BigDecimal("3.141592653589793238462643383")
-        passBigDecimal(bigDec)
+        receiveBigDecimal(bigDec)
         r.add(Status.PASS, bigDec.toString())
 
         val list = listOf("a", "b", "c")
-        passList(list)
+        receiveList(list)
         r.add(Status.PASS, list.toString())
 
         val map = mapOf("key" to "value")
-        passMap(map)
+        receiveMap(map)
         r.add(Status.PASS, map.toString())
 
         val set = setOf("a", "b", "c")
-        passSet(set)
+        receiveSet(set)
         r.add(Status.PASS, set.toString())
 
-        passEnum(Direction.NORTH)
+        val nested =
+                arrayOf(
+                        arrayOf(arrayOf("a", "b", "c"), arrayOf("d", "e", "f")),
+                        arrayOf(arrayOf("g", "h", "i"), arrayOf("j", "k", "l"))
+                )
+
+        receiveNestedArray(nested)
+        r.add(Status.PASS, nested.toString())
+
+        val longIntegerArray = Array(100) { it + 1 }.toIntArray()
+        receiveIntArray(longIntegerArray)
+        r.add(Status.PASS, longIntegerArray.toString())
+
+        receiveEnum(Direction.NORTH)
         r.add(Status.PASS, Direction.NORTH.toString())
 
         r.add(Status.PASS, this.buildIntentWithFlags())
