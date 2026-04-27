@@ -1,5 +1,5 @@
+import type { DecoderSettings } from "../decoders/decoderSettings";
 import type { HookMetadata } from "../frookyConfig";
-import type { DecoderSettings } from "./param";
 
 /**
  * Metadata that describes a hook collection.

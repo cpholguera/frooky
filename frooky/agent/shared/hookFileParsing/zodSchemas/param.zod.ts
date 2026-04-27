@@ -7,12 +7,9 @@ export const paramTypeSchema = z.string();
 
 export const paramNameSchema = z.string();
 
-export const decoderSettingsSchema = z.object({
-    maxRecursion: z.number().optional(),
-    decodeLimit: z.number().optional(),
-    magicDecode: z.boolean().optional(),
-    fastDecode: z.boolean().optional()
-});
+const decoderSettingsSchema = z.any();
+
+const baseDecoderSchema = z.any();
 
 export const paramOptionsSchema = z.object({
     decoder: z.string().optional(),
@@ -20,8 +17,6 @@ export const paramOptionsSchema = z.object({
     decoderArgs: z.array(z.string()).optional(),
     decoderSettings: decoderSettingsSchema.optional()
 });
-
-const baseDecoderSchema = z.any();
 
 export const paramSchema = z.object({
     type: paramTypeSchema,

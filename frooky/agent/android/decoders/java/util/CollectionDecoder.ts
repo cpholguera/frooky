@@ -5,8 +5,8 @@ import type { JavaParam } from "../../../hook/javaParam";
 import { decodeIterable } from "../lang/IterableDecoder";
 
 export const CollectionDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
-  decode: (input, param) => {
-    const iterable = input.iterator ? input : Java.cast(input, Java.use("java.util.Collection"));
-    return decodeIterable(iterable, param);
+  decode: (value, param, settings) => {
+    const iterable = value.iterator ? value : Java.cast(value, Java.use("java.util.Collection"));
+    return decodeIterable(iterable, param, settings);
   },
 };

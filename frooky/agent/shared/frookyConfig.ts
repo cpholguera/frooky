@@ -56,7 +56,7 @@ export interface FrookyConfig {
   /**
    * Settings applied to all hooks in this frooky config
    */
-  globalSetting?: HookSettings;
+  globalSettings?: HookSettings;
 
   /**
    * Collection of hooks.

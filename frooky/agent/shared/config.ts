@@ -1,15 +1,14 @@
-import type { HookSettings } from "frooky";
+export const DEFAULT_DECODER_SETTINGS = {
+  fastDecode: false,
+  magicDecode: false,
+  maxRecursion: 5,
+  decodeLimit: 1000,
+};
 
-export const DEFAULT_HOOK_SETTINGS: HookSettings = {
+export const DEFAULT_HOOK_SETTINGS = {
   stackTraceLimit: 10,
-  disableStacktrace: false,
   eventFilter: [],
-  decoderSettings: {
-    fastDecode: false,
-    magicDecode: false,
-    maxRecursion: 5,
-    decodeLimit: 1000,
-  },
+  decoderSettings: DEFAULT_DECODER_SETTINGS,
 };
 
 // specifies the interval between cached events are send back to the host

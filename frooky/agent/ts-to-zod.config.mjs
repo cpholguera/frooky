@@ -53,5 +53,10 @@ export default [
         "name": "frooky_config",
         "input": "shared/frookyConfig.ts",
         "output": "shared/hookFileParsing/zodSchemas/frookyConfig.zod.ts"
+    },
+    {
+        "name": "decoder_settings",
+        "input": "shared/decoders/decoderSettings.ts",
+        "output": "shared/hookFileParsing/zodSchemas/decoderSettings.zod.ts"
     }
 ]

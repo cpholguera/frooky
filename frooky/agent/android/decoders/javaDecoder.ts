@@ -33,11 +33,11 @@ const javaDecoderRegistry: Record<string, BaseDecoder<Java.Wrapper, JavaParam>> 
  * on `param.decoder` so subsequent calls skip this dispatch entirely.
  */
 export const JavaDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
-  decode: (input, param, quickDecode = false): DecodedValue => {
+  decode: (input, param, settings?): DecodedValue => {
     const cachedDecoder = param.decoder;
     if (cachedDecoder) {
       // use the cached decoder immediately
-      return cachedDecoder.decode(input, param, quickDecode);
+      return cachedDecoder.decode(input, param, settings);
     } else if (param.type.startsWith("[")) {
       // java array decoder
       param.decoder = javaDecoderRegistry.JavaArrayDecoder;
@@ -55,6 +55,6 @@ export const JavaDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
       // Primitive JS value (already converted by Frida)
       param.decoder = JavaPrimitiveDecoder;
     }
-    return param.decoder.decode(input, param, quickDecode);
+    return param.decoder.decode(input, param, settings);
   },
 };

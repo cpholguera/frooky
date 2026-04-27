@@ -16,7 +16,7 @@ export interface HookValidatorResult {
   totalErrors: number;
 }
 
-export function validateHooks(hooks: Hook[], platform: Platform, globalSetting?: HookSettings, metadata?: HookMetadata): HookValidatorResult {
+export function validateHooks(hooks: Hook[], platform: Platform, globalSettings?: HookSettings, metadata?: HookMetadata): HookValidatorResult {
   const result: HookValidatorResult = {
     validHooks: [],
     invalidHooks: [],
@@ -33,8 +33,8 @@ export function validateHooks(hooks: Hook[], platform: Platform, globalSetting?:
     }
 
     // Merge global settings into hook setting
-    if (globalSetting) {
-      hook.settings = { ...DEFAULT_HOOK_SETTINGS, ...globalSetting, ...hook.settings };
+    if (globalSettings) {
+      hook.settings = { ...DEFAULT_HOOK_SETTINGS, ...globalSettings, ...hook.settings };
     }
 
     try {
@@ -69,7 +69,7 @@ export function validateHooks(hooks: Hook[], platform: Platform, globalSetting?:
       result.totalErrors += 1;
       result.invalidHooks.push(hook);
       if (e instanceof z.ZodError) {
-        frooky.log.warn(`Hook is not according to schema: ${JSON.stringify(z.treeifyError(e), null, 2)}`);
+        frooky.log.warn(`The hook contains invalid entires. It will be ignored:\n${z.prettifyError(e)}`);
       } else {
         frooky.log.warn(e as string);
       }

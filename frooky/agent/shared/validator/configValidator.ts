@@ -1,7 +1,30 @@
-import type { FrookyConfig, Platform } from "frooky";
+import type { FrookyConfig, HookSettings, Platform } from "frooky";
+import z from "zod";
+import type { DecoderSettings } from "../decoders/decoderSettings";
+import { decoderSettingsSchema } from "../hookFileParsing/zodSchemas/decoderSettings.zod";
 import { hookMetadataSchema } from "../hookFileParsing/zodSchemas/frookyConfig.zod";
 import { hookSettingsSchema } from "../hookFileParsing/zodSchemas/hook.zod";
 import { type HookValidatorResult, validateHooks } from "./hookValidator";
+
+export function validateHookSettings(settings: HookSettings) {
+  try {
+    hookSettingsSchema.parse(settings);
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      frooky.log.warn(`The global settings contains invalid entires. They will be ignored:\n${z.prettifyError(e)}`);
+    }
+  }
+}
+
+export function validateDecoderSettings(decoderSettings: DecoderSettings) {
+  try {
+    decoderSettingsSchema.parse(decoderSettings);
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      frooky.log.warn(`The global decoder settings contains invalid entires. They will be ignored:\n${z.prettifyError(e)}`);
+    }
+  }
+}
 
 export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platform): HookValidatorResult {
   frooky.log.info(`Validating frooky configuration for platform ${platform}`);
@@ -25,19 +48,19 @@ export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platf
     frooky.log.warn("This frooky configuration does not have metadata. Consider adding them for better results.");
   }
 
-  // validate global settings
-  if (frookyConfig.globalSetting) {
-    try {
-      hookSettingsSchema.parse(frookyConfig.globalSetting);
-    } catch (e) {
-      frooky.log.warn(`The global settings contains invalid entires: ${e}`);
+  if (frookyConfig.globalSettings) {
+    // validate global settings
+    validateHookSettings(frookyConfig.globalSettings);
+    if (frookyConfig.globalSettings.decoderSettings) {
+      // validate decoder settings
+      validateDecoderSettings(frookyConfig.globalSettings.decoderSettings);
     }
   }
 
   // validate hooks
   let hookValidatorResult: HookValidatorResult;
   if (frookyConfig.hooks) {
-    hookValidatorResult = validateHooks(frookyConfig.hooks, platform, frookyConfig.globalSetting, frookyConfig.metadata);
+    hookValidatorResult = validateHooks(frookyConfig.hooks, platform, frookyConfig.globalSettings, frookyConfig.metadata);
 
     frooky.log.info("Hook configuration validated.");
     return hookValidatorResult;

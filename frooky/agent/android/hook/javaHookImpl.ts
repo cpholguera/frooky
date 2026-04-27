@@ -1,5 +1,6 @@
 import Java from "frida-java-bridge";
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
+import type { DecoderSettings } from "../../shared/decoders/decoderSettings";
 import type { Param } from "../../shared/hook/param";
 import { JavaDecoder } from "../decoders/javaDecoder";
 import { JavaHookEvent } from "../event/javaHookEvent";
@@ -34,7 +35,7 @@ export function buildJavaStackTrace(limit: number): string[] {
  * @param args - The actual argument values passed to the method
  * @param params- The optional frooky parameters for additional context information
  */
-export function decodeArgs(args: Java.Wrapper[], params?: Param[]): DecodedValue[] {
+export function decodeArgs(args: Java.Wrapper[], params: Param[], settings?: DecoderSettings): DecodedValue[] {
   if (args.length === 0) {
     throw Error("Empty args passed");
   }
@@ -45,7 +46,7 @@ export function decodeArgs(args: Java.Wrapper[], params?: Param[]): DecodedValue
   const decodedArgs: DecodedValue[] = [];
   try {
     args.forEach((arg: Java.Wrapper, i: number) => {
-      decodedArgs.push(JavaDecoder.decode(arg, params[i]));
+      decodedArgs.push(JavaDecoder.decode(arg, params[i], settings));
     });
   } catch (e) {
     frooky.log.error(`Error decoding input parameter: ${e}`);
@@ -55,7 +56,7 @@ export function decodeArgs(args: Java.Wrapper[], params?: Param[]): DecodedValue
 
 export function buildAndDispatchEvent(javaHookOp: JavaHookOp, decodedArgs: DecodedValue[], returnValue: DecodedValue, stackTrace: string[], fieldType: FieldType): void {
   const event = new JavaHookEvent(javaHookOp.javaClass, javaHookOp.methodName, fieldType);
-  event.category = javaHookOp.category;
+  event.category = javaHookOp.metadata?.category;
   event.stackTrace = stackTrace;
   event.args = decodedArgs;
   event.returnValue = returnValue;

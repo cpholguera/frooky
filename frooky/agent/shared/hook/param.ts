@@ -1,4 +1,5 @@
 import type { BaseDecoder } from "../decoders/baseDecoder";
+import type { DecoderSettings } from "../decoders/decoderSettings";
 
 /**
  * Specifies when a decoder should be applied during function execution.
@@ -33,41 +34,6 @@ export type ParamType = string;
  * @public
  */
 export type ParamName = string;
-
-/**
- * Decoder settings.
- *
- * @public
- */
-export type DecoderSettings = {
-  /**
-   * Maximum recursion depth for nested structure decoding.
-   *
-   * @example 10
-   */
-  maxRecursion?: number;
-
-  /**
-   * Maximum number of elements to decode in a collection or buffer.
-   *
-   * @example 1000
-   */
-  decodeLimit?: number;
-
-  /**
-   * When enabled, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime.
-   *
-   * @defaultValue false
-   */
-  magicDecode?: boolean;
-
-  /**
-   * When enabled, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
-   *
-   * @defaultValue false
-   */
-  fastDecode?: boolean;
-};
 
 /**
  * Decoder options for a parameter.
@@ -129,5 +95,6 @@ export interface Param {
   /** Controls when and how the parameter is decoded. */
   options?: ParamOptions;
   /** Cached decoder, resolved on first decode of this parameter type. */
-  decoder?: BaseDecoder<unknown, Param>;
+  // biome-ignore lint/suspicious/noExplicitAny: decoder is a cache for any concrete BaseDecoder; variance on TValue prevents using unknown here
+  decoder?: BaseDecoder<any, any>;
 }

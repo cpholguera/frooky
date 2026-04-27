@@ -6,12 +6,12 @@ metadata:
 
 # global settings for the hooks in this hook file.
 globalSettings:
-  stackTraceLimit: 10           # Sets stackTraceLimit to 10 for all hooks
+  stackTraceLimit: 10            # Sets stackTraceLimit to 10 for all hooks
   decoderSettings:
-    fastDecode: false             # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
-    magicDecode: true             # If set, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime
-    maxRecursion: 10              # Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
-    elementLimit: 1000            # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
+    fastDecode: true             # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
+    magicDecode: true            # If set, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime
+    maxRecursion: 10             # Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
+    decodeLimit: 10              # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
 
 hooks:
     # java primitive types
@@ -32,16 +32,27 @@ hooks:
       - name: receiveString
         overloads:
           - params:
-            - [java.lang.String, receivedString, {decoderSettings: {magicDecode: false}}]
+            - [java.lang.String, receivedString, {decoderSettings: {elementLimit: 10}}]
 
 
   # primitive java arrays
   - javaClass: org.owasp.mastestapp.MastgTest
+    settings:
+      stackTraceLimit: 5
+      decoderSettings:
+        fastDecode: false
+        magicDecode: false
+        maxRecursion: 5
+        decodeLimit: 5
     methods:
       - receiveStringArray
       - receiveBooleanArray
       - receiveByteArray
       - receiveShortArray
+      - name: receiveIntArray
+        overloads:
+          - params:
+            - ["[I", receivedInteger, {decoderSettings: {decodeLimit: 50}}]
       - receiveIntArray
       - receiveLongArray
       - receiveFloatArray

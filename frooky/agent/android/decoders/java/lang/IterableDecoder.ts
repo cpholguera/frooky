@@ -1,28 +1,35 @@
 // iterableDecoder.ts
-import Java from "frida-java-bridge";
-import type { BaseDecoder } from "../../../../shared/decoders/baseDecoder";
+import type Java from "frida-java-bridge";
+import { DEFAULT_DECODER_SETTINGS } from "../../../../shared/config";
 import type { DecodedValue } from "../../../../shared/decoders/decodedValue";
-import type { Param } from "../../../../shared/hook/param";
+import type { DecoderSettings } from "../../../../shared/decoders/decoderSettings";
 import type { JavaParam } from "../../../hook/javaParam";
 import { JavaDecoder } from "../../javaDecoder";
+
+function defaultElementDecoder(element: Java.Wrapper, settings?: DecoderSettings): DecodedValue {
+  const elementType = element == null ? "java.lang.Object" : (element.$className ?? "java.lang.Object");
+  return JavaDecoder.decode(element, { type: elementType }, settings);
+}
 
 /**
  * Decode any java.lang.Iterable by walking its iterator().
  */
-export function decodeIterable(iterable: Java.Wrapper, param: JavaParam, elementDecoder: (element: Java.Wrapper) => DecodedValue = defaultElementDecoder): DecodedValue {
+export function decodeIterable(iterable: Java.Wrapper, param: JavaParam, settings?: DecoderSettings, customElementDecoder?: (entry: Java.Wrapper) => DecodedValue): DecodedValue {
   const values: DecodedValue[] = [];
   const iterator = iterable.iterator();
+  const limit = settings?.decodeLimit ?? DEFAULT_DECODER_SETTINGS.decodeLimit;
 
   let count = 0;
-  while (iterator.hasNext() && count < DECODER_MAX_ELEMENTS) {
-    values.push(elementDecoder(iterator.next()));
+  while (iterator.hasNext() && count < limit) {
+    const element = iterator.next();
+    values.push(customElementDecoder ? customElementDecoder(element) : defaultElementDecoder(element, settings));
     count++;
   }
 
   if (iterator.hasNext()) {
     values.push({
       type: "java.lang.String",
-      value: `[truncated at ${DECODER_MAX_ELEMENTS}]`,
+      value: `[truncated at ${limit}]`,
     } as DecodedValue);
   }
 
@@ -32,15 +39,3 @@ export function decodeIterable(iterable: Java.Wrapper, param: JavaParam, element
     value: values,
   };
 }
-
-function defaultElementDecoder(element: Java.Wrapper): DecodedValue {
-  const elementType = element == null ? "java.lang.Object" : (element.$className ?? "java.lang.Object");
-  return JavaDecoder.decode(element, { type: elementType });
-}
-
-export const IterableDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
-  decode: (input: Java.Wrapper, param: Param): DecodedValue => {
-    const iterable = input.iterator ? input : Java.cast(input, Java.use("java.lang.Iterable"));
-    return decodeIterable(iterable, param);
-  },
-};

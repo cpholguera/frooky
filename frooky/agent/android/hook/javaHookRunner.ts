@@ -1,4 +1,5 @@
 import Java from "frida-java-bridge";
+import { DEFAULT_HOOK_SETTINGS } from "../../shared/config";
 import type { MethodName } from "../../shared/hook/hook";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import type { Param, ParamType } from "../../shared/hook/param";
@@ -86,19 +87,24 @@ function buildJavaHookOps(hook: JavaHook): JavaHookOp[] {
 
 // actually hooks the java method
 export function registerJavaHookOps(javaHookOp: JavaHookOp) {
+  let returnParam: JavaParam;
   javaHookOp.javaMethod.implementation = function (...args: Java.Wrapper[]) {
     // call the original implementation
     const returnValue = javaHookOp.javaMethod.apply(this, args);
     try {
       // decode the return value
-      const returnValueType = { type: javaHookOp.javaMethod.returnType.className ?? "void", implementationType: javaHookOp.javaMethod.returnType.className ?? "void" };
-      const decodedReturnValue = JavaDecoder.decode(returnValue, returnValueType);
+      if (!returnParam) {
+        const returnType = javaHookOp.javaMethod.returnType.className ?? "void";
+        returnParam = { type: returnType, implementationType: returnType };
+      }
+      const decodedReturnValue = JavaDecoder.decode(returnValue, returnParam, javaHookOp.settings?.decoderSettings);
       // collect the stack trace from Frida
-      const stackTrace = javaHookOp.stackTraceLimit > 0 ? buildJavaStackTrace(javaHookOp.stackTraceLimit) : [];
+      const stackTraceLimit: number = javaHookOp.settings?.stackTraceLimit ? javaHookOp.settings?.stackTraceLimit : DEFAULT_HOOK_SETTINGS.stackTraceLimit;
+      const stackTrace = buildJavaStackTrace(stackTraceLimit);
       // collect the field type and (optional) instance hash
       const fieldType = buildFieldType(this as Java.Wrapper);
       // decode the arguments passed to the method
-      const decodedArgs = decodeArgs(args, javaHookOp.params);
+      const decodedArgs = decodeArgs(args, javaHookOp.params, javaHookOp.settings?.decoderSettings);
       // create a frooky hook event and send it to the event cache
       buildAndDispatchEvent(javaHookOp, decodedArgs, decodedReturnValue, stackTrace, fieldType);
     } catch (e) {

@@ -45,15 +45,15 @@ function elementTypeFromSignature(element: string): string {
 }
 
 export const JavaArrayDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
-  decode: (input: Java.Wrapper, param: JavaParam): DecodedValue => {
+  decode: (value, param, settings): DecodedValue => {
     const signature = param.implementationType ?? param.type;
     const elementSignature = signature.startsWith("[") ? signature.substring(1) : signature;
     const elementType = elementTypeFromSignature(elementSignature);
-    let value: unknown[];
+    let arrayValue: unknown[];
 
     if (PRIMITIVE_TYPES.has(elementType)) {
       // Frida unwraps primitive arrays to a JS-iterable directly
-      value = Array.from(input as unknown as ArrayLike<unknown>);
+      arrayValue = Array.from(value as unknown as ArrayLike<unknown>);
     } else {
       // complex java types
       const elementParam: JavaParam = {
@@ -62,18 +62,18 @@ export const JavaArrayDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
         implementationType: undefined,
         decoder: undefined,
       };
-      const len = input.length;
-      value = new Array(len);
+      const len = value.length;
+      arrayValue = new Array(len);
       for (let i = 0; i < len; i++) {
-        const el = input[i];
-        value[i] = el == null ? null : JavaDecoder.decode(el, elementParam).value;
+        const el = value[i];
+        arrayValue[i] = el == null ? null : JavaDecoder.decode(el, elementParam, settings).value;
       }
     }
 
     return {
       type: param.type,
       name: param.name,
-      value,
+      value: arrayValue,
     };
   },
 };

@@ -2,18 +2,18 @@
 import { z } from "zod";
 
 import { hookMetadataSchema } from "./frookyConfig.zod";
-import { decoderSettingsSchema } from "./param.zod";
-
-export const hookSettingsSchema = z.object({
-    stackTraceLimit: z.number().optional(),
-    disableStacktrace: z.boolean().optional(),
-    eventFilter: z.array(z.string()).optional(),
-    decoderSettings: decoderSettingsSchema.optional()
-});
 
 export const returnTypeSchema = z.string();
 
 export const methodNameSchema = z.string();
+
+const decoderSettingsSchema = z.any();
+
+export const hookSettingsSchema = z.object({
+    stackTraceLimit: z.number().optional(),
+    eventFilter: z.array(z.string()).optional(),
+    decoderSettings: decoderSettingsSchema.optional()
+});
 
 export const hookSchema = z.object({
     metadata: hookMetadataSchema.optional(),
