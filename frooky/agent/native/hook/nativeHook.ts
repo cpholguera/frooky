@@ -1,4 +1,7 @@
+import type { DecoderSettings } from "../../shared/decoders/decoderSettings";
 import type { Hook } from "../../shared/hook/hook";
+import type { ParamType } from "../../shared/hook/param";
+import type { NativeDecoder } from "../decoders/nativeDecoder";
 import type { NativeParam } from "./nativeParam";
 
 /**
@@ -8,6 +11,12 @@ import type { NativeParam } from "./nativeParam";
  */
 export type SymbolName = string;
 
+export type NativeReturnType = {
+  type: ParamType;
+  decoder?: typeof NativeDecoder;
+  decoderSettings: DecoderSettings;
+};
+
 /**
  * Expanded Native method definition with name and optional overloads.
  *
@@ -15,7 +24,7 @@ export type SymbolName = string;
  */
 export interface NativeFrookyFunctionDefinition {
   symbol: SymbolName;
-  returnType?: NativeParam;
+  returnType?: NativeReturnType;
   params?: NativeParam[];
 }
 

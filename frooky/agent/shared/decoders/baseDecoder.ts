@@ -1,6 +1,7 @@
 import type { DecoderSettings } from "../decoders/decoderSettings";
 import type { Param } from "../hook/param";
 import type { DecodedValue } from "./decodedValue";
+
 /**
  * Base interface for value decoders.
  *

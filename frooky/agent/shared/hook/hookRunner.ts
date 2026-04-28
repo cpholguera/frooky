@@ -4,7 +4,7 @@ import type { Hook, HookSettings } from "frooky";
 // Hook Operation
 // Contains all information to hook one method or function
 export interface HookOp {
-  settings: HookSettings;
+  hookSettings: HookSettings;
   module?: string;
   moduleAddress?: NativePointer;
 }

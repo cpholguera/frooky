@@ -1,6 +1,7 @@
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../../shared/config";
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
+import { validateAndNormalizeDecoderSettings } from "../../shared/validator/configValidator";
 import { NativeDecoder } from "../decoders/nativeDecoder";
 import type { NativeFrookyFunctionDefinition, NativeHook, SymbolName } from "./nativeHook";
 import { buildAndDispatchEvent, buildNativeStackTrace, decodeNativeArgs } from "./nativeHookImpl";
@@ -23,10 +24,9 @@ export function registerNativeHookOps(nativeHookOp: NativeHookOp) {
   Interceptor.attach(nativeHookOp.symbolAddress, {
     onEnter: function (args: NativePointer[]) {
       // collect the stack trace from Frida
-      const stackTraceLimit: number = nativeHookOp.settings?.stackTraceLimit ? nativeHookOp.settings?.stackTraceLimit : DEFAULT_HOOK_SETTINGS.stackTraceLimit;
+      const stackTraceLimit: number = nativeHookOp.hookSettings?.stackTraceLimit ? nativeHookOp.hookSettings?.stackTraceLimit : DEFAULT_HOOK_SETTINGS.stackTraceLimit;
       stackTrace = buildNativeStackTrace(this.context, stackTraceLimit);
-      // decode the arguments
-      // passed to the method
+      // decode the arguments passed to this function
       decodedArgs = decodeNativeArgs(args, nativeHookOp.params);
     },
     onLeave: (returnValue: InvocationReturnValue) => {
@@ -49,25 +49,20 @@ function buildNativeHookOps(hook: NativeHook): NativeHookOp[] {
     const module = Process.getModuleByName(hook.module);
 
     hook.functions.forEach((fn: NativeFrookyFunctionDefinition) => {
-      if (hook.settings?.decoderSettings) {
-        fn.params?.forEach((param: NativeParam) => {
-          param.options = param.options ?? {};
-          param.options.decoderSettings = {
-            ...hook.settings?.decoderSettings,
-            ...param.options.decoderSettings,
-          };
-          // add the DEFAULT_DECODER_SETTINGS in case the setting is not yet defined
-          param.options.decoderSettings = { ...DEFAULT_DECODER_SETTINGS, ...param.options.decoderSettings };
-        });
+      // add the decoder settings to the return type of the function
+      if (fn.returnType?.decoderSettings) {
+        fn.returnType.decoderSettings = validateAndNormalizeDecoderSettings(fn.returnType.decoderSettings);
+        fn.returnType.decoderSettings = { ...DEFAULT_DECODER_SETTINGS, ...fn.returnType.decoderSettings };
       }
+
       try {
         nativeHHookOps.push({
           module: hook.module,
           symbol: fn.symbol,
-          settings: hook.settings,
+          hookSettings: hook.hookSettings,
           symbolAddress: module.getExportByName(fn.symbol),
           params: fn.params ?? [],
-          returnType: fn.returnType ?? { type: "void", name: undefined },
+          returnType: fn.returnType ?? { type: "void", decoderSettings: DEFAULT_DECODER_SETTINGS },
         });
       } catch (e) {
         frooky.log.error(`Failed to resolve native symbol '${fn.symbol}'${hook.module ? ` in module '${hook.module}'` : ""}: ${e}`);

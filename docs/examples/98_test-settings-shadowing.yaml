@@ -19,14 +19,15 @@ globalSettings:
 hooks:
 # decode argument: null terminated string 
   - module: libreceiveString.so
-    # hookSettings:
-    #   stackTraceLimit: 55
-    # decoderSettings:
-    #   decodeLimit: 55
+    hookSettings:
+      stackTraceLimit: 55
+    decoderSettings:
+      decodeLimit: 55
     functions:
       - symbol: receive_cstring
         params:
           - [char *, string]
-      # - symbol: receive_utf8
-      #   params:
-      #     - [ char *, {decodeAt: enter, decoderSettings:  { decodeLimit: 999}}]
+      - symbol: receive_utf8
+        returnType: [ int, { decodeLimit: 777 } ]
+        params:
+          - [ char *, { decodeAt: enter, decodeLimit: 99 }]

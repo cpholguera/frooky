@@ -11,8 +11,9 @@ export type { SymbolName };
  *
  * @public
  */
-export interface NativeFunctionDefinitionInput extends Omit<NativeFrookyFunctionDefinition, "params"> {
+export interface NativeFunctionDefinitionInput extends Omit<NativeFrookyFunctionDefinition, "params" | "returnType"> {
   params?: ParamInput[];
+  returnType?: ParamInput;
 }
 
 /**
@@ -20,7 +21,7 @@ export interface NativeFunctionDefinitionInput extends Omit<NativeFrookyFunction
  *
  * @public
  */
-export type NativeFrookyFunction = SymbolName | NativeFunctionDefinitionInput;
+export type NativeFrookyFunctionInput = SymbolName | NativeFunctionDefinitionInput;
 
 /**
  * Native hook configuration for YAML parsing.
@@ -34,7 +35,7 @@ export type NativeFrookyFunction = SymbolName | NativeFunctionDefinitionInput;
  */
 export interface NativeHookInput extends Omit<NativeHook, "functions" | "hookSettings" | "decoderSettings"> {
   type: "native";
-  functions: NativeFrookyFunction[];
+  functions: NativeFrookyFunctionInput[];
   hookSettings?: HookSettingsInput;
   decoderSettings?: DecoderSettingsInput;
 }
@@ -52,7 +53,7 @@ function normalizeFunctionDefinition(input: NativeFunctionDefinitionInput): Nati
   };
 }
 
-function normalizeFunction(input: NativeFrookyFunction): NativeFrookyFunctionDefinition {
+function normalizeFunction(input: NativeFrookyFunctionInput): NativeFrookyFunctionDefinition {
   if (typeof input === "string") {
     return { symbol: input };
   }

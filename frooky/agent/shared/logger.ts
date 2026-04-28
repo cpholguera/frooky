@@ -6,8 +6,8 @@ export type logTo = "device" | "frooky";
 
 const LEVEL_PREFIX: Record<LogLevel, string> = {
   info: "[i]",
-  warn: "[!]",
-  error: "[-]",
+  warn: "[?]",
+  error: "[!]",
 };
 
 /**

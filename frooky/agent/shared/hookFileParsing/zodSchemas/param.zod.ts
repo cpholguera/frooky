@@ -10,10 +10,9 @@ export const paramTypeSchema = z.string();
 export const paramNameSchema = z.string();
 
 export const paramOptionsSchema = z.object({
-    decoder: z.string().optional(),
     decodeAt: decodeAtSchema.optional(),
     decoderArgs: z.array(z.string()).optional(),
-    decoderSettings: decoderSettingsSchema.optional()
+    decoderSettings: decoderSettingsSchema
 });
 
 const baseDecoderSchema = z.any();
@@ -21,6 +20,6 @@ const baseDecoderSchema = z.any();
 export const paramSchema = z.object({
     type: paramTypeSchema,
     name: paramNameSchema.optional(),
-    options: paramOptionsSchema.optional(),
-    decoder: baseDecoderSchema.optional()
+    decoder: baseDecoderSchema.optional(),
+    decoderSettings: decoderSettingsSchema
 });

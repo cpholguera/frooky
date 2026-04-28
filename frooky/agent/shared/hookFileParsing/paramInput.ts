@@ -1,4 +1,6 @@
-import type { Param, ParamName, ParamOptions, ParamType } from "../hook/param";
+import { DEFAULT_DECODER_SETTINGS } from "../config";
+import type { DecoderSettings } from "../decoders/decoderSettings";
+import type { Param, ParamName, ParamType } from "../hook/param";
 
 /**
  * Flexible input format for defining a parameter in YAML configuration.
@@ -15,31 +17,31 @@ import type { Param, ParamName, ParamOptions, ParamType } from "../hook/param";
  *
  * @public
  */
-export type ParamInput = ParamType | [ParamType, ParamOptions] | [ParamType, ParamName] | [ParamType, ParamName, ParamOptions] | Param;
+export type ParamInput = ParamType | [ParamType, Partial<DecoderSettings>] | [ParamType, ParamName] | [ParamType, ParamName, Partial<DecoderSettings>] | Param;
 
 // returns a normalized ParamDefinition from any type of ParamInput
 export function normalizeParam(param: ParamInput): Param {
   if (typeof param === "string") {
-    return { type: param };
+    return { type: param, decoderSettings: DEFAULT_DECODER_SETTINGS };
   }
 
   // Check array before plain object, since arrays are also objects
   if (Array.isArray(param)) {
-    const [paramType, paramNameOrParamOptions, paramOptions] = param;
+    const [paramType, paramNameOrDecoderSettings, decoderSettings] = param;
 
     if (param.length === 3) {
       return {
         type: paramType,
-        name: paramNameOrParamOptions as string,
-        options: paramOptions as ParamOptions,
+        name: paramNameOrDecoderSettings as string,
+        decoderSettings: decoderSettings as DecoderSettings,
       };
     }
 
-    if (typeof paramNameOrParamOptions === "object") {
-      return { type: paramType, options: paramNameOrParamOptions };
+    if (typeof paramNameOrDecoderSettings === "object") {
+      return { type: paramType, decoderSettings: paramNameOrDecoderSettings as DecoderSettings };
     }
 
-    return { type: paramType, name: paramNameOrParamOptions };
+    return { type: paramType, name: paramNameOrDecoderSettings, decoderSettings: DEFAULT_DECODER_SETTINGS };
   }
 
   return param as Param;

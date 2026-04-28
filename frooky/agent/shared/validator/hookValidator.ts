@@ -31,10 +31,14 @@ export function validateHooks(hooks: Hook[], platform: Platform, globalHooksSett
     // Merge global hooks settings into hook setting
     if (globalHooksSettings) {
       hook.hookSettings = { ...DEFAULT_HOOK_SETTINGS, ...globalHooksSettings, ...hook.hookSettings };
+    } else {
+      hook.hookSettings = DEFAULT_HOOK_SETTINGS;
     }
     // Merge global decoder settings into hook setting
     if (globalDecoderSettings) {
       hook.decoderSettings = { ...DEFAULT_DECODER_SETTINGS, ...globalDecoderSettings, ...hook.decoderSettings };
+    } else {
+      hook.decoderSettings = DEFAULT_DECODER_SETTINGS;
     }
 
     try {

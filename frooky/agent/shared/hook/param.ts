@@ -42,13 +42,6 @@ export type ParamName = string;
  */
 export interface ParamOptions {
   /**
-   * Overwrites the standard decoder lookup and uses the custom decoder.
-   *
-   * @example "android.content.IntentFlagDecoder."
-   */
-  decoder?: string;
-
-  /**
    * When the decoder should be applied.
    *
    * @defaultValue "enter"
@@ -71,7 +64,7 @@ export interface ParamOptions {
    * @example {maxRecursion: 0, magicDecode: true}
    * @example {fastDecode: true}
    */
-  decoderSettings?: DecoderSettings;
+  decoderSettings: DecoderSettings;
 }
 
 /**
@@ -92,9 +85,11 @@ export interface Param {
   type: ParamType;
   /** Optional parameter name, e.g. `"username"` or `"age"`. */
   name?: ParamName;
-  /** Controls when and how the parameter is decoded. */
-  options?: ParamOptions;
   /** Cached decoder, resolved on first decode of this parameter type. */
   // biome-ignore lint/suspicious/noExplicitAny: decoder is a cache for any concrete BaseDecoder; variance on TValue prevents using unknown here
   decoder?: BaseDecoder<any, any>;
+  /**
+   * Settings applied when running the decoder.
+   */
+  decoderSettings: DecoderSettings;
 }

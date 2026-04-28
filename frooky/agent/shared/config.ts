@@ -2,6 +2,8 @@ import type { DecoderSettings } from "./decoders/decoderSettings";
 import type { HookSettings } from "./hook/hook";
 
 export const DEFAULT_DECODER_SETTINGS: DecoderSettings = {
+  decodeAt: "enter",
+  decoderArgs: [],
   fastDecode: false,
   magicDecode: false,
   maxRecursion: 5,
