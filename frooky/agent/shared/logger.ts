@@ -4,6 +4,12 @@ import { LogEvent } from "./event/logEvent";
 export type LogLevel = "info" | "warn" | "error";
 export type logTo = "device" | "frooky";
 
+const LEVEL_PREFIX: Record<LogLevel, string> = {
+  info: "[i]",
+  warn: "[!]",
+  error: "[-]",
+};
+
 /**
  * Sets the level of logging.
  * 0: No logging
@@ -25,31 +31,41 @@ export class Logger {
     this.logTo = logTo;
   }
 
-  private emit(level: LogLevel, msg: string): void {
+  private format(level: LogLevel, msg: string | string[]): string {
+    const prefix = LEVEL_PREFIX[level];
+    if (Array.isArray(msg)) {
+      const lines = msg.map((m) => `    ${m}`).join("\n");
+      return `${prefix} ${level}:\n${lines}`;
+    }
+    return `${prefix} ${msg}`;
+  }
+
+  private emit(level: LogLevel, msg: string | string[]): void {
+    const formatted = this.format(level, msg);
     if (this.logTo === "device") {
       switch (level) {
         case "info":
-          console.log(`[i] ${msg}`);
+          console.log(formatted);
           break;
         case "warn":
-          console.warn(`[!] ${msg}`);
+          console.warn(formatted);
           break;
         case "error":
-          console.error(`[-] ${msg}`);
+          console.error(formatted);
           break;
       }
     } else if (this.logTo === "frooky") {
-      this.frooky.addEvent(new LogEvent(level, msg));
+      this.frooky.addEvent(new LogEvent(level, formatted));
     }
   }
 
-  public info(msg: string): void {
+  public info(msg: string | string[]): void {
     if (this.verbosity >= 3) this.emit("info", msg);
   }
-  public warn(msg: string): void {
+  public warn(msg: string | string[]): void {
     if (this.verbosity >= 2) this.emit("warn", msg);
   }
-  public error(msg: string): void {
+  public error(msg: string | string[]): void {
     if (this.verbosity >= 1) this.emit("error", msg);
   }
 }

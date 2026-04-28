@@ -1,6 +1,8 @@
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "../../android/hook/javaHook";
+import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
 import type { Hook, MethodName } from "../hook/hook";
 import { normalizeParam, type ParamInput } from "./paramInput";
+import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
 
 /**
  * Describes a specific Java method overload.
@@ -38,13 +40,17 @@ export type JavaMethodInput = MethodName | JavaMethodDefinitionInput;
  *
  * Extended type for YAML input parsing.
  *
+ * The settings are optional here.
+ *
  * @public
  * @discriminator {type}
  */
 
-export interface JavaHookInput extends Omit<JavaHook, "methods"> {
+export interface JavaHookInput extends Omit<JavaHook, "methods" | "hookSettings" | "decoderSettings"> {
   type: "java";
   methods: JavaMethodInput[];
+  hookSettings?: HookSettingsInput;
+  decoderSettings?: DecoderSettingsInput;
 }
 
 // Type guard function
@@ -73,9 +79,18 @@ function normalizeMethod(input: JavaMethodDefinitionInput | string): JavaMethodD
 }
 
 // will return a JavaHook for any form of JavaHookInput
+// if not set, the default settings for the hook and their decoders are set here
 export function normalizeJavaHook(input: JavaHookInput): JavaHook {
   return {
     ...input,
     methods: input.methods.map(normalizeMethod),
+    hookSettings: {
+      ...DEFAULT_HOOK_SETTINGS,
+      ...input.hookSettings,
+    },
+    decoderSettings: {
+      ...DEFAULT_DECODER_SETTINGS,
+      ...input.decoderSettings,
+    },
   };
 }

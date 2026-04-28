@@ -1,29 +1,35 @@
 import type { FrookyConfig, HookSettings, Platform } from "frooky";
 import z from "zod";
+import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
 import type { DecoderSettings } from "../decoders/decoderSettings";
-import { decoderSettingsSchema } from "../hookFileParsing/zodSchemas/decoderSettings.zod";
 import { hookMetadataSchema } from "../hookFileParsing/zodSchemas/frookyConfig.zod";
-import { hookSettingsSchema } from "../hookFileParsing/zodSchemas/hook.zod";
+import { decoderSettingsInputSchema, hookSettingsInputSchema } from "../hookFileParsing/zodSchemas/settingsInput.zod";
 import { type HookValidatorResult, validateHooks } from "./hookValidator";
 
-export function validateHookSettings(settings: HookSettings) {
-  try {
-    hookSettingsSchema.parse(settings);
-  } catch (e) {
-    if (e instanceof z.ZodError) {
-      frooky.log.warn(`The global settings contains invalid entires. They will be ignored:\n${z.prettifyError(e)}`);
+export function validateAndNormalizeHookSettings(settings: HookSettings): HookSettings {
+  const result = hookSettingsInputSchema.safeParse(settings);
+
+  if (!result.success) {
+    for (const issue of result.error.issues) {
+      const key = issue.path[0] as keyof HookSettings;
+      (settings as Record<keyof HookSettings, unknown>)[key] = DEFAULT_HOOK_SETTINGS[key];
+      frooky.log.warn([`Hook setting "'${key}'" contains invalid data:`, z.prettifyError(result.error), `The value for '${key}' was reset to the default: ${DEFAULT_HOOK_SETTINGS[key]}`]);
     }
   }
+  return settings;
 }
 
-export function validateDecoderSettings(decoderSettings: DecoderSettings) {
-  try {
-    decoderSettingsSchema.parse(decoderSettings);
-  } catch (e) {
-    if (e instanceof z.ZodError) {
-      frooky.log.warn(`The global decoder settings contains invalid entires. They will be ignored:\n${z.prettifyError(e)}`);
+export function validateAndNormalizeDecoderSettings(settings: DecoderSettings): DecoderSettings {
+  const result = decoderSettingsInputSchema.safeParse(settings);
+
+  if (!result.success) {
+    for (const issue of result.error.issues) {
+      const key = issue.path[0] as keyof DecoderSettings;
+      (settings as Record<keyof DecoderSettings, unknown>)[key] = DEFAULT_DECODER_SETTINGS[key];
+      frooky.log.warn([`Decoder setting "'${key}'" contains invalid data:`, z.prettifyError(result.error), `The value for '${key}' was reset to the default: ${DEFAULT_DECODER_SETTINGS[key]}`]);
     }
   }
+  return settings;
 }
 
 export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platform): HookValidatorResult {
@@ -48,21 +54,22 @@ export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platf
     frooky.log.warn("This frooky configuration does not have metadata. Consider adding them for better results.");
   }
 
-  if (frookyConfig.globalSettings) {
-    // validate global settings
-    validateHookSettings(frookyConfig.globalSettings);
-    if (frookyConfig.globalSettings.decoderSettings) {
-      // validate decoder settings
-      validateDecoderSettings(frookyConfig.globalSettings.decoderSettings);
-    }
+  // validate global settings
+  if (frookyConfig.globalSettings?.hookSettings) {
+    frookyConfig.globalSettings.hookSettings = validateAndNormalizeHookSettings(frookyConfig.globalSettings.hookSettings);
+  }
+  if (frookyConfig.globalSettings?.decoderSettings) {
+    frookyConfig.globalSettings.decoderSettings = validateAndNormalizeDecoderSettings(frookyConfig.globalSettings.decoderSettings);
   }
 
   // validate hooks
   let hookValidatorResult: HookValidatorResult;
   if (frookyConfig.hooks) {
-    hookValidatorResult = validateHooks(frookyConfig.hooks, platform, frookyConfig.globalSettings, frookyConfig.metadata);
+    hookValidatorResult = validateHooks(frookyConfig.hooks, platform, frookyConfig.globalSettings?.hookSettings, frookyConfig.globalSettings?.decoderSettings);
 
-    frooky.log.info("Hook configuration validated.");
+    console.log(JSON.stringify(frookyConfig, null, 2));
+
+    frooky.log.info("Hook configuration successfully validated.");
     return hookValidatorResult;
   } else {
     throw Error("Config file does not have any hooks declared.");

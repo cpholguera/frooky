@@ -2,8 +2,8 @@
 import { z } from "zod";
 
 export const decoderSettingsSchema = z.object({
-    maxRecursion: z.number().optional(),
-    decodeLimit: z.number().optional(),
-    magicDecode: z.boolean().optional(),
-    fastDecode: z.boolean().optional()
+    maxRecursion: z.number(),
+    decodeLimit: z.number(),
+    magicDecode: z.boolean(),
+    fastDecode: z.boolean()
 });

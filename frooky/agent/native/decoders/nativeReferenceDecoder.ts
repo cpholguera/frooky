@@ -4,7 +4,7 @@ import type { NativeParam } from "../hook/nativeParam";
 import type { FundamentalType } from "./nativeDecoder";
 import { NativeFallbackDecoder } from "./nativeFallbackDecoder";
 
-const referenceDecoders: Record<FundamentalType, (input: NativePointer) => null | number | boolean | string> = {
+const referenceValueDecoders: Record<FundamentalType, (input: NativePointer) => null | number | boolean | string> = {
   void: () => null,
   bool: (input) => input.readU8() !== 0,
   char: (input) => {
@@ -42,17 +42,17 @@ const referenceDecoders: Record<FundamentalType, (input: NativePointer) => null 
 };
 
 export const NativeReferenceDecoder: BaseDecoder<NativePointer, NativeParam> = {
-  decode: (input: NativePointer, param: NativeParam): DecodedValue => {
+  decode: (value, param, settings): DecodedValue => {
     const pointeeType = param.nativeType?.pointee as FundamentalType;
-    const referenceDecoder = referenceDecoders[pointeeType];
-    if (referenceDecoder) {
+    const referenceValueDecoder = referenceValueDecoders[pointeeType];
+    if (referenceValueDecoder) {
       return {
         type: param.type,
         name: param.name,
-        value: referenceDecoder(input),
+        value: referenceValueDecoder(value),
       };
     } else {
-      return NativeFallbackDecoder.decode(input, param);
+      return NativeFallbackDecoder.decode(value, param, settings);
     }
   },
 };

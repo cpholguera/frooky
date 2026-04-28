@@ -33,7 +33,7 @@ export function decodeNativeArgs(args: NativePointer[], params: NativeParam[]): 
 
 export function buildAndDispatchEvent(nativeHookOp: NativeHookOp, decodedArgs: DecodedValue[], returnValue: DecodedValue, stackTrace: string[]): void {
   const event = new NativeHookEvent(nativeHookOp.module, nativeHookOp.symbol);
-  event.category = nativeHookOp.category;
+  event.category = nativeHookOp.metadata?.category;
   event.stackTrace = stackTrace;
   event.args = decodedArgs;
   event.returnValue = returnValue;

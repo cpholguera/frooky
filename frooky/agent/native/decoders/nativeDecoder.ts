@@ -21,11 +21,11 @@ const nativeDecoderRegistry: Record<string, BaseDecoder<NativePointer, NativePar
 };
 
 export const NativeDecoder: BaseDecoder<NativePointer, NativeParam> = {
-  decode: (input: NativePointer, nativeParam: NativeParam, quickDecode = false): DecodedValue => {
+  decode: (input, nativeParam, settings): DecodedValue => {
     // a decoder was already resolved for this Param
     const cachedDecoder = nativeParam.decoder;
     if (cachedDecoder) {
-      return cachedDecoder.decode(input, nativeParam, quickDecode);
+      return cachedDecoder.decode(input, nativeParam, settings);
     }
 
     // Resolve the decoder from the frooky parameter declaration and cache it
@@ -33,6 +33,6 @@ export const NativeDecoder: BaseDecoder<NativePointer, NativeParam> = {
     nativeParam.nativeType = normalizedNativeType;
     nativeParam.decoder = nativeDecoderRegistry[normalizedNativeType.type] ?? NativeFallbackDecoder;
 
-    return nativeParam.decoder.decode(input, nativeParam, quickDecode);
+    return nativeParam.decoder.decode(input, nativeParam, settings);
   },
 };

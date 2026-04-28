@@ -37,17 +37,17 @@ const valueDecoders: Record<FundamentalType, (input: NativePointer) => null | nu
 };
 
 export const NativeValueDecoder: BaseDecoder<NativePointer, NativeParam> = {
-  decode: (input: NativePointer, param: NativeParam): DecodedValue => {
+  decode: (value, param, settings): DecodedValue => {
     const type = param.type as FundamentalType;
     const valueDecoder = valueDecoders[type];
     if (valueDecoder) {
       return {
         type: param.type,
         name: param.name,
-        value: valueDecoder(input),
+        value: valueDecoder(value),
       };
     } else {
-      return NativeFallbackDecoder.decode(input, param);
+      return NativeFallbackDecoder.decode(value, param, settings);
     }
   },
 };

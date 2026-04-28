@@ -1,3 +1,4 @@
+import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../../shared/config";
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import { NativeDecoder } from "../decoders/nativeDecoder";
@@ -22,8 +23,10 @@ export function registerNativeHookOps(nativeHookOp: NativeHookOp) {
   Interceptor.attach(nativeHookOp.symbolAddress, {
     onEnter: function (args: NativePointer[]) {
       // collect the stack trace from Frida
-      stackTrace = nativeHookOp.settings.stackTraceLimit > 0 ? buildNativeStackTrace(this.context, nativeHookOp.settings.stackTraceLimit) : [];
-      // decode the arguments passed to the method
+      const stackTraceLimit: number = nativeHookOp.settings?.stackTraceLimit ? nativeHookOp.settings?.stackTraceLimit : DEFAULT_HOOK_SETTINGS.stackTraceLimit;
+      stackTrace = buildNativeStackTrace(this.context, stackTraceLimit);
+      // decode the arguments
+      // passed to the method
       decodedArgs = decodeNativeArgs(args, nativeHookOp.params);
     },
     onLeave: (returnValue: InvocationReturnValue) => {
@@ -46,11 +49,22 @@ function buildNativeHookOps(hook: NativeHook): NativeHookOp[] {
     const module = Process.getModuleByName(hook.module);
 
     hook.functions.forEach((fn: NativeFrookyFunctionDefinition) => {
+      if (hook.settings?.decoderSettings) {
+        fn.params?.forEach((param: NativeParam) => {
+          param.options = param.options ?? {};
+          param.options.decoderSettings = {
+            ...hook.settings?.decoderSettings,
+            ...param.options.decoderSettings,
+          };
+          // add the DEFAULT_DECODER_SETTINGS in case the setting is not yet defined
+          param.options.decoderSettings = { ...DEFAULT_DECODER_SETTINGS, ...param.options.decoderSettings };
+        });
+      }
       try {
         nativeHHookOps.push({
-          stackTraceLimit: hook.stackTraceLimit ?? DEFAULT_STACK_TRACE_LIMIT,
           module: hook.module,
           symbol: fn.symbol,
+          settings: hook.settings,
           symbolAddress: module.getExportByName(fn.symbol),
           params: fn.params ?? [],
           returnType: fn.returnType ?? { type: "void", name: undefined },

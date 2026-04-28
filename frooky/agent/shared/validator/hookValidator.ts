@@ -1,6 +1,7 @@
-import type { Hook, HookMetadata, HookSettings, Platform } from "frooky";
+import type { Hook, HookSettings, Platform } from "frooky";
 import { z } from "zod";
-import { DEFAULT_HOOK_SETTINGS } from "../config";
+import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
+import type { DecoderSettings } from "../decoders/decoderSettings";
 import { isJavaHook, type JavaHookInput, normalizeJavaHook } from "../hookFileParsing/javaHookInput";
 import { isNativeHook, type NativeHookInput, normalizeNativeHook } from "../hookFileParsing/nativeHookInput";
 import { isObjcHook, normalizeObjcHook, type ObjcHookInput } from "../hookFileParsing/objcHookInput";
@@ -16,7 +17,7 @@ export interface HookValidatorResult {
   totalErrors: number;
 }
 
-export function validateHooks(hooks: Hook[], platform: Platform, globalSettings?: HookSettings, metadata?: HookMetadata): HookValidatorResult {
+export function validateHooks(hooks: Hook[], platform: Platform, globalHooksSettings?: HookSettings, globalDecoderSettings?: DecoderSettings): HookValidatorResult {
   const result: HookValidatorResult = {
     validHooks: [],
     invalidHooks: [],
@@ -27,14 +28,13 @@ export function validateHooks(hooks: Hook[], platform: Platform, globalSettings?
   hooks.forEach((hook) => {
     result.totalHooks += 1;
 
-    // Merge config metadata into hook metadata
-    if (metadata) {
-      hook.metadata = { ...metadata, ...hook.metadata };
+    // Merge global hooks settings into hook setting
+    if (globalHooksSettings) {
+      hook.hookSettings = { ...DEFAULT_HOOK_SETTINGS, ...globalHooksSettings, ...hook.hookSettings };
     }
-
-    // Merge global settings into hook setting
-    if (globalSettings) {
-      hook.settings = { ...DEFAULT_HOOK_SETTINGS, ...globalSettings, ...hook.settings };
+    // Merge global decoder settings into hook setting
+    if (globalDecoderSettings) {
+      hook.decoderSettings = { ...DEFAULT_DECODER_SETTINGS, ...globalDecoderSettings, ...hook.decoderSettings };
     }
 
     try {

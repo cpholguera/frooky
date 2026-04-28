@@ -1,5 +1,4 @@
 import type { DecoderSettings } from "../decoders/decoderSettings";
-import type { HookMetadata } from "../frookyConfig";
 
 /**
  * Metadata that describes a hook collection.
@@ -10,17 +9,17 @@ export interface HookSettings {
   /**
    * Sets stackTraceLimit to the given value for all hooks.
    */
-  stackTraceLimit?: number;
+  stackTraceLimit: number;
 
   /**
    * Stack trace filters to apply.
    */
-  eventFilter?: string[];
+  eventFilter: string[];
 
   /**
-   * Decoder specific settings.
+   * Timeout in seconds frooky will try to hook in case something the target library is not available.
    */
-  decoderSettings?: DecoderSettings;
+  hookTimeout: number;
 }
 
 /**
@@ -47,14 +46,11 @@ export type MethodName = string;
  */
 export interface Hook {
   /**
-   * Optional metadata for this hook. If provided, these values will be merged with the metadata defined in the frooky configuration during hook loading, and will take priority on conflict.
-   *
-   * @example The `description` field in the frooky config will be overwritten if this metadata also defines one.
+   * Hook settings applied to all its hooks and their decoders
    */
-  metadata?: HookMetadata;
-
+  hookSettings: HookSettings;
   /**
-   * Settings applied to this hook
+   * Decoder settings applied to all its hooks and their decoders
    */
-  settings?: HookSettings;
+  decoderSettings: DecoderSettings;
 }

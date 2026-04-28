@@ -4,6 +4,7 @@ import { z } from "zod";
 import { objcHookSchema } from "./objcHook.zod";
 import { methodNameSchema, returnTypeSchema } from "./hook.zod";
 import { paramInputSchema } from "./param.input.zod";
+import { decoderSettingsInputSchema, hookSettingsInputSchema } from "./settingsInput.zod";
 
 export const objcMethodDefinitionInputSchema = z.object({
     name: methodNameSchema,
@@ -13,7 +14,9 @@ export const objcMethodDefinitionInputSchema = z.object({
 
 export const objcMethodInputSchema = z.union([methodNameSchema, objcMethodDefinitionInputSchema]);
 
-export const objcHookInputSchema = objcHookSchema.omit({ "methods": true }).extend({
+export const objcHookInputSchema = objcHookSchema.omit({ "methods": true, "hookSettings": true, "decoderSettings": true }).extend({
     type: z.literal("objc"),
-    methods: z.array(objcMethodInputSchema)
+    methods: z.array(objcMethodInputSchema),
+    hookSettings: hookSettingsInputSchema.optional(),
+    decoderSettings: decoderSettingsInputSchema.optional()
 });

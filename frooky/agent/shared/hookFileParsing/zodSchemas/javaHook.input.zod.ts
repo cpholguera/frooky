@@ -4,6 +4,7 @@ import { z } from "zod";
 import { javaHookSchema, javaMethodDefinitionSchema, javaOverloadSchema } from "./javaHook.zod";
 import { methodNameSchema } from "./hook.zod";
 import { paramInputSchema } from "./param.input.zod";
+import { decoderSettingsInputSchema, hookSettingsInputSchema } from "./settingsInput.zod";
 
 export const javaOverloadInputSchema = javaOverloadSchema.omit({ "params": true }).extend({
     params: z.array(paramInputSchema)
@@ -15,7 +16,9 @@ export const javaMethodDefinitionInputSchema = javaMethodDefinitionSchema.omit({
 
 export const javaMethodInputSchema = z.union([methodNameSchema, javaMethodDefinitionInputSchema]);
 
-export const javaHookInputSchema = javaHookSchema.omit({ "methods": true }).extend({
+export const javaHookInputSchema = javaHookSchema.omit({ "methods": true, "hookSettings": true, "decoderSettings": true }).extend({
     type: z.literal("java"),
-    methods: z.array(javaMethodInputSchema)
+    methods: z.array(javaMethodInputSchema),
+    hookSettings: hookSettingsInputSchema.optional(),
+    decoderSettings: decoderSettingsInputSchema.optional()
 });

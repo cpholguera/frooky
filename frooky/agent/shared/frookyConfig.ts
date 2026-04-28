@@ -1,4 +1,5 @@
 import type { Hook, HookSettings } from "frooky";
+import type { DecoderSettings } from "./decoders/decoderSettings";
 
 /**
  * Target platform for hooks.
@@ -56,7 +57,10 @@ export interface FrookyConfig {
   /**
    * Settings applied to all hooks in this frooky config
    */
-  globalSettings?: HookSettings;
+  globalSettings?: {
+    hookSettings?: HookSettings;
+    decoderSettings?: DecoderSettings;
+  };
 
   /**
    * Collection of hooks.

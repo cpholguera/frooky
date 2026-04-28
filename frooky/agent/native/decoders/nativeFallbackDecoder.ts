@@ -3,11 +3,11 @@ import type { DecodedValue } from "../../shared/decoders/decodedValue";
 import type { NativeParam } from "../hook/nativeParam";
 
 export const NativeFallbackDecoder: BaseDecoder<NativePointer, NativeParam> = {
-  decode: (input: NativePointer, param: NativeParam): DecodedValue => {
+  decode: (value, param): DecodedValue => {
     return {
       type: param.type,
       name: param.name,
-      value: input.toString(),
+      value: value.toString(),
     };
   },
 };

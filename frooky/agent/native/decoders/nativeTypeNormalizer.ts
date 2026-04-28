@@ -139,9 +139,9 @@ function createPointerType(normalizedType: string): NativeType {
   };
 }
 
-export function normalizeNativeType(nativeParam: NativeParam): NativeType {
+export function normalizeNativeType(param: NativeParam): NativeType {
   // basic normalization
-  const normalizedNativeType = nativeParam.type
+  const normalizedNativeType = param.type
     .trim()
     .toLowerCase()
     .replace(/\s*\*\s*/g, "*") // remove spaces around *

@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { nativeFrookyFunctionDefinitionSchema, nativeHookSchema, symbolNameSchema } from "./nativeHook.internal.zod";
 import { paramInputSchema } from "./param.input.zod";
+import { decoderSettingsInputSchema, hookSettingsInputSchema } from "./settingsInput.zod";
 
 export const nativeFunctionDefinitionInputSchema = nativeFrookyFunctionDefinitionSchema.omit({ "params": true }).extend({
     params: z.array(paramInputSchema).optional()
@@ -10,7 +11,9 @@ export const nativeFunctionDefinitionInputSchema = nativeFrookyFunctionDefinitio
 
 export const nativeFrookyFunctionSchema = z.union([symbolNameSchema, nativeFunctionDefinitionInputSchema]);
 
-export const nativeHookInputSchema = nativeHookSchema.omit({ "functions": true }).extend({
+export const nativeHookInputSchema = nativeHookSchema.omit({ "functions": true, "hookSettings": true, "decoderSettings": true }).extend({
     type: z.literal("native"),
-    functions: z.array(nativeFrookyFunctionSchema)
+    functions: z.array(nativeFrookyFunctionSchema),
+    hookSettings: hookSettingsInputSchema.optional(),
+    decoderSettings: decoderSettingsInputSchema.optional()
 });
