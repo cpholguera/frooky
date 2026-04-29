@@ -43,7 +43,7 @@ metadata:
 
       3. Parameter Settings
 
-        Parameter settings define when a parameter is decoded (`decodeAt`), as well as the settings defined in `DecoderSettings`
+        Parameter settings (`ParamSettings`) define when a parameter is decoded (`decodeAt`), as well as the settings defined in `DecoderSettings`.
 
         Example: 
         
@@ -62,7 +62,6 @@ metadata:
         Example: 
         
         ```
-        decodeAt: exit
         fastDecode: true
         magicDecode: true 
         maxRecursion: 5
@@ -75,9 +74,9 @@ metadata:
 # global settings for the hooks in this hook file.
 globalSettings:
   hookSettings:
-    hookTimeout:     1                # Timeout in seconds frooky will try to hook in case something the target library is not available.
+    hookTimeout: 1                    # Timeout in seconds frooky will try to hook in case something the target library is not available.
     stackTraceLimit: 11               # Sets stackTraceLimit to 10 for all hooks
-    eventFilter: ['^libmyapp\.so']   # Stack trace filters to apply.
+    eventFilter: ['^libmyapp\.so']    # Stack trace filters to apply.
   decoderSettings:
     fastDecode: true                  # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
     magicDecode: true                 # If set, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime

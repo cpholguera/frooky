@@ -4,10 +4,10 @@ import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
 import type { DecoderSettings } from "../decoders/decoderSettings";
 import { type HookValidatorResult, validateHooks } from "./hookValidator";
 import { hookMetadataSchema } from "../hookFileParsing/zodSchemas/frookyConfig.zod";
-import { hookSettingsInputSchema, decoderSettingsInputSchema } from "../hookFileParsing/zodSchemas/settingsInput.zod";
+import { hookSettingsInputSchema, decoderSettingsInputSchema, paramSettingsSchema } from "../hookFileParsing/zodSchemas/settingsInput.zod";
 
-
-export function validateAndNormalizeParamSettings(settings: HookSettings): HookSettings {
+// validates hook settings and replaces invalid settings with valid default values
+export function validateAndRepairHookSettings(settings: HookSettings): HookSettings {
   const result = hookSettingsInputSchema.safeParse(settings);
 
   if (!result.success) {
@@ -21,21 +21,8 @@ export function validateAndNormalizeParamSettings(settings: HookSettings): HookS
 }
 
 
-export function validateAndNormalizeHookSettings(settings: HookSettings): HookSettings {
-  const result = hookSettingsInputSchema.safeParse(settings);
-
-  if (!result.success) {
-    for (const issue of result.error.issues) {
-      const key = issue.path[0] as keyof HookSettings;
-      (settings as Record<keyof HookSettings, unknown>)[key] = DEFAULT_HOOK_SETTINGS[key];
-      frooky.log.warn([`Hook setting "'${key}'" contains invalid data:`, z.prettifyError(result.error), `The value for '${key}' was reset to the default: ${DEFAULT_HOOK_SETTINGS[key]}`]);
-    }
-  }
-  return settings;
-}
-
-
-export function validateAndNormalizeDecoderSettings(settings: DecoderSettings): DecoderSettings {
+// validates decoder settings and replaces invalid settings with valid default values
+export function validateAndRepairDecoderSettings(settings: DecoderSettings): DecoderSettings {
   const result = decoderSettingsInputSchema.safeParse(settings);
 
   if (!result.success) {
@@ -74,14 +61,16 @@ export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platf
     frooky.log.warn("This frooky configuration does not have metadata. Consider adding them for better results.");
   }
 
-  // validate global hook settings and set to default it not set
+  // validate global hook settings and set to default value, if invalid value (e.g. string instead of int)
   if (frookyConfig.globalSettings?.hookSettings) {
-    frookyConfig.globalSettings.hookSettings = validateAndNormalizeHookSettings(frookyConfig.globalSettings.hookSettings);
+    frookyConfig.globalSettings.hookSettings = validateAndRepairHookSettings(frookyConfig.globalSettings.hookSettings);
   }
   // validate global decoder settings and set to default it not set
   if (frookyConfig.globalSettings?.decoderSettings) {
-    frookyConfig.globalSettings.decoderSettings = validateAndNormalizeDecoderSettings(frookyConfig.globalSettings.decoderSettings);
+    frookyConfig.globalSettings.decoderSettings = validateAndRepairDecoderSettings(frookyConfig.globalSettings.decoderSettings);
   }
+
+  // validate hook config and decoder settings and set to default it not set
 
   // validate hooks
   let hookValidatorResult: HookValidatorResult;

@@ -1,7 +1,7 @@
 import type { NativeFrookyFunction, NativeHook } from "../../native/hook/nativeHook";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
 import { DecoderSettings } from "../decoders/decoderSettings";
-import type { Hook } from "../hook/hook";
+import type { Hook, HookSettings } from "../hook/hook";
 import { normalizeParamType, normalizeReturnType, ParamInput, RetTypeInput } from "./decodableTypesInput";
 import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
 
@@ -62,11 +62,12 @@ function normalizeFunction(fn: NativeFrookyFunctionInput, decoderSettings: Decod
  */
 export function normalizeNativeHook(inputHook: NativeHookInput): NativeHook {
   const mergedDecoderSettings: DecoderSettings = { ...DEFAULT_DECODER_SETTINGS, ...inputHook.decoderSettings };
+  const mergedHookSettings: HookSettings = { ...DEFAULT_HOOK_SETTINGS, ...inputHook.hookSettings };
 
   return {
     ...inputHook,
     functions: inputHook.functions.map((fn: NativeFrookyFunctionInput) => normalizeFunction(fn, mergedDecoderSettings)),
-    hookSettings: { ...DEFAULT_HOOK_SETTINGS, ...inputHook.hookSettings },
+    hookSettings: mergedHookSettings,
     decoderSettings: mergedDecoderSettings,
   };
 }

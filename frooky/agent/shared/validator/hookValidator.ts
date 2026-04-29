@@ -6,9 +6,9 @@ import { isJavaHook, type JavaHookInput, normalizeJavaHook } from "../hookFilePa
 import { isNativeHook, type NativeHookInput, normalizeNativeHook } from "../hookFileParsing/nativeHookInput";
 import { isObjcHook, normalizeObjcHook, type ObjcHookInput } from "../hookFileParsing/objcHookInput";
 import { prettyPrintHook } from "../utils";
-import { javaHookInputSchema } from "../hookFileParsing/zodSchemas/javaHookInput.zod";
-import { nativeHookInputSchema } from "../hookFileParsing/zodSchemas/nativeHookInputInput.zod";
-import { objcHookInputSchema } from "../hookFileParsing/zodSchemas/objcHookInput.zod";
+import { nativeHookSchema } from "../hookFileParsing/zodSchemas/nativeHook.zod";
+import { objcHookSchema } from "../hookFileParsing/zodSchemas/objcHook.zod";
+import { javaHookSchema } from "../hookFileParsing/zodSchemas/javaHook.zod";
 
 export interface HookValidatorResult {
   validHooks: Hook[];
@@ -48,8 +48,8 @@ export function validateHooks(hooks: Hook[], platform: Platform, globalHooksSett
         }
         const javaHookInput = hook as JavaHookInput;
         javaHookInput.type = "java";
-        javaHookInputSchema.parse(javaHookInput);
         const javaHook = normalizeJavaHook(javaHookInput);
+        javaHookSchema.parse(javaHook);
         result.validHooks.push(javaHook);
       } else if (isObjcHook(hook)) {
         if (platform !== "iOS") {
@@ -57,14 +57,16 @@ export function validateHooks(hooks: Hook[], platform: Platform, globalHooksSett
         }
         const objcHookInput = hook as ObjcHookInput;
         objcHookInput.type = "objc";
-        objcHookInputSchema.parse(objcHookInput);
         const objcHook = normalizeObjcHook(objcHookInput);
+        objcHookSchema.parse(objcHook);
         result.validHooks.push(objcHook);
       } else if (isNativeHook(hook)) {
         const nativeHookInput = hook as NativeHookInput;
         nativeHookInput.type = "native";
-        nativeHookInputSchema.parse(nativeHookInput);
         const nativeHook = normalizeNativeHook(nativeHookInput);
+        nativeHookSchema.parse(nativeHook);
+
+        console.log(JSON.stringify(nativeHook, null, 2))
         result.validHooks.push(nativeHook);
       } else {
         throw new Error("Hook type is unknown. Make sure that it is either a Java, Objective-C or native hook.");

@@ -7,3 +7,9 @@ import { hookSettingsSchema } from "./hook.zod";
 export const hookSettingsInputSchema = hookSettingsSchema.partial();
 
 export const decoderSettingsInputSchema = decoderSettingsSchema.partial();
+
+const decodeAtSchema = z.any();
+
+export const paramSettingsSchema = decoderSettingsSchema.partial().and(z.object({
+    decodeAt: decodeAtSchema.optional()
+}));

@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:zodSchema": "npx ts-to-zod --all",
+    "build:zodSchema": "npx ts-to-zod --all && pretty-quick",
 
     "prod-android": "npm run build:zodSchema && node build.js -p android -c --type-check none",
     "prod-ios": "npm run build:zodSchema && node build.js -p ios -c --type-check none",

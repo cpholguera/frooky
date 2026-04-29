@@ -18,21 +18,6 @@ export default [
         "output": "shared/hookFileParsing/zodSchemas/decodableTypesInput.zod.ts"
     },
     {
-        "name": "javaHook_yaml_input_parsing",
-        "input": "shared/hookFileParsing/javaHookInput.ts",
-        "output": "shared/hookFileParsing/zodSchemas/javaHookInput.zod.ts"
-    },
-    {
-        "name": "objcHook_yaml_input_parsing",
-        "input": "shared/hookFileParsing/objcHookInput.ts",
-        "output": "shared/hookFileParsing/zodSchemas/objcHookInput.zod.ts"
-    },
-    {
-        "name": "nativeHook_yaml_input_parsing",
-        "input": "shared/hookFileParsing/nativeHookInput.ts",
-        "output": "shared/hookFileParsing/zodSchemas/nativeHookInputInput.zod.ts"
-    },
-    {
         "name": "settings_yaml_input_parsing",
         "input": "shared/hookFileParsing/settingsInput.ts",
         "output": "shared/hookFileParsing/zodSchemas/settingsInput.zod.ts"
@@ -61,7 +46,7 @@ export default [
     {
         "name": "nativeHook",
         "input": "native/hook/nativeHook.ts",
-        "output": "shared/hookFileParsing/zodSchemas/nativeHook.internal.zod.ts"
+        "output": "shared/hookFileParsing/zodSchemas/nativeHook.zod.ts"
     },
 
     {
