@@ -6,6 +6,21 @@ import { type HookValidatorResult, validateHooks } from "./hookValidator";
 import { hookMetadataSchema } from "../hookFileParsing/zodSchemas/frookyConfig.zod";
 import { hookSettingsInputSchema, decoderSettingsInputSchema } from "../hookFileParsing/zodSchemas/settingsInput.zod";
 
+
+export function validateAndNormalizeParamSettings(settings: HookSettings): HookSettings {
+  const result = hookSettingsInputSchema.safeParse(settings);
+
+  if (!result.success) {
+    for (const issue of result.error.issues) {
+      const key = issue.path[0] as keyof HookSettings;
+      (settings as Record<keyof HookSettings, unknown>)[key] = DEFAULT_HOOK_SETTINGS[key];
+      frooky.log.warn([`Hook setting "'${key}'" contains invalid data:`, z.prettifyError(result.error), `The value for '${key}' was reset to the default: ${DEFAULT_HOOK_SETTINGS[key]}`]);
+    }
+  }
+  return settings;
+}
+
+
 export function validateAndNormalizeHookSettings(settings: HookSettings): HookSettings {
   const result = hookSettingsInputSchema.safeParse(settings);
 
@@ -72,7 +87,7 @@ export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platf
   let hookValidatorResult: HookValidatorResult;
   if (frookyConfig.hooks) {
     hookValidatorResult = validateHooks(frookyConfig.hooks, platform, frookyConfig.globalSettings?.hookSettings, frookyConfig.globalSettings?.decoderSettings);
-    
+
     frooky.log.info("Hook configuration successfully validated.");
     return hookValidatorResult;
   } else {
