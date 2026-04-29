@@ -6,7 +6,6 @@
   "type": "module",
   "scripts": {
     "build:zodSchema": "npx ts-to-zod --all && pretty-quick",
-
     "prod-android": "npm run build:zodSchema && node build.js -p android -c --type-check none",
     "prod-ios": "npm run build:zodSchema && node build.js -p ios -c --type-check none",
     "dev-android": "node build.js -p android --type-check none",
@@ -16,17 +15,20 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
+    "@eslint/js": "^10.0.1",
     "@types/frida-gum": "^19.0.1",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.10.9",
     "js-yaml": "^4.1.1",
     "chokidar": "^5.0.0",
+    "eslint": "^10.2.1",
     "frida-compile": "^19.0.4",
     "frida-java-bridge": "^7.0.11",
     "frida-objc-bridge": "^8.0.5",
     "frida-swift-bridge": "^3.0.2",
     "minimist": "^1.2.8",
-    "ts-to-zod": "^5.1.0"
+    "ts-to-zod": "^5.1.0",
+    "typescript-eslint": "^8.59.1"
   },
   "overrides": {
     "@isaacs/brace-expansion": "^5.0.1"

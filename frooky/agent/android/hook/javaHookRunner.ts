@@ -1,4 +1,5 @@
 import Java from "frida-java-bridge";
+import { JavaMethodDefinition } from "../../build/hook/javaHook";
 import { DEFAULT_HOOK_SETTINGS } from "../../shared/config";
 import type { Param } from "../../shared/decoders/decodableTypes";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";

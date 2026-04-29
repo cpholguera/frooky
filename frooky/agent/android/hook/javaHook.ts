@@ -1,6 +1,6 @@
-import { Param, type RetType } from "../../shared/decoders/decodableTypes";
+import { type RetType } from "../../shared/decoders/decodableTypes";
 import type { DecoderSettings } from "../../shared/decoders/decoderSettings";
-import type { Hook, MethodName } from "../../shared/hook/hook";
+import type { Hook } from "../../shared/hook/hook";
 import type { JavaParam } from "./javaParam";
 
 /**

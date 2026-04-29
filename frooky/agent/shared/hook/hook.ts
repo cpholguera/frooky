@@ -1,6 +1,5 @@
 import type { DecoderSettings } from "../decoders/decoderSettings";
 
-
 /**
  * Metadata that describes a hook collection.
  *

@@ -1,7 +1,8 @@
 {
   "recommendations": [
-    "biomejs.biome",
     "charliermarsh.ruff",
-    "DavidAnson.vscode-markdownlint"
+    "DavidAnson.vscode-markdownlint",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint"
   ]
 }

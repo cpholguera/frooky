@@ -1,11 +1,10 @@
 {
-  "biome.lsp.bin": "./frooky/agent/node_modules/.bin/biome",
   "[typescript]": {
-    "editor.defaultFormatter": "biomejs.biome",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
   "[json]": {
-    "editor.defaultFormatter": "biomejs.biome",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
   "[markdown]": {
@@ -29,11 +28,10 @@
     "editor.formatOnSave": true
   },
   "editor.codeActionsOnSave": {
-    "source.fixAll.biome": "explicit",
-    "source.organizeImports.biome": "explicit"
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
   },
-  "biome.enabled": true, 
-  "biome.configurationPath": "./biome.json",
+  "eslint.validate": ["typescript", "javascript"],
   "kotlin.diagnostics.enabled": false,
   "C_Cpp.errorSquiggles": "disabled",
   "cSpell.words": [
