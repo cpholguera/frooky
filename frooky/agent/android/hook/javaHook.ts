@@ -1,4 +1,5 @@
 import { Param, RetType } from "../../shared/decoders/decodableTypes";
+import { DecoderSettings } from "../../shared/decoders/decoderSettings";
 import type { Hook, MethodName } from "../../shared/hook/hook";
 import { JavaParam } from "./javaParam";
 
@@ -20,18 +21,12 @@ export interface JavaOverload {
  *
  * @public
  */
-export interface JavaMethodDefinition {
-  name: MethodName;
-  returnType?: RetType;
+export interface JavaMethod {
+  name: string;
+  retType?: RetType;
   overloads?: JavaOverload[];
+  decoderSettings: DecoderSettings
 }
-
-/**
- * Java method selector
- *
- * @public
- */
-export type JavaMethod = JavaMethodDefinition;
 
 /**
  * Native hook configuration.

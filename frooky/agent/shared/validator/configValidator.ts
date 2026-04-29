@@ -72,7 +72,7 @@ export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platf
   let hookValidatorResult: HookValidatorResult;
   if (frookyConfig.hooks) {
     hookValidatorResult = validateHooks(frookyConfig.hooks, platform, frookyConfig.globalSettings?.hookSettings, frookyConfig.globalSettings?.decoderSettings);
-
+    
     frooky.log.info("Hook configuration successfully validated.");
     return hookValidatorResult;
   } else {

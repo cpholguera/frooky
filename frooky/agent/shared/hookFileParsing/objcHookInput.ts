@@ -1,26 +1,15 @@
-import type { ObjcHook, ObjcMethodDefinition } from "../../ios/hook/objcHook";
+import type { ObjcHook, ObjcMethod } from "../../ios/hook/objcHook";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
 import { Hook } from "../hook/hook";
-import { normalizeParamType, normalizeReturnType, ParamInput, ReturnTypeInput } from "./decodableTypesInput";
+import { normalizeParamType, normalizeReturnType, ParamInput, RetTypeInput } from "./decodableTypesInput";
 import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
-
-/**
- * Expanded Objective-C method definition with name and optional overloads.
- *
- * @public
- */
-export interface ObjcMethodDefinitionInput {
-  name: string;
-  returnType?: ReturnTypeInput;
-  params?: ParamInput[];
-}
 
 /**
  * Objc method selector — either a simple method name or a detailed definition.
  *
  * @public
  */
-export type ObjcMethodInput = string | ObjcMethodDefinitionInput;
+export type ObjcMethodInput = string | ObjcMethod
 
 /**
  * Native hook configuration.
@@ -53,7 +42,7 @@ function normalizeObjcMethod(input: ObjcMethodInput): ObjcMethodDefinition {
   return {
     ...input,
     params: input.params?.map(normalizeParamType),
-    returnType: input.returnType ? normalizeReturnType(input.returnType) : undefined,
+    retType: input.retType ? normalizeReturnType(input.retType) : undefined,
   };
 }
 

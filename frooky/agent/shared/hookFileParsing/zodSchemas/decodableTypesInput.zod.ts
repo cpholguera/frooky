@@ -3,14 +3,14 @@ import { z } from "zod";
 
 import { decoderSettingsSchema } from "./decoderSettings.zod";
 
-export const returnTypeInputSchema = z.union([z.string(), z.tuple([z.string(), decoderSettingsSchema.partial()])]);
+export const retTypeInputSchema = z.union([z.string(), z.tuple([z.string(), decoderSettingsSchema.partial()])]);
 
 const decodeAtSchema = z.any();
 
 const paramSchema = z.any();
 
-const paramOptionsSchema = decoderSettingsSchema.and(z.object({
-    decodeAt: decodeAtSchema
+const paramOptionsSchema = decoderSettingsSchema.partial().and(z.object({
+    decodeAt: decodeAtSchema.optional()
 }));
 
-export const paramInputSchema = z.union([z.string(), z.tuple([z.string(), paramOptionsSchema.partial()]), z.tuple([z.string(), z.string()]), z.tuple([paramSchema, z.string(), paramOptionsSchema.partial()]), paramSchema]);
+export const paramInputSchema = z.union([z.string(), z.tuple([z.string(), paramOptionsSchema]), z.tuple([z.string(), z.string()]), z.tuple([paramSchema, z.string(), paramOptionsSchema]), paramSchema]);

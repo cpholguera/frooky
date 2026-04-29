@@ -64,7 +64,12 @@ export function validateHooks(hooks: Hook[], platform: Platform, globalHooksSett
         const nativeHookInput = hook as NativeHookInput;
         nativeHookInput.type = "native";
         nativeHookInputSchema.parse(nativeHookInput);
+        console.log("BEFORE NATIVE HOOKaa")
+        console.log(JSON.stringify(nativeHookInput, null, 2))
+
         const nativeHook = normalizeNativeHook(nativeHookInput);
+        console.log("NORMALIZED NATIVE HOOK")
+        console.log(JSON.stringify(nativeHook, null, 2))
         result.validHooks.push(nativeHook);
       } else {
         throw new Error("Hook type is unknown. Make sure that it is either a Java, Objective-C or native hook.");

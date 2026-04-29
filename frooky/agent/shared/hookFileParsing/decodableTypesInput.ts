@@ -1,100 +1,114 @@
 import { DEFAULT_DECODE_AT, DEFAULT_DECODER_SETTINGS } from "../config";
 import { DecodeAt, Param, RetType } from "../decoders/decodableTypes";
 import type { DecoderSettings } from "../decoders/decoderSettings";
+import { validateAndNormalizeDecoderSettings } from "../validator/configValidator";
 
 
-type ParamOptions = DecoderSettings & {
-  decodeAt: DecodeAt
+type ParamOptions = Partial<DecoderSettings> & {
+  decodeAt?: DecodeAt
 }
 
 /**
  * Flexible input format for defining a parameter in YAML configuration.
  *
- * Accepts any of the following forms:
-
- * | Form                  | Type                             | Example                                                          |
- * |-----------------------|----------------------------------|------------------------------------------------------------------|
- * | Type only             | `string`                         | `"java.lang.String"`                                             |
- * | Structured object     | `ParamType`                      | `{ type: "java.lang.String", name: "value", decodeAt: "exit"  }` |
- * | Type + name           | `[string, string]`               | `["java.lang.String", "value"]`                                  |
- * | Type + options        | `[string, ParamOptions]`         | `["java.lang.String", { decodeAt: "exit" }]`                     |
- * | Type + name + options | `[string, string, ParamOptions]` | `["java.lang.String", "value", { decodeAt: "exit" }]`            |
+ * | Case | Form                  | Type                             | Example                                                           |
+ * |------|-----------------------|----------------------------------|-------------------------------------------------------------------|
+ * | 1    | Type only             | `string`                         | `"java.lang.String"`                                              |
+ * | 2    | Structured object     | `Param`                          | `{ type: "java.lang.String", name: "value", decodeAt: "exit" }`   |
+ * | 3    | Type + name           | `[string, string]`               | `["java.lang.String", "value"]`                                   |
+ * | 4    | Type + options        | `[string, ParamOptions]`         | `["java.lang.String", { decodeAt: "exit" }]`                      |
+ * | 5    | Type + name + options | `[string, string, ParamOptions]` | `["java.lang.String", "value", { decodeAt: "exit" }]`             |
  *
  * @public
  */
-export type ParamInput = string | [string, Partial<ParamOptions>] | [string, string] | [Param, string, Partial<ParamOptions>] | Param;
+export type ParamInput =
+  | string
+  | Param
+  | [string, string]
+  | [string, ParamOptions]
+  | [string, string, ParamOptions];
 
-// returns a normalized ParamType from any type of ParamInput
-export function normalizeParamType(paramTypeInput: ParamInput): Param {
+type ParamInputCase = "string" | "object" | "type+name" | "type+options" | "type+name+options";
 
-  // case 1: paramInput is a string
-  if (typeof paramTypeInput === "string") {
-    return { type: paramTypeInput, decodeAt: DEFAULT_DECODE_AT, settings: DEFAULT_DECODER_SETTINGS };
-  }
-
-  // case 2: paramInput is a non-array object
-  if (!Array.isArray(paramTypeInput)) {
-    return {
-      ...paramTypeInput,
-      decodeAt: paramTypeInput.decodeAt ?? DEFAULT_DECODE_AT,
-      settings: paramTypeInput.settings ?? DEFAULT_DECODER_SETTINGS,
-    };
-  }
-
-  // case 3: paramInput is an array
-  const [first, second, third] = paramTypeInput;
-
-  // case 3.1: [string, string] -> type + name
-  if (typeof second === "string") {
-    return { type: first as string, name: second, decodeAt: DEFAULT_DECODE_AT, settings: DEFAULT_DECODER_SETTINGS };
-  }
-
-  // case 3.2: [string, ParamOptions] -> type + options
-  if (third === undefined) {
-    const options = second as Partial<ParamOptions>;
-    return {
-      type: first as string,
-      decodeAt: options.decodeAt ?? DEFAULT_DECODE_AT,
-      settings: { ...DEFAULT_DECODER_SETTINGS, ...options },
-    };
-  }
-
-  // case 3.3: [string, string, ParamOptions] -> type + name + options
-  const options = third as Partial<ParamOptions>;
-  return {
-    type: first as string,
-    name: second as string,
-    decodeAt: options.decodeAt ?? DEFAULT_DECODE_AT,
-    settings: { ...DEFAULT_DECODER_SETTINGS, ...options },
-  };
+function resolveParamCase(input: ParamInput): ParamInputCase {
+  if (typeof input === "string")                                                     return "string";
+  if (!Array.isArray(input))                                                         return "object";
+  if (input.length === 2 && typeof input[1] === "string")                            return "type+name";
+  if (input.length === 3)                                                            return "type+name+options";
+  if (input.length === 2 && typeof input[1] === "object")                            return "type+options";
+  throw new Error(`Unrecognized ParamInput format: ${JSON.stringify(input)}`);
 }
+
+export function normalizeParamType(input: ParamInput, decoderSettings?: DecoderSettings): Param {
+  const baseSettings = decoderSettings
+    ? { ...DEFAULT_DECODER_SETTINGS, ...decoderSettings }
+    : DEFAULT_DECODER_SETTINGS;
+
+  switch (resolveParamCase(input)) {
+    case "string": {
+      return { type: input as string, decodeAt: DEFAULT_DECODE_AT, settings: baseSettings };
+    }
+
+    case "object": {
+      const param = input as Param;
+      validateAndNormalizeDecoderSettings(param.settings);
+      return { ...param, decodeAt: param.decodeAt ?? DEFAULT_DECODE_AT, settings: baseSettings };
+    }
+
+    case "type+name": {
+      const [type, name] = input as [string, string];
+      return { type, name, decodeAt: DEFAULT_DECODE_AT, settings: baseSettings };
+    }
+
+    case "type+options": {
+      const [type, options] = input as [string, ParamOptions];
+      const { decodeAt, ...inlineSettings } = options;
+      return { type, decodeAt: decodeAt ?? DEFAULT_DECODE_AT, settings: { ...baseSettings, ...inlineSettings } };
+    }
+
+    case "type+name+options": {
+      const [type, name, options] = input as [string, string, ParamOptions];
+      const { decodeAt, ...inlineSettings } = options;
+      return { type, name, decodeAt: decodeAt ?? DEFAULT_DECODE_AT, settings: { ...baseSettings, ...inlineSettings } };
+    }
+  }
+}
+
+
 
 /**
  * Flexible input format for defining a return type in YAML configuration.
  *
- * Accepts any of the following forms:
-
- * | Form                    | Type                         | Example                                                                           |
- * |-------------------------|------------------------------|-----------------------------------------------------------------------------------|
- * | Type                    | `string`                     | `{ type: "android.database.sqlite.SQLiteCursor", settings: { maxRecursion: 5 } }` |
- * | Type + decoder settings | `[string, DecoderSettings]`  | `["android.database.sqlite.SQLiteCursor", { maxRecursion: 5 }]`                   |
+ * | Case | Form                    | Type                        | Example                                                                            |
+ * |------|-------------------------|-----------------------------|------------------------------------------------------------------------------------|
+ * | 1    | Type only               | `string`                    | `"android.database.sqlite.SQLiteCursor"`                                           |
+ * | 2    | Type + decoder settings | `[string, DecoderSettings]` | `["android.database.sqlite.SQLiteCursor", { maxRecursion: 5 }]`                    |
  *
  * @public
  */
-export type ReturnTypeInput = string | [string, Partial<DecoderSettings>];
+export type RetTypeInput = string | [string, Partial<DecoderSettings>];
 
-// returns a normalized ReturnType from any type of ParamInput
-export function normalizeReturnType(returnTypeInput: ReturnTypeInput): RetType {
+type RetTypeInputCase = "string" | "type+settings";
 
-  // case 1: string -> type only
-  if (typeof returnTypeInput === "string") {
-    return { type: returnTypeInput, settings: DEFAULT_DECODER_SETTINGS };
+function resolveRetTypeCase(input: RetTypeInput): RetTypeInputCase {
+  if (typeof input === "string") return "string";
+  if (Array.isArray(input))     return "type+settings";
+  throw new Error(`Unrecognized RetTypeInput format: ${JSON.stringify(input)}`);
+}
+
+export function normalizeReturnType(input: RetTypeInput, decoderSettings?: DecoderSettings): RetType {
+  const baseSettings = decoderSettings
+    ? { ...DEFAULT_DECODER_SETTINGS, ...decoderSettings }
+    : DEFAULT_DECODER_SETTINGS;
+
+  switch (resolveRetTypeCase(input)) {
+    case "string": {
+      return { type: input as string, settings: baseSettings };
+    }
+
+    case "type+settings": {
+      const [type, inlineSettings] = input as [string, Partial<DecoderSettings>];
+      return { type, settings: { ...baseSettings, ...inlineSettings } };
+    }
   }
-
-  // case 2: [string, DecoderSettings] -> type + settings
-  const [type, settings] = returnTypeInput;
-  return {
-    type,
-    settings: { ...DEFAULT_DECODER_SETTINGS, ...settings },
-  };
 }

@@ -1,4 +1,5 @@
 import { RetType } from "../../shared/decoders/decodableTypes";
+import { DecoderSettings } from "../../shared/decoders/decoderSettings";
 import type { Hook } from "../../shared/hook/hook";
 import { NativeParam } from "../decoders/nativeDecodableTypes";
 
@@ -10,8 +11,9 @@ import { NativeParam } from "../decoders/nativeDecodableTypes";
  */
 export interface NativeFrookyFunction {
   symbol: string;
-  returnType?: RetType;
   params?: NativeParam[];
+  retType?: RetType;
+  decoderSettings: DecoderSettings
 }
 
 /**

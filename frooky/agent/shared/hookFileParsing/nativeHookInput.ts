@@ -1,18 +1,25 @@
+import { NativeParam } from "../../native/decoders/nativeDecodableTypes";
 import type { NativeFrookyFunction, NativeHook } from "../../native/hook/nativeHook";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
+import { Param } from "../decoders/decodableTypes";
+import { DecoderSettings } from "../decoders/decoderSettings";
 import type { Hook } from "../hook/hook";
-import { normalizeParamType, normalizeReturnType, ParamInput, ReturnTypeInput } from "./decodableTypesInput";
+import { normalizeParamType, normalizeReturnType, ParamInput, RetTypeInput } from "./decodableTypesInput";
 import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
 
+
 /**
- * Expanded Native function definition with YAML-parsed parameters.
+ * Native function selector — either a simple function name or a detailed definition.
  *
  * @public
  */
-export interface NativeFrookyFunctionInput extends Omit<NativeFrookyFunction, "params" | "returnType"> {
-  params?: ParamInput[];
-  returnType?: ReturnTypeInput;
-}
+export type NativeFrookyFunctionInput =
+  | string
+  | (Omit<NativeFrookyFunction, "params" | "retType" | "decoderSettings"> & {
+      params?: ParamInput[];
+      retType?: RetTypeInput;
+      decoderSettings?: DecoderSettings;
+    });
 
 /**
  * Native hook configuration for YAML parsing.
@@ -36,34 +43,47 @@ export function isNativeHook(h: Hook): h is NativeHook {
   return "functions" in h;
 }
 
-function normalizeFunctionDefinition(input: NativeFrookyFunctionInput): NativeFrookyFunction {
-  return {
-    ...input,
-    params: input.params?.map(normalizeParamType),
-    returnType: input.returnType ? normalizeReturnType(input.returnType) : undefined,
-  };
-}
+function normalizeFunction(fn: NativeFrookyFunctionInput, decoderSettings: DecoderSettings): NativeFrookyFunction {
+  if (typeof fn === "string") {
+    return { symbol: fn, decoderSettings: decoderSettings };
+  } else {
 
-function normalizeFunction(input: NativeFrookyFunctionInput): NativeFrookyFunction {
-  if (typeof input === "string") {
-    return { symbol: input };
+    console.log("ABOUT TO NORMALIZE THE NATIVE FUNCTION: ")
+    console.log(JSON.stringify(fn,null,2))
+
+    let normalizedParams: Param[] = []
+    if(fn.params){
+      fn.params.forEach(( param: ParamInput ) => {
+        normalizedParams.push( normalizeParamType(param, decoderSettings))
+      })
+    }
+
+    return {
+      symbol: fn.symbol,
+      params: fn.params? normalizedParams: undefined,
+      retType: fn.retType ? normalizeReturnType(fn.retType, decoderSettings): undefined,
+      decoderSettings: decoderSettings
+    };
   }
-  return normalizeFunctionDefinition(input);
 }
 
 // will return a NativeHook for any form of NativeHookInput
-// if not set, the default settings for the hook and their decoders are set here
-export function normalizeNativeHook(input: NativeHookInput): NativeHook {
+// decoderSettings will be used for parameter and return type settings
+// if no decoderSettings are provided, the DEFAULT_DECODER_SETTINGS are applied
+export function normalizeNativeHook(inputHook: NativeHookInput): NativeHook {
+  const mergedDecoderSettings: DecoderSettings = {...DEFAULT_DECODER_SETTINGS, ...inputHook.decoderSettings}
+  // normalize all functions
+  const normalizedFunctions: NativeFrookyFunction[] = []
+  inputHook.functions.forEach((fn: NativeFrookyFunctionInput) => {
+    normalizedFunctions.push(normalizeFunction(fn, mergedDecoderSettings))
+  })
   return {
-    ...input,
-    functions: input.functions.map(normalizeFunction),
+    ...inputHook,
+    functions: normalizedFunctions,
     hookSettings: {
       ...DEFAULT_HOOK_SETTINGS,
-      ...input.hookSettings,
+      ...inputHook.hookSettings,
     },
-    decoderSettings: {
-      ...DEFAULT_DECODER_SETTINGS,
-      ...input.decoderSettings,
-    },
+    decoderSettings: mergedDecoderSettings,
   };
 }

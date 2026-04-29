@@ -18,30 +18,30 @@ globalSettings:
 
 hooks:
 # decode argument: null terminated string 
-  # - module: libreceiveString.so
-  #   hookSettings:
-  #     stackTraceLimit: 55
-  #   decoderSettings:
-  #     decodeLimit: 55
-  #   functions:
-  #     # - symbol: receive_cstring
-  #     #   params:
-  #     #     - int
-  #     #     - [char *, string]
-  #     - symbol: receive_utf8
-  #       returnType: [ int, { decodeLimit: 777 } ]
-  #       params:
-  #         - [ char *, { decodeAt: enter, decodeLimit: 99 }]
-
-  - module: libreceiveFundamentalReference.so
+  - module: libreceiveString.so
+    hookSettings:
+      stackTraceLimit: 55
+    decoderSettings:
+      decodeLimit: 55
     functions:
-      - symbol: receive_bool_ref      # retType string
-        retType: void
-      - symbol: receive_char_ref      # retType string
+      - symbol: receive_cstring
         params:
-          - [char*, minAsciiRef]
-          - [char*, maxAsciiRef]
-      - symbol: receive_schar_ref
-        params:
-          - [schar*, minScharRef]
-          - [schar*, maxScharRef]
+          - char *
+      #     - [char *, string]
+      # - symbol: receive_utf8
+      #   returnType: [ int, { decodeLimit: 777 } ]
+      #   params:
+      #     - [ char *, { decodeAt: enter, decodeLimit: 99 }]
+
+  # - module: libreceiveFundamentalReference.so
+  #   functions:
+  #     - symbol: receive_bool_ref      # retType string
+  #       retType: void
+  #     - symbol: receive_char_ref      # retType string
+  #       params:
+  #         - [char*, minAsciiRef]
+  #         - [char*, maxAsciiRef]
+  #     - symbol: receive_schar_ref
+  #       params:
+  #         - [schar*, minScharRef]
+  #         - [schar*, maxScharRef]

@@ -2,13 +2,15 @@
 import { z } from "zod";
 
 import { nativeFrookyFunctionSchema, nativeHookSchema } from "./nativeHook.internal.zod";
-import { paramInputSchema, returnTypeInputSchema } from "./decodableTypesInput.zod";
+import { decoderSettingsSchema } from "./decoderSettings.zod";
+import { paramInputSchema, retTypeInputSchema } from "./decodableTypesInput.zod";
 import { decoderSettingsInputSchema, hookSettingsInputSchema } from "./settingsInput.zod";
 
-export const nativeFrookyFunctionInputSchema = nativeFrookyFunctionSchema.omit({ "params": true, "returnType": true }).extend({
-    params: z.array(paramInputSchema).optional(),
-    returnType: returnTypeInputSchema.optional()
-});
+export const nativeFrookyFunctionInputSchema = z.union([z.string(), nativeFrookyFunctionSchema.omit({ "params": true, "retType": true, "decoderSettings": true }).and(z.object({
+        params: z.array(paramInputSchema).optional(),
+        retType: retTypeInputSchema.optional(),
+        decoderSettings: decoderSettingsSchema.optional()
+    }))]);
 
 export const nativeHookInputSchema = nativeHookSchema.omit({ "functions": true, "hookSettings": true, "decoderSettings": true }).extend({
     type: z.literal("native"),

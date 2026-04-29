@@ -1,4 +1,4 @@
-import { DEFAULT_HOOK_SETTINGS } from "../../shared/config";
+import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../../shared/config";
 import { RetType } from "../../shared/decoders/decodableTypes";
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
@@ -12,7 +12,7 @@ export interface NativeHookOp extends HookOp {
   symbol: string;
   symbolAddress: NativePointer;
   params: NativeParam[];
-  returnType: RetType;
+  retType: RetType;
 }
 
 // actually hooks the native function
@@ -31,8 +31,8 @@ export function registerNativeHookOps(nativeHookOp: NativeHookOp) {
     },
     onLeave: (returnValue: InvocationReturnValue) => {
       // decode the return value
-      if (nativeHookOp.returnType) {
-        decodedReturnValue = NativeDecoder.decode(returnValue,  nativeHookOp.returnType.decoderSettings);
+      if (nativeHookOp.retType) {
+        decodedReturnValue = NativeDecoder.decode(returnValue,  nativeHookOp.retType.decoderSettings);
       } else {
         decodedReturnValue = { type: "void", value: null };
       }
@@ -52,7 +52,7 @@ function buildNativeHookOps(hook: NativeHook): NativeHookOp[] {
       // add the decoder settings to the return type of the function
       if (fn.returnType?.decoderSettings) {
         fn.returnType.decoderSettings = validateAndNormalizeReturnDecoderSettings(fn.returnType.decoderSettings);
-        fn.returnType.decoderSettings = { ...DEFAULT_RETURN_DECODER_SETTINGS, ...fn.returnType.decoderSettings };
+        fn.returnType.decoderSettings = { ...DEFAULT_DECODER_SETTINGS, ...fn.returnType.decoderSettings };
       }
 
       try {
@@ -62,7 +62,7 @@ function buildNativeHookOps(hook: NativeHook): NativeHookOp[] {
           hookSettings: hook.hookSettings,
           symbolAddress: module.getExportByName(fn.symbol),
           params: fn.params ?? [],
-          returnType: fn.returnType ?? { type: "void", decoderSettings: DEFAULT_RETURN_DECODER_SETTINGS },
+          retType: fn.returnType ?? { type: "void", decoderSettings: DEFAULT_DECODER_SETTINGS },
         });
       } catch (e) {
         frooky.log.error(`Failed to resolve native symbol '${fn.symbol}'${hook.module ? ` in module '${hook.module}'` : ""}: ${e}`);
@@ -83,7 +83,7 @@ export class NativeHookRunner implements HookRunner {
       frooky.log.info(`Building hook operations for native`);
       nativeHookOps.push(...buildNativeHookOps(h));
     });
-    frooky.log.info(`Hook operations for the following hook built: ${JSON.stringify(nativeHookOps, null, 2)}`);
+    // frooky.log.info(`Hook operations for the following hook built: ${JSON.stringify(nativeHookOps, null, 2)}`);
     frooky.log.info(`Run native hooking`);
     nativeHookOps.forEach((nativeHookOp: NativeHookOp) => {
       registerNativeHookOps(nativeHookOp);

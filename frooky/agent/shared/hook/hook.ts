@@ -24,13 +24,6 @@ export interface HookSettings {
 }
 
 /**
- * Name of a Java or Objective-C method.
- *
- * @public
- */
-export type MethodName = string;
-
-/**
  * Base hook configuration.
  *
  * @public

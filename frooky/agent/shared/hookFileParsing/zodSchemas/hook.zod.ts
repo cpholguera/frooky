@@ -9,8 +9,6 @@ export const hookSettingsSchema = z.object({
     hookTimeout: z.number()
 });
 
-export const methodNameSchema = z.string();
-
 export const hookSchema = z.object({
     hookSettings: hookSettingsSchema,
     decoderSettings: decoderSettingsSchema

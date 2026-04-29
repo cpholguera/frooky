@@ -1,7 +1,8 @@
-import type { JavaHook, JavaMethodDefinition, JavaOverload } from "../../android/hook/javaHook";
+import type { JavaHook, JavaMethod, JavaOverload } from "../../android/hook/javaHook";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
-import type { Hook, MethodName } from "../hook/hook";
-import { normalizeParamType, ParamInput } from "./decodableTypesInput";
+import { DecoderSettings } from "../decoders/decoderSettings";
+import type { Hook } from "../hook/hook";
+import { normalizeParamType, ParamInput, RetTypeInput } from "./decodableTypesInput";
 import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
 
 /**
@@ -17,23 +18,18 @@ export interface JavaOverloadInput extends Omit<JavaOverload, "params"> {
 }
 
 /**
- * Extended type for YAML input parsing.
- *
- * @public
- */
-export interface JavaMethodDefinitionInput extends Omit<JavaMethodDefinition, "overloads"> {
-  /**
-   * Explicit overload definitions.
-   */
-  overloads?: JavaOverloadInput[];
-}
-
-/**
  * Java method selector — either a simple method name or a detailed definition.
  *
  * @public
  */
-export type JavaMethodInput = MethodName | JavaMethodDefinitionInput;
+export type JavaMethodInput =
+  | string
+  | (Omit<JavaMethod, "overloads" | "retType" | "decoderSettings"> & {
+      /** Explicit overload definitions. */
+      overloads?: JavaOverloadInput[];
+      retType?: RetTypeInput;
+      decoderSettings?: DecoderSettings;
+    });
 
 /**
  * Native hook configuration.
@@ -67,7 +63,7 @@ function normalizeOverload(input: JavaOverloadInput): JavaOverload {
 }
 
 // will return a JavaMethodDefinition for any form of JavaMethodDefinitionInput or a simple method string
-function normalizeMethod(input: JavaMethodDefinitionInput | string): JavaMethodDefinition {
+function normalizeMethod(input: JavaMethodInput): JavaMethodDefinition {
   if (typeof input === "string") {
     return { name: input };
   }

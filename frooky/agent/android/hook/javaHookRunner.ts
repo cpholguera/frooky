@@ -1,9 +1,8 @@
 import Java from "frida-java-bridge";
 import { DEFAULT_HOOK_SETTINGS } from "../../shared/config";
-import type { MethodName } from "../../shared/hook/hook";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import { JavaDecoder } from "../decoders/javaDecoder";
-import type { JavaHook, JavaMethodDefinition, JavaOverload } from "./javaHook";
+import type { JavaHook, JavaOverload } from "./javaHook";
 import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeArgs } from "./javaHookImpl";
 import type { JavaParam } from "./javaParam";
 import { Param } from "../../shared/decoders/decodableTypes";
@@ -11,7 +10,7 @@ import { Param } from "../../shared/decoders/decodableTypes";
 // contains everything needed to hook one java method
 export interface JavaHookOp extends HookOp {
   javaClass: string;
-  methodName: MethodName;
+  methodName: string;
   params: Param[];
   javaMethod: Java.Method;
 }

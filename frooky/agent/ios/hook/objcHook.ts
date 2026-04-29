@@ -1,24 +1,18 @@
 import { Param, RetType } from "../../shared/decoders/decodableTypes";
-import type { Hook, MethodName } from "../../shared/hook/hook";
+import type { Hook } from "../../shared/hook/hook";
 
 /**
  * Expanded Objective-C method definition with name and optional overloads.
  *
  * @public
  */
-export interface ObjcMethodDefinition {
-  name: MethodName;
+export interface ObjcMethod {
+  name: string;
   returnType?: RetType;
   params?: Param[];
 }
 
 /**
- * Objective-C method selector — either a simple method name or a detailed definition.
- *
- * @public
- */
-export type ObjcMethod = ObjcMethodDefinition;
-
 /**
  * Objective-C hook configuration.
  * @public
