@@ -1,10 +1,10 @@
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../../shared/config";
-import { RetType } from "../../shared/decoders/decodableTypes";
+import type { RetType } from "../../shared/decoders/decodableTypes";
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
-import { NativeParam } from "../decoders/nativeDecodableTypes";
+import type { NativeParam } from "../decoders/nativeDecodableTypes";
 import { NativeDecoder } from "../decoders/nativeDecoder";
-import { NativeHook } from "./nativeHook";
+import type { NativeHook } from "./nativeHook";
 import { buildAndDispatchEvent, buildNativeStackTrace, decodeNativeArgs } from "./nativeHookImpl";
 
 export interface NativeHookOp extends HookOp {
@@ -32,7 +32,7 @@ export function registerNativeHookOps(nativeHookOp: NativeHookOp) {
     onLeave: (returnValue: InvocationReturnValue) => {
       // decode the return value
       if (nativeHookOp.retType) {
-        decodedReturnValue = NativeDecoder.decode(returnValue,  nativeHookOp.retType.decoderSettings);
+        decodedReturnValue = NativeDecoder.decode(returnValue, nativeHookOp.retType.decoderSettings);
       } else {
         decodedReturnValue = { type: "void", value: null };
       }

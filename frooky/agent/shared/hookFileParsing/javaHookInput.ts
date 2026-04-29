@@ -1,8 +1,8 @@
 import type { JavaHook, JavaMethod, JavaOverload } from "../../android/hook/javaHook";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
-import { DecoderSettings } from "../decoders/decoderSettings";
+import type { DecoderSettings } from "../decoders/decoderSettings";
 import type { Hook } from "../hook/hook";
-import { normalizeParamType, ParamInput, RetTypeInput } from "./decodableTypesInput";
+import { normalizeParamType, type ParamInput, type RetTypeInput } from "./decodableTypesInput";
 import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
 
 /**

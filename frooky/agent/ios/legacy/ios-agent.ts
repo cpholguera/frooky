@@ -1,13 +1,12 @@
 import ObjC from "frida-objc-bridge";
-import { uuidv4, toHex } from "../../shared/utils.js"
-
+import { toHex, uuidv4 } from "../../shared/utils.js";
 
 // --- Native argument decoding utilities (mirroring Android native) ---
 function _arrayBufferToHex(buffer) {
-  try{
-      var bytes = new Uint8Array(buffer);
-      return toHex(bytes)
-  }catch (e) {
+  try {
+    var bytes = new Uint8Array(buffer);
+    return toHex(bytes);
+  } catch (e) {
     return "<hex-conversion-error>";
   }
 }
@@ -18,12 +17,12 @@ function _isReadable(ptr, length) {
     if (!ptr || (ptr.isNull && ptr.isNull())) return false;
     var range = Process.findRangeByAddress(ptr);
     if (!range) return false;
-    if (typeof length !== 'number' || length <= 0) return true; // any readable range is fine for cstring
+    if (typeof length !== "number" || length <= 0) return true; // any readable range is fine for cstring
     var start = ptr;
     var end = ptr.add(length);
     var rangeEnd = range.base.add(range.size);
     // Ensure the requested [start, end) lies within the readable range
-    return (start.compare(range.base) >= 0) && (end.compare(rangeEnd) <= 0);
+    return start.compare(range.base) >= 0 && end.compare(rangeEnd) <= 0;
   } catch (e) {
     return false;
   }
@@ -48,7 +47,9 @@ function _readBytes(ptr, length) {
       var data = ObjC.classes.NSData.dataWithBytes_length_(ptr, length);
       if (data) {
         // base64
-        try { result.base64 = data.base64EncodedStringWithOptions_(0).toString(); } catch (eB64) {}
+        try {
+          result.base64 = data.base64EncodedStringWithOptions_(0).toString();
+        } catch (eB64) {}
         // derive hex by reading its bytes pointer
         try {
           var bytesPtr = data.bytes();
@@ -73,7 +74,7 @@ function _readBytes(ptr, length) {
 // Base64 is the only output format for bytes
 
 function decodeArgByDescriptor(ptr, index, desc, rawArgs, descriptors) {
-  var name = desc && desc.name ? desc.name : ("args[" + index + "]");
+  var name = desc && desc.name ? desc.name : "args[" + index + "]";
   var type = desc && desc.type ? desc.type : "string";
   var value = null;
   var selectedFormat = null;
@@ -81,8 +82,11 @@ function decodeArgByDescriptor(ptr, index, desc, rawArgs, descriptors) {
     switch (type) {
       case "string":
         if (ptr && !(ptr.isNull && ptr.isNull()) && _isReadable(ptr)) {
-          try { value = ptr.readCString(); }
-          catch (eStr) { value = ptr.toString(); }
+          try {
+            value = ptr.readCString();
+          } catch (eStr) {
+            value = ptr.toString();
+          }
         } else {
           value = "<null>";
         }
@@ -94,7 +98,11 @@ function decodeArgByDescriptor(ptr, index, desc, rawArgs, descriptors) {
         value = ptr.toUInt32();
         break;
       case "int64":
-        try { value = ptr.toInt64().toString(); } catch (e64) { value = ptr.toInt32(); }
+        try {
+          value = ptr.toInt64().toString();
+        } catch (e64) {
+          value = ptr.toInt32();
+        }
         break;
       case "pointer":
         value = ptr.toString();
@@ -105,18 +113,18 @@ function decodeArgByDescriptor(ptr, index, desc, rawArgs, descriptors) {
             var dataObj = new ObjC.Object(ptr);
             try {
               value = dataObj.base64EncodedStringWithOptions_(0).toString();
-              selectedFormat = 'base64';
+              selectedFormat = "base64";
             } catch (eCFDB64) {
               value = "<bytes-read-error>";
-              selectedFormat = 'base64';
+              selectedFormat = "base64";
             }
           } else {
             value = "<null>";
-            selectedFormat = 'base64';
+            selectedFormat = "base64";
           }
         } catch (eCFD) {
           value = "<cf-data-error>";
-          selectedFormat = 'base64';
+          selectedFormat = "base64";
         }
         break;
       case "CFDictionary":
@@ -147,7 +155,9 @@ function decodeArgByDescriptor(ptr, index, desc, rawArgs, descriptors) {
                 } else {
                   v = vObj.toString();
                 }
-              } catch(eVal) { v = String(vObj); }
+              } catch (eVal) {
+                v = String(vObj);
+              }
               js[k] = v;
             }
             value = JSON.stringify(js);
@@ -158,59 +168,85 @@ function decodeArgByDescriptor(ptr, index, desc, rawArgs, descriptors) {
           value = "<cf-dictionary-error>";
         }
         break;
-      case "bytes":
+      case "bytes": {
         var len;
         // Resolve length from lengthInArg by descriptor name if provided
         if (desc && desc.lengthInArg && Array.isArray(descriptors)) {
           var liName = desc.lengthInArg;
           var foundIdx = -1;
           for (var di = 0; di < descriptors.length; di++) {
-            if (descriptors[di] && descriptors[di].name === liName) { foundIdx = di; break; }
+            if (descriptors[di] && descriptors[di].name === liName) {
+              foundIdx = di;
+              break;
+            }
           }
           if (foundIdx !== -1 && rawArgs && rawArgs[foundIdx]) {
-            try { len = rawArgs[foundIdx].toUInt32(); } catch(eLenIn) { try { len = rawArgs[foundIdx].toInt32(); } catch(eLenIn2) { len = 64; } }
+            try {
+              len = rawArgs[foundIdx].toUInt32();
+            } catch (eLenIn) {
+              try {
+                len = rawArgs[foundIdx].toInt32();
+              } catch (eLenIn2) {
+                len = 64;
+              }
+            }
           }
         }
         // Legacy index-based dynamic length
-        if (len === undefined && desc && typeof desc.lengthArgIndex === 'number' && rawArgs && rawArgs[desc.lengthArgIndex]) {
-          try { len = rawArgs[desc.lengthArgIndex].toUInt32(); } catch(eLen) { len = 64; }
+        if (len === undefined && desc && typeof desc.lengthArgIndex === "number" && rawArgs && rawArgs[desc.lengthArgIndex]) {
+          try {
+            len = rawArgs[desc.lengthArgIndex].toUInt32();
+          } catch (eLen) {
+            len = 64;
+          }
         }
         // Fixed length fallback
         if (len === undefined) {
-          len = (desc && typeof desc.length === 'number') ? desc.length : 64;
+          len = desc && typeof desc.length === "number" ? desc.length : 64;
         }
         // Defaults: base64 output, force true unless explicitly false
-        var force = (desc && typeof desc.force !== 'undefined') ? !!desc.force : true;
+        var force = desc && typeof desc.force !== "undefined" ? !!desc.force : true;
         if (!ptr || (ptr.isNull && ptr.isNull())) {
           value = "<null>";
         } else {
           var bytesObj = _readBytes(ptr, len);
           // Unsafe fallback if both hex and base64 absent and force flag set
-          if ((!bytesObj.hex && !bytesObj.base64) && force === true) {
+          if (!bytesObj.hex && !bytesObj.base64 && force === true) {
             try {
               var bufForce = Memory.readByteArray(ptr, len);
               if (bufForce) bytesObj.hex = _arrayBufferToHex(bufForce);
-            } catch(eForce) {}
+            } catch (eForce) {}
           }
-          value = (bytesObj.base64 !== null) ? bytesObj.base64 : "<bytes-read-error>";
-          selectedFormat = 'base64';
+          value = bytesObj.base64 !== null ? bytesObj.base64 : "<bytes-read-error>";
+          selectedFormat = "base64";
         }
         break;
+      }
       case "bool":
         value = !!ptr.toInt32();
         break;
       case "double":
-        try { value = ptr.readDouble(); } catch (ed) { value = Number(ptr.toInt32()); }
+        try {
+          value = ptr.readDouble();
+        } catch (ed) {
+          value = Number(ptr.toInt32());
+        }
         break;
       default:
         if (_isReadable(ptr)) {
-          try { value = ptr.readCString(); }
-          catch(e1) {
-            try { value = ptr.toInt32(); }
-            catch(e2) {
+          try {
+            value = ptr.readCString();
+          } catch (e1) {
+            try {
+              value = ptr.toInt32();
+            } catch (e2) {
               if (_isReadable(ptr, 64)) {
-                try { var buf2 = Memory.readByteArray(ptr, 64); value = buf2 ? _arrayBufferToHex(buf2) : ptr.toString(); }
-                catch(e3) { value = ptr.toString(); }
+                try {
+                  var buf2 = Memory.readByteArray(ptr, 64);
+                  value = buf2 ? _arrayBufferToHex(buf2) : ptr.toString();
+                } catch (e3) {
+                  value = ptr.toString();
+                }
               } else {
                 value = ptr.toString();
               }
@@ -225,10 +261,10 @@ function decodeArgByDescriptor(ptr, index, desc, rawArgs, descriptors) {
     value = "<error: " + outer + ">";
   }
   var result = { name: name, type: type, value: value };
-  if (type === 'bytes') {
-    result.format = 'base64';
-  } else if (type === 'CFData') {
-    result.format = 'base64';
+  if (type === "bytes") {
+    result.format = "base64";
+  } else if (type === "CFData") {
+    result.format = "base64";
   }
   return result;
 }
@@ -243,15 +279,27 @@ function filtersPass(decodedList, descriptors) {
       var matched = false;
       for (var f = 0; f < d.filter.length; f++) {
         var term = d.filter[f];
-        if (val === null || typeof val === 'undefined') continue;
-        if (typeof val === 'string') {
-          if (val.indexOf(term) !== -1) { matched = true; break; }
-        } else if (typeof val === 'number') {
-          if (val === Number(term) || (String(val).indexOf(String(term)) !== -1)) { matched = true; break; }
-        } else if (typeof val === 'boolean') {
-          if ((term === true || term === false) ? (val === term) : (String(val).toLowerCase() === String(term).toLowerCase())) { matched = true; break; }
+        if (val === null || typeof val === "undefined") continue;
+        if (typeof val === "string") {
+          if (val.indexOf(term) !== -1) {
+            matched = true;
+            break;
+          }
+        } else if (typeof val === "number") {
+          if (val === Number(term) || String(val).indexOf(String(term)) !== -1) {
+            matched = true;
+            break;
+          }
+        } else if (typeof val === "boolean") {
+          if (term === true || term === false ? val === term : String(val).toLowerCase() === String(term).toLowerCase()) {
+            matched = true;
+            break;
+          }
         } else {
-          if (String(val).indexOf(String(term)) !== -1) { matched = true; break; }
+          if (String(val).indexOf(String(term)) !== -1) {
+            matched = true;
+            break;
+          }
         }
       }
       if (!matched) return false;
@@ -292,8 +340,7 @@ function resolveNativeSymbol(hook) {
       return Module.getGlobalExportByName(hook.symbol);
     }
   } catch (e) {
-    console.error("Failed to resolve native symbol '" + hook.symbol + "'" +
-      (hook.module ? " in module '" + hook.module + "'" : "") + ": " + e);
+    console.error("Failed to resolve native symbol '" + hook.symbol + "'" + (hook.module ? " in module '" + hook.module + "'" : "") + ": " + e);
     return null;
   }
 }
@@ -339,13 +386,14 @@ function registerNativeHook(hook, categoryName, callback) {
     return;
   }
 
-  var maxFrames = typeof hook.maxFrames === 'number' ? hook.maxFrames : 8;
+  var maxFrames = typeof hook.maxFrames === "number" ? hook.maxFrames : 8;
 
   Interceptor.attach(address, {
-    onEnter: function(args) {
+    onEnter: function (args) {
       // Preserve raw args for potential onLeave output capture
       hook.__lastEnterArgs = [];
-      for (var aiSave = 0; aiSave < 16; aiSave++) { // arbitrary upper bound
+      for (var aiSave = 0; aiSave < 16; aiSave++) {
+        // arbitrary upper bound
         if (args[aiSave] === undefined) break;
         hook.__lastEnterArgs[aiSave] = args[aiSave];
       }
@@ -365,7 +413,10 @@ function registerNativeHook(hook, categoryName, callback) {
         var needle = hook.filterEventsByStacktrace;
         var found = false;
         for (var k = 0; k < fullNativeStack.length; k++) {
-          if (fullNativeStack[k].indexOf(needle) !== -1) { found = true; break; }
+          if (fullNativeStack[k].indexOf(needle) !== -1) {
+            found = true;
+            break;
+          }
         }
         if (!found) {
           return; // suppress event
@@ -392,10 +443,10 @@ function registerNativeHook(hook, categoryName, callback) {
             var p = args[ai];
             if (p === undefined) break;
             var d = descriptors[ai];
-            if (d && (d.direction === 'out' || d.returnValue === true)) {
+            if (d && (d.direction === "out" || d.returnValue === true)) {
               hasOutDescriptors = true;
               // Placeholder; actual value resolved onLeave
-              decodedArgs.push({ name: d.name || ("args["+ai+"]"), type: d.type || 'bytes', value: '<pending-out>' });
+              decodedArgs.push({ name: d.name || "args[" + ai + "]", type: d.type || "bytes", value: "<pending-out>" });
             } else {
               decodedArgs.push(decodeArgByDescriptor(p, ai, d, args, descriptors));
             }
@@ -408,13 +459,19 @@ function registerNativeHook(hook, categoryName, callback) {
             var fallbackVal = null;
             try {
               if (_isReadable(p2)) {
-                try { fallbackVal = p2.readCString(); }
-                catch(e1) {
-                  try { fallbackVal = p2.toInt32(); }
-                  catch(e2) {
+                try {
+                  fallbackVal = p2.readCString();
+                } catch (e1) {
+                  try {
+                    fallbackVal = p2.toInt32();
+                  } catch (e2) {
                     if (_isReadable(p2, 64)) {
-                      try { var bufF = Memory.readByteArray(p2, 64); fallbackVal = bufF ? _arrayBufferToHex(bufF) : p2.toString(); }
-                      catch(e3) { fallbackVal = p2.toString(); }
+                      try {
+                        var bufF = Memory.readByteArray(p2, 64);
+                        fallbackVal = bufF ? _arrayBufferToHex(bufF) : p2.toString();
+                      } catch (e3) {
+                        fallbackVal = p2.toString();
+                      }
                     } else {
                       fallbackVal = p2.toString();
                     }
@@ -423,8 +480,10 @@ function registerNativeHook(hook, categoryName, callback) {
               } else {
                 fallbackVal = p2.toString();
               }
-            } catch(eF) { fallbackVal = "<error: " + eF + ">"; }
-            decodedArgs.push({ name: "args["+aj+"]", type: "auto", value: fallbackVal });
+            } catch (eF) {
+              fallbackVal = "<error: " + eF + ">";
+            }
+            decodedArgs.push({ name: "args[" + aj + "]", type: "auto", value: fallbackVal });
           }
         }
       } catch (eDec) {
@@ -448,7 +507,7 @@ function registerNativeHook(hook, categoryName, callback) {
         symbol: hook.symbol,
         address: address.toString(),
         stackTrace: effectiveStack,
-        inputParameters: decodedArgs
+        inputParameters: decodedArgs,
       };
       // Defer emission if we have out descriptors to enrich after execution
       if (!hasOutDescriptors) {
@@ -457,14 +516,14 @@ function registerNativeHook(hook, categoryName, callback) {
         this._deferEmit = true;
       }
     },
-    onLeave: function(retval) {
+    onLeave: function (retval) {
       try {
         if (this.event && this._deferEmit && Array.isArray(hook.args)) {
           var descriptors = hook.args;
           var rawArgs = hook.__lastEnterArgs || [];
           for (var di = 0; di < descriptors.length; di++) {
             var desc = descriptors[di];
-            if (!(desc && (desc.direction === 'out' || desc.returnValue === true))) continue;
+            if (!(desc && (desc.direction === "out" || desc.returnValue === true))) continue;
             // Determine pointer source
             var ptr = null;
             if (desc.returnValue === true) {
@@ -474,70 +533,96 @@ function registerNativeHook(hook, categoryName, callback) {
             }
             if (!ptr) continue;
             // For bytes, recalc length via lengthInArg name if present
-            if (desc.type === 'bytes') {
+            if (desc.type === "bytes") {
               var len;
               if (desc.lengthInArg) {
                 var nameMatch = desc.lengthInArg;
                 for (var sj = 0; sj < descriptors.length; sj++) {
                   if (descriptors[sj] && descriptors[sj].name === nameMatch) {
                     try {
-                      if (descriptors[sj].type === 'pointer') {
+                      if (descriptors[sj].type === "pointer") {
                         var lenPtr = rawArgs[sj];
                         if (lenPtr && !(lenPtr.isNull && lenPtr.isNull())) {
-                          try { len = lenPtr.readU64().toNumber(); }
-                          catch(eU64) { try { len = lenPtr.readU32(); } catch(eU32) { len = 0; } }
+                          try {
+                            len = lenPtr.readU64().toNumber();
+                          } catch (eU64) {
+                            try {
+                              len = lenPtr.readU32();
+                            } catch (eU32) {
+                              len = 0;
+                            }
+                          }
                         } else {
                           len = 0;
                         }
                       } else {
                         var lenValPtr = rawArgs[sj];
-                        try { len = lenValPtr.toUInt32(); } catch(eL1) { try { len = lenValPtr.toInt32(); } catch(eL2) { len = 0; } }
+                        try {
+                          len = lenValPtr.toUInt32();
+                        } catch (eL1) {
+                          try {
+                            len = lenValPtr.toInt32();
+                          } catch (eL2) {
+                            len = 0;
+                          }
+                        }
                       }
-                    } catch(eL) { len = 0; }
+                    } catch (eL) {
+                      len = 0;
+                    }
                     break;
                   }
                 }
               }
-              if (len === undefined) len = (typeof desc.length === 'number') ? desc.length : 0;
+              if (len === undefined) len = typeof desc.length === "number" ? desc.length : 0;
               if (len > 0 && _isReadable(ptr, len)) {
                 var outBytesObj = _readBytes(ptr, len);
-                this.event.inputParameters[di].value = (outBytesObj.base64 !== null) ? outBytesObj.base64 : '<bytes-read-error>';
-                this.event.inputParameters[di].format = 'base64';
+                this.event.inputParameters[di].value = outBytesObj.base64 !== null ? outBytesObj.base64 : "<bytes-read-error>";
+                this.event.inputParameters[di].format = "base64";
               } else {
-                this.event.inputParameters[di].value = '<unreadable-output>';
-                this.event.inputParameters[di].format = 'base64';
+                this.event.inputParameters[di].value = "<unreadable-output>";
+                this.event.inputParameters[di].format = "base64";
               }
-            } else if (desc.type === 'CFData') {
+            } else if (desc.type === "CFData") {
               if (ptr && !(ptr.isNull && ptr.isNull()) && ObjC && ObjC.available) {
                 try {
                   var outCFData = new ObjC.Object(ptr);
                   var b64 = outCFData.base64EncodedStringWithOptions_(0).toString();
                   this.event.inputParameters[di].value = b64;
-                  this.event.inputParameters[di].format = 'base64';
+                  this.event.inputParameters[di].format = "base64";
                 } catch (eCFDO) {
-                  this.event.inputParameters[di].value = '<bytes-read-error>';
-                  this.event.inputParameters[di].format = 'base64';
+                  this.event.inputParameters[di].value = "<bytes-read-error>";
+                  this.event.inputParameters[di].format = "base64";
                 }
               } else {
-                this.event.inputParameters[di].value = '<unreadable-output>';
-                this.event.inputParameters[di].format = 'base64';
+                this.event.inputParameters[di].value = "<unreadable-output>";
+                this.event.inputParameters[di].format = "base64";
               }
             } else {
               // Non-bytes output: attempt basic pointer/string/int decoding
               var outVal;
-              try { outVal = ptr.readCString(); }
-              catch(eStr) { try { outVal = ptr.toInt32(); } catch(eInt) { outVal = ptr.toString(); } }
+              try {
+                outVal = ptr.readCString();
+              } catch (eStr) {
+                try {
+                  outVal = ptr.toInt32();
+                } catch (eInt) {
+                  outVal = ptr.toString();
+                }
+              }
               this.event.inputParameters[di].value = outVal;
             }
           }
-          this.event.retval = retval ? retval.toString() : '<no-retval>';
+          this.event.retval = retval ? retval.toString() : "<no-retval>";
           callback(this.event);
           hook.__lastEnterArgs = undefined;
         }
-      } catch(eOut) {
-        if (this.event && this._deferEmit) { callback(this.event); }
+      } catch (eOut) {
+        if (this.event && this._deferEmit) {
+          callback(this.event);
+        }
       }
-    }
+    },
   });
 }
 
@@ -554,10 +639,10 @@ function registerObjCHook(hook, categoryName, callback) {
     return;
   }
 
-  var maxFrames = typeof hook.maxFrames === 'number' ? hook.maxFrames : 8;
+  var maxFrames = typeof hook.maxFrames === "number" ? hook.maxFrames : 8;
 
   Interceptor.attach(address, {
-    onEnter: function(args) {
+    onEnter: function (args) {
       var stackTrace = [];
       try {
         var bt = Thread.backtrace(this.context, Backtracer.ACCURATE);
@@ -577,14 +662,14 @@ function registerObjCHook(hook, categoryName, callback) {
         class: hook.objClass,
         symbol: hook.symbol,
         address: address.toString(),
-        stackTrace: stackTrace
+        stackTrace: stackTrace,
       };
 
       callback(this.event);
     },
-    onLeave: function(retval) {
+    onLeave: (retval) => {
       // Optionally emit a separate event or extend the onEnter event
-    }
+    },
   });
 }
 
@@ -598,7 +683,7 @@ export function runFrookyAgent(target) {
   var hooksSummary = [];
   var errors = [];
 
-  target.hooks.forEach(function(hook) {
+  target.hooks.forEach((hook) => {
     if (!isNativeHook(hook)) {
       console.warn("Non-native hooks are not supported on iOS. Skipping hook.");
       errors.push("Non-native hook skipped: " + JSON.stringify(hook));
@@ -611,14 +696,14 @@ export function runFrookyAgent(target) {
         hooksSummary.push({
           type: "objc",
           class: hook.objClass,
-          symbol: hook.symbol
+          symbol: hook.symbol,
         });
       } else {
         registerNativeHook(hook, target.category, callback);
         hooksSummary.push({
           type: "native",
           module: hook.module || "<global>",
-          symbol: hook.symbol
+          symbol: hook.symbol,
         });
       }
     } catch (e) {
@@ -634,7 +719,7 @@ export function runFrookyAgent(target) {
     hooks: hooksSummary,
     totalHooks: hooksSummary.length,
     errors: errors,
-    totalErrors: errors.length
+    totalErrors: errors.length,
   };
   send(summary);
-};
+}

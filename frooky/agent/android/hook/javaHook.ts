@@ -1,8 +1,7 @@
-import { Param, RetType } from "../../shared/decoders/decodableTypes";
-import { DecoderSettings } from "../../shared/decoders/decoderSettings";
+import { Param, type RetType } from "../../shared/decoders/decodableTypes";
+import type { DecoderSettings } from "../../shared/decoders/decoderSettings";
 import type { Hook, MethodName } from "../../shared/hook/hook";
-import { JavaParam } from "./javaParam";
-
+import type { JavaParam } from "./javaParam";
 
 /**
  * Describes a specific Java method overload.
@@ -25,7 +24,7 @@ export interface JavaMethod {
   name: string;
   retType?: RetType;
   overloads?: JavaOverload[];
-  decoderSettings: DecoderSettings
+  decoderSettings: DecoderSettings;
 }
 
 /**

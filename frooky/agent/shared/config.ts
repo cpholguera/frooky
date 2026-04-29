@@ -1,14 +1,14 @@
-import { DecodeAt } from "./decoders/decodableTypes";
-import type { DecoderSettings} from "./decoders/decoderSettings";
+import type { DecodeAt } from "./decoders/decodableTypes";
+import type { DecoderSettings } from "./decoders/decoderSettings";
 import type { HookSettings } from "./hook/hook";
 
-export const DEFAULT_DECODE_AT: DecodeAt = "enter"
+export const DEFAULT_DECODE_AT: DecodeAt = "enter";
 
 export const DEFAULT_DECODER_SETTINGS: DecoderSettings = {
   fastDecode: false,
   magicDecode: false,
   maxRecursion: 77,
-  decodeLimit: 77
+  decodeLimit: 77,
 };
 
 export const DEFAULT_HOOK_SETTINGS: HookSettings = {

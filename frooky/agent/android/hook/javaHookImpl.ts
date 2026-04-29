@@ -1,10 +1,10 @@
 import Java from "frida-java-bridge";
+import type { Param } from "../../shared/decoders/decodableTypes";
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
 import type { DecoderSettings } from "../../shared/decoders/decoderSettings";
 import { JavaDecoder } from "../decoders/javaDecoder";
 import { JavaHookEvent } from "../event/javaHookEvent";
 import type { JavaHookOp } from "./javaHookRunner";
-import { Param } from "../../shared/decoders/decodableTypes";
 
 export type FieldType = {
   fieldType: "static" | "instance";

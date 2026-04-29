@@ -5,10 +5,10 @@ import type { DecoderSettings } from "../decoders/decoderSettings";
 import { isJavaHook, type JavaHookInput, normalizeJavaHook } from "../hookFileParsing/javaHookInput";
 import { isNativeHook, type NativeHookInput, normalizeNativeHook } from "../hookFileParsing/nativeHookInput";
 import { isObjcHook, normalizeObjcHook, type ObjcHookInput } from "../hookFileParsing/objcHookInput";
-import { prettyPrintHook } from "../utils";
+import { javaHookSchema } from "../hookFileParsing/zodSchemas/javaHook.zod";
 import { nativeHookSchema } from "../hookFileParsing/zodSchemas/nativeHook.zod";
 import { objcHookSchema } from "../hookFileParsing/zodSchemas/objcHook.zod";
-import { javaHookSchema } from "../hookFileParsing/zodSchemas/javaHook.zod";
+import { prettyPrintHook } from "../utils";
 
 export interface HookValidatorResult {
   validHooks: Hook[];
@@ -66,7 +66,7 @@ export function validateHooks(hooks: Hook[], platform: Platform, globalHooksSett
         const nativeHook = normalizeNativeHook(nativeHookInput);
         nativeHookSchema.parse(nativeHook);
 
-        console.log(JSON.stringify(nativeHook, null, 2))
+        console.log(JSON.stringify(nativeHook, null, 2));
         result.validHooks.push(nativeHook);
       } else {
         throw new Error("Hook type is unknown. Make sure that it is either a Java, Objective-C or native hook.");

@@ -1,5 +1,5 @@
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
-import { NativeParam } from "../decoders/nativeDecodableTypes";
+import type { NativeParam } from "../decoders/nativeDecodableTypes";
 import { NativeDecoder } from "../decoders/nativeDecoder";
 import { NativeHookEvent } from "../event/nativeHookEvent";
 import type { NativeHookOp } from "./nativeHookRunner";

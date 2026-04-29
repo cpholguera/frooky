@@ -1,8 +1,7 @@
-import { RetType } from "../../shared/decoders/decodableTypes";
-import { DecoderSettings } from "../../shared/decoders/decoderSettings";
+import type { RetType } from "../../shared/decoders/decodableTypes";
+import type { DecoderSettings } from "../../shared/decoders/decoderSettings";
 import type { Hook } from "../../shared/hook/hook";
-import { NativeParam } from "../decoders/nativeDecodableTypes";
-
+import type { NativeParam } from "../decoders/nativeDecodableTypes";
 
 /**
  * Expanded Native method definition with name and optional overloads.
@@ -13,7 +12,7 @@ export interface NativeFrookyFunction {
   symbol: string;
   params?: NativeParam[];
   retType?: RetType;
-  decoderSettings: DecoderSettings
+  decoderSettings: DecoderSettings;
 }
 
 /**

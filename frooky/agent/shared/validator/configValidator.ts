@@ -2,9 +2,9 @@ import type { FrookyConfig, HookSettings, Platform } from "frooky";
 import z from "zod";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
 import type { DecoderSettings } from "../decoders/decoderSettings";
-import { type HookValidatorResult, validateHooks } from "./hookValidator";
 import { hookMetadataSchema } from "../hookFileParsing/zodSchemas/frookyConfig.zod";
-import { hookSettingsInputSchema, decoderSettingsInputSchema, paramSettingsSchema } from "../hookFileParsing/zodSchemas/settingsInput.zod";
+import { decoderSettingsInputSchema, hookSettingsInputSchema, paramSettingsSchema } from "../hookFileParsing/zodSchemas/settingsInput.zod";
+import { type HookValidatorResult, validateHooks } from "./hookValidator";
 
 // validates hook settings and replaces invalid settings with valid default values
 export function validateAndRepairHookSettings(settings: HookSettings): HookSettings {
@@ -20,7 +20,6 @@ export function validateAndRepairHookSettings(settings: HookSettings): HookSetti
   return settings;
 }
 
-
 // validates decoder settings and replaces invalid settings with valid default values
 export function validateAndRepairDecoderSettings(settings: DecoderSettings): DecoderSettings {
   const result = decoderSettingsInputSchema.safeParse(settings);
@@ -29,11 +28,7 @@ export function validateAndRepairDecoderSettings(settings: DecoderSettings): Dec
     for (const issue of result.error.issues) {
       const key = issue.path[0] as keyof DecoderSettings;
       (settings as Record<keyof DecoderSettings, unknown>)[key] = DEFAULT_DECODER_SETTINGS[key];
-      frooky.log.warn([
-        `Decoder setting "'${String(key)}'" contains invalid data:`,
-        z.prettifyError(result.error),
-        `The value for '${String(key)}' was reset to the default: ${String(DEFAULT_DECODER_SETTINGS[key])}`,
-      ]);
+      frooky.log.warn([`Decoder setting "'${String(key)}'" contains invalid data:`, z.prettifyError(result.error), `The value for '${String(key)}' was reset to the default: ${String(DEFAULT_DECODER_SETTINGS[key])}`]);
     }
   }
   return settings;

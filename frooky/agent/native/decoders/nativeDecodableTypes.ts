@@ -1,5 +1,5 @@
-import { Param, RetType } from "../../shared/decoders/decodableTypes";
-import { NativeType } from "./nativeTypeNormalizer";
+import type { Param, RetType } from "../../shared/decoders/decodableTypes";
+import type { NativeType } from "./nativeTypeNormalizer";
 
 /**
  * Represents a native parameter
@@ -10,7 +10,6 @@ export interface NativeParam extends Param {
    */
   nativeType?: NativeType;
 }
-
 
 /**
  * Represents a native parameter

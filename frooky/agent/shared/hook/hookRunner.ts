@@ -1,6 +1,6 @@
 // stub, implements shared hook resolver functions
 import type { Hook, HookSettings } from "frooky";
-import { DecoderSettings } from "../decoders/decoderSettings";
+import type { DecoderSettings } from "../decoders/decoderSettings";
 
 // Hook Operation
 // Contains all information to hook one method or function

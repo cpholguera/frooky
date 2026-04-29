@@ -1,6 +1,6 @@
 import type { ObjcHook, ObjcMethod } from "../../ios/hook/objcHook";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
-import { Hook } from "../hook/hook";
+import type { Hook } from "../hook/hook";
 import { normalizeParamType, normalizeReturnType, ParamInput, RetTypeInput } from "./decodableTypesInput";
 import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
 
@@ -9,7 +9,7 @@ import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
  *
  * @public
  */
-export type ObjcMethodInput = string | ObjcMethod
+export type ObjcMethodInput = string | ObjcMethod;
 
 /**
  * Native hook configuration.

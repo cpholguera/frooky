@@ -1,10 +1,9 @@
 import type { NativeFrookyFunction, NativeHook } from "../../native/hook/nativeHook";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
-import { DecoderSettings } from "../decoders/decoderSettings";
+import type { DecoderSettings } from "../decoders/decoderSettings";
 import type { Hook, HookSettings } from "../hook/hook";
-import { normalizeParamType, normalizeReturnType, ParamInput, RetTypeInput } from "./decodableTypesInput";
+import { normalizeParamType, normalizeReturnType, type ParamInput, type RetTypeInput } from "./decodableTypesInput";
 import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
-
 
 /**
  * Native function selector — either a simple function name or a detailed definition.
@@ -51,7 +50,7 @@ function normalizeFunction(fn: NativeFrookyFunctionInput, decoderSettings: Decod
     symbol: fn.symbol,
     params: fn.params?.map((param: ParamInput) => normalizeParamType(param, decoderSettings)),
     retType: fn.retType ? normalizeReturnType(fn.retType, decoderSettings) : undefined,
-    decoderSettings
+    decoderSettings,
   };
 }
 

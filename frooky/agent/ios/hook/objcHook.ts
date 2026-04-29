@@ -1,4 +1,4 @@
-import { Param, RetType } from "../../shared/decoders/decodableTypes";
+import type { Param, RetType } from "../../shared/decoders/decodableTypes";
 import type { Hook } from "../../shared/hook/hook";
 
 /**
