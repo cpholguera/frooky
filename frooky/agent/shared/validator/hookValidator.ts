@@ -5,10 +5,10 @@ import type { DecoderSettings } from "../decoders/decoderSettings";
 import { isJavaHook, type JavaHookInput, normalizeJavaHook } from "../hookFileParsing/javaHookInput";
 import { isNativeHook, type NativeHookInput, normalizeNativeHook } from "../hookFileParsing/nativeHookInput";
 import { isObjcHook, normalizeObjcHook, type ObjcHookInput } from "../hookFileParsing/objcHookInput";
-import { javaHookInputSchema } from "../hookFileParsing/zodSchemas/javaHook.input.zod";
-import { nativeHookInputSchema } from "../hookFileParsing/zodSchemas/nativeHook.input.zod";
-import { objcHookInputSchema } from "../hookFileParsing/zodSchemas/objcHook.input.zod";
 import { prettyPrintHook } from "../utils";
+import { javaHookInputSchema } from "../hookFileParsing/zodSchemas/javaHookInput.zod";
+import { nativeHookInputSchema } from "../hookFileParsing/zodSchemas/nativeHookInputInput.zod";
+import { objcHookInputSchema } from "../hookFileParsing/zodSchemas/objcHookInput.zod";
 
 export interface HookValidatorResult {
   validHooks: Hook[];

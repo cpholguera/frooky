@@ -1,5 +1,6 @@
 import { Param, RetType } from "../../shared/decoders/decodableTypes";
 import type { Hook, MethodName } from "../../shared/hook/hook";
+import { JavaParam } from "./javaParam";
 
 
 /**
@@ -11,7 +12,7 @@ export interface JavaOverload {
   /**
    * Parameter definitions for this overload.
    */
-  params: Param[];
+  params: JavaParam[];
 }
 
 /**

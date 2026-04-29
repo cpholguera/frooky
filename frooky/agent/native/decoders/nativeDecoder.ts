@@ -1,10 +1,9 @@
 import { BaseDecoder } from "../../shared/decoders/baseDecoder";
-import { Param, RetType } from "../../shared/decoders/decodableTypes";
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
 import { NativeParam } from "./nativeDecodableTypes";
 import { NativeFallbackDecoder } from "./nativeFallbackDecoder";
 import { NativeReferenceDecoder } from "./nativeReferenceDecoder";
-import { NativeType, normalizeNativeType } from "./nativeTypeNormalizer";
+import {  normalizeNativeType } from "./nativeTypeNormalizer";
 import { NativeValueDecoder } from "./nativeValueDecoder";
 
 export const FUNDAMENTAL_TYPES = ["void", "int", "uint", "long", "ulong", "char", "uchar", "size_t", "ssize_t", "float", "double", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64", "bool"] as const;

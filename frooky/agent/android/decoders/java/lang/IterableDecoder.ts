@@ -6,23 +6,23 @@ import type { DecoderSettings } from "../../../../shared/decoders/decoderSetting
 import type { JavaParam } from "../../../hook/javaParam";
 import { JavaDecoder } from "../../javaDecoder";
 
-function defaultElementDecoder(element: Java.Wrapper, settings?: DecoderSettings): DecodedValue {
+function defaultElementDecoder(element: Java.Wrapper, settings: DecoderSettings): DecodedValue {
   const elementType = element == null ? "java.lang.Object" : (element.$className ?? "java.lang.Object");
-  return JavaDecoder.decode(element, { type: elementType }, settings);
+  return JavaDecoder.decode(element, { type: elementType, settings: settings });
 }
 
 /**
  * Decode any java.lang.Iterable by walking its iterator().
  */
-export function decodeIterable(iterable: Java.Wrapper, param: JavaParam, settings?: DecoderSettings, customElementDecoder?: (entry: Java.Wrapper) => DecodedValue): DecodedValue {
+export function decodeIterable(iterable: Java.Wrapper, param: JavaParam, customElementDecoder?: (entry: Java.Wrapper) => DecodedValue): DecodedValue {
   const values: DecodedValue[] = [];
   const iterator = iterable.iterator();
-  const limit = settings?.decodeLimit ?? DEFAULT_DECODER_SETTINGS.decodeLimit;
+  const limit = param.settings.decodeLimit ?? DEFAULT_DECODER_SETTINGS.decodeLimit;
 
   let count = 0;
   while (iterator.hasNext() && count < limit) {
     const element = iterator.next();
-    values.push(customElementDecoder ? customElementDecoder(element) : defaultElementDecoder(element, settings));
+    values.push(customElementDecoder ? customElementDecoder(element) : defaultElementDecoder(element, param.settings));
     count++;
   }
 

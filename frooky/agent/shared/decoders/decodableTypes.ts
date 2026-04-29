@@ -44,7 +44,7 @@ export interface Param extends DecodableType {
    * @example "exit"
    * @example "both"
    */
-  decodeAt: DecodeAt;
+  decodeAt?: DecodeAt;
 }
 
 /** Describes the return type of a function or method signature. */

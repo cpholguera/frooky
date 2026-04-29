@@ -2,9 +2,9 @@ import type { FrookyConfig, HookSettings, Platform } from "frooky";
 import z from "zod";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
 import type { DecoderSettings } from "../decoders/decoderSettings";
-import { hookMetadataSchema } from "../hookFileParsing/zodSchemas/frookyConfig.zod";
-import { decoderSettingsInputSchema, hookSettingsInputSchema, paramDecoderSettingsInputSchema, returnDecoderSettingsInputSchema } from "../hookFileParsing/zodSchemas/settingsInput.zod";
 import { type HookValidatorResult, validateHooks } from "./hookValidator";
+import { hookMetadataSchema } from "../hookFileParsing/zodSchemas/frookyConfig.zod";
+import { hookSettingsInputSchema, decoderSettingsInputSchema } from "../hookFileParsing/zodSchemas/settingsInput.zod";
 
 export function validateAndNormalizeHookSettings(settings: HookSettings): HookSettings {
   const result = hookSettingsInputSchema.safeParse(settings);

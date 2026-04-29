@@ -6,14 +6,14 @@ import { JavaDecoder } from "../../javaDecoder";
 import { decodeIterable } from "../lang/IterableDecoder";
 
 export const MapDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
-  decode: (value, param, settings) => {
+  decode: (value, param) => {
     const map = value.entrySet ? value : Java.cast(value, Java.use("java.util.Map"));
     const entrySet = map.entrySet();
 
     // Cache the Map. Entry class once per call
     const MapEntry = Java.use("java.util.Map$Entry");
 
-    return decodeIterable(entrySet, param, settings, (entry) => {
+    return decodeIterable(entrySet, param, (entry) => {
       const typedEntry = entry!.getKey ? entry! : Java.cast(entry!, MapEntry);
 
       const key = typedEntry.getKey();
@@ -25,8 +25,8 @@ export const MapDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
       return {
         type: "java.util.Map.Entry",
         value: [
-          { ...JavaDecoder.decode(key, { type: keyType }, settings), name: "key" },
-          { ...JavaDecoder.decode(value, { type: valueType }, settings), name: "value" },
+          { ...JavaDecoder.decode(key, { type: keyType, settings:param.settings }), name: "key" },
+          { ...JavaDecoder.decode(value, { type: valueType, settings:param.settings }), name: "value" },
         ],
       } as DecodedValue;
     });
