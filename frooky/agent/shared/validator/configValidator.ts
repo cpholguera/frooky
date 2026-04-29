@@ -3,7 +3,7 @@ import z from "zod";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
 import type { DecoderSettings } from "../decoders/decoderSettings";
 import { hookMetadataSchema } from "../hookFileParsing/zodSchemas/frookyConfig.zod";
-import { decoderSettingsInputSchema, hookSettingsInputSchema, paramSettingsSchema } from "../hookFileParsing/zodSchemas/settingsInput.zod";
+import { decoderSettingsInputSchema, hookSettingsInputSchema } from "../hookFileParsing/zodSchemas/settingsInput.zod";
 import { type HookValidatorResult, validateHooks } from "./hookValidator";
 
 // validates hook settings and replaces invalid settings with valid default values
@@ -59,13 +59,13 @@ export function validateFrookyConfig(frookyConfig: FrookyConfig, platform: Platf
   // validate global hook settings and set to default value, if invalid value (e.g. string instead of int)
   if (frookyConfig.globalSettings?.hookSettings) {
     frookyConfig.globalSettings.hookSettings = validateAndRepairHookSettings(frookyConfig.globalSettings.hookSettings);
+    frooky.log.info([`Global hook settings validated and set to default value, if setting was invalid.`, `Global hook settings are:\n${JSON.stringify(frookyConfig.globalSettings.hookSettings, null, 2)}`]);
   }
   // validate global decoder settings and set to default it not set
   if (frookyConfig.globalSettings?.decoderSettings) {
     frookyConfig.globalSettings.decoderSettings = validateAndRepairDecoderSettings(frookyConfig.globalSettings.decoderSettings);
+    frooky.log.info([`Global decoder settings validated and set to default value, if setting was invalid.`, `Global decoder settings are:\n${JSON.stringify(frookyConfig.globalSettings.hookSettings, null, 2)}`]);
   }
-
-  // validate hook config and decoder settings and set to default it not set
 
   // validate hooks
   let hookValidatorResult: HookValidatorResult;

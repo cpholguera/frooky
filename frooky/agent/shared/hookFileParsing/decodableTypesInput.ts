@@ -32,14 +32,14 @@ export function normalizeParamType(input: ParamInput, decoderSettings?: DecoderS
   }
   // Case 3: Type + options - ["[I", { decodeAt: "exit", maxRecursion: 5 }]
   if (input.length === 2 && typeof input[1] === "object") {
-    const [type, { decodeAt, ...decoderSettings }] = input as [string, ParamSettings];
-    var validatedDecoderSettings = validateAndRepairDecoderSettings({ ...DEFAULT_DECODER_SETTINGS, ...decoderSettings });
+    const [type, { decodeAt, ...inlineDecoderSettings }] = input as [string, ParamSettings];
+    var validatedDecoderSettings = validateAndRepairDecoderSettings({ ...DEFAULT_DECODER_SETTINGS, ...inlineDecoderSettings });
     return { type, decodeAt: decodeAt ?? DEFAULT_DECODE_AT, settings: validatedDecoderSettings };
   }
   // Case 4: Type + name + options - ["[B", "encryptedOutput", { decodeAt: "exit", magicDecode: false }]
   if (input.length === 3) {
-    const [type, name, { decodeAt, ...decoderSettings }] = input as [string, string, ParamSettings];
-    var validatedDecoderSettings = validateAndRepairDecoderSettings({ ...DEFAULT_DECODER_SETTINGS, ...decoderSettings });
+    const [type, name, { decodeAt, ...inlineDecoderSettings }] = input as [string, string, ParamSettings];
+    var validatedDecoderSettings = validateAndRepairDecoderSettings({ ...DEFAULT_DECODER_SETTINGS, ...inlineDecoderSettings });
     return { type, name, decodeAt: decodeAt ?? DEFAULT_DECODE_AT, settings: validatedDecoderSettings };
   }
   throw new Error(`Unrecognized ParamInput format: ${JSON.stringify(input)}`);

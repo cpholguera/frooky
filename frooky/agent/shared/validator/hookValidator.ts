@@ -65,8 +65,6 @@ export function validateHooks(hooks: Hook[], platform: Platform, globalHooksSett
         nativeHookInput.type = "native";
         const nativeHook = normalizeNativeHook(nativeHookInput);
         nativeHookSchema.parse(nativeHook);
-
-        console.log(JSON.stringify(nativeHook, null, 2));
         result.validHooks.push(nativeHook);
       } else {
         throw new Error("Hook type is unknown. Make sure that it is either a Java, Objective-C or native hook.");
@@ -75,7 +73,7 @@ export function validateHooks(hooks: Hook[], platform: Platform, globalHooksSett
       result.totalErrors += 1;
       result.invalidHooks.push(hook);
       if (e instanceof z.ZodError) {
-        frooky.log.warn(`The hook contains invalid entires. It will be ignored:\n${z.prettifyError(e)}`);
+        frooky.log.warn(`The hook contains invalid entires which could not have been repaired. It will be ignored:\n${z.prettifyError(e)}`);
       } else {
         frooky.log.warn(e as string);
       }
