@@ -1,5 +1,5 @@
 metadata:
-  name: Test Settings Native
+  name: Test Settings Android
   description: |
     This frooky config uses different kind of settings:
 
@@ -76,7 +76,7 @@ globalSettings:
   hookSettings:
     hookTimeout: 1                    # Timeout in seconds frooky will try to hook in case something the target library is not available.
     stackTraceLimit: 11               # Sets stackTraceLimit to 10 for all hooks
-    eventFilter: ['^libmyapp\.so']    # Stack trace filters to apply.
+    eventFilter: ['^(?!android).*']   # Stack trace filters to apply.
   decoderSettings:
     fastDecode: true                  # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
     magicDecode: true                 # If set, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime
@@ -84,57 +84,60 @@ globalSettings:
     decodeLimit: 11                   # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
 
 hooks:
-  # simple function declaration
-  - module: libreceiveFundamentalValue.so
-    functions: 
-      - receive_bool
+  # simple method declaration
+  - javaClass: org.owasp.mastestapp.MastgTest
+    methods:
+      - receiveBoolean
 
-  # object with ONLY symbol provided, technically the same form as the one before
-  - module: libreceiveFundamentalValue.so
-    functions: 
-      - symbol: receive_short
+  # object with ONLY name provided, technically the same form as the one before
+  - javaClass: org.owasp.mastestapp.MastgTest
+    methods:
+      - name: receiveByte
+
 
   # PARTIAL local hook settings take priority over global setting, simple function declaration
-  - module: libreceiveFundamentalValue.so
+  - javaClass: org.owasp.mastestapp.MastgTest
     hookSettings:
       hookTimeout: 2
     decoderSettings:
       decodeLimit: 22
-    functions:
-      - receive_int
-      - receive_char
+    methods:
+      - receiveShort
+      - receiveInt
 
   # PARTIAL local hook settings take priority over global setting, simple function declaration
-  - module: libreceiveFundamentalValue.so
+  - javaClass: org.owasp.mastestapp.MastgTest
     hookSettings:
       hookTimeout: 3
     decoderSettings:
       decodeLimit: 33
-    functions:
-      - symbol:  receive_long
+    methods:
+      - name: receiveLong
 
   # PARTIAL local hook settings take priority over global setting, object with ONLY symbol provided
-  - module: libreceiveFundamentalValue.so
+  - javaClass: org.owasp.mastestapp.MastgTest
     hookSettings:
       hookTimeout: 4
     decoderSettings:
       decodeLimit: 44
-    functions:
-      - receive_schar
-      - receive_ullong
+    methods:
+      - receiveFloat
+      - receiveDouble
+
 
   # PARTIAL local parameter settings take priority over global setting, form [type, settings]
-  - module: libreceiveFundamentalValue.so
-    functions:
-      - symbol: receive_llong
-        params: 
-          - [ llong , { decodeLimit: 55 } ]
+  - javaClass: org.owasp.mastestapp.MastgTest
+    methods:
+      - name: receiveIntArray
+        overloads:
+          - params:
+            - ["[I", {decoderSettings: {decodeLimit: 55}}]
 
   # PARTIAL local parameter settings take priority over global setting, form [type, name, settings]
-  - module: libreceiveFundamentalValue.so
-    functions:
-      - symbol: receive_ulong
-        params: 
-          - [ llong , astronomicUnit , { decodeLimit: 66 } ]
-
+  - javaClass: org.owasp.mastestapp.MastgTest
+    methods:
+      - name: receiveNestedPrimitivesArray
+        overloads:
+          - params:
+            - ["[[[I", {decoderSettings: {decodeLimit: 56}}]
 
