@@ -2,13 +2,13 @@
 import { z } from "zod";
 
 import { objcHookSchema } from "./objcHook.zod";
-import { methodNameSchema, returnTypeSchema } from "./hook.zod";
+import { frookyReturnTypeSchema, methodNameSchema } from "./hook.zod";
 import { paramInputSchema } from "./param.input.zod";
 import { decoderSettingsInputSchema, hookSettingsInputSchema } from "./settingsInput.zod";
 
 export const objcMethodDefinitionInputSchema = z.object({
     name: methodNameSchema,
-    returnType: returnTypeSchema.optional(),
+    returnType: frookyReturnTypeSchema.optional(),
     params: z.array(paramInputSchema).optional()
 });
 

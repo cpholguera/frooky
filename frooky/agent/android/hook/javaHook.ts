@@ -1,4 +1,4 @@
-import type { Hook, MethodName } from "../../shared/hook/hook";
+import type { FrookyReturnType, Hook, MethodName } from "../../shared/hook/hook";
 import type { Param } from "../../shared/hook/param";
 
 /**
@@ -19,14 +19,8 @@ export interface JavaOverload {
  * @public
  */
 export interface JavaMethodDefinition {
-  /**
-   * Method name.
-   */
   name: MethodName;
-
-  /**
-   * Explicit overload definitions.
-   */
+  returnType?: FrookyReturnType;
   overloads?: JavaOverload[];
 }
 

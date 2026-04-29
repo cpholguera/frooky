@@ -1,5 +1,5 @@
 import type { BaseDecoder } from "../decoders/baseDecoder";
-import type { DecoderSettings } from "../decoders/decoderSettings";
+import type { ParamDecoderSettings } from "../decoders/decoderSettings";
 
 /**
  * Specifies when a decoder should be applied during function execution.
@@ -36,38 +36,6 @@ export type ParamType = string;
 export type ParamName = string;
 
 /**
- * Decoder options for a parameter.
- *
- * @public
- */
-export interface ParamOptions {
-  /**
-   * When the decoder should be applied.
-   *
-   * @defaultValue "enter"
-   * @example "exit"
-   * @example "both"
-   */
-  decodeAt?: DecodeAt;
-
-  /**
-   * Extra arguments passed to the decoder. They must be a valid parameter name.
-   *
-   * @example [ "ctxPointer" ]
-   * @example [ "inBuffer", "bufferLength" ]
-   */
-  decoderArgs?: string[];
-
-  /**
-   * Settings applied when running the decoder.
-   *
-   * @example {maxRecursion: 0, magicDecode: true}
-   * @example {fastDecode: true}
-   */
-  decoderSettings: DecoderSettings;
-}
-
-/**
  * Normalized parameter descriptor used internally during function hooking.
  *
  * For input, prefer the shorthand {@link ParamInput} forms, which are
@@ -91,5 +59,5 @@ export interface Param {
   /**
    * Settings applied when running the decoder.
    */
-  decoderSettings: DecoderSettings;
+  decoderSettings: ParamDecoderSettings;
 }

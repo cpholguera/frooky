@@ -7,7 +7,14 @@ export const decoderSettingsSchema = z.object({
     maxRecursion: z.number(),
     decodeLimit: z.number(),
     magicDecode: z.boolean(),
-    fastDecode: z.boolean(),
-    decodeAt: decodeAtSchema,
+    fastDecode: z.boolean()
+});
+
+export const returnDecoderSettingsSchema = decoderSettingsSchema.extend({
     decoderArgs: z.array(z.string())
+});
+
+export const paramDecoderSettingsSchema = decoderSettingsSchema.extend({
+    decoderArgs: z.array(z.string()),
+    decodeAt: decodeAtSchema
 });

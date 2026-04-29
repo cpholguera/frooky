@@ -1,4 +1,12 @@
-import type { DecoderSettings } from "../decoders/decoderSettings";
+import type { BaseDecoder } from "../decoders/baseDecoder";
+import type { DecoderSettings, ReturnDecoderSettings } from "../decoders/decoderSettings";
+import type { ParamType } from "./param";
+
+export interface FrookyReturnType {
+  type: ParamType;
+  decoder?: BaseDecoder<any, any>;
+  decoderSettings: ReturnDecoderSettings;
+}
 
 /**
  * Metadata that describes a hook collection.
@@ -21,16 +29,6 @@ export interface HookSettings {
    */
   hookTimeout: number;
 }
-
-/**
- * Frida-compatible type for a return value used with Native and Objective-C hooks
- *
- * @example "(NSString *)"
- * @example "int"
- *
- * @public
- */
-export type ReturnType = string;
 
 /**
  * Name of a Java or Objective-C method.

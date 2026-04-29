@@ -4,8 +4,6 @@ import type { Hook } from "../hook/hook";
 import { normalizeParam, type ParamInput } from "./paramInput";
 import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
 
-export type { SymbolName };
-
 /**
  * Expanded Native function definition with YAML-parsed parameters.
  *

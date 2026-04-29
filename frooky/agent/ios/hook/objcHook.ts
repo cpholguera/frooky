@@ -1,4 +1,4 @@
-import type { Hook, MethodName, ReturnType } from "../../shared/hook/hook";
+import type { FrookyReturnType, Hook, MethodName } from "../../shared/hook/hook";
 import type { Param } from "../../shared/hook/param";
 
 /**
@@ -8,7 +8,7 @@ import type { Param } from "../../shared/hook/param";
  */
 export interface ObjcMethodDefinition {
   name: MethodName;
-  returnType?: ReturnType;
+  returnType?: FrookyReturnType;
   params?: Param[];
 }
 

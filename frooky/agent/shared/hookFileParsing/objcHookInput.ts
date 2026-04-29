@@ -1,6 +1,6 @@
 import type { ObjcHook, ObjcMethodDefinition } from "../../ios/hook/objcHook";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
-import type { Hook, MethodName, ReturnType } from "../hook/hook";
+import type { FrookyReturnType, Hook, MethodName } from "../hook/hook";
 import { normalizeParam, type ParamInput } from "./paramInput";
 import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
 
@@ -11,7 +11,7 @@ import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
  */
 export interface ObjcMethodDefinitionInput {
   name: MethodName;
-  returnType?: ReturnType;
+  returnType?: FrookyReturnType;
   params?: ParamInput[];
 }
 
