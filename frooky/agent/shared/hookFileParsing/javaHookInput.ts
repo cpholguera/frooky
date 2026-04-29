@@ -1,8 +1,9 @@
 import type { JavaHook, JavaMethod, JavaOverload } from "../../android/hook/javaHook";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
 import type { DecoderSettings } from "../decoders/decoderSettings";
-import type { Hook } from "../hook/hook";
-import { normalizeParamType, type ParamInput, type RetTypeInput } from "./decodableTypesInput";
+import type { Hook, HookSettings } from "../hook/hook";
+import { validateAndRepairDecoderSettings, validateAndRepairHookSettings } from "../validator/configValidator";
+import { normalizeParamType, normalizeReturnType, type ParamInput, type RetTypeInput } from "./decodableTypesInput";
 import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
 
 /**
@@ -55,38 +56,37 @@ export function isJavaHook(h: Hook): h is JavaHook {
 }
 
 // will return a JavaOverload for any form of JavaOverloadInput
-function normalizeOverload(input: JavaOverloadInput): JavaOverload {
+function normalizeOverload(overload: JavaOverloadInput, decoderSettings: DecoderSettings): JavaOverload {
   return {
-    ...input,
-    params: input.params.map(normalizeParamType),
+    ...overload,
+    params: overload.params.map((param: ParamInput) => normalizeParamType(param, decoderSettings)),
   };
 }
 
-// will return a JavaMethodDefinition for any form of JavaMethodDefinitionInput or a simple method string
-function normalizeMethod(input: JavaMethodInput): JavaMethodDefinition {
-  if (typeof input === "string") {
-    return { name: input };
+// will return a JavaMethod for any form of JavaMethodInput or a simple method string
+function normalizeMethod(method: JavaMethodInput, decoderSettings: DecoderSettings): JavaMethod {
+  if (typeof method === "string") {
+    return { name: method, decoderSettings };
   }
 
   return {
-    ...input,
-    overloads: input.overloads?.map(normalizeOverload),
+    ...method,
+    overloads: method.overloads?.map((overload: JavaOverloadInput) => normalizeOverload(overload, decoderSettings)),
+    retType: method.retType ? normalizeReturnType(method.retType, decoderSettings) : undefined,
+    decoderSettings,
   };
 }
 
 // will return a JavaHook for any form of JavaHookInput
 // if not set, the default settings for the hook and their decoders are set here
 export function normalizeJavaHook(input: JavaHookInput): JavaHook {
+  const mergedDecoderSettings: DecoderSettings = validateAndRepairDecoderSettings({ ...DEFAULT_DECODER_SETTINGS, ...input.decoderSettings });
+  const mergedHookSettings: HookSettings = validateAndRepairHookSettings({ ...DEFAULT_HOOK_SETTINGS, ...input.hookSettings });
+
   return {
     ...input,
-    methods: input.methods.map(normalizeMethod),
-    hookSettings: {
-      ...DEFAULT_HOOK_SETTINGS,
-      ...input.hookSettings,
-    },
-    decoderSettings: {
-      ...DEFAULT_DECODER_SETTINGS,
-      ...input.decoderSettings,
-    },
+    methods: input.methods.map((method: JavaMethodInput) => normalizeMethod(method, mergedDecoderSettings)),
+    hookSettings: mergedHookSettings,
+    decoderSettings: mergedDecoderSettings,
   };
 }
