@@ -131,7 +131,7 @@ hooks:
       - name: receiveIntArray
         overloads:
           - params:
-            - ["[I", {decoderSettings: {decodeLimit: 55}}]
+            - ["[I", {decodeLimit: 55}]
 
   # PARTIAL local parameter settings take priority over global setting, form [type, name, settings]
   - javaClass: org.owasp.mastestapp.MastgTest
@@ -139,5 +139,5 @@ hooks:
       - name: receiveNestedPrimitivesArray
         overloads:
           - params:
-            - ["[[[I", {decoderSettings: {decodeLimit: 56}}]
+            - ["[[[I", {decodeLimit: 66}]
 

@@ -50,6 +50,7 @@ export function validateHooks(hooks: Hook[], platform: Platform, globalHooksSett
         javaHookInput.type = "java";
         const javaHook = normalizeJavaHook(javaHookInput);
         javaHookSchema.parse(javaHook);
+        frooky.log.info(`Java hook successfully parsed:\n${JSON.stringify(javaHook, null, 2)} `);
         result.validHooks.push(javaHook);
       } else if (isObjcHook(hook)) {
         if (platform !== "iOS") {
@@ -59,12 +60,15 @@ export function validateHooks(hooks: Hook[], platform: Platform, globalHooksSett
         objcHookInput.type = "objc";
         const objcHook = normalizeObjcHook(objcHookInput);
         objcHookSchema.parse(objcHook);
+        frooky.log.info(`Objective-C hook successfully parsed:\n${JSON.stringify(objcHook, null, 2)} `);
         result.validHooks.push(objcHook);
       } else if (isNativeHook(hook)) {
         const nativeHookInput = hook as NativeHookInput;
         nativeHookInput.type = "native";
         const nativeHook = normalizeNativeHook(nativeHookInput);
         nativeHookSchema.parse(nativeHook);
+        frooky.log.info(`Native hook successfully parsed:\n${JSON.stringify(nativeHook, null, 2)} `);
+
         result.validHooks.push(nativeHook);
       } else {
         throw new Error("Hook type is unknown. Make sure that it is either a Java, Objective-C or native hook.");
