@@ -2,6 +2,7 @@ import type { NativeFrookyFunction, NativeHook } from "../../native/hook/nativeH
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
 import type { DecoderSettings } from "../decoders/decoderSettings";
 import type { Hook, HookSettings } from "../hook/hook";
+import { validateAndRepairDecoderSettings, validateAndRepairHookSettings } from "../validator/configValidator";
 import { normalizeParamType, normalizeReturnType, type ParamInput, type RetTypeInput } from "./decodableTypesInput";
 import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
 
@@ -60,8 +61,8 @@ function normalizeFunction(fn: NativeFrookyFunctionInput, decoderSettings: Decod
  * and applied to all parameters and return types.
  */
 export function normalizeNativeHook(inputHook: NativeHookInput): NativeHook {
-  const mergedDecoderSettings: DecoderSettings = { ...DEFAULT_DECODER_SETTINGS, ...inputHook.decoderSettings };
-  const mergedHookSettings: HookSettings = { ...DEFAULT_HOOK_SETTINGS, ...inputHook.hookSettings };
+  const mergedDecoderSettings: DecoderSettings = validateAndRepairDecoderSettings({ ...DEFAULT_DECODER_SETTINGS, ...inputHook.decoderSettings });
+  const mergedHookSettings: HookSettings = validateAndRepairHookSettings({ ...DEFAULT_HOOK_SETTINGS, ...inputHook.hookSettings });
 
   return {
     ...inputHook,
