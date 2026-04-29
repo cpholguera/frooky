@@ -1,12 +1,5 @@
-import type { BaseDecoder } from "../decoders/baseDecoder";
-import type { DecoderSettings, ReturnDecoderSettings } from "../decoders/decoderSettings";
-import type { ParamType } from "./param";
+import type { DecoderSettings } from "../decoders/decoderSettings";
 
-export interface FrookyReturnType {
-  type: ParamType;
-  decoder?: BaseDecoder<any, any>;
-  decoderSettings: ReturnDecoderSettings;
-}
 
 /**
  * Metadata that describes a hook collection.

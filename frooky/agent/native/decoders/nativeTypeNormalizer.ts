@@ -1,4 +1,4 @@
-import type { NativeParam } from "../hook/nativeParam";
+import { NativeParam } from "./nativeDecodableTypes";
 import type { FundamentalType } from "./nativeDecoder";
 
 export interface NativeType {

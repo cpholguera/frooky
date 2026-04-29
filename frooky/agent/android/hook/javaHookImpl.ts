@@ -1,10 +1,10 @@
 import Java from "frida-java-bridge";
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
 import type { DecoderSettings } from "../../shared/decoders/decoderSettings";
-import type { Param } from "../../shared/hook/param";
 import { JavaDecoder } from "../decoders/javaDecoder";
 import { JavaHookEvent } from "../event/javaHookEvent";
 import type { JavaHookOp } from "./javaHookRunner";
+import { Param } from "../../shared/decoders/decodableTypes";
 
 export type FieldType = {
   fieldType: "static" | "instance";
@@ -46,7 +46,7 @@ export function decodeArgs(args: Java.Wrapper[], params: Param[], settings?: Dec
   const decodedArgs: DecodedValue[] = [];
   try {
     args.forEach((arg: Java.Wrapper, i: number) => {
-      decodedArgs.push(JavaDecoder.decode(arg, params[i], settings));
+      decodedArgs.push(JavaDecoder.decode(arg, params[i]));
     });
   } catch (e) {
     frooky.log.error(`Error decoding input parameter: ${e}`);
@@ -56,7 +56,6 @@ export function decodeArgs(args: Java.Wrapper[], params: Param[], settings?: Dec
 
 export function buildAndDispatchEvent(javaHookOp: JavaHookOp, decodedArgs: DecodedValue[], returnValue: DecodedValue, stackTrace: string[], fieldType: FieldType): void {
   const event = new JavaHookEvent(javaHookOp.javaClass, javaHookOp.methodName, fieldType);
-  event.category = javaHookOp.metadata?.category;
   event.stackTrace = stackTrace;
   event.args = decodedArgs;
   event.returnValue = returnValue;

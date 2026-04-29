@@ -1,5 +1,6 @@
-import type { FrookyReturnType, Hook, MethodName } from "../../shared/hook/hook";
-import type { Param } from "../../shared/hook/param";
+import { Param, RetType } from "../../shared/decoders/decodableTypes";
+import type { Hook, MethodName } from "../../shared/hook/hook";
+
 
 /**
  * Describes a specific Java method overload.
@@ -20,7 +21,7 @@ export interface JavaOverload {
  */
 export interface JavaMethodDefinition {
   name: MethodName;
-  returnType?: FrookyReturnType;
+  returnType?: RetType;
   overloads?: JavaOverload[];
 }
 

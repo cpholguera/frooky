@@ -1,27 +1,19 @@
-import type { DecoderSettings, ParamDecoderSettings, ReturnDecoderSettings } from "./decoders/decoderSettings";
+import { DecodeAt } from "./decoders/decodableTypes";
+import type { DecoderSettings} from "./decoders/decoderSettings";
 import type { HookSettings } from "./hook/hook";
+
+export const DEFAULT_DECODE_AT: DecodeAt = "enter"
 
 export const DEFAULT_DECODER_SETTINGS: DecoderSettings = {
   fastDecode: false,
   magicDecode: false,
-  maxRecursion: 5,
-  decodeLimit: 1000,
-};
-
-export const DEFAULT_PARAM_DECODER_SETTINGS: ParamDecoderSettings = {
-  ...DEFAULT_DECODER_SETTINGS,
-  decoderArgs: [],
-  decodeAt: "enter",
-};
-
-export const DEFAULT_RETURN_DECODER_SETTINGS: ReturnDecoderSettings = {
-  ...DEFAULT_DECODER_SETTINGS,
-  decoderArgs: [],
+  maxRecursion: 77,
+  decodeLimit: 77
 };
 
 export const DEFAULT_HOOK_SETTINGS: HookSettings = {
-  hookTimeout: 5,
-  stackTraceLimit: 10,
+  hookTimeout: 77,
+  stackTraceLimit: 77,
   eventFilter: [],
 };
 

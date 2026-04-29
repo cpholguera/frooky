@@ -1,7 +1,7 @@
 import type { ObjcHook, ObjcMethodDefinition } from "../../ios/hook/objcHook";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
-import type { FrookyReturnType, Hook, MethodName } from "../hook/hook";
-import { normalizeParam, type ParamInput } from "./paramInput";
+import { Hook } from "../hook/hook";
+import { normalizeParamType, normalizeReturnType, ParamInput, ReturnTypeInput } from "./decodableTypesInput";
 import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
 
 /**
@@ -10,8 +10,8 @@ import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
  * @public
  */
 export interface ObjcMethodDefinitionInput {
-  name: MethodName;
-  returnType?: FrookyReturnType;
+  name: string;
+  returnType?: ReturnTypeInput;
   params?: ParamInput[];
 }
 
@@ -20,7 +20,7 @@ export interface ObjcMethodDefinitionInput {
  *
  * @public
  */
-export type ObjcMethodInput = MethodName | ObjcMethodDefinitionInput;
+export type ObjcMethodInput = string | ObjcMethodDefinitionInput;
 
 /**
  * Native hook configuration.
@@ -52,7 +52,8 @@ function normalizeObjcMethod(input: ObjcMethodInput): ObjcMethodDefinition {
 
   return {
     ...input,
-    params: input.params?.map(normalizeParam),
+    params: input.params?.map(normalizeParamType),
+    returnType: input.returnType ? normalizeReturnType(input.returnType) : undefined,
   };
 }
 

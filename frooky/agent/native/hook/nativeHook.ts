@@ -1,25 +1,18 @@
-import type { FrookyReturnType, Hook } from "../../shared/hook/hook";
-import type { NativeParam } from "./nativeParam";
+import { RetType } from "../../shared/decoders/decodableTypes";
+import type { Hook } from "../../shared/hook/hook";
+import { NativeParam } from "../decoders/nativeDecodableTypes";
 
-export type SymbolName = string;
 
 /**
  * Expanded Native method definition with name and optional overloads.
  *
  * @public
  */
-export interface NativeFrookyFunctionDefinition {
-  symbol: SymbolName;
-  returnType?: FrookyReturnType;
+export interface NativeFrookyFunction {
+  symbol: string;
+  returnType?: RetType;
   params?: NativeParam[];
 }
-
-/**
- * Native method selector — either a simple method name or a detailed definition.
- *
- * @public
- */
-export type NativeFrookyFunction = NativeFrookyFunctionDefinition;
 
 /**
  * Native hook configuration.

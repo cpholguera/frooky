@@ -37,6 +37,7 @@
   "kotlin.diagnostics.enabled": false,
   "C_Cpp.errorSquiggles": "disabled",
   "cSpell.words": [
+    "frooky",
     "JNIEXPORT",
     "jobject"
   ]

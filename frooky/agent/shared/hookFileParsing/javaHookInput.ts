@@ -1,7 +1,7 @@
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "../../android/hook/javaHook";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
 import type { Hook, MethodName } from "../hook/hook";
-import { normalizeParam, type ParamInput } from "./paramInput";
+import { normalizeParamType, ParamInput } from "./decodableTypesInput";
 import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
 
 /**
@@ -11,7 +11,7 @@ import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
  */
 export interface JavaOverloadInput extends Omit<JavaOverload, "params"> {
   /**
-   * Parameter definitions for this overload.
+   * Parameter type for this overload.
    */
   params: ParamInput[];
 }
@@ -62,7 +62,7 @@ export function isJavaHook(h: Hook): h is JavaHook {
 function normalizeOverload(input: JavaOverloadInput): JavaOverload {
   return {
     ...input,
-    params: input.params.map(normalizeParam),
+    params: input.params.map(normalizeParamType),
   };
 }
 

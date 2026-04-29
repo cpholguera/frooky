@@ -2,11 +2,11 @@ import Java from "frida-java-bridge";
 import { DEFAULT_HOOK_SETTINGS } from "../../shared/config";
 import type { MethodName } from "../../shared/hook/hook";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
-import type { Param, ParamType } from "../../shared/hook/param";
 import { JavaDecoder } from "../decoders/javaDecoder";
 import type { JavaHook, JavaMethodDefinition, JavaOverload } from "./javaHook";
 import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeArgs } from "./javaHookImpl";
 import type { JavaParam } from "./javaParam";
+import { Param } from "../../shared/decoders/decodableTypes";
 
 // contains everything needed to hook one java method
 export interface JavaHookOp extends HookOp {
@@ -80,7 +80,7 @@ function buildJavaHookOps(hook: JavaHook, handle: Java.MethodDispatcher, methodD
           };
         });
       }
-      const paramList: ParamType[] = declaredOverload.params.map((p: Param) => p.type);
+      const paramList: Param[] = declaredOverload.params.map((p: Param) => p.type);
       try {
         pushHookOp(hook, methodDefinition, declaredOverload.params, handle.overload(...paramList), javaHookOps);
       } catch (e) {

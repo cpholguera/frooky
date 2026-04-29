@@ -1,6 +1,6 @@
 import type { BaseDecoder } from "../../shared/decoders/baseDecoder";
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
-import type { NativeParam } from "../hook/nativeParam";
+import { NativeParam } from "./nativeDecodableTypes";
 import type { FundamentalType } from "./nativeDecoder";
 import { NativeFallbackDecoder } from "./nativeFallbackDecoder";
 
@@ -42,7 +42,7 @@ const referenceValueDecoders: Record<FundamentalType, (input: NativePointer) => 
 };
 
 export const NativeReferenceDecoder: BaseDecoder<NativePointer, NativeParam> = {
-  decode: (value, param, settings): DecodedValue => {
+  decode: (value, param): DecodedValue => {
     const pointeeType = param.nativeType?.pointee as FundamentalType;
     const referenceValueDecoder = referenceValueDecoders[pointeeType];
     if (referenceValueDecoder) {
@@ -52,7 +52,7 @@ export const NativeReferenceDecoder: BaseDecoder<NativePointer, NativeParam> = {
         value: referenceValueDecoder(value),
       };
     } else {
-      return NativeFallbackDecoder.decode(value, param, settings);
+      return NativeFallbackDecoder.decode(value, param);
     }
   },
 };

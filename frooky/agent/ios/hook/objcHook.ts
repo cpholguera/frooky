@@ -1,5 +1,5 @@
-import type { FrookyReturnType, Hook, MethodName } from "../../shared/hook/hook";
-import type { Param } from "../../shared/hook/param";
+import { Param, RetType } from "../../shared/decoders/decodableTypes";
+import type { Hook, MethodName } from "../../shared/hook/hook";
 
 /**
  * Expanded Objective-C method definition with name and optional overloads.
@@ -8,7 +8,7 @@ import type { Param } from "../../shared/hook/param";
  */
 export interface ObjcMethodDefinition {
   name: MethodName;
-  returnType?: FrookyReturnType;
+  returnType?: RetType;
   params?: Param[];
 }
 

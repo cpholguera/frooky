@@ -1,7 +1,7 @@
-import type { NativeFrookyFunctionDefinition, NativeHook, SymbolName } from "../../native/hook/nativeHook";
+import type { NativeFrookyFunction, NativeHook } from "../../native/hook/nativeHook";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../config";
 import type { Hook } from "../hook/hook";
-import { normalizeParam, type ParamInput } from "./paramInput";
+import { normalizeParamType, normalizeReturnType, ParamInput, ReturnTypeInput } from "./decodableTypesInput";
 import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
 
 /**
@@ -9,17 +9,10 @@ import type { DecoderSettingsInput, HookSettingsInput } from "./settingsInput";
  *
  * @public
  */
-export interface NativeFunctionDefinitionInput extends Omit<NativeFrookyFunctionDefinition, "params" | "returnType"> {
+export interface NativeFrookyFunctionInput extends Omit<NativeFrookyFunction, "params" | "returnType"> {
   params?: ParamInput[];
-  returnType?: ParamInput;
+  returnType?: ReturnTypeInput;
 }
-
-/**
- * Native method selector - either a simple method name or a detailed YAML definition.
- *
- * @public
- */
-export type NativeFrookyFunctionInput = SymbolName | NativeFunctionDefinitionInput;
 
 /**
  * Native hook configuration for YAML parsing.
@@ -43,15 +36,15 @@ export function isNativeHook(h: Hook): h is NativeHook {
   return "functions" in h;
 }
 
-function normalizeFunctionDefinition(input: NativeFunctionDefinitionInput): NativeFrookyFunctionDefinition {
+function normalizeFunctionDefinition(input: NativeFrookyFunctionInput): NativeFrookyFunction {
   return {
     ...input,
-    params: input.params?.map(normalizeParam),
-    returnType: input.returnType ? normalizeParam(input.returnType) : undefined,
+    params: input.params?.map(normalizeParamType),
+    returnType: input.returnType ? normalizeReturnType(input.returnType) : undefined,
   };
 }
 
-function normalizeFunction(input: NativeFrookyFunctionInput): NativeFrookyFunctionDefinition {
+function normalizeFunction(input: NativeFrookyFunctionInput): NativeFrookyFunction {
   if (typeof input === "string") {
     return { symbol: input };
   }

@@ -1,5 +1,3 @@
-import type { DecodeAt } from "../hook/param";
-
 /**
  * Decoder settings any kind of parameter or return type decoder
  *
@@ -33,45 +31,4 @@ export interface DecoderSettings {
    * @defaultValue false
    */
   fastDecode: boolean;
-}
-
-/**
- * Decoder settings for return types
- *
- * @public
- */
-export interface ReturnDecoderSettings extends DecoderSettings {
-  /**
-   * Extra arguments passed to the decoder. They must be a valid parameter name.
-   *
-   * @defaultValue []
-   * @example [ "ctxPointer" ]
-   * @example [ "inBuffer", "bufferLength" ]
-   */
-  decoderArgs: string[];
-}
-
-/**
- * Decoder settings for function / method parameters
- *
- * @public
- */
-export interface ParamDecoderSettings extends DecoderSettings {
-  /**
-   * Extra arguments passed to the decoder. They must be a valid parameter name.
-   *
-   * @defaultValue []
-   * @example [ "ctxPointer" ]
-   * @example [ "inBuffer", "bufferLength" ]
-   */
-  decoderArgs: string[];
-
-  /**
-   * When the decoder should be applied.
-   *
-   * @defaultValue "enter"
-   * @example "exit"
-   * @example "both"
-   */
-  decodeAt: DecodeAt;
 }
