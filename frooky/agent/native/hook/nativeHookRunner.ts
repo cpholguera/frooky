@@ -47,6 +47,8 @@ export function registerNativeHookOps(nativeHookOp: NativeHookOp) {
 async function buildNativeHookOps(hook: NativeHook): Promise<NativeHookOp[]> {
   const nativeHHookOps: NativeHookOp[] = [];
   try {
+    // TODO: Load all modules in one timeout instead of each one. At the moment, each typo adds one timeout.
+
     let module: Module;
     try {
       frooky.log.info(`Trying to load the module '${hook.module}' with a timeout of ${hook.hookSettings.hookTimeout}ms.`);
