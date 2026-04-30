@@ -130,18 +130,26 @@ export function prettyPrintHook(hook: Hook, short: boolean = true): string {
 // run a function with in an interval until the timeout is reached or
 export function retryUntilSuccess(fn: () => void, intervalMs: number = 100, timeoutMs: number = 5000): Promise<void> {
   return new Promise((resolve, reject) => {
-    const interval = setInterval(() => {
+    let interval: ReturnType<typeof setInterval> | undefined;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+
+    const tryFn = () => {
       try {
         fn();
         clearInterval(interval);
         clearTimeout(timeout);
         resolve();
-      } catch (_) {
-        // keep retrying
+        return true;
+      } catch (e) {
+        frooky.log.warn(String(e));
+        return false;
       }
-    }, intervalMs);
+    };
 
-    const timeout = setTimeout(() => {
+    if (tryFn()) return;
+
+    interval = setInterval(tryFn, intervalMs);
+    timeout = setTimeout(() => {
       clearInterval(interval);
       reject(new Error(`Timeout of ${timeoutMs}ms reached`));
     }, timeoutMs);

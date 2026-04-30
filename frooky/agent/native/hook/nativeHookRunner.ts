@@ -49,15 +49,16 @@ async function buildNativeHookOps(hook: NativeHook): Promise<NativeHookOp[]> {
   try {
     let module: Module;
     try {
+      frooky.log.info(`Trying to load the module '${hook.module}' with a timeout of ${hook.hookSettings.hookTimeout}ms.`);
       await retryUntilSuccess(
         () => {
           module = Process.getModuleByName(hook.module);
         },
-        500,
-        10000,
+        100,
+        hook.hookSettings.hookTimeout,
       );
     } catch (e) {
-      frooky.log.warn(`Module ${hook.module} could not be loaded within ${hook.hookSettings.hookTimeout}ms`);
+      frooky.log.error(`Module ${hook.module} could not be loaded within ${hook.hookSettings.hookTimeout}ms. It may be that the module '${hook.module}' does not exist.`);
       return nativeHHookOps;
     }
 

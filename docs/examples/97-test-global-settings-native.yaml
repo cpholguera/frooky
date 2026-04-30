@@ -74,24 +74,24 @@ metadata:
 # global settings for the hooks in this hook file.
 globalSettings:
   hookSettings:
-    hookTimeout: 1111                 # Timeout in seconds frooky will try to hook in case something the target library is not available.
-    stackTraceLimit: 11               # Sets stackTraceLimit to 10 for all hooks
-    eventFilter: ['^libmyapp\.so']    # Stack trace filters to apply.
+    hookTimeout: 1111 # Timeout in seconds frooky will try to hook in case something the target library is not available.
+    stackTraceLimit: 11 # Sets stackTraceLimit to 10 for all hooks
+    eventFilter: ['^libmyapp\.so'] # Stack trace filters to apply.
   decoderSettings:
-    fastDecode: true                  # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
-    magicDecode: true                 # If set, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime
-    maxRecursion: 1                   # Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
-    decodeLimit: 11                   # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
+    fastDecode: true # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
+    magicDecode: true # If set, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime
+    maxRecursion: 1 # Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
+    decodeLimit: 11 # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
 
 hooks:
   # simple function declaration
   - module: libreceiveFundamentalValue.so
-    functions: 
+    functions:
       - receive_bool
 
   # object with ONLY symbol provided, technically the same form as the one before
   - module: libreceiveFundamentalValue.so
-    functions: 
+    functions:
       - symbol: receive_short
 
   # PARTIAL local hook settings take priority over global setting, simple function declaration
@@ -111,7 +111,7 @@ hooks:
     decoderSettings:
       decodeLimit: 33
     functions:
-      - symbol:  receive_long
+      - symbol: receive_long
 
   # PARTIAL local hook settings take priority over global setting, object with ONLY symbol provided
   - module: libreceiveFundamentalValue.so
@@ -127,14 +127,12 @@ hooks:
   - module: libreceiveFundamentalValue.so
     functions:
       - symbol: receive_llong
-        params: 
-          - [ llong , { decodeLimit: 55 } ]
+        params:
+          - [llong, { decodeLimit: 55 }]
 
   # PARTIAL local parameter settings take priority over global setting, form [type, name, settings]
   - module: libreceiveFundamentalValue.so
     functions:
       - symbol: receive_ulong
-        params: 
-          - [ llong , astronomicUnit , { decodeLimit: 66 } ]
-
-
+        params:
+          - [llong, astronomicUnit, { decodeLimit: 66 }]
