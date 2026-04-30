@@ -7,13 +7,13 @@ export const DEFAULT_DECODE_AT: DecodeAt = "enter";
 export const DEFAULT_DECODER_SETTINGS: DecoderSettings = {
   fastDecode: false,
   magicDecode: false,
-  maxRecursion: 77,
-  decodeLimit: 77,
+  maxRecursion: 10,
+  decodeLimit: 1000,
 };
 
 export const DEFAULT_HOOK_SETTINGS: HookSettings = {
-  hookTimeout: 77,
-  stackTraceLimit: 77,
+  hookTimeout: 5000,
+  stackTraceLimit: 10,
   eventFilter: [],
 };
 

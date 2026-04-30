@@ -82,15 +82,15 @@ export class FrookyApp {
   //   this.nativeHookRunner.operationsBuilder(this.hookStore.getNativeHooks());
   // }
 
-  public executeHookOperations() {
+  public async executeHookOperations(): Promise<void> {
     if (this.platform === "Android") {
-      this.platformHookRunner.executeHooking(this.hookStore.getJavaHooks());
+      await this.platformHookRunner.executeHooking(this.hookStore.getJavaHooks());
     }
     // if (this.platform === "iOS") {
     //   this.platformHookRunner.executeHooking(this.hookStore.getObjcHookOperations());
     // }
     // run native hook on both platforms
-    this.nativeHookRunner.executeHooking(this.hookStore.getNativeHooks());
+    await this.nativeHookRunner.executeHooking(this.hookStore.getNativeHooks());
   }
 
   /**

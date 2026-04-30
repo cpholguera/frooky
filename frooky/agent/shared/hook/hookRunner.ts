@@ -12,5 +12,5 @@ export interface HookOp {
 }
 
 export interface HookRunner {
-  executeHooking(hooks: Hook[]): void;
+  executeHooking(hooks: Hook[]): Promise<void>;
 }

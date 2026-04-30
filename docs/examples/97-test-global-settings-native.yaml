@@ -74,7 +74,7 @@ metadata:
 # global settings for the hooks in this hook file.
 globalSettings:
   hookSettings:
-    hookTimeout: 1                    # Timeout in seconds frooky will try to hook in case something the target library is not available.
+    hookTimeout: 1111                 # Timeout in seconds frooky will try to hook in case something the target library is not available.
     stackTraceLimit: 11               # Sets stackTraceLimit to 10 for all hooks
     eventFilter: ['^libmyapp\.so']    # Stack trace filters to apply.
   decoderSettings:
@@ -97,7 +97,7 @@ hooks:
   # PARTIAL local hook settings take priority over global setting, simple function declaration
   - module: libreceiveFundamentalValue.so
     hookSettings:
-      hookTimeout: 2
+      hookTimeout: 2000
     decoderSettings:
       decodeLimit: 22
     functions:
@@ -107,7 +107,7 @@ hooks:
   # PARTIAL local hook settings take priority over global setting, simple function declaration
   - module: libreceiveFundamentalValue.so
     hookSettings:
-      hookTimeout: 3
+      hookTimeout: 3000
     decoderSettings:
       decodeLimit: 33
     functions:
@@ -116,7 +116,7 @@ hooks:
   # PARTIAL local hook settings take priority over global setting, object with ONLY symbol provided
   - module: libreceiveFundamentalValue.so
     hookSettings:
-      hookTimeout: 4
+      hookTimeout: 4000
     decoderSettings:
       decodeLimit: 44
     functions:

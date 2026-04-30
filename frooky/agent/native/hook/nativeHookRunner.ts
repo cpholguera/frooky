@@ -2,6 +2,7 @@ import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../../shared/co
 import type { RetType } from "../../shared/decoders/decodableTypes";
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
+import { retryUntilSuccess } from "../../shared/utils";
 import type { NativeParam } from "../decoders/nativeDecodableTypes";
 import { NativeDecoder } from "../decoders/nativeDecoder";
 import type { NativeHook } from "./nativeHook";
@@ -43,10 +44,22 @@ export function registerNativeHookOps(nativeHookOp: NativeHookOp) {
 }
 
 // builds a list of native hook operations. Each NativeHookOp contains all information to hook ONE native function
-function buildNativeHookOps(hook: NativeHook): NativeHookOp[] {
+async function buildNativeHookOps(hook: NativeHook): Promise<NativeHookOp[]> {
   const nativeHHookOps: NativeHookOp[] = [];
   try {
-    const module = Process.getModuleByName(hook.module);
+    let module: Module;
+    try {
+      await retryUntilSuccess(
+        () => {
+          module = Process.getModuleByName(hook.module);
+        },
+        500,
+        10000,
+      );
+    } catch (e) {
+      frooky.log.warn(`Module ${hook.module} could not be loaded within ${hook.hookSettings.hookTimeout}ms`);
+      return nativeHHookOps;
+    }
 
     hook.functions.forEach((fn: NativeFrookyFunctionDefinition) => {
       // add the decoder settings to the return type of the function
@@ -75,15 +88,15 @@ function buildNativeHookOps(hook: NativeHook): NativeHookOp[] {
 }
 
 export class NativeHookRunner implements HookRunner {
-  executeHooking(hooks: NativeHook[]): void {
-    var nativeHookOps: NativeHookOp[] = [];
+  async executeHooking(hooks: NativeHook[]): Promise<void> {
+    const nativeHookOps: NativeHookOp[] = [];
 
     frooky.log.info(`Executing native hook operations`);
-    hooks.forEach((h: NativeHook) => {
+    for (const h of hooks) {
       frooky.log.info(`Building hook operations for native`);
-      nativeHookOps.push(...buildNativeHookOps(h));
-    });
-    // frooky.log.info(`Hook operations for the following hook built: ${JSON.stringify(nativeHookOps, null, 2)}`);
+      nativeHookOps.push(...(await buildNativeHookOps(h)));
+    }
+
     frooky.log.info(`Run native hooking`);
     nativeHookOps.forEach((nativeHookOp: NativeHookOp) => {
       registerNativeHookOps(nativeHookOp);
