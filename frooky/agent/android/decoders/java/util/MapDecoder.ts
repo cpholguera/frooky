@@ -25,8 +25,8 @@ export const MapDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
       return {
         type: "java.util.Map.Entry",
         value: [
-          { ...JavaDecoder.decode(key, { type: keyType, settings:param.settings }), name: "key" },
-          { ...JavaDecoder.decode(value, { type: valueType, settings:param.settings }), name: "value" },
+          { ...JavaDecoder.decode(key, { type: keyType, decoderSettings: param.decoderSettings }), name: "key" },
+          { ...JavaDecoder.decode(value, { type: valueType, decoderSettings: param.decoderSettings }), name: "value" },
         ],
       } as DecodedValue;
     });

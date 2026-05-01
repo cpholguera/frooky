@@ -8,7 +8,7 @@ import { JavaDecoder } from "../../javaDecoder";
 
 function defaultElementDecoder(element: Java.Wrapper, settings: DecoderSettings): DecodedValue {
   const elementType = element == null ? "java.lang.Object" : (element.$className ?? "java.lang.Object");
-  return JavaDecoder.decode(element, { type: elementType, settings: settings });
+  return JavaDecoder.decode(element, { type: elementType, decoderSettings: settings });
 }
 
 /**
@@ -17,12 +17,12 @@ function defaultElementDecoder(element: Java.Wrapper, settings: DecoderSettings)
 export function decodeIterable(iterable: Java.Wrapper, param: JavaParam, customElementDecoder?: (entry: Java.Wrapper) => DecodedValue): DecodedValue {
   const values: DecodedValue[] = [];
   const iterator = iterable.iterator();
-  const limit = param.settings.decodeLimit ?? DEFAULT_DECODER_SETTINGS.decodeLimit;
+  const limit = param.decoderSettings.decodeLimit ?? DEFAULT_DECODER_SETTINGS.decodeLimit;
 
   let count = 0;
   while (iterator.hasNext() && count < limit) {
     const element = iterator.next();
-    values.push(customElementDecoder ? customElementDecoder(element) : defaultElementDecoder(element, param.settings));
+    values.push(customElementDecoder ? customElementDecoder(element) : defaultElementDecoder(element, param.decoderSettings));
     count++;
   }
 

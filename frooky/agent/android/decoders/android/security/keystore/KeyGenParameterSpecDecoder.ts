@@ -68,7 +68,7 @@ export const KeyGenParameterSpecDecoder: BaseDecoder<Java.Wrapper, JavaParam> = 
       }
       try {
         const raw = fn.call(typedSpec);
-        const type: JavaParam = { type: fn.returnType.className ?? "void", implementationType: fn.returnType.className ?? "void", settings: param.settings, decodeAt: param.decodeAt };
+        const type: JavaParam = { type: fn.returnType.className ?? "void", implementationType: fn.returnType.className ?? "void", decoderSettings: param.decoderSettings, decodeAt: param.decodeAt };
         value[stripPrefix(name)] = JavaDecoder.decode(raw, type);
       } catch (e) {
         value[stripPrefix(name)] = `Error when decoding : ${e}>`;

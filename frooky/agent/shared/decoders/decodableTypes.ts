@@ -25,7 +25,7 @@ export interface DecodableType {
   decoder?: BaseDecoder<any, any>;
 
   /** Settings applied when running the decoder. */
-  settings: DecoderSettings;
+  decoderSettings: DecoderSettings;
 }
 
 /**

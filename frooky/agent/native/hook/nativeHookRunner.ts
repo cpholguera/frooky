@@ -73,8 +73,8 @@ async function buildNativeHookOps(hook: NativeHook): Promise<NativeHookOp[]> {
       return;
     }
 
-    if (fn.retType?.settings) {
-      fn.retType.settings = validateAndRepairDecoderSettings({ ...DEFAULT_DECODER_SETTINGS, ...fn.retType?.settings });
+    if (fn.retType?.decoderSettings) {
+      fn.retType.decoderSettings = validateAndRepairDecoderSettings({ ...DEFAULT_DECODER_SETTINGS, ...fn.retType?.decoderSettings });
     }
 
     nativeHHookOps.push({
@@ -84,7 +84,7 @@ async function buildNativeHookOps(hook: NativeHook): Promise<NativeHookOp[]> {
       symbol: fn.symbol,
       symbolAddress: symbolAddress,
       params: fn.params ?? [],
-      retType: fn.retType ?? { type: "void", settings: DEFAULT_DECODER_SETTINGS },
+      retType: fn.retType ?? { type: "void", decoderSettings: DEFAULT_DECODER_SETTINGS },
     });
   });
   return nativeHHookOps;
