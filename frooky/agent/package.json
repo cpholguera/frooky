@@ -6,12 +6,17 @@
   "type": "module",
   "scripts": {
     "build:zodSchema": "npx ts-to-zod --all && pretty-quick",
-    "prod-android": "npm run build:zodSchema && node build.js -p android -c --type-check none",
-    "prod-ios": "npm run build:zodSchema && node build.js -p ios -c --type-check none",
-    "dev-android": "node build.js -p android --type-check none",
-    "dev-ios": "node build.js -p ios --type-check none",
-    "watch-android": "node build.js -p android -t frida -w --type-check none",
-    "watch-ios": "node build.js -p ios -w -t frida --type-check none"
+    "build:prod:android": "node build.js android -c --type-check none",
+    "build:prod:ios": "node build.js ios -c --type-check none",
+    "build:dev:android": "node build.js android --type-check none",
+    "build:dev:ios": "node build.js ios --type-check none",
+    "build:watch:android": "node build.js android -t frida -w --type-check none",
+    "build:watch:ios": "node build.js ios -w -t frida --type-check none",
+    "build:test:android": "mkdir -p dist && frida-compile --type-check none tests/android/agent-runner.ts -o dist/agent-test-android.js",
+    "build:test:ios": "mkdir -p dist && frida-compile --type-check none tests/ios/agent-runner.ts -o dist/agent-test-ios.js",
+    "test:android": "npm run build:test:android && node tests/run-tests.js -p dist/agent-test-android.js -usb",
+    "test:ios:usb": "npm run build:test:ios && node tests/run-tests.js -p dist/agent-test-ios.js -usb",
+    "test:ios:local": "npm run build:test:ios && node tests/run-tests.js -p dist/agent-test-ios.js"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
