@@ -68,7 +68,6 @@ export function validateHooks(hooks: Hook[], platform: Platform, globalHooksSett
         const nativeHook = normalizeNativeHook(nativeHookInput);
         nativeHookSchema.parse(nativeHook);
         frooky.log.info(`Native hook successfully parsed:\n${JSON.stringify(nativeHook, null, 2)} `);
-
         result.validHooks.push(nativeHook);
       } else {
         throw new Error("Hook type is unknown. Make sure that it is either a Java, Objective-C or native hook.");

@@ -44,14 +44,14 @@ export function isNativeHook(h: Hook): h is NativeHook {
 // normalizes the NativeFrookyFunctionInput used in the YAML to an internally usable NativeFrookyFunction
 function normalizeFunction(fn: NativeFrookyFunctionInput, decoderSettings: DecoderSettings): NativeFrookyFunction {
   if (typeof fn === "string") {
-    return { symbol: fn, decoderSettings };
+    return { symbol: fn, decoderSettings: decoderSettings };
   }
 
   return {
     symbol: fn.symbol,
     params: fn.params?.map((param: ParamInput) => normalizeParamType(param, decoderSettings)),
     retType: fn.retType ? normalizeReturnType(fn.retType, decoderSettings) : undefined,
-    decoderSettings,
+    decoderSettings: decoderSettings,
   };
 }
 

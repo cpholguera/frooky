@@ -3,9 +3,10 @@ import type { RetType } from "../../shared/decoders/decodableTypes";
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
 import type { HookOp, HookRunner } from "../../shared/hook/hookRunner";
 import { retryUntilSuccess } from "../../shared/utils";
+import { validateAndRepairDecoderSettings } from "../../shared/validator/configValidator";
 import type { NativeParam } from "../decoders/nativeDecodableTypes";
 import { NativeDecoder } from "../decoders/nativeDecoder";
-import type { NativeHook } from "./nativeHook";
+import type { NativeFrookyFunction, NativeHook } from "./nativeHook";
 import { buildAndDispatchEvent, buildNativeStackTrace, decodeNativeArgs } from "./nativeHookImpl";
 
 export interface NativeHookOp extends HookOp {
@@ -33,7 +34,7 @@ export function registerNativeHookOps(nativeHookOp: NativeHookOp) {
     onLeave: (returnValue: InvocationReturnValue) => {
       // decode the return value
       if (nativeHookOp.retType) {
-        decodedReturnValue = NativeDecoder.decode(returnValue, nativeHookOp.retType.decoderSettings);
+        decodedReturnValue = NativeDecoder.decode(returnValue, nativeHookOp.retType);
       } else {
         decodedReturnValue = { type: "void", value: null };
       }
@@ -46,47 +47,46 @@ export function registerNativeHookOps(nativeHookOp: NativeHookOp) {
 // builds a list of native hook operations. Each NativeHookOp contains all information to hook ONE native function
 async function buildNativeHookOps(hook: NativeHook): Promise<NativeHookOp[]> {
   const nativeHHookOps: NativeHookOp[] = [];
-  try {
-    // TODO: Load all modules in one timeout instead of each one. At the moment, each typo adds one timeout.
+  // TODO: Load all modules in one timeout instead of each one. At the moment, each typo adds one timeout.
 
-    let module: Module;
+  let module: Module;
+  try {
+    frooky.log.info(`Trying to load the module '${hook.module}' with a timeout of ${hook.hookSettings.hookTimeout}ms.`);
+    await retryUntilSuccess(
+      () => {
+        module = Process.getModuleByName(hook.module);
+      },
+      100,
+      hook.hookSettings.hookTimeout,
+    );
+  } catch (e) {
+    frooky.log.error(`Module ${hook.module} could not be loaded within ${hook.hookSettings.hookTimeout}ms. Module '${hook.module}' does not exist, or did not load within the timeout.`);
+    return nativeHHookOps;
+  }
+
+  hook.functions.forEach((fn: NativeFrookyFunction) => {
+    let symbolAddress: NativePointer;
     try {
-      frooky.log.info(`Trying to load the module '${hook.module}' with a timeout of ${hook.hookSettings.hookTimeout}ms.`);
-      await retryUntilSuccess(
-        () => {
-          module = Process.getModuleByName(hook.module);
-        },
-        100,
-        hook.hookSettings.hookTimeout,
-      );
+      symbolAddress = module.getExportByName(fn.symbol);
     } catch (e) {
-      frooky.log.error(`Module ${hook.module} could not be loaded within ${hook.hookSettings.hookTimeout}ms. It may be that the module '${hook.module}' does not exist.`);
-      return nativeHHookOps;
+      frooky.log.error(`Symbol '${fn.symbol}' does not exist in module '${module}'`);
+      return;
     }
 
-    hook.functions.forEach((fn: NativeFrookyFunctionDefinition) => {
-      // add the decoder settings to the return type of the function
-      if (fn.returnType?.decoderSettings) {
-        fn.returnType.decoderSettings = validateAndNormalizeReturnDecoderSettings(fn.returnType.decoderSettings);
-        fn.returnType.decoderSettings = { ...DEFAULT_DECODER_SETTINGS, ...fn.returnType.decoderSettings };
-      }
+    if (fn.retType?.settings) {
+      fn.retType.settings = validateAndRepairDecoderSettings({ ...DEFAULT_DECODER_SETTINGS, ...fn.retType?.settings });
+    }
 
-      try {
-        nativeHHookOps.push({
-          module: hook.module,
-          symbol: fn.symbol,
-          hookSettings: hook.hookSettings,
-          symbolAddress: module.getExportByName(fn.symbol),
-          params: fn.params ?? [],
-          retType: fn.returnType ?? { type: "void", decoderSettings: DEFAULT_DECODER_SETTINGS },
-        });
-      } catch (e) {
-        frooky.log.error(`Failed to resolve native symbol '${fn.symbol}'${hook.module ? ` in module '${hook.module}'` : ""}: ${e}`);
-      }
+    nativeHHookOps.push({
+      hookSettings: hook.hookSettings,
+      decoderSettings: validateAndRepairDecoderSettings({ ...DEFAULT_DECODER_SETTINGS, ...hook.decoderSettings }),
+      module: hook.module,
+      symbol: fn.symbol,
+      symbolAddress: symbolAddress,
+      params: fn.params ?? [],
+      retType: fn.retType ?? { type: "void", settings: DEFAULT_DECODER_SETTINGS },
     });
-  } catch (e) {
-    frooky.log.error(`Failed to get module '${hook.module}': ${e}`);
-  }
+  });
   return nativeHHookOps;
 }
 
