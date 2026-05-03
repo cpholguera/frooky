@@ -1,6 +1,6 @@
 import type { DecodeAt } from "./decoders/decodableTypes";
 import type { DecoderSettings } from "./decoders/decoderSettings";
-import type { HookSettings } from "./hook/hook";
+import { HookSettings } from "./hook/hookSettings";
 
 export const DEFAULT_DECODE_AT: DecodeAt = "enter";
 

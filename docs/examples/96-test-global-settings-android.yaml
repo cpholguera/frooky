@@ -1,5 +1,5 @@
 metadata:
-  name: Test Settings Android
+  methodName: Test Settings Android
   description: |
     This frooky config uses different kind of settings:
 
@@ -83,16 +83,16 @@ globalSettings:
     maxRecursion: 1                   # Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
     decodeLimit: 11                   # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
 
-hooks:
+hookScopes:
   # simple method declaration
   - javaClass: org.owasp.mastestapp.MastgTest
-    methods:
+    hooks:
       - receiveBoolean
 
   # object with ONLY name provided, technically the same form as the one before
   - javaClass: org.owasp.mastestapp.MastgTest
-    methods:
-      - name: receiveByte
+    hooks:
+      - methodName: receiveByte
 
 
   # PARTIAL local hook settings take priority over global setting, simple function declaration
@@ -101,7 +101,7 @@ hooks:
       hookTimeout: 2
     decoderSettings:
       decodeLimit: 22
-    methods:
+    hooks:
       - receiveShort
       - receiveInt
 
@@ -111,8 +111,8 @@ hooks:
       hookTimeout: 3
     decoderSettings:
       decodeLimit: 33
-    methods:
-      - name: receiveLong
+    hooks:
+      - methodName: receiveLong
 
   # PARTIAL local hook settings take priority over global setting, object with ONLY symbol provided
   - javaClass: org.owasp.mastestapp.MastgTest
@@ -120,23 +120,23 @@ hooks:
       hookTimeout: 4
     decoderSettings:
       decodeLimit: 44
-    methods:
+    hooks:
       - receiveFloat
       - receiveDouble
 
 
   # PARTIAL local parameter settings take priority over global setting, form [type, settings]
   - javaClass: org.owasp.mastestapp.MastgTest
-    methods:
-      - name: receiveIntArray
+    hooks:
+      - methodName: receiveIntArray
         overloads:
           - params:
             - ["[I", {decodeLimit: 55}]
 
   # PARTIAL local parameter settings take priority over global setting, form [type, name, settings]
   - javaClass: org.owasp.mastestapp.MastgTest
-    methods:
-      - name: receiveNestedPrimitivesArray
+    hooks:
+      - methodName: receiveNestedPrimitivesArray
         overloads:
           - params:
             - ["[[[I", {decodeLimit: 66}]

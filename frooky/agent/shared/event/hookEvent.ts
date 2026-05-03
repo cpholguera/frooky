@@ -13,12 +13,6 @@ export abstract class HookEvent extends BaseEvent {
    */
   type = "hook";
 
-  /**
-   * The category grouping this hook belongs to,
-   * as defined in the hook configuration.
-   */
-  category?: string;
-
   /** Stack trace captured at the point of interception. */
   stackTrace?: string[];
 

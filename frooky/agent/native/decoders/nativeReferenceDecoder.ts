@@ -48,7 +48,7 @@ export const NativeReferenceDecoder: BaseDecoder<NativePointer, NativeParam> = {
     if (referenceValueDecoder) {
       return {
         type: param.type,
-        name: param.name,
+        name: param.paramNname,
         value: referenceValueDecoder(value),
       };
     } else {

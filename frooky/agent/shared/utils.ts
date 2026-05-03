@@ -1,14 +1,11 @@
-import type { Hook, JavaMethod, ObjcMethod } from "frooky";
-import { isJavaHook } from "./hookFileParsing/javaHookInput";
-import { isNativeHook, type NativeFrookyFunction } from "./hookFileParsing/nativeHookInput";
-import { isObjcHook } from "./hookFileParsing/objcHookInput";
-
 /**
  * Generates a v4 UUID
  * @returns {string} v4 UUID (e.g. "6b5354ed-8c3e-476d-8999-96b2251d8a3c")
  */
 export function uuidv4(): string {
-  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c: string): string => ((+c ^ ((Math.random() * 16) >> (+c / 4))) & 15).toString(16));
+  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c: string): string =>
+    ((+c ^ ((Math.random() * 16) >> (+c / 4))) & 15).toString(16),
+  );
 }
 
 const HEX_TABLE: readonly string[] = Object.freeze(Array.from({ length: 256 }, (_, i) => (i < 16 ? "0" : "") + i.toString(16)));
@@ -99,32 +96,6 @@ export function toHexAndAscii(bytes: Uint8Array, length: number = Infinity, plac
   }
 
   return ["0x" + hexArray.join("") + ellipsis, asciiArray.join("") + ellipsis];
-}
-
-export function prettyPrintHook(hook: Hook, short: boolean = true): string {
-  var result: string = "";
-  if (short) {
-    if (isJavaHook(hook)) {
-      hook.methods.forEach((m: JavaMethod, index: number) => {
-        const prefix = index === 0 ? "- " : "  ";
-        result += typeof m === "string" ? `${prefix}${hook.javaClass}: ${m}\n` : `${prefix}${hook.javaClass}: ${m.name}\n`;
-      });
-    } else if (isObjcHook(hook)) {
-      hook.methods.forEach((m: ObjcMethod, index: number) => {
-        const prefix = index === 0 ? "- " : "  ";
-        result += typeof m === "string" ? `${prefix}${hook.objcClass}: ${m}\n` : `${prefix}${hook.objcClass}: ${m.name}\n`;
-      });
-    }
-    if (isNativeHook(hook)) {
-      hook.functions.forEach((f: NativeFrookyFunction, index: number) => {
-        const prefix = index === 0 ? "- " : "  ";
-        result += typeof f === "string" ? `${prefix}${hook.module}: ${f}\n` : `${prefix}${hook.module}: ${f.symbol}\n`;
-      });
-    }
-  } else {
-    result = JSON.stringify(hook, null, 2);
-  }
-  return result;
 }
 
 // run a function with in an interval until the timeout is reached or

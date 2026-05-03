@@ -72,7 +72,7 @@ export const JavaArrayDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
 
     return {
       type: param.type,
-      name: param.name,
+      name: param.paramNname,
       value: arrayValue,
     };
   },

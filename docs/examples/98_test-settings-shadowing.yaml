@@ -16,32 +16,32 @@ globalSettings:
     maxRecursion: 11    # Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
     decodeLimit: 11              # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
 
-hooks:
+hookScopes:
 # decode argument: null terminated string 
   - module: libreceiveString.so
     hookSettings:
       stackTraceLimit: 55
     decoderSettings:
       decodeLimit: 55
-    functions:
-      - symbol: receive_cstring
+    hooks:
+      - symbolName: receive_cstring
         params:
           - char *
       #     - [char *, string]
-      # - symbol: receive_utf8
+      # - symbolName: receive_utf8
       #   returnType: [ int, { decodeLimit: 777 } ]
       #   params:
       #     - [ char *, { decodeAt: enter, decodeLimit: 99 }]
 
   # - module: libreceiveFundamentalReference.so
-  #   functions:
-  #     - symbol: receive_bool_ref      # retType string
+  #   hooks:
+  #     - symbolName: receive_bool_ref      # retType string
   #       retType: void
-  #     - symbol: receive_char_ref      # retType string
+  #     - symbolName: receive_char_ref      # retType string
   #       params:
   #         - [char*, minAsciiRef]
   #         - [char*, maxAsciiRef]
-  #     - symbol: receive_schar_ref
+  #     - symbolName: receive_schar_ref
   #       params:
   #         - [schar*, minScharRef]
   #         - [schar*, maxScharRef]

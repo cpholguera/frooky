@@ -3,12 +3,12 @@
 import Java from "frida-java-bridge";
 import type { FrookyConfig } from "frooky";
 import { FrookyApp } from "../FrookyApp";
-import { JavaHookRunner } from "./hook/javaHookRunner";
+import { JavaHookResolver } from "./hook/javaHookResolver";
 
 if (Java.available) {
   rpc.exports = {
     runFrookyAgent(frookyConfig: FrookyConfig) {
-      globalThis.frooky = new FrookyApp("Android", new JavaHookRunner());
+      globalThis.frooky = new FrookyApp("Android", new JavaHookResolver());
       frooky.loadFrookyConfig(frookyConfig);
 
       Java.perform(() => {

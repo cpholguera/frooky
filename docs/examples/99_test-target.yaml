@@ -13,10 +13,10 @@ globalSettings:
     maxRecursion: 10             # Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
     decodeLimit: 10              # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
 
-hooks:
+hookScopes:
     # java primitive types
   - javaClass: org.owasp.mastestapp.MastgTest
-    methods:
+    hooks:
       - receiveBoolean
       - receiveByte
       - receiveShort
@@ -28,8 +28,8 @@ hooks:
 
     # java types which are converted to "string" type in javascript
   - javaClass: org.owasp.mastestapp.MastgTest
-    methods:
-      - name: receiveString
+    hooks:
+      - methodName: receiveString
         overloads:
           - params:
             - [java.lang.String, receivedString, {decoderSettings: {elementLimit: 10}}]
@@ -44,12 +44,12 @@ hooks:
         magicDecode: false
         maxRecursion: 5
         decodeLimit: 5
-    methods:
+    hooks:
       - receiveStringArray
       - receiveBooleanArray
       - receiveByteArray
       - receiveShortArray
-      - name: receiveIntArray
+      - methodName: receiveIntArray
         overloads:
           - params:
             - ["[I", receivedInteger, {decoderSettings: {decodeLimit: 50}}]
@@ -63,7 +63,7 @@ hooks:
 
   # complex common java types
   - javaClass: org.owasp.mastestapp.MastgTest
-    methods:
+    hooks:
       - receiveBigInteger
       - receiveBigDecimal
       - receiveList
@@ -72,14 +72,14 @@ hooks:
       - receiveEnum
 
   - javaClass: androidx.security.crypto.EncryptedSharedPreferences$Editor
-    methods:
+    hooks:
       - putString
       - putStringSet
 
   # 3 different overloads with different ways of param declaration 
   - javaClass: android.content.Intent 
-    methods:
-      - name: $init
+    hooks:
+      - methodName: $init
         overloads:
           - params:
             - android.content.Intent
@@ -91,23 +91,23 @@ hooks:
             - android.net.Uri
 
   - javaClass: android.content.Intent 
-    methods:
-      - name: setFlags
+    hooks:
+      - methodName: setFlags
         overloads:
           - params:
             - [int, flags, { decoder: android.content.IntentFlagDecoder }]
 
 
   - javaClass: java.security.KeyPairGenerator
-    methods:
+    hooks:
       - initialize
                   
   - javaClass: android.app.Activity 
-    methods:
+    hooks:
       - startActivity
 
   - module: libcrypto.so
-    functions:
+    hooks:
       - X509_new
       - symbol: RSA_parse_public_key
       - EVP_EncryptUpdate
@@ -119,7 +119,7 @@ hooks:
 
 # decode arguments passed by value
   - module: libreceiveFundamentalValue.so
-    functions:
+    hooks:
       - symbol: receive_bool
         params:
           - [bool, falseBool]
@@ -179,7 +179,7 @@ hooks:
 
 # decode arguments passed by reference
   - module: libreceiveFundamentalReference.so
-    functions:
+    hooks:
       - symbol: receive_bool_ref
         params:
           - [bool*, falseBoolRef]
@@ -242,7 +242,7 @@ hooks:
     settings:
       decoderSettings:
         magicDecode: false
-    functions:
+    hooks:
       - symbol: receive_cstring
         params:
           - [char *, string]

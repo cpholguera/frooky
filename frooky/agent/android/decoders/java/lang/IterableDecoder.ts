@@ -1,8 +1,8 @@
 // iterableDecoder.ts
 import type Java from "frida-java-bridge";
-import { DEFAULT_DECODER_SETTINGS } from "../../../../shared/config";
 import type { DecodedValue } from "../../../../shared/decoders/decodedValue";
 import type { DecoderSettings } from "../../../../shared/decoders/decoderSettings";
+import { DEFAULT_DECODER_SETTINGS } from "../../../../shared/defaultValues";
 import type { JavaParam } from "../../../hook/javaParam";
 import { JavaDecoder } from "../../javaDecoder";
 
@@ -35,7 +35,7 @@ export function decodeIterable(iterable: Java.Wrapper, param: JavaParam, customE
 
   return {
     type: param.implementationType ?? param.type,
-    name: param.name,
+    name: param.paramNname,
     value: values,
   };
 }

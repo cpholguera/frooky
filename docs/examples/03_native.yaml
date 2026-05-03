@@ -6,12 +6,12 @@ metadata:
   author: frooky dev team
   version: v1
 
-hooks:
+hookScopes:
   # Hook multiple functions by name (all symbols in a module).
   # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
   # Docs: https://www.man7.org/linux/man-pages/man2/close.2.html
   - module: libc.so
-    functions:
+    hooks:
       - open
       - close
 
@@ -19,15 +19,15 @@ hooks:
   # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
   # Docs: https://www.man7.org/linux/man-pages/man2/close.2.html
   - module: libc.so
-    functions:
-      - symbol: open
-      - symbol: close
+    hooks:
+      - symbolName: open
+      - symbolName: close
 
   # Hook with unnamed parameter types and return type (type information required for decoding).
   # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
   - module: libc.so
-    functions:
-      - symbol: open
+    hooks:
+      - symbolName: open
         returnType: int
         params:
           - "const char *"
@@ -37,22 +37,22 @@ hooks:
   # Hook with named parameters (names provide context in output).
   # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
   - module: libc.so
-    functions:
-      - symbol: open
+    hooks:
+      - symbolName: open
         returnType: int
         params:
           - ["const char *", path]
           - [int, flags]
           - [mode_t, mode]
 
-  # Hook multiple functions from the same module with various parameter counts.
+  # Hook multiple hooks from the same module with various parameter counts.
   # Docs: https://docs.openssl.org/master/man3/ENGINE_add/
   # Docs: https://docs.openssl.org/master/man3/EVP_EncryptInit/
   - module: libssl.so
-    functions:
-      - symbol: ENGINE_load_builtin_engines
-      - symbol: ENGINE_cleanup
-      - symbol: OSSL_CMP_validate_cert_path
+    hooks:
+      - symbolName: ENGINE_load_builtin_engines
+      - symbolName: ENGINE_cleanup
+      - symbolName: OSSL_CMP_validate_cert_path
         returnType: int
         params:
           - ["const OSSL_CMP_CTX *", ctx]
@@ -64,8 +64,8 @@ hooks:
   # Pass `decoderArgs` with the length parameter name/index.
   # Docs: https://www.man7.org/linux/man-pages/man2/read.2.html
   - module: libc.so
-    functions:
-      - symbol: read
+    hooks:
+      - symbolName: read
         returnType: ssize_t
         params:
           - [int, fd]
@@ -76,8 +76,8 @@ hooks:
   # Here, `ctx` contains cipher algorithm info needed to decode `key` and `iv` correctly.
   # Docs: https://docs.openssl.org/master/man3/EVP_EncryptInit/
   - module: libssl.so
-    functions:
-      - symbol: EVP_EncryptInit_ex
+    hooks:
+      - symbolName: EVP_EncryptInit_ex
         returnType: int
         params:
           - ["EVP_CIPHER_CTX *", ctx]
@@ -90,8 +90,8 @@ hooks:
   # Pass decoder parameters to decode buffer contents based on related parameters.
   # Docs: https://docs.openssl.org/master/man3/SSL_write/
   - module: libssl.so
-    functions:
-      - symbol: SSL_write
+    hooks:
+      - symbolName: SSL_write
         returnType: int
         params:
           - ["SSL *", ssl]

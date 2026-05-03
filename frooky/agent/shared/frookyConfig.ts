@@ -1,49 +1,7 @@
-import type { Hook, HookSettings } from "frooky";
-import type { DecoderSettings } from "./decoders/decoderSettings";
-
-/**
- * Target platform for hooks.
- *
- * @public
- */
-export type Platform = "Android" | "iOS";
-
-/**
- * Metadata that describes a hook collection.
- *
- * @public
- */
-export interface HookMetadata {
-  /**
-   * Target platform for the hook collection.
-   */
-  platform?: Platform;
-
-  /**
-   * Name of the hook collection.
-   */
-  name?: string;
-
-  /**
-   * Short description of the hook collection.
-   */
-  description?: string;
-
-  /**
-   * Category of the hook collection. Can, for example, be used to filter or group events.
-   */
-  category?: string;
-
-  /**
-   * Author or organization that maintains the hook collection.
-   */
-  author?: string;
-
-  /**
-   * Version of the hook collection.
-   */
-  version?: string | number;
-}
+import { JavaHookScope } from "./frookyConfigParsing/javaHookScope";
+import { NativeHookScope } from "./frookyConfigParsing/nativeHookScope";
+import { InputDecoderSettings, InputHookSettings } from "./frookyConfigParsing/settingsInput";
+import { FrookyMetadata } from "./frookyMetadata";
 
 /**
  * frooky configuration.
@@ -52,18 +10,18 @@ export interface FrookyConfig {
   /**
    * Metadata about the hook collection
    */
-  metadata?: HookMetadata;
+  metadata?: FrookyMetadata;
 
   /**
    * Settings applied to all hooks in this frooky config
    */
   globalSettings?: {
-    hookSettings?: HookSettings;
-    decoderSettings?: DecoderSettings;
+    hookSettings?: InputHookSettings;
+    decoderSettings?: InputDecoderSettings;
   };
 
   /**
    * Collection of hooks.
    */
-  hooks: Hook[];
+  hookScopes: JavaHookScope[] | NativeHookScope[];
 }

@@ -6,7 +6,7 @@ export const NativeStringDecoder: BaseDecoder<NativePointer, NativeParam> = {
   decode: (value, param): DecodedValue => {
     return {
       type: param.type,
-      name: param.name,
+      name: param.paramNname,
       value: value.readCString(),
     };
   },

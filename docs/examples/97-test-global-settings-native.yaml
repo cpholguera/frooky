@@ -83,16 +83,16 @@ globalSettings:
     maxRecursion: 1 # Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
     decodeLimit: 11 # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
 
-hooks:
+hookScopes:
   # simple function declaration
   - module: libreceiveFundamentalValue.so
-    functions:
+    hooks:
       - receive_bool
 
   # object with ONLY symbol provided, technically the same form as the one before
   - module: libreceiveFundamentalValue.so
-    functions:
-      - symbol: receive_short
+    hooks:
+      - symbolName: receive_short
 
   # PARTIAL local hook settings take priority over global setting, simple function declaration
   - module: libreceiveFundamentalValue.so
@@ -100,7 +100,7 @@ hooks:
       hookTimeout: 2000
     decoderSettings:
       decodeLimit: 22
-    functions:
+    hooks:
       - receive_int
       - receive_char
 
@@ -110,8 +110,8 @@ hooks:
       hookTimeout: 3000
     decoderSettings:
       decodeLimit: 33
-    functions:
-      - symbol: receive_long
+    hooks:
+      - symbolName: receive_long
 
   # PARTIAL local hook settings take priority over global setting, object with ONLY symbol provided
   - module: libreceiveFundamentalValue.so
@@ -119,20 +119,20 @@ hooks:
       hookTimeout: 4000
     decoderSettings:
       decodeLimit: 44
-    functions:
+    hooks:
       - receive_schar
       - receive_ullong
 
   # PARTIAL local parameter settings take priority over global setting, form [type, settings]
   - module: libreceiveFundamentalValue.so
-    functions:
-      - symbol: receive_llong
+    hooks:
+      - symbolName: receive_llong
         params:
           - [llong, { decodeLimit: 55 }]
 
   # PARTIAL local parameter settings take priority over global setting, form [type, name, settings]
   - module: libreceiveFundamentalValue.so
-    functions:
-      - symbol: receive_ulong
+    hooks:
+      - symbolName: receive_ulong
         params:
           - [llong, astronomicUnit, { decodeLimit: 66 }]

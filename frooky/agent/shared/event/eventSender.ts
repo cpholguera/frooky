@@ -1,6 +1,6 @@
 // takes care of event cache and sending events to the host
 
-import { SEND_INTERVAL } from "../config";
+import { SEND_INTERVAL } from "../defaultValues";
 import type { BaseEvent } from "./baseEvent";
 
 let senderInterval: ReturnType<typeof setInterval> | null = null;

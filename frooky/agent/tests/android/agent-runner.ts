@@ -3,9 +3,9 @@ import { runTests } from "../agent-test-framework";
 
 // Import all test files
 import "../shared/test-testing";
-import "./test-util";
 import "./test-decoder";
 import "./test-runtime";
+import "./test-util";
 
 Java.perform(() => {
   setTimeout(() => {

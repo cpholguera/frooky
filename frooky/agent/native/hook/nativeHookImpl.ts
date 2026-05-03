@@ -2,7 +2,7 @@ import type { DecodedValue } from "../../shared/decoders/decodedValue";
 import type { NativeParam } from "../decoders/nativeDecodableTypes";
 import { NativeDecoder } from "../decoders/nativeDecoder";
 import { NativeHookEvent } from "../event/nativeHookEvent";
-import type { NativeHookOp } from "./nativeHookRunner";
+import { NativeHook } from "./nativeHook";
 
 export function buildNativeStackTrace(ctx: CpuContext, limit: number): string[] {
   const stackTrace: string[] = [];
@@ -31,8 +31,8 @@ export function decodeNativeArgs(args: NativePointer[], params: NativeParam[]): 
   return decodedArgs;
 }
 
-export function buildAndDispatchEvent(nativeHookOp: NativeHookOp, decodedArgs: DecodedValue[], returnValue: DecodedValue, stackTrace: string[]): void {
-  const event = new NativeHookEvent(nativeHookOp.module, nativeHookOp.symbol);
+export function buildAndDispatchEvent(nativeHook: NativeHook, decodedArgs: DecodedValue[], returnValue: DecodedValue, stackTrace: string[]): void {
+  const event = new NativeHookEvent(nativeHook.moduleName, nativeHook.symbolName);
   event.stackTrace = stackTrace;
   event.args = decodedArgs;
   event.returnValue = returnValue;

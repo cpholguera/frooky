@@ -4,56 +4,52 @@
  * @type {import("ts-to-zod").TsToZodConfig}
  */
 export default [
-    // source: shared/hook
-    {
-        "name": "hook",
-        "input": "shared/hook/hook.ts",
-        "output": "shared/hookFileParsing/zodSchemas/hook.zod.ts"
-    },
 
-    // source: shared/hookFileParsing
-    {
-        "name": "param_yaml_input_parsing",
-        "input": "shared/hookFileParsing/decodableTypesInput.ts",
-        "output": "shared/hookFileParsing/zodSchemas/decodableTypesInput.zod.ts"
-    },
-    {
-        "name": "settings_yaml_input_parsing",
-        "input": "shared/hookFileParsing/settingsInput.ts",
-        "output": "shared/hookFileParsing/zodSchemas/settingsInput.zod.ts"
-    },
+    // 1. Internal Types
+    // These types are only used internally, but ZOD needs them as reference wen validating te INPUT YAMLs
 
-    // source: shared/decoders/
     {
-        "name": "decoder_setting",
+        "name": "decoder_settings",
         "input": "shared/decoders/decoderSettings.ts",
-        "output": "shared/hookFileParsing/zodSchemas/decoderSettings.zod.ts"
-    },
-
-    // source: various rest
-    {
-        "name": "javaHook",
-        "input": "android/hook/javaHook.ts",
-        "output": "shared/hookFileParsing/zodSchemas/javaHook.zod.ts"
+        "output": "shared/frookyConfigParsing/zodSchemas/decoderSettings.zod.ts"
     },
 
     {
-        "name": "objcHook",
-        "input": "ios/hook/objcHook.ts",
-        "output": "shared/hookFileParsing/zodSchemas/objcHook.zod.ts"
+        "name": "hook_settings",
+        "input": "shared/hook/hookSettings.ts",
+        "output": "shared/frookyConfigParsing/zodSchemas/hookSettings.zod.ts"
     },
 
     {
-        "name": "nativeHook",
-        "input": "native/hook/nativeHook.ts",
-        "output": "shared/hookFileParsing/zodSchemas/nativeHook.zod.ts"
+        "name": "hook_metadata",
+        "input": "shared/frookyMetadata.ts",
+        "output": "shared/frookyConfigParsing/zodSchemas/frookyMetadata.zod.ts"
+    },
+
+
+    // 2. Types used in the input YAMLs. They usually have less strict requirements or multiple ways of declaring a method, function parameter etc.
+    // These are the types used to validate the input YAML
+   {
+        "name": "hook_decoder_settings_input",
+        "input": "shared/frookyConfigParsing/settingsInput.ts",
+        "output": "shared/frookyConfigParsing/zodSchemas/settingsInput.zod.ts"
+    },
+    
+    {
+        "name": "java_hook_scope",
+        "input": "shared/frookyConfigParsing/javaHookScope.ts",
+        "output": "shared/frookyConfigParsing/zodSchemas/javaHookScope.zod.ts"
+    },
+    
+    {
+        "name": "native_hook_scope",
+        "input": "shared/frookyConfigParsing/nativeHookScope.ts",
+        "output": "shared/frookyConfigParsing/zodSchemas/nativeHookScope.zod.ts"
     },
 
     {
-        "name": "frooky_config",
-        "input": "shared/frookyConfig.ts",
-        "output": "shared/hookFileParsing/zodSchemas/frookyConfig.zod.ts"
-    },
-
-
+        "name": "decodable_types_input",
+        "input": "shared/frookyConfigParsing/decodableTypesInput.ts",
+        "output": "shared/frookyConfigParsing/zodSchemas/decodableTypesInput.zod.ts"
+    }
 ]

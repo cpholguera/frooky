@@ -1,7 +1,7 @@
-import { DEFAULT_DECODE_AT, DEFAULT_DECODER_SETTINGS } from "../config";
+import { validateAndRepairDecoderSettings } from "../configValidator";
 import type { Param, RetType } from "../decoders/decodableTypes";
 import type { DecoderSettings } from "../decoders/decoderSettings";
-import { validateAndRepairDecoderSettings } from "../validator/configValidator";
+import { DEFAULT_DECODE_AT, DEFAULT_DECODER_SETTINGS } from "../defaultValues";
 import type { ParamSettings } from "./settingsInput";
 
 /**

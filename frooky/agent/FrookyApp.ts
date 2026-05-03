@@ -1,14 +1,15 @@
-import type { FrookyConfig, Platform } from "frooky";
-import { NativeHookRunner } from "./native/hook/nativeHookRunner";
-import type { BaseEvent } from "./shared/event/baseEvent";
+import type { FrookyConfig } from "frooky";
+import { NativeHookResolver } from "./native/hook/nativeHookResolver";
+import { NativeHookValidator } from "./native/hook/nativeHookValidator";
+import { validateConfig } from "./shared/configValidator";
+import { BaseEvent } from "./shared/event/baseEvent";
 import { startAsyncSender } from "./shared/event/eventSender";
-import type { HookEvent } from "./shared/event/hookEvent";
-import type { LogEvent } from "./shared/event/logEvent";
-import type { SummaryEvent } from "./shared/event/summaryEvent";
-import type { HookRunner } from "./shared/hook/hookRunner";
-import { HookStore } from "./shared/hook/hookStore";
+import { HookEvent } from "./shared/event/hookEvent";
+import { LogEvent } from "./shared/event/logEvent";
+import type { Platform } from "./shared/frookyMetadata";
+import { HookResolver } from "./shared/hook/hookResolver";
+import { HookValidator } from "./shared/hook/hookValidator";
 import { Logger, type logTo } from "./shared/logger";
-import { validateFrookyConfig } from "./shared/validator/configValidator";
 
 declare global {
   var frooky: FrookyApp;
@@ -21,9 +22,10 @@ declare global {
 export class FrookyApp {
   private eventCache: BaseEvent[] = [];
   private platform: Platform;
-  private hookStore: HookStore = new HookStore();
-  private platformHookRunner: HookRunner;
-  private nativeHookRunner: NativeHookRunner;
+  private platformHookValidator: HookValidator<any, any, any>;
+  private platformHookResolver: HookResolver<any, any>;
+  private nativeHookValidator: NativeHookValidator;
+  private nativeHookResolver: NativeHookResolver;
 
   /** Logger instance for this for frooky. */
   public log: Logger;
@@ -34,13 +36,23 @@ export class FrookyApp {
    * @param verbosity - Log verbosity level (default: `3`).
    * @param logTo - Log destination (default: `"device"`).
    */
-  constructor(platform: Platform, platformHookRunner: HookRunner, verbosity: number = 3, logTo: logTo = "device") {
+  constructor(
+    platform: Platform,
+    platformInputHookValidator: HookValidator<any, any, any>,
+    platformHookResolver: HookResolver<any, any>,
+    verbosity: number = 3,
+    logTo: logTo = "device",
+  ) {
     //initialize asynchronous sender
     startAsyncSender(this.eventCache);
 
     this.platform = platform;
-    this.platformHookRunner = platformHookRunner;
-    this.nativeHookRunner = new NativeHookRunner();
+    this.platformHookValidator = platformInputHookValidator;
+    this.platformHookResolver = platformHookResolver;
+
+    this.nativeHookValidator = new NativeHookValidator();
+    this.nativeHookResolver = new NativeHookResolver();
+
     this.verbosity = verbosity;
 
     // setup logger
@@ -57,40 +69,38 @@ export class FrookyApp {
   /**
    * Validates and registers a {@link FrookyConfig}.
    *
-   * @param frookyConfig - The configuration to add.
+   * @param inputFrookyConfig - The configuration to add.
    */
-  public loadFrookyConfig(frookyConfig: FrookyConfig) {
+  public async loadFrookyConfig(inputFrookyConfig: FrookyConfig) {
     this.log.info("Loading frooky configuration.");
 
-    // validating frooky config
-    const hookParsingResult = validateFrookyConfig(frookyConfig, this.platform);
-    this.log.info("Adding valid hook and their metadata to the hook store.");
+    // validate frooky config
+    this.log.info("Validating frooky configuration.");
+    const { globalHookSettings, globalDecoderSettings } = validateConfig(inputFrookyConfig, this.platform);
 
-    // adding valid metadata and hooks to the hook store
-    this.hookStore.addHooks(hookParsingResult.validHooks);
-    this.log.info(`Added the following hooks to the store: \n${this.hookStore.prettyPrintHooks()}`);
-  }
+    // validate the platform hooks (java or objc)
+    this.log.info(`Validating '${this.platform}' hooks.`);
+    const validPlatformHooks = this.platformHookValidator.validateHooks(inputFrookyConfig, globalHookSettings, globalDecoderSettings);
 
-  // public prepareHookOperation() {
-  //   if (this.platform === "Android") {
-  //     this.platformHookRunner.operationsBuilder(this.hookStore.getJavaHooks());
-  //   }
-  //   if (this.platform === "iOS") {
-  //     this.platformHookRunner.operationsBuilder(this.hookStore.getObjcHooks());
-  //   }
-  //   // run native hook on both platforms
-  //   this.nativeHookRunner.operationsBuilder(this.hookStore.getNativeHooks());
-  // }
+    this.log.info(`Validating 'native' hooks.`);
+    const validNativeHook = this.nativeHookValidator.validateHooks(inputFrookyConfig, globalHookSettings, globalDecoderSettings);
 
-  public async executeHookOperations(): Promise<void> {
-    if (this.platform === "Android") {
-      await this.platformHookRunner.executeHooking(this.hookStore.getJavaHooks());
-    }
-    // if (this.platform === "iOS") {
-    //   this.platformHookRunner.executeHooking(this.hookStore.getObjcHookOperations());
-    // }
-    // run native hook on both platforms
-    await this.nativeHookRunner.executeHooking(this.hookStore.getNativeHooks());
+    // resolve valid platform hooks
+    const platformPromises = this.platformHookResolver.resolve(validPlatformHooks).then((resolved) => {
+      this.log.info(`Platform hook resolved: ${resolved}`);
+      // hook platform hook
+    });
+
+    // resolve valid native hooks
+    const nativePromises = this.nativeHookResolver.resolve(validNativeHook).then((resolved) => {
+      this.log.info(`Native hook resolved: ${resolved}`);
+      // hook platform hook
+    });
+
+    // Wait for all to finish
+    await Promise.all([platformPromises, nativePromises]);
+
+    this.log.info("All hooks resolved.");
   }
 
   /**
@@ -98,7 +108,7 @@ export class FrookyApp {
    *
    * @param event - The event to cache.
    */
-  public addEvent(event: LogEvent | HookEvent | SummaryEvent): void {
+  public addEvent(event: LogEvent | HookEvent): void {
     this.eventCache.push(event);
   }
 }

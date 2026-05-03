@@ -2,11 +2,11 @@
 import { z } from "zod";
 
 import { decoderSettingsSchema } from "./decoderSettings.zod";
-import { hookSettingsSchema } from "./hook.zod";
+import { hookSettingsSchema } from "./hookSettings.zod";
 
-export const hookSettingsInputSchema = hookSettingsSchema.partial();
+export const inputHookSettingsSchema = hookSettingsSchema.partial();
 
-export const decoderSettingsInputSchema = decoderSettingsSchema.partial();
+export const inputDecoderSettingsSchema = decoderSettingsSchema.partial();
 
 const decodeAtSchema = z.any();
 
