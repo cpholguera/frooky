@@ -7,6 +7,7 @@ import { startAsyncSender } from "./shared/event/eventSender";
 import { HookEvent } from "./shared/event/hookEvent";
 import { LogEvent } from "./shared/event/logEvent";
 import type { Platform } from "./shared/frookyMetadata";
+import { Hook } from "./shared/hook/hook";
 import { HookResolver } from "./shared/hook/hookResolver";
 import { HookValidator } from "./shared/hook/hookValidator";
 import { Logger, type logTo } from "./shared/logger";
@@ -24,8 +25,11 @@ export class FrookyApp {
   private platform: Platform;
   private platformHookValidator: HookValidator<any, any, any>;
   private platformHookResolver: HookResolver<any, any>;
-  private nativeHookValidator: NativeHookValidator;
-  private nativeHookResolver: NativeHookResolver;
+  private nativeHookValidator: NativeHookValidator = new NativeHookValidator();
+  private nativeHookResolver: NativeHookResolver = new NativeHookResolver();
+
+  /** Internal hook store  */
+  private hookStore: Hook[] = [];
 
   /** Logger instance for this for frooky. */
   public log: Logger;
@@ -49,9 +53,6 @@ export class FrookyApp {
     this.platform = platform;
     this.platformHookValidator = platformInputHookValidator;
     this.platformHookResolver = platformHookResolver;
-
-    this.nativeHookValidator = new NativeHookValidator();
-    this.nativeHookResolver = new NativeHookResolver();
 
     this.verbosity = verbosity;
 
@@ -85,22 +86,22 @@ export class FrookyApp {
     this.log.info(`Validating 'native' hooks.`);
     const validNativeHook = this.nativeHookValidator.validateHooks(inputFrookyConfig, globalHookSettings, globalDecoderSettings);
 
-    // resolve valid platform hooks
-    const platformPromises = this.platformHookResolver.resolve(validPlatformHooks).then((resolved) => {
-      this.log.info(`Platform hook resolved: ${resolved}`);
-      // hook platform hook
+    //resolve valid platform hooks
+    const platformPromises = this.platformHookResolver.resolveInputHooks(validPlatformHooks).then((platformHooks) => {
+      this.hookStore.push(...platformHooks);
     });
 
     // resolve valid native hooks
-    const nativePromises = this.nativeHookResolver.resolve(validNativeHook).then((resolved) => {
-      this.log.info(`Native hook resolved: ${resolved}`);
-      // hook platform hook
+    const nativePromises = this.nativeHookResolver.resolveInputHooks(validNativeHook).then((nativeHooks) => {
+      this.hookStore.push(...nativeHooks);
     });
 
     // Wait for all to finish
-    await Promise.all([platformPromises, nativePromises]);
+    await Promise.all([platformPromises, nativePromises]).catch((e) => {
+      this.log.error(`Error while resolving hooks: ${String(e)}`);
+    });
 
-    this.log.info("All hooks resolved.");
+    frooky.log.info(`${this.platform} and native hooks resolved and stored.`);
   }
 
   /**

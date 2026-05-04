@@ -12,7 +12,7 @@ export const DEFAULT_DECODER_SETTINGS: DecoderSettings = {
 };
 
 export const DEFAULT_HOOK_SETTINGS: HookSettings = {
-  hookTimeout: 5000,
+  hookTimeoutMs: 5000,
   stackTraceLimit: 10,
   eventFilter: [],
 };

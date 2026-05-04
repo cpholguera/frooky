@@ -99,30 +99,6 @@ export function toHexAndAscii(bytes: Uint8Array, length: number = Infinity, plac
 }
 
 // run a function with in an interval until the timeout is reached or
-export function retryUntilSuccess(fn: () => void, intervalMs: number = 100, timeoutMs: number = 5000): Promise<void> {
-  return new Promise((resolve, reject) => {
-    let interval: ReturnType<typeof setInterval> | undefined;
-    let timeout: ReturnType<typeof setTimeout> | undefined;
-
-    const tryFn = () => {
-      try {
-        fn();
-        clearInterval(interval);
-        clearTimeout(timeout);
-        resolve();
-        return true;
-      } catch (e) {
-        frooky.log.warn(String(e));
-        return false;
-      }
-    };
-
-    if (tryFn()) return;
-
-    interval = setInterval(tryFn, intervalMs);
-    timeout = setTimeout(() => {
-      clearInterval(interval);
-      reject(new Error(`Timeout of ${timeoutMs}ms reached`));
-    }, timeoutMs);
-  });
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

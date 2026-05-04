@@ -17,5 +17,5 @@ export interface HookSettings {
   /**
    * Timeout in seconds frooky will try to hook in case something the target library is not available.
    */
-  hookTimeout: number;
+  hookTimeoutMs: number;
 }

@@ -74,8 +74,9 @@ import { JavaHook } from "./javaHook";
 
 // builds hook operations and registers them
 export class JavaHookResolver implements HookResolver<InputJavaHookCanonical, JavaHook> {
-  async resolve(inputHooks: InputJavaHookCanonical[]): Promise<JavaHook[]> {
-    throw Error(`not yet implemented`);
+  async resolveInputHooks(inputHooks: InputJavaHookCanonical[]): Promise<JavaHook[]> {
+    frooky.log.warn("JavaHookResolver not yet implemented, skipping.");
+    return [];
   }
 }
 // async executeHooking(javaHookScopes: JavaHookScope[]) {
