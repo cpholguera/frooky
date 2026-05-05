@@ -1,6 +1,6 @@
 import {} from "../../build/hook/javaHook";
 import { InputJavaHookCanonical } from "../../shared/frookyConfigParsing/javaHookScope";
-import type { HookResolver } from "../../shared/hook/hookResolver";
+import type { HookManager } from "../../shared/hook/hookManager";
 import { JavaHook } from "./javaHook";
 
 // function buildParamsFromArgumentTypes(argTypes: Java.Type[]): JavaParam[] {
@@ -73,7 +73,10 @@ import { JavaHook } from "./javaHook";
 // }
 
 // builds hook operations and registers them
-export class JavaHookResolver implements HookResolver<InputJavaHookCanonical, JavaHook> {
+export class JavaHookResolver implements HookManager<InputJavaHookCanonical, JavaHook> {
+  registerHooks(hooks: JavaHook[]): void {
+    throw new Error("Method not implemented.");
+  }
   async resolveInputHooks(inputHooks: InputJavaHookCanonical[]): Promise<JavaHook[]> {
     frooky.log.warn("JavaHookResolver not yet implemented, skipping.");
     return [];

@@ -23,3 +23,7 @@ export interface JavaHook extends Hook {
   method: Java.Method;
   overloads: JavaOverload[];
 }
+
+export function isJavaHook(hook: Hook): hook is JavaHook {
+  return "overloads" in hook;
+}

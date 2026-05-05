@@ -4,7 +4,7 @@
 import Java from "frida-java-bridge";
 import type { FrookyConfig } from "frooky";
 import { FrookyApp } from "../FrookyApp";
-import { JavaHookResolver } from "./hook/javaHookResolver";
+import { JavaHookResolver } from "./hook/javaHookManager";
 import { JavaHookValidator } from "./hook/javaHookValidator";
 
 var frookyConfigs: FrookyConfig[];
@@ -16,7 +16,7 @@ if (Java.available) {
 
   globalThis.frooky = new FrookyApp("Android", new JavaHookValidator(), new JavaHookResolver(), 3, "device");
   frookyConfigs.forEach((frookyConfig) => {
-    frooky.loadFrookyConfig(frookyConfig);
+    frooky.run(frookyConfig);
   });
 
   Java.perform(() => {

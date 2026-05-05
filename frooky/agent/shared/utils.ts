@@ -98,7 +98,6 @@ export function toHexAndAscii(bytes: Uint8Array, length: number = Infinity, plac
   return ["0x" + hexArray.join("") + ellipsis, asciiArray.join("") + ellipsis];
 }
 
-// run a function with in an interval until the timeout is reached or
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

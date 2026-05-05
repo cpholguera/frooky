@@ -11,3 +11,7 @@ export interface NativeHook extends Hook {
   symbolName: string;
   symbolAddress: NativePointer;
 }
+
+export function isNativeHook(hook: Hook): hook is NativeHook {
+  return "symbolName" in hook;
+}
