@@ -46,8 +46,8 @@ export class FrookyApp {
    */
   constructor(
     platform: Platform,
-    platformInputHookValidator: HookValidator<any, any, any>,
-    platformHookResolver: HookManager<any, any>,
+    platformHookValidator: HookValidator<any, any, any>,
+    platformHookManager: HookManager<any, any>,
     verbosity: number = 3,
     logTo: logTo = "device",
   ) {
@@ -55,8 +55,8 @@ export class FrookyApp {
     startAsyncSender(this.eventCache);
 
     this.platform = platform;
-    this.platformHookValidator = platformInputHookValidator;
-    this.platformHookResolver = platformHookResolver;
+    this.platformHookValidator = platformHookValidator;
+    this.platformHookResolver = platformHookManager;
 
     this.verbosity = verbosity;
 
@@ -91,7 +91,7 @@ export class FrookyApp {
    *
    * @param inputFrookyConfig - The configuration to add.
    */
-  public async loadFrookyConfig(inputFrookyConfig: FrookyConfig) {
+  public async loadFrookyConfig(inputFrookyConfig: FrookyConfig): {platformHooks: JavaHook | } {
     this.log.info("Loading frooky configuration.");
 
     // validate frooky config
