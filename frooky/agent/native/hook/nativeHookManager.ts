@@ -60,7 +60,6 @@ async function resolveModule(moduleName: string, hookTimeoutMs: number): Promise
 
 export class NativeHookResolver implements HookManager<InputNativeHookCanonical, NativeHook> {
   registerHooks(hooks: NativeHook[]) {
-    console.log("aaaaaaaaaaaaaaaa");
     for (const hook of hooks) {
       registerHook(hook);
     }
