@@ -21,6 +21,7 @@ export interface JavaOverload {
  */
 export interface JavaHook extends Hook {
   method: Java.Method;
+  methodName: string;
   overloads: JavaOverload[];
 }
 

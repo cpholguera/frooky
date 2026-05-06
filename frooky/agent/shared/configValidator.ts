@@ -72,19 +72,13 @@ export function validateConfig(
   let globalHookSettings: HookSettings = DEFAULT_HOOK_SETTINGS;
   if (inputFrookyConfig.globalSettings?.hookSettings) {
     globalHookSettings = validateAndRepairHookSettings(inputFrookyConfig.globalSettings.hookSettings);
-    frooky.log.info([
-      `Global hook settings validated and set to default value, if setting was invalid or not set.`,
-      `Global hook settings are:\n${JSON.stringify(inputFrookyConfig.globalSettings.hookSettings, null, 2)}`,
-    ]);
+    frooky.log.info(`Global hook settings are:\n${JSON.stringify(inputFrookyConfig.globalSettings.hookSettings, null, 2)}`);
   }
 
   let globalDecoderSettings: DecoderSettings = DEFAULT_DECODER_SETTINGS;
   if (inputFrookyConfig.globalSettings?.decoderSettings) {
     globalDecoderSettings = validateAndRepairDecoderSettings(inputFrookyConfig.globalSettings.decoderSettings);
-    frooky.log.info([
-      `Global decoder settings validated and set to default value, if setting was invalid or not set.`,
-      `Global decoder settings are:\n${JSON.stringify(inputFrookyConfig.globalSettings.decoderSettings, null, 2)}`,
-    ]);
+    frooky.log.info(`Global decoder settings are:\n${JSON.stringify(inputFrookyConfig.globalSettings.decoderSettings, null, 2)}`);
   }
 
   return { globalHookSettings, globalDecoderSettings };

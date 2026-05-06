@@ -6,7 +6,8 @@ metadata:
 
 # global settings for the hooks in this hook file.
 globalSettings:
-  stackTraceLimit: 10            # Sets stackTraceLimit to 10 for all hooks
+  hookSettings:
+    stackTraceLimit: 10            # Sets stackTraceLimit to 10 for all hooks
   decoderSettings:
     fastDecode: true             # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
     magicDecode: true            # If set, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime
@@ -29,7 +30,7 @@ hookGroup:
     # java types which are converted to "string" type in javascript
   - javaClass: org.owasp.mastestapp.MastgTest
     hooks:
-      - methodName: receiveString
+      - method: receiveString
         overloads:
           - params:
             - [java.lang.String, receivedString, {decoderSettings: {elementLimit: 10}}]
@@ -49,7 +50,7 @@ hookGroup:
       - receiveBooleanArray
       - receiveByteArray
       - receiveShortArray
-      - methodName: receiveIntArray
+      - method: receiveIntArray
         overloads:
           - params:
             - ["[I", receivedInteger, {decoderSettings: {decodeLimit: 50}}]
@@ -79,7 +80,7 @@ hookGroup:
   # 3 different overloads with different ways of param declaration 
   - javaClass: android.content.Intent 
     hooks:
-      - methodName: $init
+      - method: $init
         overloads:
           - params:
             - android.content.Intent
@@ -92,7 +93,7 @@ hookGroup:
 
   - javaClass: android.content.Intent 
     hooks:
-      - methodName: setFlags
+      - method: setFlags
         overloads:
           - params:
             - [int, flags, { decoder: android.content.IntentFlagDecoder }]

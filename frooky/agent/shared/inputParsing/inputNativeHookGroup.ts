@@ -46,7 +46,6 @@ export function isNativeHookGroup(inputHookScope: object): inputHookScope is Inp
   return "module" in inputHookScope && !("javaClass" in inputHookScope) && !("objcClass" in inputHookScope);
 }
 
-// normalizes the InputNativeHook used in the YAML to an internally usable InputNativeHookCanonical
 function normalizeHook(
   inputHook: InputNativeHook,
   moduleName: string,
@@ -87,15 +86,15 @@ export function normalizeNativeHookGroup(
   globalHookSettings: HookSettings,
   globalDecoderSettings: DecoderSettings,
 ): InputNativeHookGroup {
-  const mergedDecoderSettings: DecoderSettings = validateAndRepairDecoderSettings({
-    ...DEFAULT_DECODER_SETTINGS,
-    ...globalHookSettings,
-    ...hookGroup.decoderSettings,
-  });
   const mergedHookSettings: HookSettings = validateAndRepairHookSettings({
     ...DEFAULT_HOOK_SETTINGS,
-    ...globalDecoderSettings,
+    ...globalHookSettings,
     ...hookGroup.hookSettings,
+  });
+  const mergedDecoderSettings: DecoderSettings = validateAndRepairDecoderSettings({
+    ...DEFAULT_DECODER_SETTINGS,
+    ...globalDecoderSettings,
+    ...hookGroup.decoderSettings,
   });
 
   return {

@@ -1,5 +1,5 @@
+import { Param } from "../../shared/decoders/decodableTypes";
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
-import { NativeParam } from "../decoders/nativeDecodableTypes";
 import { NativeDecoder } from "../decoders/nativeDecoder";
 import { NativeHookEvent } from "../event/nativeHookEvent";
 import { NativeHook } from "./nativeHook";
@@ -8,7 +8,8 @@ export function buildNativeStackTrace(ctx: CpuContext, limit: number): string[] 
   const stackTrace: string[] = [];
   try {
     const btFull = Thread.backtrace(ctx, Backtracer.FUZZY);
-    for (let i = 0; i < limit; i++) {
+    const count = Math.min(limit, btFull.length);
+    for (let i = 0; i < count; i++) {
       try {
         stackTrace.push(DebugSymbol.fromAddress(btFull[i]).toString());
       } catch (e) {
@@ -21,10 +22,10 @@ export function buildNativeStackTrace(ctx: CpuContext, limit: number): string[] 
   return stackTrace;
 }
 
-export function decodeNativeArgs(args: NativePointer[], params: NativeParam[]): DecodedValue[] {
+export function decodeNativeArgs(args: NativePointer[], params: Param[]): DecodedValue[] {
   const decodedArgs: DecodedValue[] = [];
   if (params.length > 0) {
-    params.forEach((param: NativeParam, i: number) => {
+    params.forEach((param: Param, i: number) => {
       decodedArgs.push(NativeDecoder.decode(args[i], param, param.decoderSettings));
     });
   }
