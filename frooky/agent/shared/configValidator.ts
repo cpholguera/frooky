@@ -2,11 +2,11 @@ import z from "zod";
 import type { DecoderSettings } from "./decoders/decoderSettings";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "./defaultValues";
 import { FrookyConfig } from "./frookyConfig";
-import { InputDecoderSettings, InputHookSettings } from "./frookyConfigParsing/settingsInput";
-import { frookyMetadataSchema } from "./frookyConfigParsing/zodSchemas/frookyMetadata.zod";
-import { inputDecoderSettingsSchema, inputHookSettingsSchema } from "./frookyConfigParsing/zodSchemas/settingsInput.zod";
 import type { FrookyMetadata, Platform } from "./frookyMetadata";
 import { HookSettings } from "./hook/hookSettings";
+import { InputDecoderSettings, InputHookSettings } from "./inputParsing/inputSettings";
+import { frookyMetadataSchema } from "./inputParsing/zodSchemas/frookyMetadata.zod";
+import { inputDecoderSettingsSchema, inputHookSettingsSchema } from "./inputParsing/zodSchemas/inputSettings.zod";
 
 // validates hook settings and replaces invalid settings with valid default values
 // empty ones are set to the default

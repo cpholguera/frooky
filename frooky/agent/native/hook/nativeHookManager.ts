@@ -1,7 +1,7 @@
 import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { DEFAULT_HOOK_SETTINGS } from "../../shared/defaultValues";
-import { InputNativeHookCanonical } from "../../shared/frookyConfigParsing/nativeHookScope";
 import type { HookManager } from "../../shared/hook/hookManager";
+import { InputNativeHookNormalized } from "../../shared/inputParsing/inputNativeHookGroup";
 import { sleep } from "../../shared/utils";
 import { NativeDecoder } from "../decoders/nativeDecoder";
 import type { NativeHook } from "./nativeHook";
@@ -24,7 +24,7 @@ function registerHook(hook: NativeHook) {
     onLeave: (returnValue: InvocationReturnValue) => {
       // decode the return value
       if (hook.retType) {
-        decodedReturnValue = NativeDecoder.decode(returnValue, hook.retType);
+        decodedReturnValue = NativeDecoder.decode(returnValue, hook.retType, hook.decoderSettings);
       } else {
         decodedReturnValue = { type: "void", value: null };
       }
@@ -34,7 +34,7 @@ function registerHook(hook: NativeHook) {
   });
 }
 
-function resolveSymbolName(symbol: string, module: Module): NativePointer {
+function resolveSymbol(symbol: string, module: Module): NativePointer {
   try {
     return module.getExportByName(symbol);
   } catch (e) {
@@ -43,7 +43,7 @@ function resolveSymbolName(symbol: string, module: Module): NativePointer {
 }
 
 async function resolveModule(moduleName: string, hookTimeoutMs: number): Promise<Module> {
-  frooky.log.info(`Trying to load native module ${moduleName} with a timeout of ${hookTimeoutMs}ms.`);
+  frooky.log.info(`Loading native module ${moduleName} with a timeout of ${hookTimeoutMs}ms.`);
   const deadline = Date.now() + hookTimeoutMs;
   while (true) {
     try {
@@ -58,24 +58,23 @@ async function resolveModule(moduleName: string, hookTimeoutMs: number): Promise
   }
 }
 
-export class NativeHookResolver implements HookManager<InputNativeHookCanonical, NativeHook> {
+export class NativeHookManager implements HookManager<InputNativeHookNormalized, NativeHook> {
   registerHooks(hooks: NativeHook[]) {
     for (const hook of hooks) {
       registerHook(hook);
     }
   }
-  async resolveInputHooks(inputHooks: InputNativeHookCanonical[]): Promise<NativeHook[]> {
+  async resolveHooks(inputHooks: InputNativeHookNormalized[]): Promise<NativeHook[]> {
     frooky.log.info(`Resolving native hooks`);
 
     const promises = inputHooks.map(async (inputHook) => {
       const hookTimeoutMs = inputHook.hookSettings?.hookTimeoutMs ?? DEFAULT_HOOK_SETTINGS.hookTimeoutMs;
       try {
-        const module = await resolveModule(inputHook.moduleName, hookTimeoutMs);
-        const symbolAddress = resolveSymbolName(inputHook.symbolName, module);
+        const module = await resolveModule(inputHook.module!, hookTimeoutMs);
+        const symbolAddress = resolveSymbol(inputHook.symbol, module);
         return {
-          moduleName: inputHook.moduleName,
-          module,
-          symbolName: inputHook.symbolName,
+          module: module,
+          symbolName: inputHook.symbol,
           symbolAddress,
           params: inputHook.params,
           retType: inputHook.retType,

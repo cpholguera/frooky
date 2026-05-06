@@ -74,8 +74,8 @@ metadata:
 # global settings for the hooks in this hook file.
 globalSettings:
   hookSettings:
-    hookTimeout: 1111 # Timeout in seconds frooky will try to hook in case something the target library is not available.
-    stackTraceLimit: 11 # Sets stackTraceLimit to 10 for all hooks
+    hookTimeoutMs: 1111 # Timeout in ms frooky will try to hook in case something the target library is not available.
+    stackTraceLimit: 0 # Sets stackTraceLimit to 10 for all hooks
     eventFilter: ['^libmyapp\.so'] # Stack trace filters to apply.
   decoderSettings:
     fastDecode: true # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
@@ -83,7 +83,7 @@ globalSettings:
     maxRecursion: 1 # Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
     decodeLimit: 11 # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
 
-hookScopes:
+hookGroup:
   # simple function declaration
   - module: libreceiveFundamentalValue.so
     hooks:
@@ -92,12 +92,12 @@ hookScopes:
   # object with ONLY symbol provided, technically the same form as the one before
   - module: libreceiveFundamentalValue.so
     hooks:
-      - symbolName: receive_short
+      - symbol: receive_short
 
   # PARTIAL local hook settings take priority over global setting, simple function declaration
   - module: libreceiveFundamentalValue.so
     hookSettings:
-      hookTimeout: 2000
+      hookTimeoutMs: 2000
     decoderSettings:
       decodeLimit: 22
     hooks:
@@ -107,16 +107,16 @@ hookScopes:
   # PARTIAL local hook settings take priority over global setting, simple function declaration
   - module: libreceiveFundamentalValue.so
     hookSettings:
-      hookTimeout: 3000
+      hookTimeoutMs: 3000
     decoderSettings:
       decodeLimit: 33
     hooks:
-      - symbolName: receive_long
+      - symbol: receive_long
 
   # PARTIAL local hook settings take priority over global setting, object with ONLY symbol provided
   - module: libreceiveFundamentalValue.so
     hookSettings:
-      hookTimeout: 4000
+      hookTimeoutMs: 4000
     decoderSettings:
       decodeLimit: 44
     hooks:
@@ -126,13 +126,13 @@ hookScopes:
   # PARTIAL local parameter settings take priority over global setting, form [type, settings]
   - module: libreceiveFundamentalValue.so
     hooks:
-      - symbolName: receive_llong
+      - symbol: receive_llong
         params:
           - [llong, { decodeLimit: 55 }]
 
   # PARTIAL local parameter settings take priority over global setting, form [type, name, settings]
   - module: libreceiveFundamentalValue.so
     hooks:
-      - symbolName: receive_ulong
+      - symbol: receive_ulong
         params:
           - [llong, astronomicUnit, { decodeLimit: 66 }]

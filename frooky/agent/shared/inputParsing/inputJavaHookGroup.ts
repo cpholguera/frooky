@@ -1,7 +1,7 @@
 import { DecoderSettings } from "../decoders/decoderSettings";
 import { HookSettings } from "../hook/hookSettings";
-import { ParamInput, RetTypeInput } from "./decodableTypesInput";
-import { InputDecoderSettings, InputHookSettings } from "./settingsInput";
+import { InputParam, InputRetType } from "./inputDecodableTypes";
+import { InputDecoderSettings, InputHookSettings } from "./inputSettings";
 
 /**
  * Describes a specific Java method overload.
@@ -12,7 +12,7 @@ export interface InputOverload {
   /**
    * Parameter type for this overload.
    */
-  params: ParamInput[];
+  params: InputParam[];
 }
 
 /**
@@ -20,11 +20,11 @@ export interface InputOverload {
  *
  * @public
  */
-export type InputJavaHookCanonical = {
-  className: string;
-  methodName: string;
+export type InputJavaHookNormalized = {
+  javaClass: string;
+  method: string;
   overloads?: InputOverload[];
-  retType?: RetTypeInput;
+  retType?: InputRetType;
   hookSettings?: HookSettings;
   decoderSettings?: DecoderSettings;
 };
@@ -34,7 +34,7 @@ export type InputJavaHookCanonical = {
  *
  * @public
  */
-export type InputJavaHook = string | InputJavaHookCanonical;
+export type InputJavaHook = string | InputJavaHookNormalized;
 
 /**
  * Native hook configuration.
@@ -46,7 +46,7 @@ export type InputJavaHook = string | InputJavaHookCanonical;
  * @public
  * @discriminator {type}
  */
-export interface JavaHookScope {
+export interface InputJavaHookGroup {
   type: "java";
   javaClass: string;
   hooks: InputJavaHook[];
@@ -60,7 +60,7 @@ export interface JavaHookScope {
 // }
 
 // Type guard function
-export function isJavaHookScope(hookScopeInput: object): hookScopeInput is JavaHookScope {
+export function isJavaHookScope(hookScopeInput: object): hookScopeInput is InputJavaHookGroup {
   return "javaClass" in hookScopeInput;
 }
 

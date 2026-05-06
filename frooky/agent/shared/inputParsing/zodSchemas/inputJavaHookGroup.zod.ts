@@ -3,25 +3,25 @@ import { z } from "zod";
 
 import { decoderSettingsSchema } from "./decoderSettings.zod";
 import { hookSettingsSchema } from "./hookSettings.zod";
-import { paramInputSchema, retTypeInputSchema } from "./decodableTypesInput.zod";
-import { inputDecoderSettingsSchema, inputHookSettingsSchema } from "./settingsInput.zod";
+import { inputParamSchema, inputRetTypeSchema } from "./inputDecodableTypes.zod";
+import { inputDecoderSettingsSchema, inputHookSettingsSchema } from "./inputSettings.zod";
 
 export const inputOverloadSchema = z.object({
-    params: z.array(paramInputSchema)
+    params: z.array(inputParamSchema)
 });
 
-export const inputJavaHookCanonicalSchema = z.object({
-    className: z.string(),
-    methodName: z.string(),
+export const inputJavaHookNormalizedSchema = z.object({
+    javaClass: z.string(),
+    method: z.string(),
     overloads: z.array(inputOverloadSchema).optional(),
-    retType: retTypeInputSchema.optional(),
+    retType: inputRetTypeSchema.optional(),
     hookSettings: hookSettingsSchema.optional(),
     decoderSettings: decoderSettingsSchema.optional()
 });
 
-export const inputJavaHookSchema = z.union([z.string(), inputJavaHookCanonicalSchema]);
+export const inputJavaHookSchema = z.union([z.string(), inputJavaHookNormalizedSchema]);
 
-export const javaHookScopeSchema = z.object({
+export const inputJavaHookGroupSchema = z.object({
     type: z.literal("java"),
     javaClass: z.string(),
     hooks: z.array(inputJavaHookSchema),

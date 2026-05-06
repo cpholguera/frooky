@@ -6,7 +6,7 @@ metadata:
   author: frooky dev team
   version: v1
 
-hookScopes:
+hookGroup:
   # Hook a method using simple string syntax.
   # Docs: https://developer.apple.com/documentation/localauthentication/lacontext/invalidate()?language=objc
   - objcClass: LAContext

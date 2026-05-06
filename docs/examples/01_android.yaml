@@ -6,7 +6,7 @@ metadata:
   author: frooky dev team
   version: v1
 
-hookScopes:
+hookGroup:
   # Hook multiple hooks by name (all overloads are included).
   # Docs: https://developer.android.com/reference/android/security/AttestedKeyPair
   - javaClass: android.security.AttestedKeyPair

@@ -11,18 +11,21 @@ export class HookStore {
   }
 
   addHooks(hooks: Hook[]): void {
-    this.hooks = { ...hooks };
+    this.hooks = [...hooks];
   }
 
   getHooks(): Hook[] {
     return [...this.hooks];
   }
+
   getNativeHooks(): NativeHook[] {
     return this.hooks.filter(isNativeHook);
   }
+
   getJavaHooks(): JavaHook[] {
     return this.hooks.filter(isJavaHook);
   }
+
   getObjcHooks(): ObjcHook[] {
     return this.hooks.filter(isObjcHook);
   }

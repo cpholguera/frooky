@@ -1,12 +1,12 @@
 import type { BaseDecoder } from "../../shared/decoders/baseDecoder";
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
-import type { NativeParam } from "./nativeDecodableTypes";
+import { NativeDecodableType } from "./nativeDecodableTypes";
 
-export const NativeStringDecoder: BaseDecoder<NativePointer, NativeParam> = {
-  decode: (value, param): DecodedValue => {
+export const NativeStringDecoder: BaseDecoder<NativePointer, NativeDecodableType> = {
+  decode: (value: NativePointer, type: NativeDecodableType): DecodedValue => {
     return {
-      type: param.type,
-      name: param.paramNname,
+      type: type.type,
+      name: type.name,
       value: value.readCString(),
     };
   },

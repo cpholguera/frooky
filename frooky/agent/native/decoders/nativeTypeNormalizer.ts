@@ -1,4 +1,4 @@
-import type { NativeParam } from "./nativeDecodableTypes";
+import { NativeDecodableType } from "./nativeDecodableTypes";
 import type { FundamentalType } from "./nativeDecoder";
 
 export interface NativeType {
@@ -139,9 +139,9 @@ function createPointerType(normalizedType: string): NativeType {
   };
 }
 
-export function normalizeNativeType(param: NativeParam): NativeType {
+export function buildNativeType(type: NativeDecodableType): NativeType {
   // basic normalization
-  const normalizedNativeType = param.type
+  const normalizedNativeType = type.type
     .trim()
     .toLowerCase()
     .replace(/\s*\*\s*/g, "*") // remove spaces around *

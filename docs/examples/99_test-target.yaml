@@ -13,7 +13,7 @@ globalSettings:
     maxRecursion: 10             # Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
     decodeLimit: 10              # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
 
-hookScopes:
+hookGroup:
     # java primitive types
   - javaClass: org.owasp.mastestapp.MastgTest
     hooks:

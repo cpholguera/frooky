@@ -1,7 +1,7 @@
-import { JavaHookScope } from "./frookyConfigParsing/javaHookScope";
-import { NativeHookScope } from "./frookyConfigParsing/nativeHookScope";
-import { InputDecoderSettings, InputHookSettings } from "./frookyConfigParsing/settingsInput";
 import { FrookyMetadata } from "./frookyMetadata";
+import { InputJavaHookGroup } from "./inputParsing/inputJavaHookGroup";
+import { InputNativeHookGroup } from "./inputParsing/inputNativeHookGroup";
+import { InputDecoderSettings, InputHookSettings } from "./inputParsing/inputSettings";
 
 /**
  * frooky configuration.
@@ -23,5 +23,5 @@ export interface FrookyConfig {
   /**
    * Collection of hooks.
    */
-  hookScopes: JavaHookScope[] | NativeHookScope[];
+  hookGroup: InputJavaHookGroup[] | InputNativeHookGroup[];
 }

@@ -1,27 +1,20 @@
 import { DecoderSettings } from "../decoders/decoderSettings";
 import { HookSettings } from "../hook/hookSettings";
-import { RetTypeInput } from "./decodableTypesInput";
-import { InputDecoderSettings, InputHookSettings } from "./settingsInput";
+import { InputRetType } from "./inputDecodableTypes";
+import { InputDecoderSettings, InputHookSettings } from "./inputSettings";
 
 /**
  * Objective-C canonical input hook
  *
  * @public
  */
-export type InputObjcHookCanonical = {
+export type InputObjcHook = {
   className: string;
   methodName: string;
-  retType?: RetTypeInput;
+  retType?: InputRetType;
   hookSettings?: HookSettings;
   decoderSettings?: DecoderSettings;
 };
-
-/**
- * Objective-C input hook - either a simple method name or a detailed definition (canonical form)
- *
- * @public
- */
-export type InputObjcHook = string | InputObjcHookCanonical;
 
 /**
  * Native hook configuration.
@@ -33,15 +26,15 @@ export type InputObjcHook = string | InputObjcHookCanonical;
  * @public
  * @discriminator {type}
  */
-export interface ObjcHookScope {
+export interface InputObjcHookGroup {
   type: "objc";
   objcClass: string;
-  hooks: InputObjcHook[];
+  hooks: string | InputObjcHook;
   hookSettings?: InputHookSettings;
   decoderSettings?: InputDecoderSettings;
 }
 
 // Type guard function
-export function isObjcHookScope(hookScopeInput: object): hookScopeInput is ObjcHookScope {
+export function isObjcHookScope(hookScopeInput: object): hookScopeInput is InputObjcHookGroup {
   return "objcClass" in hookScopeInput;
 }

@@ -1,22 +1,12 @@
-import type { Param, RetType } from "../../shared/decoders/decodableTypes";
+import { DecodableType } from "../../shared/decoders/decodableTypes";
 import type { NativeType } from "./nativeTypeNormalizer";
 
 /**
  * Represents a native parameter
  */
-export interface NativeParam extends Param {
+export interface NativeDecodableType extends DecodableType {
   /**
    * Normalized type used for native decoding.
    */
-  nativeType?: NativeType;
-}
-
-/**
- * Represents a native parameter
- */
-export interface NativeRetType extends RetType {
-  /**
-   * Normalized type used for native decoding.
-   */
-  nativeType?: NativeType;
+  nativeType: NativeType;
 }

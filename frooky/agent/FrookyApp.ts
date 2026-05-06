@@ -1,18 +1,13 @@
-import type { FrookyConfig, JavaHook } from "frooky";
-import { ObjcHook } from "./ios/hooks/objcHook";
-import { NativeHookResolver } from "./native/hook/nativeHookManager";
+import type { FrookyConfig } from "frooky";
+import { NativeHookManager } from "./native/hook/nativeHookManager";
 import { NativeHookValidator } from "./native/hook/nativeHookValidator";
 import { validateConfig } from "./shared/configValidator";
 import { BaseEvent } from "./shared/event/baseEvent";
 import { startAsyncSender } from "./shared/event/eventSender";
 import { HookEvent } from "./shared/event/hookEvent";
 import { LogEvent } from "./shared/event/logEvent";
-import { InputObjcHook } from "./shared/frookyConfigParsing/iosHookScope";
-import { InputJavaHook } from "./shared/frookyConfigParsing/javaHookScope";
-import { InputNativeHookCanonical } from "./shared/frookyConfigParsing/nativeHookScope";
 import type { Platform } from "./shared/frookyMetadata";
 import { HookManager } from "./shared/hook/hookManager";
-import { HookStore } from "./shared/hook/hookStore";
 import { HookValidator } from "./shared/hook/hookValidator";
 import { Logger, type logTo } from "./shared/logger";
 
@@ -27,13 +22,10 @@ declare global {
 export class FrookyApp {
   private eventCache: BaseEvent[] = [];
   private platform: Platform;
-  private platformHookValidator: HookValidator<any, any, any>;
-  private platformHookResolver: HookManager<any, any>;
+  private platformHookValidator: HookValidator<any, any>;
+  private platformHookManger: HookManager<any, any>;
   private nativeHookValidator = new NativeHookValidator();
-  private nativeHookResolver = new NativeHookResolver();
-
-  /** Internal hook store  */
-  private hookStore = new HookStore();
+  private nativeHookManager = new NativeHookManager();
 
   /** Logger instance for this for frooky. */
   public log: Logger;
@@ -46,8 +38,8 @@ export class FrookyApp {
    */
   constructor(
     platform: Platform,
-    platformHookValidator: HookValidator<any, any, any>,
-    platformHookManager: HookManager<any, any>,
+    platformInputHookValidator: HookValidator<any, any>,
+    platformHookResolver: HookManager<any, any>,
     verbosity: number = 3,
     logTo: logTo = "device",
   ) {
@@ -55,8 +47,8 @@ export class FrookyApp {
     startAsyncSender(this.eventCache);
 
     this.platform = platform;
-    this.platformHookValidator = platformHookValidator;
-    this.platformHookResolver = platformHookManager;
+    this.platformHookValidator = platformInputHookValidator;
+    this.platformHookManger = platformHookResolver;
 
     this.verbosity = verbosity;
 
@@ -77,12 +69,10 @@ export class FrookyApp {
    * @param inputFrookyConfig - The frooky config to add.
    */
   public async run(inputFrookyConfig: FrookyConfig) {
-    await this.loadFrookyConfig(inputFrookyConfig);
-
     try {
-      this.registerHooks();
+      await this.loadFrookyConfig(inputFrookyConfig);
     } catch (e) {
-      console.error(`registerHooks failed: ${String(e)}`);
+      console.error(`Error during loading of the frooky config: ${String(e)}`);
     }
   }
 
@@ -91,60 +81,40 @@ export class FrookyApp {
    *
    * @param inputFrookyConfig - The configuration to add.
    */
-  public async loadFrookyConfig(inputFrookyConfig: FrookyConfig): {platformHooks: JavaHook | } {
+  public async loadFrookyConfig(inputFrookyConfig: FrookyConfig) {
     this.log.info("Loading frooky configuration.");
 
     // validate frooky config
     this.log.info("Validating frooky configuration.");
     const { globalHookSettings, globalDecoderSettings } = validateConfig(inputFrookyConfig, this.platform);
 
-    // validate the platform hooks (java or objc)
+    // validate the platform hooks
     this.log.info(`Validating '${this.platform}' hooks.`);
-    const validPlatformHooks = this.platformHookValidator.validateHooks(inputFrookyConfig, globalHookSettings, globalDecoderSettings);
+    const validPlatformHooks = this.platformHookValidator.validateAndNormalizeHooks(inputFrookyConfig, globalHookSettings, globalDecoderSettings);
 
     this.log.info(`Validating 'native' hooks.`);
-    const validNativeHook = this.nativeHookValidator.validateHooks(inputFrookyConfig, globalHookSettings, globalDecoderSettings);
+    const validNativeHook = this.nativeHookValidator.validateAndNormalizeHooks(inputFrookyConfig, globalHookSettings, globalDecoderSettings);
 
+    // async resolve the hooks and register them
     this.log.info(`Resolving ${this.platform}- and native hooks.`);
-    await this.resolveHooks(validPlatformHooks, validNativeHook);
-  }
-
-  private async resolveHooks(platformHooks: InputJavaHook[] | InputObjcHook[], nativeHooks: InputNativeHookCanonical[]) {
-    const platformPromises = this.platformHookResolver
-      .resolveInputHooks(platformHooks)
+    const platformPromises = this.platformHookManger
+      .resolveHooks(validPlatformHooks)
       .then((platformHooks) => {
-        this.hookStore.addHooks(platformHooks);
-      })
-      .then(() => {
-        this.log.info(`${this.platform} hooks resolved and stored.`);
+        this.platformHookManger.registerHooks(platformHooks);
       })
       .catch((e) => {
         this.log.error(`Error while resolving platform hooks: ${String(e)}`);
       });
 
-    const nativePromises = this.nativeHookResolver
-      .resolveInputHooks(nativeHooks)
+    const nativePromises = this.nativeHookManager
+      .resolveHooks(validNativeHook)
       .then((nativeHooks) => {
-        this.hookStore.addHooks(nativeHooks);
-      })
-      .then(() => {
-        this.log.info(`Native hooks resolved and stored.`);
+        this.nativeHookManager.registerHooks(nativeHooks);
       })
       .catch((e) => {
         this.log.error(`Error while resolving native hooks: ${String(e)}`);
       });
     await Promise.all([platformPromises, nativePromises]);
-  }
-
-  public registerHooks(): void {
-    let platformHooks: JavaHook[] | ObjcHook[] = [];
-    if (this.platform === "Android") {
-      platformHooks = this.hookStore.getJavaHooks();
-    } else if (this.platform === "iOS") {
-      platformHooks = this.hookStore.getObjcHooks();
-    }
-    this.platformHookResolver.registerHooks(platformHooks);
-    this.nativeHookResolver.registerHooks(this.hookStore.getNativeHooks());
   }
 
   /**

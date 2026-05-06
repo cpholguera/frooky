@@ -2,39 +2,38 @@ import z from "zod";
 import { validateAndRepairDecoderSettings, validateAndRepairHookSettings } from "../../shared/configValidator";
 import { DecoderSettings } from "../../shared/decoders/decoderSettings";
 import { FrookyConfig } from "../../shared/frookyConfig";
-import { InputJavaHook, InputJavaHookCanonical, isJavaHookScope, JavaHookScope } from "../../shared/frookyConfigParsing/javaHookScope";
-import { inputJavaHookCanonicalSchema } from "../../shared/frookyConfigParsing/zodSchemas/javaHookScope.zod";
 import { HookSettings } from "../../shared/hook/hookSettings";
 import { HookValidator } from "../../shared/hook/hookValidator";
+import { InputJavaHook, InputJavaHookGroup, InputJavaHookNormalized, isJavaHookScope } from "../../shared/inputParsing/inputJavaHookGroup";
+import { inputJavaHookNormalizedSchema } from "../../shared/inputParsing/zodSchemas/inputJavaHookGroup.zod";
 
-export class JavaHookValidator implements HookValidator<InputJavaHook, InputJavaHookCanonical, JavaHookScope> {
-  validateHooks(inputFrookyConfig: FrookyConfig, globalHookSettings: HookSettings, globalDecoderSettings: DecoderSettings): InputJavaHookCanonical[] {
-    const inputJavaHookCanonical: InputJavaHookCanonical[] = [];
-    const inputJavaHookScopes = this.getPlatformHookScopes(inputFrookyConfig);
-    for (const inputJavaHookScope of inputJavaHookScopes) {
-      for (const inputJavaHook of inputJavaHookScope.hooks) {
-        const hookScopeHookSettings = validateAndRepairHookSettings({ ...globalHookSettings, ...inputJavaHookScope.hookSettings });
-        const hookScopeDecoderSettings = validateAndRepairDecoderSettings({ ...globalDecoderSettings, ...inputJavaHookScope.decoderSettings });
-        const canonical = this.validateAndNormalizeInputHook(
-          inputJavaHook,
-          hookScopeHookSettings,
-          hookScopeDecoderSettings,
-          inputJavaHookScope.javaClass,
-        );
-        if (canonical !== undefined) {
-          inputJavaHookCanonical.push(canonical);
+export class JavaHookValidator implements HookValidator<InputJavaHookNormalized, InputJavaHookGroup> {
+  validateAndNormalizeHooks(
+    inputFrookyConfig: FrookyConfig,
+    globalHookSettings: HookSettings,
+    globalDecoderSettings: DecoderSettings,
+  ): InputJavaHookNormalized[] {
+    const inputJavaHookCanonical: InputJavaHookNormalized[] = [];
+    const inputJavaHookGroups = this.getPlatformHookGroups(inputFrookyConfig);
+    for (const inputJavaHookGroup of inputJavaHookGroups) {
+      for (const inputJavaHook of inputJavaHookGroup.hooks) {
+        const hookScopeHookSettings = validateAndRepairHookSettings({ ...globalHookSettings, ...inputJavaHookGroup.hookSettings });
+        const hookScopeDecoderSettings = validateAndRepairDecoderSettings({ ...globalDecoderSettings, ...inputJavaHookGroup.decoderSettings });
+        const normalizedJavaHook = this.normalizeHook(inputJavaHook, hookScopeHookSettings, hookScopeDecoderSettings, inputJavaHookGroup.javaClass);
+        if (normalizedJavaHook !== undefined) {
+          inputJavaHookCanonical.push(normalizedJavaHook);
         }
       }
     }
     return inputJavaHookCanonical;
   }
-  validateAndNormalizeInputHook(
+  normalizeHook(
     inputHook: InputJavaHook,
     hookScopeHookSettings: HookSettings,
     hookScopeDecoderSettings: DecoderSettings,
     className: string,
-  ): InputJavaHookCanonical | undefined {
-    const methodName = typeof inputHook === "string" ? inputHook : inputHook.methodName;
+  ): InputJavaHookNormalized | undefined {
+    const methodName = typeof inputHook === "string" ? inputHook : inputHook.method;
 
     let hookSettings: HookSettings;
     let decoderSettings: DecoderSettings;
@@ -46,15 +45,15 @@ export class JavaHookValidator implements HookValidator<InputJavaHook, InputJava
       decoderSettings = { ...hookScopeDecoderSettings, ...inputHook.decoderSettings };
     }
 
-    const testCandidate: InputJavaHookCanonical = {
-      ...(typeof inputHook === "string" ? { methodName: inputHook } : inputHook),
-      className,
+    const testCandidate: InputJavaHook = {
+      ...(typeof inputHook === "string" ? { method: inputHook } : inputHook),
+      javaClass: className,
       hookSettings,
       decoderSettings,
     };
 
     try {
-      return inputJavaHookCanonicalSchema.parse(testCandidate);
+      return inputJavaHookNormalizedSchema.parse(testCandidate);
     } catch (e) {
       frooky.log.warn([
         `Skipping hook for method '${methodName}' from class '${className}' due to an invalid declaration.`,
@@ -62,13 +61,13 @@ export class JavaHookValidator implements HookValidator<InputJavaHook, InputJava
       ]);
     }
   }
-  getPlatformHookScopes(inputFrookyConfig: FrookyConfig): JavaHookScope[] {
-    const platformHookScopes: JavaHookScope[] = [];
-    for (const hookScope of inputFrookyConfig.hookScopes) {
+  getPlatformHookGroups(inputFrookyConfig: FrookyConfig): InputJavaHookGroup[] {
+    const platformHookGroup: InputJavaHookGroup[] = [];
+    for (const hookScope of inputFrookyConfig.hookGroup) {
       if (isJavaHookScope(hookScope)) {
-        platformHookScopes.push(hookScope);
+        platformHookGroup.push(hookScope);
       }
     }
-    return platformHookScopes;
+    return platformHookGroup;
   }
 }

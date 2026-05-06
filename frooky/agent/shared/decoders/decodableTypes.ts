@@ -19,6 +19,9 @@ export interface DecodableType {
   /** Declared parameter type such as primitive type, array, class, interface, or native structs. */
   type: string;
 
+  /** Optional name for named parameters. */
+  name?: string;
+
   /**
    * Cached decoder, resolved on first decode of this parameter type.  Used to avoid repeated decoder lookups.
    */
@@ -34,9 +37,6 @@ export interface DecodableType {
  * Extends {@link DecodableType} with an optional name and controls when decoding is applied (on function entry, exit, or both).
  */
 export interface Param extends DecodableType {
-  /** Optional parameter name, e.g. `"username"` or `"age"`. */
-  name?: string;
-
   /**
    * When the decoder should be applied.
    *
@@ -46,6 +46,3 @@ export interface Param extends DecodableType {
    */
   decodeAt?: DecodeAt;
 }
-
-/** Describes the return type of a function or method signature. */
-export interface RetType extends DecodableType {}

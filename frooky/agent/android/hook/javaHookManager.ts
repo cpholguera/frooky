@@ -1,6 +1,6 @@
 import {} from "../../build/hook/javaHook";
-import { InputJavaHookCanonical } from "../../shared/frookyConfigParsing/javaHookScope";
 import type { HookManager } from "../../shared/hook/hookManager";
+import { InputJavaHook } from "../../shared/inputParsing/inputJavaHookGroup";
 import { JavaHook } from "./javaHook";
 
 // function buildParamsFromArgumentTypes(argTypes: Java.Type[]): JavaParam[] {
@@ -73,21 +73,21 @@ import { JavaHook } from "./javaHook";
 // }
 
 // builds hook operations and registers them
-export class JavaHookResolver implements HookManager<InputJavaHookCanonical, JavaHook> {
+export class JavaHookManager implements HookManager<InputJavaHook, JavaHook> {
   registerHooks(hooks: JavaHook[]): void {
-    throw new Error("Method not implemented.");
+    // throw new Error("Method not implemented.");
   }
-  async resolveInputHooks(inputHooks: InputJavaHookCanonical[]): Promise<JavaHook[]> {
+  async resolveHooks(hooks: InputJavaHook[]): Promise<JavaHook[]> {
     frooky.log.warn("JavaHookResolver not yet implemented, skipping.");
     return [];
   }
 }
-// async executeHooking(javaHookScopes: JavaHookScope[]) {
+// async executeHooking(javahookGroup: JavaHookScope[]) {
 // frooky.log.info(`Hook the native function`);
 
 /// TODO: Refactor to be like NativeHookRunner
 
-// javaHookScopes.forEach((hookScope: JavaHookScope) => {
+// javahookGroup.forEach((hookScope: JavaHookScope) => {
 //   if (!hookScope.hooks) {
 //     frooky.log.warn(`Java hook did not specify an methods.`);
 //   } else {

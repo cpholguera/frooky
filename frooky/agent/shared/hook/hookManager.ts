@@ -1,6 +1,6 @@
 import { Hook } from "./hook";
 
-export interface HookManager<TInputHookCanonical, THooks extends Hook> {
-  resolveInputHooks(inputHooks: TInputHookCanonical[]): Promise<THooks[]>;
+export interface HookManager<TInputHook, THooks extends Hook> {
+  resolveHooks(inputHooks: TInputHook[], moduleName?: string): Promise<THooks[]>;
   registerHooks(hooks: THooks[]): void;
 }

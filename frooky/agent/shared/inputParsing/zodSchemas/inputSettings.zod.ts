@@ -10,6 +10,6 @@ export const inputDecoderSettingsSchema = decoderSettingsSchema.partial();
 
 const decodeAtSchema = z.any();
 
-export const paramSettingsSchema = decoderSettingsSchema.partial().and(z.object({
+export const inputParamSettingsSchema = decoderSettingsSchema.partial().and(z.object({
     decodeAt: decodeAtSchema.optional()
 }));

@@ -6,7 +6,7 @@ metadata:
   author: frooky dev team
   version: v1
 
-hookScopes:
+hookGroup:
   # Hook multiple functions by name (all symbols in a module).
   # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
   # Docs: https://www.man7.org/linux/man-pages/man2/close.2.html
@@ -20,14 +20,14 @@ hookScopes:
   # Docs: https://www.man7.org/linux/man-pages/man2/close.2.html
   - module: libc.so
     hooks:
-      - symbolName: open
-      - symbolName: close
+      - symbol: open
+      - symbol: close
 
   # Hook with unnamed parameter types and return type (type information required for decoding).
   # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
   - module: libc.so
     hooks:
-      - symbolName: open
+      - symbol: open
         returnType: int
         params:
           - "const char *"
@@ -38,7 +38,7 @@ hookScopes:
   # Docs: https://www.man7.org/linux/man-pages/man2/open.2.html
   - module: libc.so
     hooks:
-      - symbolName: open
+      - symbol: open
         returnType: int
         params:
           - ["const char *", path]
@@ -50,9 +50,9 @@ hookScopes:
   # Docs: https://docs.openssl.org/master/man3/EVP_EncryptInit/
   - module: libssl.so
     hooks:
-      - symbolName: ENGINE_load_builtin_engines
-      - symbolName: ENGINE_cleanup
-      - symbolName: OSSL_CMP_validate_cert_path
+      - symbol: ENGINE_load_builtin_engines
+      - symbol: ENGINE_cleanup
+      - symbol: OSSL_CMP_validate_cert_path
         returnType: int
         params:
           - ["const OSSL_CMP_CTX *", ctx]
@@ -65,7 +65,7 @@ hookScopes:
   # Docs: https://www.man7.org/linux/man-pages/man2/read.2.html
   - module: libc.so
     hooks:
-      - symbolName: read
+      - symbol: read
         returnType: ssize_t
         params:
           - [int, fd]
@@ -77,7 +77,7 @@ hookScopes:
   # Docs: https://docs.openssl.org/master/man3/EVP_EncryptInit/
   - module: libssl.so
     hooks:
-      - symbolName: EVP_EncryptInit_ex
+      - symbol: EVP_EncryptInit_ex
         returnType: int
         params:
           - ["EVP_CIPHER_CTX *", ctx]
@@ -91,7 +91,7 @@ hookScopes:
   # Docs: https://docs.openssl.org/master/man3/SSL_write/
   - module: libssl.so
     hooks:
-      - symbolName: SSL_write
+      - symbol: SSL_write
         returnType: int
         params:
           - ["SSL *", ssl]

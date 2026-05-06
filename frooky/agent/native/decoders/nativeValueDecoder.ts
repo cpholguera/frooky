@@ -1,6 +1,7 @@
 import type { BaseDecoder } from "../../shared/decoders/baseDecoder";
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
-import type { NativeParam } from "./nativeDecodableTypes";
+import { DecoderSettings } from "../../shared/decoders/decoderSettings";
+import { NativeDecodableType } from "./nativeDecodableTypes";
 import type { FundamentalType } from "./nativeDecoder";
 import { NativeFallbackDecoder } from "./nativeFallbackDecoder";
 
@@ -36,18 +37,17 @@ const valueDecoders: Record<FundamentalType, (input: NativePointer) => null | nu
   double: (input) => input.toInt32(),
 };
 
-export const NativeValueDecoder: BaseDecoder<NativePointer, NativeParam> = {
-  decode: (value, param, settings): DecodedValue => {
-    const type = param.type as FundamentalType;
-    const valueDecoder = valueDecoders[type];
+export const NativeValueDecoder: BaseDecoder<NativePointer, NativeDecodableType> = {
+  decode: (value: NativePointer, type: NativeDecodableType, settings: DecoderSettings, args?: any[]): DecodedValue => {
+    const valueDecoder = valueDecoders[type.type as FundamentalType];
     if (valueDecoder) {
       return {
-        type: param.type,
-        name: param.paramNname,
+        type: type.type,
+        name: type.name,
         value: valueDecoder(value),
       };
     } else {
-      return NativeFallbackDecoder.decode(value, param, settings);
+      return NativeFallbackDecoder.decode(value, type, settings);
     }
   },
 };
