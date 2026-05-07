@@ -1,5 +1,5 @@
 metadata:
-  methodName: Test Settings Android
+  name: Test Settings Android
   description: |
     This frooky config uses different kind of settings:
 
@@ -92,7 +92,7 @@ hookGroup:
   # object with ONLY name provided, technically the same form as the one before
   - javaClass: org.owasp.mastestapp.MastgTest
     hooks:
-      - methodName: receiveByte
+      - method: receiveByte
 
 
   # PARTIAL local hook settings take priority over global setting, simple function declaration
@@ -112,7 +112,7 @@ hookGroup:
     decoderSettings:
       decodeLimit: 33
     hooks:
-      - methodName: receiveLong
+      - method: receiveLong
 
   # PARTIAL local hook settings take priority over global setting, object with ONLY symbol provided
   - javaClass: org.owasp.mastestapp.MastgTest
@@ -128,7 +128,7 @@ hookGroup:
   # PARTIAL local parameter settings take priority over global setting, form [type, settings]
   - javaClass: org.owasp.mastestapp.MastgTest
     hooks:
-      - methodName: receiveIntArray
+      - method: receiveIntArray
         overloads:
           - params:
             - ["[I", {decodeLimit: 55}]
@@ -136,7 +136,7 @@ hookGroup:
   # PARTIAL local parameter settings take priority over global setting, form [type, name, settings]
   - javaClass: org.owasp.mastestapp.MastgTest
     hooks:
-      - methodName: receiveNestedPrimitivesArray
+      - method: receiveNestedPrimitivesArray
         overloads:
           - params:
             - ["[[[I", {decodeLimit: 66}]

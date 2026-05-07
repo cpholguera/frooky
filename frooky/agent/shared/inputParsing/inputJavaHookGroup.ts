@@ -1,6 +1,9 @@
+import { JavaOverload } from "../../android/hook/javaHook";
+import { validateAndRepairDecoderSettings, validateAndRepairHookSettings } from "../configValidator";
 import { DecoderSettings } from "../decoders/decoderSettings";
+import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../defaultValues";
 import { HookSettings } from "../hook/hookSettings";
-import { InputParam, InputRetType } from "./inputDecodableTypes";
+import { InputParam, InputRetType, normalizeParamInput, normalizeRetTypeInput } from "./inputDecodableTypes";
 import { InputDecoderSettings, InputHookSettings } from "./inputSettings";
 
 /**
@@ -54,48 +57,61 @@ export interface InputJavaHookGroup {
   decoderSettings?: InputDecoderSettings;
 }
 
-// export interface HookScopeInput extends Omit<HookScope, "hookSettings" | "decoderSettings"> {
-//   hookSettings?: HookSettingsInput;
-//   decoderSettings?: DecoderSettingsInput;
-// }
-
 // Type guard function
 export function isJavaHookScope(hookScopeInput: object): hookScopeInput is InputJavaHookGroup {
   return "javaClass" in hookScopeInput;
 }
 
-// // will return a JavaOverload for any form of JavaOverloadInput
-// function normalizeOverload(overload: JavaOverloadInput, decoderSettings: DecoderSettings): JavaOverload {
-//   return {
-//     ...overload,
-//     params: overload.params.map((param: ParamInput) => normalizeParamType(param, decoderSettings)),
-//   };
-// }
+// will return a JavaOverload for any form of JavaOverloadInput
+function normalizeOverload(overload: InputOverload, decoderSettings: DecoderSettings): JavaOverload {
+  return {
+    ...overload,
+    params: overload.params.map((param: InputParam) => normalizeParamInput(param, decoderSettings)),
+  };
+}
 
-// // will return a JavaMethod for any form of JavaMethodInput or a simple method string
-// function normalizeMethod(method: JavaHookInput, hookSettings: HookSettings, decoderSettings: DecoderSettings): JavaHook {
-//   if (typeof method === "string") {
-//     return { name: method, hookSettings: hookSettings, decoderSettings: decoderSettings };
-//   }
+// will return a JavaMethod for any form of JavaMethodInput or a simple method string
+function normalizeMethod(
+  javaClass: string,
+  method: InputJavaHook,
+  hookSettings: HookSettings,
+  decoderSettings: DecoderSettings,
+): InputJavaHookNormalized {
+  if (typeof method === "string") {
+    return { javaClass: javaClass, method: method, hookSettings: hookSettings, decoderSettings: decoderSettings };
+  }
 
-//   return {
-//     ...method,
-//     overloads: method.overloads?.map((overload: JavaOverloadInput) => normalizeOverload(overload, decoderSettings)),
-//     retType: method.retType ? normalizeReturnType(method.retType, decoderSettings) : undefined,
-//     hookSettings: hookSettings,
-//     decoderSettings: decoderSettings,
-//   };
-// }
+  return {
+    ...method,
+    javaClass: javaClass,
+    overloads: method.overloads?.map((overload: InputOverload) => normalizeOverload(overload, decoderSettings)),
+    retType: method.retType ? normalizeRetTypeInput(method.retType, decoderSettings) : undefined,
+    hookSettings: hookSettings,
+    decoderSettings: decoderSettings,
+  };
+}
 
-// // resolves the declared hooks form the hook file and returns a JavaHookScope
-// export function resolveJavaHookScope(hookScopeInput: JavaHookScopeInput): JavaHookScope {
-//   const mergedDecoderSettings: DecoderSettings = validateAndRepairDecoderSettings({ ...DEFAULT_DECODER_SETTINGS, ...hookScopeInput.decoderSettings });
-//   const mergedHookSettings: HookSettings = validateAndRepairHookSettings({ ...DEFAULT_HOOK_SETTINGS, ...hookScopeInput.hookSettings });
+// normalized hook group
+export function normalizeJavaHookGroup(
+  hookGroup: InputJavaHookGroup,
+  globalHookSettings: HookSettings,
+  globalDecoderSettings: DecoderSettings,
+): InputJavaHookGroup {
+  const mergedHookSettings: HookSettings = validateAndRepairHookSettings({
+    ...DEFAULT_HOOK_SETTINGS,
+    ...globalHookSettings,
+    ...hookGroup.hookSettings,
+  });
+  const mergedDecoderSettings: DecoderSettings = validateAndRepairDecoderSettings({
+    ...DEFAULT_DECODER_SETTINGS,
+    ...globalDecoderSettings,
+    ...hookGroup.decoderSettings,
+  });
 
-//   return {
-//     ...hookScopeInput,
-//     hooks: hookScopeInput.hooks.map((hooks: JavaHookInput) => normalizeMethod(hooks, mergedHookSettings, mergedDecoderSettings)),
-//     hookSettings: mergedHookSettings,
-//     decoderSettings: mergedDecoderSettings,
-//   };
-// }
+  return {
+    ...hookGroup,
+    hooks: hookGroup.hooks.map((hook: InputJavaHook) => normalizeMethod(hookGroup.javaClass, hook, mergedHookSettings, mergedDecoderSettings)),
+    hookSettings: mergedHookSettings,
+    decoderSettings: mergedDecoderSettings,
+  };
+}
