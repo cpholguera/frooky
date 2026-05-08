@@ -2,7 +2,7 @@ import { validateAndRepairDecoderSettings, validateAndRepairHookSettings } from 
 import type { DecoderSettings } from "../decoders/decoderSettings";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../defaultValues";
 import { HookSettings } from "../hook/hookSettings";
-import { InputParam, InputRetType, normalizeParamInput, normalizeRetTypeInput } from "./inputDecodableTypes";
+import { InputParam, InputRetType, normalizeInputParam, normalizeInputRetType } from "./inputDecodableTypes";
 import { InputDecoderSettings, InputHookSettings } from "./inputSettings";
 
 export type InputNativeHookNormalized = {
@@ -64,8 +64,8 @@ function normalizeHook(
   return {
     symbol: inputHook.symbol,
     module: moduleName,
-    params: inputHook.params?.map((paramInput: InputParam) => normalizeParamInput(paramInput, decoderSettings)),
-    retType: inputHook.retType ? normalizeRetTypeInput(inputHook.retType, decoderSettings) : undefined,
+    params: inputHook.params?.map((paramInput: InputParam) => normalizeInputParam(paramInput, decoderSettings)),
+    retType: inputHook.retType ? normalizeInputRetType(inputHook.retType, decoderSettings) : undefined,
     hookSettings: hookSettings,
     decoderSettings: decoderSettings,
   };

@@ -74,7 +74,7 @@ metadata:
 # global settings for the hooks in this hook file.
 globalSettings:
   hookSettings:
-    hookTimeout: 1                    # Timeout in seconds frooky will try to hook in case something the target library is not available.
+    hookTimeoutMs: 1111                    # Timeout in seconds frooky will try to hook in case something the target library is not available.
     stackTraceLimit: 11               # Sets stackTraceLimit to 10 for all hooks
     eventFilter: ['^(?!android).*']   # Stack trace filters to apply.
   decoderSettings:
@@ -98,7 +98,7 @@ hookGroup:
   # PARTIAL local hook settings take priority over global setting, simple function declaration
   - javaClass: org.owasp.mastestapp.MastgTest
     hookSettings:
-      hookTimeout: 2
+      hookTimeoutMs: 2000
     decoderSettings:
       decodeLimit: 22
     hooks:
@@ -108,7 +108,7 @@ hookGroup:
   # PARTIAL local hook settings take priority over global setting, simple function declaration
   - javaClass: org.owasp.mastestapp.MastgTest
     hookSettings:
-      hookTimeout: 3
+      hookTimeoutMs: 3000
     decoderSettings:
       decodeLimit: 33
     hooks:
@@ -117,7 +117,7 @@ hookGroup:
   # PARTIAL local hook settings take priority over global setting, object with ONLY symbol provided
   - javaClass: org.owasp.mastestapp.MastgTest
     hookSettings:
-      hookTimeout: 4
+      hookTimeoutMs: 4000
     decoderSettings:
       decodeLimit: 44
     hooks:
@@ -140,4 +140,3 @@ hookGroup:
         overloads:
           - params:
             - ["[[[I", {decodeLimit: 66}]
-

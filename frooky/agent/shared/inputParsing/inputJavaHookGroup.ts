@@ -1,9 +1,8 @@
-import { JavaOverload } from "../../android/hook/javaHook";
 import { validateAndRepairDecoderSettings, validateAndRepairHookSettings } from "../configValidator";
 import { DecoderSettings } from "../decoders/decoderSettings";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../defaultValues";
 import { HookSettings } from "../hook/hookSettings";
-import { InputParam, InputRetType, normalizeParamInput, normalizeRetTypeInput } from "./inputDecodableTypes";
+import { InputParam, InputRetType, normalizeInputParam, normalizeInputRetType } from "./inputDecodableTypes";
 import { InputDecoderSettings, InputHookSettings } from "./inputSettings";
 
 /**
@@ -63,10 +62,10 @@ export function isJavaHookScope(hookScopeInput: object): hookScopeInput is Input
 }
 
 // will return a JavaOverload for any form of JavaOverloadInput
-function normalizeOverload(overload: InputOverload, decoderSettings: DecoderSettings): JavaOverload {
+function normalizeOverload(overload: InputOverload, decoderSettings: DecoderSettings): InputOverload {
   return {
     ...overload,
-    params: overload.params.map((param: InputParam) => normalizeParamInput(param, decoderSettings)),
+    params: overload.params.map((param: InputParam) => normalizeInputParam(param, decoderSettings)),
   };
 }
 
@@ -85,7 +84,7 @@ function normalizeMethod(
     ...method,
     javaClass: javaClass,
     overloads: method.overloads?.map((overload: InputOverload) => normalizeOverload(overload, decoderSettings)),
-    retType: method.retType ? normalizeRetTypeInput(method.retType, decoderSettings) : undefined,
+    retType: method.retType ? normalizeInputRetType(method.retType, decoderSettings) : undefined,
     hookSettings: hookSettings,
     decoderSettings: decoderSettings,
   };

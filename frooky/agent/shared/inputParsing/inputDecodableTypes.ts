@@ -21,7 +21,7 @@ import type { InputParamSettings } from "./inputSettings";
  */
 export type InputParam = string | [string, string] | [string, InputParamSettings] | [string, string, InputParamSettings] | Param;
 
-export function normalizeParamInput(input: InputParam, decoderSettings?: DecoderSettings): Param {
+export function normalizeInputParam(input: InputParam, decoderSettings?: DecoderSettings): Param {
   const mergedSettings = decoderSettings ? { ...DEFAULT_DECODER_SETTINGS, ...decoderSettings } : DEFAULT_DECODER_SETTINGS;
 
   // Case 1: Type only - "java.lang.String"
@@ -67,7 +67,7 @@ export function normalizeParamInput(input: InputParam, decoderSettings?: Decoder
  */
 export type InputRetType = string | [string, Partial<DecoderSettings>] | DecodableType;
 
-export function normalizeRetTypeInput(input: InputRetType, decoderSettings?: DecoderSettings): DecodableType {
+export function normalizeInputRetType(input: InputRetType, decoderSettings?: DecoderSettings): DecodableType {
   const mergedSettings = decoderSettings ? { ...DEFAULT_DECODER_SETTINGS, ...decoderSettings } : DEFAULT_DECODER_SETTINGS;
 
   // validate and repair merged settings

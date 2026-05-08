@@ -1,18 +1,12 @@
-import {} from "../../build/hook/javaHook";
+import Java from "frida-java-bridge";
+import { JavaHook } from "../../build/hook/javaHook";
+import { DecoderSettings } from "../../shared/decoders/decoderSettings";
+import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../../shared/defaultValues";
 import type { HookManager } from "../../shared/hook/hookManager";
-import { InputJavaHook } from "../../shared/inputParsing/inputJavaHookGroup";
-import { JavaHook } from "./javaHook";
-
-// function buildParamsFromArgumentTypes(argTypes: Java.Type[]): JavaParam[] {
-// return argTypes.reduce((params: JavaParam[], t: Java.Type) => {
-//   if (t.className) {
-//     params.push({ type: t.className, implementationType: t.className });
-//   } else {
-//     frooky.log.warn(`No Frida type name for the VM type ${t.name} found.`);
-//   }
-//   return params;
-// }, []);
-// }
+import { InputParam, normalizeInputParam } from "../../shared/inputParsing/inputDecodableTypes";
+import { InputJavaHookNormalized } from "../../shared/inputParsing/inputJavaHookGroup";
+import { sleep } from "../../shared/utils";
+import { JavaParam } from "./javaParam";
 
 // actually hooks the java method
 // export function registerJavaHookOps(javaHookOp: JavaHookOp) {
@@ -43,69 +37,112 @@ import { JavaHook } from "./javaHook";
 // };
 // }
 
-// function buildJavaHookOps(hook: JavaHookScope, handle: Java.MethodDispatcher, methodDefinition: JavaMethodDefinition, javaHookOps: JavaHookOp[]): void {
-// if (methodDefinition.overloads?.length) {
-//   // Only hook explicitly declared overloads
-//   methodDefinition.overloads.forEach((declaredOverload: JavaOverload) => {
-//     // merge decoder settings from the hook into the param options
-//     if (hook.settings?.decoderSettings) {
-//       declaredOverload.params.forEach((param: JavaParam) => {
-//         param.options = param.options ?? {};
-//         param.options.decoderSettings = {
-//           ...hook.settings?.decoderSettings,
-//           ...param.options.decoderSettings,
-//         };
-//       });
-//     }
-//     const paramList: Param[] = declaredOverload.params.map((p: Param) => p.type);
-//     try {
-//       pushHookOp(hook, methodDefinition, declaredOverload.params, handle.overload(...paramList), javaHookOps);
-//     } catch (e) {
-//       frooky.log.warn(`Failed to get overload for method '${methodDefinition.name}' in class '${hook.javaClass}': ${e}.`);
-//     }
-//   });
-// } else {
-//   // Hook all overloads
-//   handle.overloads.forEach((javaMethod: Java.Method) => {
-//     pushHookOp(hook, methodDefinition, buildParamsFromArgumentTypes(javaMethod.argumentTypes), javaMethod, javaHookOps);
-//   });
-// }
-// }
+// resolve java classes, the method and their overloads
+export class JavaHookManager implements HookManager<InputJavaHookNormalized, JavaHook> {
+  private resolvedJavaClasses: Record<string, Java.Wrapper> = {};
 
-// builds hook operations and registers them
-export class JavaHookManager implements HookManager<InputJavaHook, JavaHook> {
-  registerHooks(hooks: JavaHook[]): void {
-    // throw new Error("Method not implemented.");
+  private buildParamsFromArgumentTypes(argTypes: Java.Type[], decoderSettings: DecoderSettings): JavaParam[] {
+    return argTypes.reduce((params: JavaParam[], type: Java.Type) => {
+      if (type.className) {
+        params.push({
+          type: type.className,
+          implementationType: type.className,
+          decoderSettings: decoderSettings,
+        });
+      } else {
+        frooky.log.warn(`No Frida type name for the VM type ${type.name} found.`);
+      }
+      return params;
+    }, []);
   }
-  async resolveHooks(hooks: InputJavaHook[]): Promise<JavaHook[]> {
-    frooky.log.warn("JavaHookResolver not yet implemented, skipping.");
-    return [];
+
+  private async resolveAndCacheJavaClass(name: string, hookTimeoutMs: number): Promise<Java.Wrapper> {
+    frooky.log.info(`Resolving java class ${name} with a timeout of ${hookTimeoutMs}ms.`);
+    const deadline = Date.now() + hookTimeoutMs;
+
+    let javaClass: Java.Wrapper | undefined;
+    while (true) {
+      try {
+        javaClass = Java.use(name);
+        this.resolvedJavaClasses[name] = javaClass;
+
+        break;
+      } catch (_) {
+        //  silently ignore errors from Java.use
+      }
+      if (Date.now() >= deadline) {
+        throw new Error(`Java class ${name} could not be loaded within ${hookTimeoutMs}ms. It either does not exist, or is not loaded yet.`);
+      }
+      await sleep(100);
+    }
+
+    return javaClass;
+  }
+
+  resolveMethod(javaClass: Java.Wrapper, inputHook: InputJavaHookNormalized): Java.MethodDispatcher {
+    try {
+      return javaClass[inputHook.method];
+    } catch (e) {
+      throw Error(`Method ${inputHook.method} was not found in class ${javaClass.$className}.`);
+    }
+  }
+
+  resolveOverloads(method: Java.MethodDispatcher, inputHook: InputJavaHookNormalized): JavaHook[] {
+    const result: JavaHook[] = [];
+    if (inputHook.overloads?.length) {
+      // Only get declared overloaded methods
+      for (const overload of inputHook.overloads) {
+        const normalizedParams: JavaParam[] = overload.params.map((inputParam: InputParam) => normalizeInputParam(inputParam) as JavaParam);
+        // extract a list of java parameter types e.g. ["int", "java.lang.String", "double"] to be used to look up the overload
+        const paramTypes: string[] = normalizedParams.map((param: JavaParam) => param.type);
+        try {
+          result.push({
+            methodName: method.methodName,
+            method: method.overload(...paramTypes),
+            params: normalizedParams,
+            hookSettings: inputHook.hookSettings ?? DEFAULT_HOOK_SETTINGS,
+            decoderSettings: inputHook.decoderSettings ?? DEFAULT_DECODER_SETTINGS,
+          });
+        } catch (e) {
+          frooky.log.warn(`Failed to get overload for method '${inputHook.method}(${paramTypes})' in class '${method.holder}': ${e}.`);
+        }
+      }
+    } else {
+      // Get all overloaded methods
+      for (const javaMethod of method.overloads) {
+        const params: JavaParam[] = this.buildParamsFromArgumentTypes(javaMethod.argumentTypes, inputHook.decoderSettings!);
+        result.push({
+          methodName: method.methodName,
+          method: javaMethod,
+          params: params,
+          hookSettings: inputHook.hookSettings ?? DEFAULT_HOOK_SETTINGS,
+          decoderSettings: inputHook.decoderSettings ?? DEFAULT_DECODER_SETTINGS,
+        });
+      }
+    }
+    return result;
+  }
+
+  async resolveHooks(inputHooks: InputJavaHookNormalized[]): Promise<JavaHook[]> {
+    frooky.log.info(`Resolving Java hooks`);
+
+    const promises = inputHooks.map(async (inputHook) => {
+      try {
+        if (!(inputHook.javaClass in this.resolvedJavaClasses)) {
+          await this.resolveAndCacheJavaClass(inputHook.javaClass, inputHook.hookSettings?.hookTimeoutMs ?? DEFAULT_HOOK_SETTINGS.hookTimeoutMs);
+        }
+        const javaClass = this.resolvedJavaClasses[inputHook.javaClass];
+        const method = this.resolveMethod(javaClass, inputHook);
+        return this.resolveOverloads(method, inputHook);
+      } catch (e) {
+        frooky.log.error(`${e}`);
+        return null;
+      }
+    });
+    return Promise.all(promises).then((results) => results.filter((r): r is JavaHook[] => r !== null).flat());
+  }
+
+  registerHooks(hooks: JavaHook[]): void {
+    throw new Error("Method not implemented.");
   }
 }
-// async executeHooking(javahookGroup: JavaHookScope[]) {
-// frooky.log.info(`Hook the native function`);
-
-/// TODO: Refactor to be like NativeHookRunner
-
-// javahookGroup.forEach((hookScope: JavaHookScope) => {
-//   if (!hookScope.hooks) {
-//     frooky.log.warn(`Java hook did not specify an methods.`);
-//   } else {
-//     hookScope.hooks.forEach((method) => {
-//       try {
-//         const handle: Java.MethodDispatcher = Java.use(hookScope.javaClass)[method.name];
-//         buildJavaHookOps(hookScope, handle, method, hookOps);
-//       } catch (e) {
-//         frooky.log.warn(`Failed to resolve method '${method.name}' in class '${hookScope.javaClass}': ${e}.`);
-//       }
-//     });
-//   }
-// });
-
-// frooky.log.info(`Hook operations for the following hook built: ${JSON.stringify(hookOps, null, 2)}`);
-// frooky.log.info(`Run Android hooking`);
-
-// hookOps.forEach((hookOp: JavaHookOp) => {
-//   registerJavaHookOps(hookOp);
-// });
-// }
