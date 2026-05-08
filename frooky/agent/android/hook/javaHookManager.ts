@@ -1,12 +1,12 @@
 import Java from "frida-java-bridge";
-import { JavaHook } from "../../build/hook/javaHook";
 import { DecoderSettings } from "../../shared/decoders/decoderSettings";
-import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../../shared/defaultValues";
+import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS, FRIDA_LOOKUP_INTERVAL_MS } from "../../shared/defaultValues";
 import type { HookManager } from "../../shared/hook/hookManager";
 import { InputParam, normalizeInputParam } from "../../shared/inputParsing/inputDecodableTypes";
 import { InputJavaHookNormalized } from "../../shared/inputParsing/inputJavaHookGroup";
 import { sleep } from "../../shared/utils";
 import { JavaDecoder } from "../decoders/javaDecoder";
+import { JavaHook } from "./javaHook";
 import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeArgs } from "./javaHookImpl";
 import { JavaParam } from "./javaParam";
 
@@ -61,30 +61,31 @@ export class JavaHookManager implements HookManager<InputJavaHookNormalized, Jav
     frooky.log.info(`Resolving java class ${name} with a timeout of ${hookTimeoutMs}ms.`);
     const deadline = Date.now() + hookTimeoutMs;
 
-    let javaClass: Java.Wrapper | undefined;
     while (true) {
       try {
-        javaClass = Java.use(name);
-        this.resolvedJavaClasses[name] = javaClass;
-
-        break;
+        if (this.resolvedJavaClasses[name]) {
+          frooky.log.info(`Cached module '${name}' found.`);
+          return this.resolvedJavaClasses[name];
+        }
+        this.resolvedJavaClasses[name] = Java.use(name);
+        frooky.log.info(`Module '${name}' successfully resolved.`);
+        return this.resolvedJavaClasses[name];
       } catch (_) {
         //  silently ignore errors from Java.use
       }
       if (Date.now() >= deadline) {
-        throw new Error(`Java class ${name} could not be loaded within ${hookTimeoutMs}ms. It either does not exist, or is not loaded yet.`);
+        throw new Error(`Skipping hooks for java class ${name} as it could not be loaded during a time out of ${hookTimeoutMs}ms.`);
       }
-      await sleep(100);
+      await sleep(FRIDA_LOOKUP_INTERVAL_MS);
     }
-
-    return javaClass;
   }
 
   resolveMethod(javaClass: Java.Wrapper, inputHook: InputJavaHookNormalized): Java.MethodDispatcher {
-    try {
-      return javaClass[inputHook.method];
-    } catch (e) {
-      throw Error(`Method ${inputHook.method} was not found in class ${javaClass.$className}.`);
+    const resolvedMethod = javaClass[inputHook.method];
+    if (resolvedMethod) {
+      return resolvedMethod;
+    } else {
+      throw Error(`Skipping hook for ${inputHook.method} as it was not found in class ${javaClass.$className}.`);
     }
   }
 
@@ -128,16 +129,17 @@ export class JavaHookManager implements HookManager<InputJavaHookNormalized, Jav
     frooky.log.info(`Resolving Java hooks`);
 
     const promises = inputHooks.map(async (inputHook) => {
+      const hookTimeoutMs = inputHook.hookSettings?.hookTimeoutMs ?? DEFAULT_HOOK_SETTINGS.hookTimeoutMs;
       try {
         if (!(inputHook.javaClass in this.resolvedJavaClasses)) {
-          await this.resolveAndCacheJavaClass(inputHook.javaClass, inputHook.hookSettings?.hookTimeoutMs ?? DEFAULT_HOOK_SETTINGS.hookTimeoutMs);
+          await this.resolveAndCacheJavaClass(inputHook.javaClass, hookTimeoutMs);
         }
         const javaClass = this.resolvedJavaClasses[inputHook.javaClass];
         const method = this.resolveMethod(javaClass, inputHook);
+
         return this.resolveOverloads(method, inputHook);
       } catch (e) {
-        frooky.log.error(`${e}`);
-        return null;
+        frooky.log.warn(`${e}`);
       }
     });
     return Promise.all(promises).then((results) => results.filter((r): r is JavaHook[] => r !== null).flat());

@@ -1,5 +1,5 @@
 import { DecodedValue } from "../../shared/decoders/decodedValue";
-import { DEFAULT_HOOK_SETTINGS } from "../../shared/defaultValues";
+import { DEFAULT_HOOK_SETTINGS, FRIDA_LOOKUP_INTERVAL_MS } from "../../shared/defaultValues";
 import type { HookManager } from "../../shared/hook/hookManager";
 import { InputNativeHookNormalized } from "../../shared/inputParsing/inputNativeHookGroup";
 import { sleep } from "../../shared/utils";
@@ -42,7 +42,7 @@ function resolveSymbol(symbol: string, module: Module): NativePointer {
   }
 }
 
-async function resolveModule(moduleName: string, hookTimeoutMs: number): Promise<Module> {
+async function resolveAndCacheModule(moduleName: string, hookTimeoutMs: number): Promise<Module> {
   frooky.log.info(`Loading native module ${moduleName} with a timeout of ${hookTimeoutMs}ms.`);
   const deadline = Date.now() + hookTimeoutMs;
   while (true) {
@@ -52,13 +52,15 @@ async function resolveModule(moduleName: string, hookTimeoutMs: number): Promise
       // silently ignore errors from Process.getModuleByName
     }
     if (Date.now() >= deadline) {
-      throw new Error(`Module '${moduleName}' could not be loaded within ${hookTimeoutMs}ms. It either does not exist, or is not loaded yet.`);
+      throw new Error(`Sipping hooks for module '${moduleName}' as it could not be loaded during a time out of ${hookTimeoutMs}ms.`);
     }
-    await sleep(100);
+    await sleep(FRIDA_LOOKUP_INTERVAL_MS);
   }
 }
 
 export class NativeHookManager implements HookManager<InputNativeHookNormalized, NativeHook> {
+  private resolvedModules: Record<string, Module> = {};
+
   registerHooks(hooks: NativeHook[]) {
     for (const hook of hooks) {
       registerHook(hook);
@@ -70,7 +72,7 @@ export class NativeHookManager implements HookManager<InputNativeHookNormalized,
     const promises = inputHooks.map(async (inputHook) => {
       const hookTimeoutMs = inputHook.hookSettings?.hookTimeoutMs ?? DEFAULT_HOOK_SETTINGS.hookTimeoutMs;
       try {
-        const module = await resolveModule(inputHook.module!, hookTimeoutMs);
+        const module = await resolveAndCacheModule(inputHook.module!, hookTimeoutMs);
         const symbolAddress = resolveSymbol(inputHook.symbol, module);
         return {
           module: module,
@@ -82,11 +84,10 @@ export class NativeHookManager implements HookManager<InputNativeHookNormalized,
           decoderSettings: inputHook.decoderSettings,
         } as NativeHook;
       } catch (e) {
-        frooky.log.error(String(e));
-        return null;
+        frooky.log.warn(`${e}`);
       }
     });
 
-    return Promise.all(promises).then((results) => results.filter((r): r is NativeHook => r !== null));
+    return Promise.all(promises).then((nativeHook) => nativeHook.filter((r): r is NativeHook => r !== null));
   }
 }

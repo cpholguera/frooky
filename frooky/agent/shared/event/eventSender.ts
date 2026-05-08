@@ -1,11 +1,11 @@
 // takes care of event cache and sending events to the host
 
-import { SEND_INTERVAL } from "../defaultValues";
+import { SEND_INTERVAL_MS } from "../defaultValues";
 import type { BaseEvent } from "./baseEvent";
 
 let senderInterval: ReturnType<typeof setInterval> | null = null;
 
-export function startAsyncSender(eventCache: BaseEvent[], sendInterval: number = SEND_INTERVAL): void {
+export function startAsyncSender(eventCache: BaseEvent[], sendInterval: number = SEND_INTERVAL_MS): void {
   if (senderInterval !== null) {
     return; // already running
   }

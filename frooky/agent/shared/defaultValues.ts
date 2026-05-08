@@ -18,4 +18,7 @@ export const DEFAULT_HOOK_SETTINGS: HookSettings = {
 };
 
 // specifies the interval between cached events are send back to the host
-export const SEND_INTERVAL = 100;
+export const SEND_INTERVAL_MS = 100;
+
+// specifies the interval during frida module and classes lookup
+export const FRIDA_LOOKUP_INTERVAL_MS = 100;
