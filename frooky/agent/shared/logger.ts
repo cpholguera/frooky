@@ -41,21 +41,31 @@ export class Logger {
     return `${prefix} ${msg}`;
   }
 
+  private readonly levelColors: Record<LogLevel, string> = {
+    info: "\x1b[34m", // blue
+    warn: "\x1b[33m", // yellow
+    error: "\x1b[31m", // red
+    debug: "\x1b[32m", // green
+  };
+
+  private readonly reset = "\x1b[0m";
+
   private emit(level: LogLevel, msg: string | string[]): void {
     const formatted = this.format(level, msg);
     if (this.logTo === "device") {
+      const color = this.levelColors[level];
       switch (level) {
         case "info":
-          console.log(formatted);
+          console.log(color + formatted + this.reset);
           break;
         case "warn":
-          console.warn(formatted);
+          console.warn(color + formatted + this.reset);
           break;
         case "error":
-          console.error(formatted);
+          console.error(color + formatted + this.reset);
           break;
         case "debug":
-          console.debug(formatted);
+          console.debug(color + formatted + this.reset);
           break;
       }
     } else if (this.logTo === "frooky") {

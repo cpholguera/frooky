@@ -58,9 +58,11 @@ export class FrookyApp {
 
     // printing some context infos
     this.log.info("Initializing frooky");
-    this.log.info(`Target platform: ${this.platform}`);
-    this.log.info(`Frida version:  ${Frida.version}`);
-    this.log.info(`Target process:\n${JSON.stringify(Process, null, 2)}}`);
+    this.log.info(`Declared target platform: ${this.platform}`);
+    this.log.info(`Target platform: ${Process.platform}}`);
+    this.log.info(`Target frida version: ${Frida.version}`);
+    this.log.info(`Target arch: ${Process.arch}}`);
+    this.log.debug(`Target process:\n${JSON.stringify(Process, null, 2)}}`);
   }
 
   /**
@@ -72,7 +74,7 @@ export class FrookyApp {
     try {
       await this.loadFrookyConfig(inputFrookyConfig);
     } catch (e) {
-      console.error(`Error during loading of the frooky config: ${String(e)}`);
+      this.log.error(`Error during loading of the frooky config: ${String(e)}`);
     }
   }
 

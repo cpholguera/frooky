@@ -51,5 +51,11 @@ export default [
         "name": "decodable_types_input",
         "input": "shared/inputParsing/inputDecodableTypes.ts",
         "output": "shared/inputParsing/zodSchemas/inputDecodableTypes.zod.ts"
+    },
+
+    {
+        "name": "frooky_config",
+        "input": "shared/frookyConfig.ts",
+        "output": "shared/inputParsing/zodSchemas/frookyConfig.zod.ts"
     }
 ]

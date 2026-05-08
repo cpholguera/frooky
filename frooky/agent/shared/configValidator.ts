@@ -47,7 +47,6 @@ export function validateAndRepairDecoderSettings(settings: InputDecoderSettings)
 }
 
 export function validateMetadata(metadata: FrookyMetadata, platform: Platform) {
-  frooky.log.info(`frooky config metadata:\n${JSON.stringify(metadata, null, 2)}`);
   if (metadata.platform?.toLowerCase() !== platform.toLocaleLowerCase()) {
     frooky.log.warn(
       `The platform declared in the frooky configuration does not match the actual platform (${platform}). Not all hooks may be valid.`,
@@ -64,7 +63,9 @@ export function validateConfig(
   platform: Platform,
 ): { globalHookSettings: HookSettings; globalDecoderSettings: DecoderSettings } {
   if (inputFrookyConfig.metadata) {
+    frooky.log.info(`Metadata are valid.`);
     validateMetadata(inputFrookyConfig.metadata, platform);
+    frooky.log.debug(`Metadata: ${JSON.stringify(inputFrookyConfig.metadata, null, 2)}`);
   } else {
     frooky.log.warn(`No metadata declared.`);
   }
@@ -72,13 +73,15 @@ export function validateConfig(
   let globalHookSettings: HookSettings = DEFAULT_HOOK_SETTINGS;
   if (inputFrookyConfig.globalSettings?.hookSettings) {
     globalHookSettings = validateAndRepairHookSettings(inputFrookyConfig.globalSettings.hookSettings);
-    frooky.log.info(`Global hook settings are:\n${JSON.stringify(inputFrookyConfig.globalSettings.hookSettings, null, 2)}`);
+    frooky.log.info(`Global settings are valid.`);
+    frooky.log.debug(`Global settings: ${JSON.stringify(inputFrookyConfig.globalSettings.hookSettings, null, 2)}`);
   }
 
   let globalDecoderSettings: DecoderSettings = DEFAULT_DECODER_SETTINGS;
   if (inputFrookyConfig.globalSettings?.decoderSettings) {
     globalDecoderSettings = validateAndRepairDecoderSettings(inputFrookyConfig.globalSettings.decoderSettings);
-    frooky.log.info(`Global decoder settings are:\n${JSON.stringify(inputFrookyConfig.globalSettings.decoderSettings, null, 2)}`);
+    frooky.log.info(`Global decoder settings are valid.`);
+    frooky.log.debug(`Global decoder settings: ${JSON.stringify(inputFrookyConfig.globalSettings.decoderSettings, null, 2)}`);
   }
 
   return { globalHookSettings, globalDecoderSettings };

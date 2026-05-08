@@ -27,7 +27,7 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
           if (!resolvedJavaClass) return null;
           try {
             const method = this.resolveMethod(resolvedJavaClass, inputHook);
-            frooky.log.info(`Java method '${resolvedJavaClass.$className}.${method.methodName}' found: ${method.handle}.`);
+            frooky.log.debug(`Java method '${resolvedJavaClass.$className}.${method.methodName}' found: ${method.handle}.`);
             return this.resolveOverloads(method, inputHook);
           } catch (e) {
             frooky.log.warn(`${e}`);
@@ -85,15 +85,22 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
 
   private async resolveJavaClass(javaClassName: string, timeout: number): Promise<Java.Wrapper> {
     frooky.log.info(`Resolving java class ${javaClassName} with a timeout of ${timeout}ms.`);
-    return this.pollUntilResolved(() => {
-      try {
-        const resolvedJavaClass = Java.use(javaClassName);
-        frooky.log.info(`Java class '${javaClassName}' resolved.`);
-        return resolvedJavaClass;
-      } catch (_) {
-        return null;
-      }
-    }, timeout);
+    return this.pollUntilResolved(
+      () => {
+        try {
+          frooky.log.debug(`Trying to resolve Java class '${javaClassName}'.`);
+
+          const resolvedJavaClass = Java.use(javaClassName);
+          frooky.log.info(`Java class '${javaClassName}' resolved.`);
+          return resolvedJavaClass;
+        } catch (_) {
+          frooky.log.debug(`Java class '${javaClassName}' not resolved yet.`);
+          return null;
+        }
+      },
+      javaClassName,
+      timeout,
+    );
   }
 
   private resolveMethod(javaClass: Java.Wrapper, inputHook: InputJavaHookNormalized): Java.MethodDispatcher {

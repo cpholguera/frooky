@@ -138,7 +138,7 @@ hookGroup:
   # PARTIAL local parameter settings take priority over global setting, form [type, name, settings]
   - javaClass: org.owasp.mastestapp.MastgTest
     hookSettings:
-      stackTraceLimit: 0
+      stackTraceLimit: 4
     hooks:
       - method: receiveNestedPrimitivesArray
         overloads:
