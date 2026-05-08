@@ -3,6 +3,8 @@ import type { Param } from "../../shared/decoders/decodableTypes";
 import type { DecodedValue } from "../../shared/decoders/decodedValue";
 import type { DecoderSettings } from "../../shared/decoders/decoderSettings";
 import { JavaDecoder } from "../decoders/javaDecoder";
+import { JavaHookEvent } from "../event/javaHookEvent";
+import { JavaHook } from "./javaHook";
 
 export type FieldType = {
   fieldType: "static" | "instance";
@@ -52,16 +54,16 @@ export function decodeArgs(args: Java.Wrapper[], params: Param[], settings?: Dec
   return decodedArgs;
 }
 
-// export function buildAndDispatchEvent(
-//   javaHookOp: JavaHookOp,
-//   decodedArgs: DecodedValue[],
-//   returnValue: DecodedValue,
-//   stackTrace: string[],
-//   fieldType: FieldType,
-// ): void {
-//   const event = new JavaHookEvent(javaHookOp.javaClass, javaHookOp.methodName, fieldType);
-//   event.stackTrace = stackTrace;
-//   event.args = decodedArgs;
-//   event.returnValue = returnValue;
-//   frooky.addEvent(event);
-// }
+export function buildAndDispatchEvent(
+  javaHook: JavaHook,
+  decodedArgs: DecodedValue[],
+  returnValue: DecodedValue,
+  stackTrace: string[],
+  fieldType: FieldType,
+): void {
+  const event = new JavaHookEvent(javaHook.method, fieldType);
+  event.stackTrace = stackTrace;
+  event.args = decodedArgs;
+  event.returnValue = returnValue;
+  frooky.addEvent(event);
+}

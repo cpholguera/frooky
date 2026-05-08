@@ -32,40 +32,6 @@ export class JavaHookValidator implements HookValidator<InputJavaHookNormalized,
     return normalizedJavaHooks;
   }
 
-  // normalizeHook(
-  //   inputHook: InputJavaHook,
-  //   hookScopeHookSettings: HookSettings,
-  //   hookScopeDecoderSettings: DecoderSettings,
-  //   className: string,
-  // ): InputJavaHookNormalized | undefined {
-  //   const methodName = typeof inputHook === "string" ? inputHook : inputHook.method;
-
-  //   let hookSettings: HookSettings;
-  //   let decoderSettings: DecoderSettings;
-  //   if (typeof inputHook === "string") {
-  //     hookSettings = hookScopeHookSettings;
-  //     decoderSettings = hookScopeDecoderSettings;
-  //   } else {
-  //     hookSettings = { ...hookScopeHookSettings, ...inputHook.hookSettings };
-  //     decoderSettings = { ...hookScopeDecoderSettings, ...inputHook.decoderSettings };
-  //   }
-
-  //   const testCandidate: InputJavaHook = {
-  //     ...(typeof inputHook === "string" ? { method: inputHook } : inputHook),
-  //     javaClass: className,
-  //     hookSettings,
-  //     decoderSettings,
-  //   };
-
-  //   try {
-  //     return inputJavaHookNormalizedSchema.parse(testCandidate);
-  //   } catch (e) {
-  //     frooky.log.warn([
-  //       `Skipping hook for method '${methodName}' from class '${className}' due to an invalid declaration.`,
-  //       `Validation error:\n${z.prettifyError(e as z.ZodError)}`,
-  //     ]);
-  //   }
-  // }
   getPlatformHookGroups(inputFrookyConfig: FrookyConfig): InputJavaHookGroup[] {
     const platformHookGroup: InputJavaHookGroup[] = [];
     for (const hookScope of inputFrookyConfig.hookGroup) {

@@ -1,3 +1,4 @@
+import Java from "frida-java-bridge";
 import { HookEvent } from "../../shared/event/hookEvent";
 import type { FieldType } from "../hook/javaHookImpl";
 
@@ -8,15 +9,15 @@ import type { FieldType } from "../hook/javaHookImpl";
  * ```
  */
 export class JavaHookEvent extends HookEvent {
-  readonly javaClass: string;
+  readonly javaClassName: string;
   readonly method: string;
   readonly fieldType: FieldType;
 
-  constructor(javaClass: string, method: string, fieldType: FieldType) {
+  constructor(method: Java.Method, fieldType: FieldType) {
     super();
     this.type += "-java";
-    this.javaClass = javaClass;
-    this.method = method;
+    this.javaClassName = method.holder.$className;
+    this.method = method.methodName;
     this.fieldType = fieldType;
   }
 }

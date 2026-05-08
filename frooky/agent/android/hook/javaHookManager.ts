@@ -6,36 +6,37 @@ import type { HookManager } from "../../shared/hook/hookManager";
 import { InputParam, normalizeInputParam } from "../../shared/inputParsing/inputDecodableTypes";
 import { InputJavaHookNormalized } from "../../shared/inputParsing/inputJavaHookGroup";
 import { sleep } from "../../shared/utils";
+import { JavaDecoder } from "../decoders/javaDecoder";
+import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeArgs } from "./javaHookImpl";
 import { JavaParam } from "./javaParam";
 
-// actually hooks the java method
-// export function registerJavaHookOps(javaHookOp: JavaHookOp) {
-// let returnParam: JavaParam;
-// javaHookOp.javaMethod.implementation = function (...args: Java.Wrapper[]) {
-//   // call the original implementation
-//   const returnValue = javaHookOp.javaMethod.apply(this, args);
-//   try {
-//     // decode the return value
-//     if (!returnParam) {
-//       const returnType = javaHookOp.javaMethod.returnType.className ?? "void";
-//       returnParam = { type: returnType, implementationType: returnType };
-//     }
-//     const decodedReturnValue = JavaDecoder.decode(returnValue, returnParam, javaHookOp.settings?.decoderSettings);
-//     // collect the stack trace from Frida
-//     const stackTraceLimit: number = javaHookOp.settings?.stackTraceLimit ? javaHookOp.settings?.stackTraceLimit : DEFAULT_HOOK_SETTINGS.stackTraceLimit;
-//     const stackTrace = buildJavaStackTrace(stackTraceLimit);
-//     // collect the field type and (optional) instance hash
-//     const fieldType = buildFieldType(this as Java.Wrapper);
-//     // decode the arguments passed to the method
-//     const decodedArgs = decodeArgs(args, javaHookOp.params, javaHookOp.settings?.decoderSettings);
-//     // create a frooky hook event and send it to the event cache
-//     buildAndDispatchEvent(javaHookOp, decodedArgs, decodedReturnValue, stackTrace, fieldType);
-//   } catch (e) {
-//     frooky.log.error(`Error during the execution of ${javaHookOp.javaClass}.${javaHookOp.methodName}: ${e}`);
-//   }
-//   return returnValue;
-// };
-// }
+export function registerHook(javaHook: JavaHook) {
+  let returnParam: JavaParam;
+  javaHook.method.implementation = function (...args: Java.Wrapper[]) {
+    // call the original implementation
+    const returnValue = javaHook.method.apply(this, args);
+    try {
+      // decode the return value
+      if (!returnParam) {
+        const returnType = javaHook.method.returnType.className ?? "void";
+        returnParam = { type: returnType, implementationType: returnType, decoderSettings: javaHook.decoderSettings };
+      }
+      const decodedReturnValue = JavaDecoder.decode(returnValue, returnParam, javaHook.decoderSettings);
+      // collect the stack trace from Frida
+      const stackTraceLimit: number = javaHook.hookSettings.stackTraceLimit;
+      const stackTrace = buildJavaStackTrace(stackTraceLimit);
+      // collect the field type and (optional) instance hash
+      const fieldType = buildFieldType(this as Java.Wrapper);
+      // decode the arguments passed to the method
+      const decodedArgs = decodeArgs(args, javaHook.params, javaHook.decoderSettings);
+      // create a frooky hook event and send it to the event cache
+      buildAndDispatchEvent(javaHook, decodedArgs, decodedReturnValue, stackTrace, fieldType);
+    } catch (e) {
+      frooky.log.error(`Error during the execution of ${javaHook.method.holder.$className}.${javaHook.methodName}: ${e}`);
+    }
+    return returnValue;
+  };
+}
 
 // resolve java classes, the method and their overloads
 export class JavaHookManager implements HookManager<InputJavaHookNormalized, JavaHook> {
@@ -143,6 +144,8 @@ export class JavaHookManager implements HookManager<InputJavaHookNormalized, Jav
   }
 
   registerHooks(hooks: JavaHook[]): void {
-    throw new Error("Method not implemented.");
+    for (const hook of hooks) {
+      registerHook(hook);
+    }
   }
 }
