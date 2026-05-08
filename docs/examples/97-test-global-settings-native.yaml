@@ -113,7 +113,7 @@ hookGroup:
       - symbol: receive_long
 
   # PARTIAL local hook settings take priority over global setting, object with ONLY symbol provided
-  - module: libreceiveFundaaaaaaaaaaamentalValue.so
+  - module: libreceiveFundamentalValue.so
     hookSettings:
       stackTraceLimit: 4
     decoderSettings:
@@ -136,6 +136,6 @@ hookGroup:
     hookSettings:
       stackTraceLimit: 4
     hooks:
-      - symbol: receaaaaaaaaaaaaaadddive_ulong
+      - symbol: receive_ulong
         params:
           - [llong, astronomicUnit, { decodeLimit: 66 }]

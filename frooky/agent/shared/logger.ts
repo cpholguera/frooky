@@ -1,12 +1,13 @@
 import type { FrookyApp } from "../FrookyApp";
 import { LogEvent } from "./event/logEvent";
 
-export type LogLevel = "info" | "warn" | "error";
+export type LogLevel = "info" | "warn" | "error" | "debug";
 export type logTo = "device" | "frooky";
 
 const LEVEL_PREFIX: Record<LogLevel, string> = {
+  debug: "[d]",
   info: "[i]",
-  warn: "[?]",
+  warn: "[!]",
   error: "[!]",
 };
 
@@ -53,12 +54,18 @@ export class Logger {
         case "error":
           console.error(formatted);
           break;
+        case "debug":
+          console.debug(formatted);
+          break;
       }
     } else if (this.logTo === "frooky") {
       this.frooky.addEvent(new LogEvent(level, formatted));
     }
   }
 
+  public debug(msg: string | string[]): void {
+    if (this.verbosity >= 3) this.emit("debug", msg);
+  }
   public info(msg: string | string[]): void {
     if (this.verbosity >= 3) this.emit("info", msg);
   }

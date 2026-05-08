@@ -95,24 +95,14 @@ export class FrookyApp {
     this.log.info(`Validating 'native' hooks.`);
     const validNativeHook = this.nativeHookValidator.validateAndNormalizeHooks(inputFrookyConfig, globalHookSettings, globalDecoderSettings);
 
-    // // async resolve the hooks and register them
-    // this.log.info(`Resolving ${this.platform}- and native hooks.`);
-    // const platformPromises = this.platformHookManger
-    //   .resolveHooks(validPlatformHooks, globalHookSettings.hookTimeout)
-    //   .then((platformHooks) => {
-    //     this.platformHookManger.registerHooks(platformHooks);
-    //   })
-    //   .catch((e) => {
-    //     this.log.error(`Error while resolving platform hooks: ${String(e)}`);
-    //   });
-
-    const nativePromises = this.nativeHookManager
-      .resolveHooks(validNativeHook, globalHookSettings.hookTimeout)
-      .then((nativeHookPromises) => {
-        for (const nativeHookPromise of nativeHookPromises) {
-          nativeHookPromise.then((nativeHook) => {
-            if (nativeHook) {
-              this.nativeHookManager.registerHook(nativeHook);
+    // async resolve platform hooks and register them
+    const platformPromises = this.platformHookManger
+      .resolveHooks(validPlatformHooks, globalHookSettings.hookTimeout)
+      .then((platformHookPromises) => {
+        for (const platformHookPromise of platformHookPromises) {
+          platformHookPromise.then((platformHooks) => {
+            if (platformHooks) {
+              this.platformHookManger.registerHooks(platformHooks);
             }
           });
         }
@@ -120,7 +110,25 @@ export class FrookyApp {
       .catch((e) => {
         this.log.error(`Error while resolving native hooks: ${String(e)}`);
       });
-    await Promise.all([/*platformPromises,*/ nativePromises]);
+
+    // async resolve native hooks and register them
+    const nativePromises = this.nativeHookManager
+      .resolveHooks(validNativeHook, globalHookSettings.hookTimeout)
+      .then((nativeHookPromises) => {
+        for (const nativeHookPromise of nativeHookPromises) {
+          nativeHookPromise.then((nativeHooks) => {
+            if (nativeHooks) {
+              this.nativeHookManager.registerHooks(nativeHooks);
+            }
+          });
+        }
+      })
+      .catch((e) => {
+        this.log.error(`Error while resolving native hooks: ${String(e)}`);
+      });
+
+    // wait until all promises are resolved
+    await Promise.all([platformPromises, nativePromises]);
   }
 
   /**

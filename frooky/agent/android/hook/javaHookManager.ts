@@ -1,46 +1,72 @@
 import Java from "frida-java-bridge";
 import { DecoderSettings } from "../../shared/decoders/decoderSettings";
-import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS, HOOK_LOOKUP_TIMEOUT_SECONDS } from "../../shared/defaultValues";
-import type { HookManager } from "../../shared/hook/hookManager";
+import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../../shared/defaultValues";
+import { HookManager } from "../../shared/hook/hookManager";
 import { InputParam, normalizeInputParam } from "../../shared/inputParsing/inputDecodableTypes";
 import { InputJavaHookNormalized } from "../../shared/inputParsing/inputJavaHookGroup";
-import { sleepMilliseconds } from "../../shared/utils";
 import { JavaDecoder } from "../decoders/javaDecoder";
 import { JavaHook } from "./javaHook";
 import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeArgs } from "./javaHookImpl";
 import { JavaParam } from "./javaParam";
 
-export function registerHook(javaHook: JavaHook) {
-  let returnParam: JavaParam;
-  javaHook.method.implementation = function (...args: Java.Wrapper[]) {
-    // call the original implementation
-    const returnValue = javaHook.method.apply(this, args);
-    try {
-      // decode the return value
-      if (!returnParam) {
-        const returnType = javaHook.method.returnType.className ?? "void";
-        returnParam = { type: returnType, implementationType: returnType, decoderSettings: javaHook.decoderSettings };
-      }
-      const decodedReturnValue = JavaDecoder.decode(returnValue, returnParam, javaHook.decoderSettings);
-      // collect the stack trace from Frida
-      const stackTraceLimit: number = javaHook.hookSettings.stackTraceLimit;
-      const stackTrace = buildJavaStackTrace(stackTraceLimit);
-      // collect the field type and (optional) instance hash
-      const fieldType = buildFieldType(this as Java.Wrapper);
-      // decode the arguments passed to the method
-      const decodedArgs = decodeArgs(args, javaHook.params, javaHook.decoderSettings);
-      // create a frooky hook event and send it to the event cache
-      buildAndDispatchEvent(javaHook, decodedArgs, decodedReturnValue, stackTrace, fieldType);
-    } catch (e) {
-      frooky.log.error(`Error during the execution of ${javaHook.method.holder.$className}.${javaHook.methodName}: ${e}`);
-    }
-    return returnValue;
-  };
-}
-
 // resolve java classes, the method and their overloads
-export class JavaHookManager implements HookManager<InputJavaHookNormalized, JavaHook> {
-  private resolvedJavaClasses: Record<string, Java.Wrapper> = {};
+export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHook> {
+  async resolveHooks(inputHooks: InputJavaHookNormalized[], timeout: number): Promise<Promise<JavaHook[] | null>[]> {
+    frooky.log.info(`Resolving Java hooks`);
+
+    const uniqueClasses: string[] = [...new Map(inputHooks.map((inputHook) => [inputHook.javaClass, inputHook])).keys()];
+    return uniqueClasses.flatMap((javaClass) => {
+      const javaClassPromise = this.resolveJavaClass(javaClass, timeout).catch((e) => {
+        frooky.log.warn(`${e}`);
+        return null;
+      });
+      return inputHooks
+        .filter((inputHook) => inputHook.javaClass === javaClass)
+        .map(async (inputHook): Promise<JavaHook[] | null> => {
+          const resolvedJavaClass = await javaClassPromise;
+          if (!resolvedJavaClass) return null;
+          try {
+            const method = this.resolveMethod(resolvedJavaClass, inputHook);
+            frooky.log.info(`Java method '${resolvedJavaClass.$className}.${method.methodName}' found: ${method.handle}.`);
+            return this.resolveOverloads(method, inputHook);
+          } catch (e) {
+            frooky.log.warn(`${e}`);
+            return null;
+          }
+        });
+    });
+  }
+
+  registerHooks(javaHooks: JavaHook[]): JavaHook[] {
+    for (const javaHook of javaHooks) {
+      let returnParam: JavaParam;
+      javaHook.method.implementation = function (...args: Java.Wrapper[]) {
+        // call the original implementation
+        const returnValue = javaHook.method.apply(this, args);
+        try {
+          // decode the return value
+          if (!returnParam) {
+            const returnType = javaHook.method.returnType.className ?? "void";
+            returnParam = { type: returnType, implementationType: returnType, decoderSettings: javaHook.decoderSettings };
+          }
+          const decodedReturnValue = JavaDecoder.decode(returnValue, returnParam, javaHook.decoderSettings);
+          // collect the stack trace from Frida
+          const stackTraceLimit: number = javaHook.hookSettings.stackTraceLimit;
+          const stackTrace = buildJavaStackTrace(stackTraceLimit);
+          // collect the field type and (optional) instance hash
+          const fieldType = buildFieldType(this as Java.Wrapper);
+          // decode the arguments passed to the method
+          const decodedArgs = decodeArgs(args, javaHook.params, javaHook.decoderSettings);
+          // create a frooky hook event and send it to the event cache
+          buildAndDispatchEvent(javaHook, decodedArgs, decodedReturnValue, stackTrace, fieldType);
+        } catch (e) {
+          frooky.log.error(`Error during the execution of ${javaHook.method.holder.$className}.${javaHook.methodName}: ${e}`);
+        }
+        return returnValue;
+      };
+    }
+    return javaHooks;
+  }
 
   private buildParamsFromArgumentTypes(argTypes: Java.Type[], decoderSettings: DecoderSettings): JavaParam[] {
     return argTypes.reduce((params: JavaParam[], type: Java.Type) => {
@@ -57,39 +83,29 @@ export class JavaHookManager implements HookManager<InputJavaHookNormalized, Jav
     }, []);
   }
 
-  private async resolveAndCacheJavaClass(name: string, hookTimeoutMs: number): Promise<Java.Wrapper> {
-    frooky.log.info(`Resolving java class ${name} with a timeout of ${hookTimeoutMs}ms.`);
-    const deadline = Date.now() + hookTimeoutMs;
-
-    while (true) {
+  private async resolveJavaClass(javaClassName: string, timeout: number): Promise<Java.Wrapper> {
+    frooky.log.info(`Resolving java class ${javaClassName} with a timeout of ${timeout}ms.`);
+    return this.pollUntilResolved(() => {
       try {
-        if (this.resolvedJavaClasses[name]) {
-          frooky.log.info(`Cached module '${name}' found.`);
-          return this.resolvedJavaClasses[name];
-        }
-        this.resolvedJavaClasses[name] = Java.use(name);
-        frooky.log.info(`Module '${name}' successfully resolved.`);
-        return this.resolvedJavaClasses[name];
+        const resolvedJavaClass = Java.use(javaClassName);
+        frooky.log.info(`Java class '${javaClassName}' resolved.`);
+        return resolvedJavaClass;
       } catch (_) {
-        //  silently ignore errors from Java.use
+        return null;
       }
-      if (Date.now() >= deadline) {
-        throw new Error(`Skipping hooks for java class ${name} as it could not be loaded during a time out of ${hookTimeoutMs}ms.`);
-      }
-      await sleepMilliseconds(HOOK_LOOKUP_TIMEOUT_SECONDS);
-    }
+    }, timeout);
   }
 
-  resolveMethod(javaClass: Java.Wrapper, inputHook: InputJavaHookNormalized): Java.MethodDispatcher {
+  private resolveMethod(javaClass: Java.Wrapper, inputHook: InputJavaHookNormalized): Java.MethodDispatcher {
     const resolvedMethod = javaClass[inputHook.method];
     if (resolvedMethod) {
       return resolvedMethod;
     } else {
-      throw Error(`Skipping hook for ${inputHook.method} as it was not found in class ${javaClass.$className}.`);
+      throw Error(`Skipping hook for ${inputHook.method}. This method does not exist in class ${javaClass.$className}.`);
     }
   }
 
-  resolveOverloads(method: Java.MethodDispatcher, inputHook: InputJavaHookNormalized): JavaHook[] {
+  private resolveOverloads(method: Java.MethodDispatcher, inputHook: InputJavaHookNormalized): JavaHook[] {
     const result: JavaHook[] = [];
     if (inputHook.overloads?.length) {
       // Only get declared overloaded methods
@@ -106,7 +122,7 @@ export class JavaHookManager implements HookManager<InputJavaHookNormalized, Jav
             decoderSettings: inputHook.decoderSettings ?? DEFAULT_DECODER_SETTINGS,
           });
         } catch (e) {
-          frooky.log.warn(`Failed to get overload for method '${inputHook.method}(${paramTypes})' in class '${method.holder}': ${e}.`);
+          frooky.log.warn(`Skipping overload for method '${inputHook.method}(${paramTypes})'. The overload does not exist.`);
         }
       }
     } else {
@@ -123,30 +139,5 @@ export class JavaHookManager implements HookManager<InputJavaHookNormalized, Jav
       }
     }
     return result;
-  }
-
-  async resolveHooks(inputHooks: InputJavaHookNormalized[], timeout: number): Promise<JavaHook[]> {
-    frooky.log.info(`Resolving Java hooks`);
-
-    const promises = inputHooks.map(async (inputHook) => {
-      try {
-        if (!(inputHook.javaClass in this.resolvedJavaClasses)) {
-          await this.resolveAndCacheJavaClass(inputHook.javaClass, timeout);
-        }
-        const javaClass = this.resolvedJavaClasses[inputHook.javaClass];
-        const method = this.resolveMethod(javaClass, inputHook);
-
-        return this.resolveOverloads(method, inputHook);
-      } catch (e) {
-        frooky.log.warn(`${e}`);
-      }
-    });
-    return Promise.all(promises).then((results) => results.filter((r): r is JavaHook[] => r !== null).flat());
-  }
-
-  registerHook(hooks: JavaHook[]): void {
-    for (const hook of hooks) {
-      registerHook(hook);
-    }
   }
 }

@@ -21,4 +21,4 @@ export const DEFAULT_HOOK_SETTINGS: HookSettings = {
 export const SEND_INTERVAL_MS = 100;
 
 // specifies the interval during frida module and classes lookup
-export const HOOK_LOOKUP_TIMEOUT_SECONDS = 5;
+export const HOOK_LOOKUP_INTERVAL_MS = 500;
