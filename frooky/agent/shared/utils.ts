@@ -98,6 +98,10 @@ export function toHexAndAscii(bytes: Uint8Array, length: number = Infinity, plac
   return ["0x" + hexArray.join("") + ellipsis, asciiArray.join("") + ellipsis];
 }
 
-export function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+export function sleepMilliseconds(milliSeconds: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, milliSeconds));
+}
+
+export function sleepSeconds(seconds: number): Promise<void> {
+  return sleepMilliseconds(seconds * 1000);
 }

@@ -1,10 +1,10 @@
 import Java from "frida-java-bridge";
 import { DecoderSettings } from "../../shared/decoders/decoderSettings";
-import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS, FRIDA_LOOKUP_INTERVAL_MS } from "../../shared/defaultValues";
+import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS, HOOK_LOOKUP_TIMEOUT_SECONDS } from "../../shared/defaultValues";
 import type { HookManager } from "../../shared/hook/hookManager";
 import { InputParam, normalizeInputParam } from "../../shared/inputParsing/inputDecodableTypes";
 import { InputJavaHookNormalized } from "../../shared/inputParsing/inputJavaHookGroup";
-import { sleep } from "../../shared/utils";
+import { sleepMilliseconds } from "../../shared/utils";
 import { JavaDecoder } from "../decoders/javaDecoder";
 import { JavaHook } from "./javaHook";
 import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeArgs } from "./javaHookImpl";
@@ -76,7 +76,7 @@ export class JavaHookManager implements HookManager<InputJavaHookNormalized, Jav
       if (Date.now() >= deadline) {
         throw new Error(`Skipping hooks for java class ${name} as it could not be loaded during a time out of ${hookTimeoutMs}ms.`);
       }
-      await sleep(FRIDA_LOOKUP_INTERVAL_MS);
+      await sleepMilliseconds(HOOK_LOOKUP_TIMEOUT_SECONDS);
     }
   }
 
@@ -125,14 +125,13 @@ export class JavaHookManager implements HookManager<InputJavaHookNormalized, Jav
     return result;
   }
 
-  async resolveHooks(inputHooks: InputJavaHookNormalized[]): Promise<JavaHook[]> {
+  async resolveHooks(inputHooks: InputJavaHookNormalized[], timeout: number): Promise<JavaHook[]> {
     frooky.log.info(`Resolving Java hooks`);
 
     const promises = inputHooks.map(async (inputHook) => {
-      const hookTimeoutMs = inputHook.hookSettings?.hookTimeoutMs ?? DEFAULT_HOOK_SETTINGS.hookTimeoutMs;
       try {
         if (!(inputHook.javaClass in this.resolvedJavaClasses)) {
-          await this.resolveAndCacheJavaClass(inputHook.javaClass, hookTimeoutMs);
+          await this.resolveAndCacheJavaClass(inputHook.javaClass, timeout);
         }
         const javaClass = this.resolvedJavaClasses[inputHook.javaClass];
         const method = this.resolveMethod(javaClass, inputHook);
@@ -145,7 +144,7 @@ export class JavaHookManager implements HookManager<InputJavaHookNormalized, Jav
     return Promise.all(promises).then((results) => results.filter((r): r is JavaHook[] => r !== null).flat());
   }
 
-  registerHooks(hooks: JavaHook[]): void {
+  registerHook(hooks: JavaHook[]): void {
     for (const hook of hooks) {
       registerHook(hook);
     }

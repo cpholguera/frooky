@@ -95,26 +95,32 @@ export class FrookyApp {
     this.log.info(`Validating 'native' hooks.`);
     const validNativeHook = this.nativeHookValidator.validateAndNormalizeHooks(inputFrookyConfig, globalHookSettings, globalDecoderSettings);
 
-    // async resolve the hooks and register them
-    this.log.info(`Resolving ${this.platform}- and native hooks.`);
-    const platformPromises = this.platformHookManger
-      .resolveHooks(validPlatformHooks)
-      .then((platformHooks) => {
-        this.platformHookManger.registerHooks(platformHooks);
-      })
-      .catch((e) => {
-        this.log.error(`Error while resolving platform hooks: ${String(e)}`);
-      });
+    // // async resolve the hooks and register them
+    // this.log.info(`Resolving ${this.platform}- and native hooks.`);
+    // const platformPromises = this.platformHookManger
+    //   .resolveHooks(validPlatformHooks, globalHookSettings.hookTimeout)
+    //   .then((platformHooks) => {
+    //     this.platformHookManger.registerHooks(platformHooks);
+    //   })
+    //   .catch((e) => {
+    //     this.log.error(`Error while resolving platform hooks: ${String(e)}`);
+    //   });
 
     const nativePromises = this.nativeHookManager
-      .resolveHooks(validNativeHook)
-      .then((nativeHooks) => {
-        this.nativeHookManager.registerHooks(nativeHooks);
+      .resolveHooks(validNativeHook, globalHookSettings.hookTimeout)
+      .then((nativeHookPromises) => {
+        for (const nativeHookPromise of nativeHookPromises) {
+          nativeHookPromise.then((nativeHook) => {
+            if (nativeHook) {
+              this.nativeHookManager.registerHook(nativeHook);
+            }
+          });
+        }
       })
       .catch((e) => {
         this.log.error(`Error while resolving native hooks: ${String(e)}`);
       });
-    await Promise.all([platformPromises, nativePromises]);
+    await Promise.all([/*platformPromises,*/ nativePromises]);
   }
 
   /**

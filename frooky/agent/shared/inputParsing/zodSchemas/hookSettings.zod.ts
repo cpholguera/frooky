@@ -4,5 +4,5 @@ import { z } from "zod";
 export const hookSettingsSchema = z.object({
     stackTraceLimit: z.number(),
     eventFilter: z.array(z.string()),
-    hookTimeoutMs: z.number()
+    hookTimeout: z.number()
 });

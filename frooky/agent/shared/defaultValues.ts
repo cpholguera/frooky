@@ -12,7 +12,7 @@ export const DEFAULT_DECODER_SETTINGS: DecoderSettings = {
 };
 
 export const DEFAULT_HOOK_SETTINGS: HookSettings = {
-  hookTimeoutMs: 5000,
+  hookTimeout: 5,
   stackTraceLimit: 10,
   eventFilter: [],
 };
@@ -21,4 +21,4 @@ export const DEFAULT_HOOK_SETTINGS: HookSettings = {
 export const SEND_INTERVAL_MS = 100;
 
 // specifies the interval during frida module and classes lookup
-export const FRIDA_LOOKUP_INTERVAL_MS = 100;
+export const HOOK_LOOKUP_TIMEOUT_SECONDS = 5;
