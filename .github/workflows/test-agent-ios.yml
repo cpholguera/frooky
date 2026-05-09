@@ -3,7 +3,7 @@ name: Test agent iOS
 on:
   push:
     paths:
-      - 'frooky/agent/**'
+      - "frooky/agent/**"
 
 permissions:
   contents: read
@@ -11,8 +11,6 @@ permissions:
 jobs:
   build-app-ios:
     uses: ./.github/workflows/build-app-ios.yml
-    with:
-      target_app: basic-parameter
 
   test-agent-ios:
     name: Test agent iOS
@@ -71,7 +69,6 @@ jobs:
             done
           done
 
-
       - name: Run tests
         shell: bash
         run: |
@@ -96,7 +93,6 @@ jobs:
 
           echo "App did not start within the timeout."
           exit 1
-
 
       - name: Write summary and check result
         run: |
