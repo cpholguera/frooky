@@ -1,7 +1,6 @@
 import Java from "frida-java-bridge";
-import type { BaseDecoder } from "../../../../../shared/decoders/baseDecoder";
-import type { JavaParam } from "../../../../hook/javaParam";
-import { JavaDecoder } from "../../../javaDecoder";
+import { JavaDecoder, JavaParam } from "frooky/android";
+import { BaseDecoder } from "frooky/shared";
 
 const getters = [
   "getAlgorithmParameterSpec",
@@ -68,7 +67,12 @@ export const KeyGenParameterSpecDecoder: BaseDecoder<Java.Wrapper, JavaParam> = 
       }
       try {
         const raw = fn.call(typedSpec);
-        const type: JavaParam = { type: fn.returnType.className ?? "void", implementationType: fn.returnType.className ?? "void", decoderSettings: param.decoderSettings, decodeAt: param.decodeAt };
+        const type: JavaParam = {
+          type: fn.returnType.className ?? "void",
+          implementationType: fn.returnType.className ?? "void",
+          decoderSettings: param.decoderSettings,
+          decodeAt: param.decodeAt,
+        };
         value[stripPrefix(name)] = JavaDecoder.decode(raw, type);
       } catch (e) {
         value[stripPrefix(name)] = `Error when decoding : ${e}>`;

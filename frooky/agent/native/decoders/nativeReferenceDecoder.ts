@@ -1,9 +1,5 @@
-import type { BaseDecoder } from "../../shared/decoders/baseDecoder";
-import type { DecodedValue } from "../../shared/decoders/decodedValue";
-import { DecoderSettings } from "../../shared/decoders/decoderSettings";
-import { NativeDecodableType } from "./nativeDecodableTypes";
-import type { FundamentalType } from "./nativeDecoder";
-import { NativeFallbackDecoder } from "./nativeFallbackDecoder";
+import { FundamentalType, NativeDecodableType, NativeFallbackDecoder } from "frooky/native";
+import { BaseDecoder, DecodedValue, DecoderSettings } from "frooky/shared";
 
 const referenceValueDecoders: Record<FundamentalType, (input: NativePointer) => null | number | boolean | string> = {
   void: () => null,

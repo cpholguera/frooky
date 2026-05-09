@@ -1,5 +1,4 @@
-import type { DecodedValue } from "../decoders/decodedValue";
-import { BaseEvent } from "./baseEvent";
+import { BaseEvent, DecodedValue } from "frooky/shared";
 
 /**
  * Abstract class for all hook events created by frooky.

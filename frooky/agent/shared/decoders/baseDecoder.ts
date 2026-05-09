@@ -1,5 +1,5 @@
-import type { DecodedValue } from "./decodedValue";
-import { DecoderSettings } from "./decoderSettings";
+import { DecoderSettings } from "../frookySettings";
+import { DecodedValue } from "./decodedValue";
 
 /**
  * Base interface for value decoders.

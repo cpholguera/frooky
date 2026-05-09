@@ -1,5 +1,4 @@
-import { DecoderSettings } from "../decoders/decoderSettings";
-import { HookSettings } from "./hookSettings";
+import { DecoderSettings, HookSettings } from "frooky/shared";
 
 export interface Hook {
   hookSettings: HookSettings;

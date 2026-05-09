@@ -1,10 +1,6 @@
 import Java from "frida-java-bridge";
-import type { Param } from "../../shared/decoders/decodableTypes";
-import type { DecodedValue } from "../../shared/decoders/decodedValue";
-import type { DecoderSettings } from "../../shared/decoders/decoderSettings";
-import { JavaDecoder } from "../decoders/javaDecoder";
-import { JavaHookEvent } from "../event/javaHookEvent";
-import { JavaHook } from "./javaHook";
+import { JavaDecoder, JavaHook, JavaHookEvent } from "frooky/android";
+import { DecodedValue, DecoderSettings, Param } from "frooky/shared";
 
 export type FieldType = {
   fieldType: "static" | "instance";
@@ -35,7 +31,7 @@ export function buildJavaStackTrace(limit: number): string[] {
  * @param args - The actual argument values passed to the method
  * @param params- The optional frooky parameters for additional context information
  */
-export function decodeArgs(args: Java.Wrapper[], params: Param[], settings?: DecoderSettings): DecodedValue[] {
+export function decodeJavaArgs(args: Java.Wrapper[], params: Param[], settings?: DecoderSettings): DecodedValue[] {
   if (args.length === 0) {
     throw Error("Empty args passed");
   }

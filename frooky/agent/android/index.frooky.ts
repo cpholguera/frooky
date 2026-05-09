@@ -1,10 +1,9 @@
 // This file is used when the agent is run by frooky. Hooks are dynamically loaded using rpc at runtime.
 
 import Java from "frida-java-bridge";
-import type { FrookyConfig } from "frooky";
+import { JavaHookManager, JavaHookValidator } from "frooky/android";
+import { FrookyConfig } from "frooky/shared";
 import { FrookyAgent } from "../FrookyAgent";
-import { JavaHookManager } from "./hook/javaHookManager";
-import { JavaHookValidator } from "./hook/javaHookValidator";
 
 if (Java.available) {
   rpc.exports = {

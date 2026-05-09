@@ -1,5 +1,5 @@
-import type { BaseDecoder } from "./baseDecoder";
-import type { DecoderSettings } from "./decoderSettings";
+import { BaseDecoder } from "..";
+import { DecoderSettings } from "../frookySettings";
 
 /**
  * Specifies when a decoder should be applied during function execution.

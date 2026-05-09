@@ -1,12 +1,18 @@
+import {
+  DecoderSettings,
+  DEFAULT_DECODER_SETTINGS,
+  DEFAULT_FROOKY_SETTINGS,
+  DEFAULT_HOOK_SETTINGS,
+  FrookyConfig,
+  FrookyMetadata,
+  FrookySettings,
+  HookSettings,
+  InputDecoderSettings,
+  InputFrookySettings,
+  InputHookSettings,
+} from "frooky/shared";
+import { frookyMetadataSchema, frookySettingsSchema, inputDecoderSettingsSchema, inputHookSettingsSchema } from "frooky/zod";
 import z from "zod";
-import { DEFAULT_DECODER_SETTINGS, DEFAULT_FROOKY_SETTINGS, DEFAULT_HOOK_SETTINGS } from "./defaultValues";
-import { FrookyConfig } from "./frookyConfig";
-import type { FrookyMetadata, Platform } from "./frookyMetadata";
-import { DecoderSettings, FrookySettings, HookSettings } from "./frookySettings";
-import { InputDecoderSettings, InputFrookySettings, InputHookSettings } from "./inputParsing/inputSettings";
-import { frookyMetadataSchema } from "./inputParsing/zodSchemas/frookyMetadata.zod";
-import { frookySettingsSchema } from "./inputParsing/zodSchemas/frookySettings.zod";
-import { inputDecoderSettingsSchema, inputHookSettingsSchema } from "./inputParsing/zodSchemas/inputSettings.zod";
 
 // validates the config settings
 export function validateAndRepairFrookySettings(settings: InputFrookySettings): FrookySettings {

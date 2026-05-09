@@ -1,6 +1,5 @@
-import { Param } from "../../shared/decoders/decodableTypes";
-import { Hook } from "../../shared/hook/hook";
-import { NativeDecodableType } from "../decoders/nativeDecodableTypes";
+import { NativeDecodableType } from "frooky/native";
+import { Hook, Param } from "frooky/shared";
 
 /**
  * Contains all information to hook a native function.

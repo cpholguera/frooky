@@ -1,7 +1,4 @@
-import { FrookyMetadata } from "./frookyMetadata";
-import { InputJavaHookGroup } from "./inputParsing/inputJavaHookGroup";
-import { InputNativeHookGroup } from "./inputParsing/inputNativeHookGroup";
-import { InputFrookySettings } from "./inputParsing/inputSettings";
+import { FrookyMetadata, InputFrookySettings, InputJavaHookGroup, InputNativeHookGroup } from "frooky/shared";
 
 /**
  * frooky configuration.

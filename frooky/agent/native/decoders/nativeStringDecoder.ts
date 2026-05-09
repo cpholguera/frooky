@@ -1,6 +1,5 @@
-import type { BaseDecoder } from "../../shared/decoders/baseDecoder";
-import type { DecodedValue } from "../../shared/decoders/decodedValue";
-import { NativeDecodableType } from "./nativeDecodableTypes";
+import { NativeDecodableType } from "frooky/native";
+import { BaseDecoder, DecodedValue } from "frooky/shared";
 
 export const NativeStringDecoder: BaseDecoder<NativePointer, NativeDecodableType> = {
   decode: (value: NativePointer, type: NativeDecodableType): DecodedValue => {

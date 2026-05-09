@@ -1,10 +1,7 @@
 // iterableDecoder.ts
 import type Java from "frida-java-bridge";
-import type { DecodedValue } from "../../../../shared/decoders/decodedValue";
-import type { DecoderSettings } from "../../../../shared/decoders/decoderSettings";
-import { DEFAULT_DECODER_SETTINGS } from "../../../../shared/defaultValues";
-import type { JavaParam } from "../../../hook/javaParam";
-import { JavaDecoder } from "../../javaDecoder";
+import { JavaDecoder, JavaParam } from "frooky/android";
+import { DecodedValue, DecoderSettings, DEFAULT_DECODER_SETTINGS } from "frooky/shared";
 
 function defaultElementDecoder(element: Java.Wrapper, settings: DecoderSettings): DecodedValue {
   const elementType = element == null ? "java.lang.Object" : (element.$className ?? "java.lang.Object");

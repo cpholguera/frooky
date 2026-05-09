@@ -1,13 +1,14 @@
 import Java from "frida-java-bridge";
-import { DecoderSettings } from "../../shared/decoders/decoderSettings";
-import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../../shared/defaultValues";
-import { HookManager } from "../../shared/hook/hookManager";
-import { InputParam, normalizeInputParam } from "../../shared/inputParsing/inputDecodableTypes";
-import { InputJavaHookNormalized } from "../../shared/inputParsing/inputJavaHookGroup";
-import { JavaDecoder } from "../decoders/javaDecoder";
-import { JavaHook } from "./javaHook";
-import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeArgs } from "./javaHookImpl";
-import { JavaParam } from "./javaParam";
+import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeJavaArgs, JavaDecoder, JavaHook, JavaParam } from "frooky/android";
+import {
+  DecoderSettings,
+  DEFAULT_DECODER_SETTINGS,
+  DEFAULT_HOOK_SETTINGS,
+  HookManager,
+  InputJavaHookNormalized,
+  InputParam,
+  normalizeInputParam,
+} from "frooky/shared";
 
 // resolve java classes, the method and their overloads
 export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHook> {
@@ -56,7 +57,7 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
           // collect the field type and (optional) instance hash
           const fieldType = buildFieldType(this as Java.Wrapper);
           // decode the arguments passed to the method
-          const decodedArgs = decodeArgs(args, javaHook.params, javaHook.decoderSettings);
+          const decodedArgs = decodeJavaArgs(args, javaHook.params, javaHook.decoderSettings);
           // create a frooky hook event and send it to the event cache
           buildAndDispatchEvent(javaHook, decodedArgs, decodedReturnValue, stackTrace, fieldType);
         } catch (e) {

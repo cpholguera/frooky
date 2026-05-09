@@ -1,4 +1,4 @@
-import { uuidv4 } from "../utils";
+import { uuidv4 } from "frooky/shared";
 
 /**
  * Abstract class for all events created by frooky.

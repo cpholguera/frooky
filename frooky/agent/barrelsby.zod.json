@@ -1,0 +1,5 @@
+{
+  "directory": ["./shared/inputParsing/zodSchemas"],
+  "singleFile": true,
+  "delete": true
+}

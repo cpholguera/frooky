@@ -1,7 +1,4 @@
-import { DecoderSettings } from "../decoders/decoderSettings";
-import { HookSettings } from "../hook/hookSettings";
-import { InputRetType } from "./inputDecodableTypes";
-import { InputDecoderSettings, InputHookSettings } from "./inputSettings";
+import { DecoderSettings, HookSettings, InputDecoderSettings, InputHookSettings, InputRetType } from "frooky/shared";
 
 /**
  * Objective-C canonical input hook

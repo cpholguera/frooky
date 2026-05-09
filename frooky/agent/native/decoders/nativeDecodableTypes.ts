@@ -1,5 +1,5 @@
-import { DecodableType } from "../../shared/decoders/decodableTypes";
-import type { NativeType } from "./nativeTypeNormalizer";
+import { DecodableType } from "frooky/shared";
+import { NativeType } from "./nativeTypeNormalizer";
 
 /**
  * Represents a native parameter

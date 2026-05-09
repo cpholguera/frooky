@@ -8,7 +8,11 @@
     "allowImportingTsExtensions": true,
     "types": ["node", "frida-gum", "frida-java-bridge", "frida-objc-bridge", "frida-swift-bridge"],
     "paths": {
-      "frooky": ["./index.ts"]
+      "frooky/shared": ["./shared/index.ts"],
+      "frooky/android": ["./android/index.ts"],
+      "frooky/ios": ["./ios/index.ts"],
+      "frooky/native": ["./native/index.ts"],
+      "frooky/zod": ["./shared/inputParsing/zodSchemas/index.ts"]
     }
   },
   "include": ["./**/*"]

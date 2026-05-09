@@ -1,0 +1,6 @@
+{
+  "directory": ["./shared", "./android", "./ios", "./native", "./shared/inputParsing/zodSchemas"],
+  "singleFile": true,
+  "delete": true,
+  "exclude": ["index\\.frooky\\.ts", "index\\.frida\\.ts", ".*\\.zod\\.ts", "tests/.*", "doc/.*", "node_modules/.*"]
+}

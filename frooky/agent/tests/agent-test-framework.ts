@@ -1,5 +1,21 @@
 // very simple testing framework runnable in a frida environment
 
+interface Matcher<T> {
+  toBe(expected: T): void;
+  toEqual(expected: T): void;
+  toBeTruthy(): void;
+  toBeFalsy(): void;
+  toThrow(errorMatch?: string | Error): void;
+  notToThrow(): void;
+}
+
+declare global {
+  function test(name: string, fn: () => void | Promise<void>): void;
+  function expect<T>(actual: T): Matcher<T>;
+}
+
+export {};
+
 interface TestResult {
   name: string;
   passed: boolean;
@@ -16,6 +32,7 @@ interface Matcher<T> {
   toBeTruthy: () => void;
   toBeFalsy: () => void;
   toThrow: (errorMatch?: string | Error) => void;
+  notToThrow(): void;
 }
 
 const topLevelTests: Array<{ name: string; fn: () => void }> = [];
@@ -64,8 +81,26 @@ globalThis.expect = <T>(actual: T): Matcher<T> => ({
     if (typeof errorMatch === "string") {
       assert(caughtError.message.includes(errorMatch), `Expected error message to include "${errorMatch}" but got "${caughtError.message}"`);
     } else {
-      assert(caughtError instanceof errorMatch.constructor && caughtError.message === errorMatch.message, `Expected ${errorMatch.constructor.name}: "${errorMatch.message}" but got ${(caughtError as Error).constructor.name}: "${caughtError.message}"`);
+      assert(
+        caughtError instanceof errorMatch.constructor && caughtError.message === errorMatch.message,
+        `Expected ${errorMatch.constructor.name}: "${errorMatch.message}" but got ${(caughtError as Error).constructor.name}: "${caughtError.message}"`,
+      );
     }
+  },
+  notToThrow: () => {
+    assert(typeof actual === "function", "Expected a function");
+
+    let caughtError: unknown;
+    try {
+      (actual as () => void)();
+    } catch (e) {
+      caughtError = e;
+    }
+
+    assert(
+      caughtError === undefined,
+      `Expected function not to throw but got ${caughtError instanceof Error ? `${caughtError.constructor.name}: "${caughtError.message}"` : String(caughtError)}`,
+    );
   },
 });
 
