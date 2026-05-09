@@ -1,6 +1,5 @@
 import type { DecodeAt } from "./decoders/decodableTypes";
-import type { DecoderSettings } from "./decoders/decoderSettings";
-import { HookSettings } from "./hook/hookSettings";
+import { DecoderSettings, FrookySettings, HookSettings } from "./frookySettings";
 
 export const DEFAULT_DECODE_AT: DecodeAt = "enter";
 
@@ -12,9 +11,17 @@ export const DEFAULT_DECODER_SETTINGS: DecoderSettings = {
 };
 
 export const DEFAULT_HOOK_SETTINGS: HookSettings = {
-  hookTimeout: 5,
   stackTraceLimit: 10,
   eventFilter: [],
+};
+
+export const DEFAULT_FROOKY_SETTINGS: FrookySettings = {
+  verbose: false,
+  logLevel: "error",
+  logTo: "frooky",
+  resolverTimeout: 5,
+  hookSettings: DEFAULT_HOOK_SETTINGS,
+  decoderSettings: DEFAULT_DECODER_SETTINGS,
 };
 
 // specifies the interval between cached events are send back to the host

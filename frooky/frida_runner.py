@@ -1,23 +1,26 @@
 from __future__ import annotations
 
-import frida
-import time
-import sys
 import json
-import yaml
 import logging
+import sys
+import time
 from dataclasses import dataclass
+from importlib.resources import files
 from pathlib import Path
 from typing import Optional
-from importlib.resources import files
 
+import frida
+import yaml
 
 from ._version import __version__ as frooky_version
+
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class RunnerOptions:
     """Options for the FrookyRunner."""
+
     platform: str
     hook_paths: list[Path]
     output_path: Path
@@ -47,35 +50,19 @@ class FrookyRunner:
     def _prepare_targets(self) -> dict:
         """Load hook JSON files and merge their category and hooks into a single target."""
         # Read all hook files as JSON and merge their hooks arrays
-        merged_hooks = []
-        category = None
-        
+        hook_configs = []
+
         for hook_path in self.options.hook_paths:
             with open(hook_path, "r", encoding="utf-8") as f:
                 if Path(hook_path).suffix in (".yaml", ".yml"):
                     hook_data = yaml.safe_load(f)
                 else:
-                    logger.warning(
-                        "%s is in JSON format, which is deprecated. "
-                        "Please migrate to YAML.",
-                        Path(hook_path).name
-                    )
+                    logger.warning("%s is in JSON format, which is deprecated. Please migrate to YAML.", Path(hook_path).name)
                     hook_data = json.load(f)
-            
-            # Take category from first file that has one
-            if category is None and "category" in hook_data:
-                category = hook_data["category"]
-            
-            # Merge hooks
-            if "hooks" in hook_data:
-                merged_hooks.extend(hook_data["hooks"])
-        
-        # Build the target object
-        return  {
-            "category": category or "FROOKY",
-            "hooks": merged_hooks
-        }
 
+                hook_configs.append(hook_data)
+
+        return hook_configs
 
     def _create_message_handler(self) -> None:
         """Create a message handler closure with access to output path."""
@@ -92,11 +79,11 @@ class FrookyRunner:
                 with open(output_path, "a", encoding="utf-8") as f:
                     json.dump(payload, f)
                     f.write("\n")
-                
+
                 # Check if this is a summary event
                 if isinstance(payload, dict):
                     event_type = payload.get("type")
-                    
+
                     if event_type == "summary":
                         # Store summary info and print once
                         self.total_hooks = payload.get("totalHooks", 0)
@@ -119,11 +106,11 @@ class FrookyRunner:
                     with open(output_path, "a", encoding="utf-8") as f:
                         json.dump(parsed, f)
                         f.write("\n")
-                    
+
                     # Check if this is a summary event
                     if isinstance(parsed, dict):
                         event_type = parsed.get("type")
-                        
+
                         if event_type == "summary":
                             # Store summary info and print once
                             self.total_hooks = parsed.get("totalHooks", 0)
@@ -161,7 +148,7 @@ class FrookyRunner:
         event_display = self.last_event[:max_event_len]
         if len(self.last_event) > max_event_len:
             event_display += "..."
-        
+
         status = f"\r  Events: {self.event_count:,} \t\t| Last: {event_display}"
         # Pad with spaces to clear previous content
         status = status.ljust(100)
@@ -170,7 +157,7 @@ class FrookyRunner:
     def _get_target_description(self) -> str:
         """Get a description of the target for the header."""
         opts = self.options
-        
+
         if opts.attach_frontmost:
             app = self.device.get_frontmost_application()
             if app:
@@ -190,10 +177,10 @@ class FrookyRunner:
         """Print the Frooky header with session information."""
 
         # Get agent Frida version
-        agent_frida_version_path = files('frooky') / "agent" / "dist" / "version.json"
+        agent_frida_version_path = files("frooky") / "agent" / "dist" / "version.json"
         agent_frida_version_json = json.loads(agent_frida_version_path.read_text(encoding="utf-8"))
-        agent_frida_version = str(agent_frida_version_json['frida'])
-        
+        agent_frida_version = str(agent_frida_version_json["frida"])
+
         # Logo lines
         logo = [
             "   ___    ____           ",
@@ -203,7 +190,7 @@ class FrookyRunner:
             "\\/     /_/  |_|  \\___/ \\___/ |_|\\_\\  \\__, |",
             "                                     |___/",
         ]
-        
+
         # Info lines to display on the right
         info = [
             f"v{frooky_version} - Powered by Frida {frida.__version__}",
@@ -215,21 +202,21 @@ class FrookyRunner:
             f"Hook files: {len(self.options.hook_paths)}",
             f"Output: {self.options.output_path}",
         ]
-        
+
         # Find the width of the widest logo line
         logo_width = max(len(line) for line in logo)
-        
+
         # Combine logo and info side by side
         lines = [""]
         for i in range(max(len(logo), len(info))):
             logo_part = logo[i].ljust(logo_width) if i < len(logo) else " " * logo_width
             info_part = info[i] if i < len(info) else ""
             lines.append(f"{logo_part}   {info_part}")
-        
+
         lines.append("")
         lines.append("  Press Ctrl+C to stop...")
         lines.append("")
-        
+
         print("\n".join(lines))
 
     def _get_device(self) -> frida.core.Device:
@@ -288,10 +275,10 @@ class FrookyRunner:
             # Attach or spawn
             self.session = self._attach_or_spawn()
 
-
             # Check if the agent is compiled and available
-            script_path = files('frooky') / "agent" / "dist" / f"agent-{self.options.platform}.js"
+            script_path = files("frooky") / "agent" / "dist" / f"agent-{self.options.platform}.js"
             script_source = script_path.read_text(encoding="utf-8")
+            print(script_path)
             # Print header with all session info
             self._print_header()
 

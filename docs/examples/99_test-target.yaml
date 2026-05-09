@@ -5,14 +5,19 @@ metadata:
   platform: Android
 
 # global settings for the hooks in this hook file.
-globalSettings:
+settings:
+  verbose: true,
+  logLevel: "debug"
+  logTo: "frida"
+  resolverTimeout: 5,
   hookSettings:
-    stackTraceLimit: 10            # Sets stackTraceLimit to 10 for all hooks
+    stackTraceLimit: 11               # Sets stackTraceLimit to 10 for all hooks
+    eventFilter: ['^(?!android).*']   # Stack trace filters to apply.
   decoderSettings:
-    fastDecode: true             # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
-    magicDecode: true            # If set, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime
-    maxRecursion: 10             # Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
-    decodeLimit: 10              # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
+    fastDecode: true                  # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
+    magicDecode: true                 # If set, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime
+    maxRecursion: 1                   # Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
+    decodeLimit: 11                   # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
 
 hookGroup:
     # java primitive types

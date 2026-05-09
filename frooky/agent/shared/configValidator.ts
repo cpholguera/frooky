@@ -1,16 +1,47 @@
 import z from "zod";
-import type { DecoderSettings } from "./decoders/decoderSettings";
-import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "./defaultValues";
+import { DEFAULT_DECODER_SETTINGS, DEFAULT_FROOKY_SETTINGS, DEFAULT_HOOK_SETTINGS } from "./defaultValues";
 import { FrookyConfig } from "./frookyConfig";
 import type { FrookyMetadata, Platform } from "./frookyMetadata";
-import { HookSettings } from "./hook/hookSettings";
-import { InputDecoderSettings, InputHookSettings } from "./inputParsing/inputSettings";
+import { DecoderSettings, FrookySettings, HookSettings } from "./frookySettings";
+import { InputDecoderSettings, InputFrookySettings, InputHookSettings } from "./inputParsing/inputSettings";
 import { frookyMetadataSchema } from "./inputParsing/zodSchemas/frookyMetadata.zod";
+import { frookySettingsSchema } from "./inputParsing/zodSchemas/frookySettings.zod";
 import { inputDecoderSettingsSchema, inputHookSettingsSchema } from "./inputParsing/zodSchemas/inputSettings.zod";
+
+// validates the config settings
+export function validateAndRepairFrookySettings(settings: InputFrookySettings): FrookySettings {
+  frooky.log.info(`Validating frooky config settings`);
+  const validatedSettings = DEFAULT_FROOKY_SETTINGS;
+
+  if (settings.hookSettings) {
+    validatedSettings.hookSettings = validateAndRepairHookSettings(settings.hookSettings);
+  }
+
+  if (settings.decoderSettings) {
+    validatedSettings.decoderSettings = validateAndRepairDecoderSettings(settings.decoderSettings);
+  }
+
+  const result = frookySettingsSchema.safeParse(validatedSettings);
+
+  if (!result.success) {
+    for (const issue of result.error.issues) {
+      const key = issue.path[0] as keyof FrookySettings;
+      (settings as Record<keyof FrookySettings, unknown>)[key] = DEFAULT_FROOKY_SETTINGS[key];
+      frooky.log.warn([
+        `Frooky setting "'${key}'" contains invalid data:`,
+        z.prettifyError(result.error),
+        `The value for '${key}' was reset to the default: ${DEFAULT_FROOKY_SETTINGS[key]}`,
+      ]);
+    }
+  }
+  frooky.log.info(`Frooky config is valid`);
+  return { ...DEFAULT_FROOKY_SETTINGS, ...validatedSettings };
+}
 
 // validates hook settings and replaces invalid settings with valid default values
 // empty ones are set to the default
 export function validateAndRepairHookSettings(settings: InputHookSettings): HookSettings {
+  frooky.log.info(`Validating frooky hook settings`);
   const result = inputHookSettingsSchema.safeParse(settings);
 
   if (!result.success) {
@@ -24,12 +55,14 @@ export function validateAndRepairHookSettings(settings: InputHookSettings): Hook
       ]);
     }
   }
+  frooky.log.info(`frooky hook settings are valid`);
   return { ...DEFAULT_HOOK_SETTINGS, ...settings };
 }
 
 // validates decoder settings and replaces invalid settings with valid default values
 // empty ones are set to the default
 export function validateAndRepairDecoderSettings(settings: InputDecoderSettings): DecoderSettings {
+  frooky.log.info(`Validating frooky decoder settings`);
   const result = inputDecoderSettingsSchema.safeParse(settings);
 
   if (!result.success) {
@@ -43,10 +76,12 @@ export function validateAndRepairDecoderSettings(settings: InputDecoderSettings)
       ]);
     }
   }
+  frooky.log.info(`frooky decoder settings are valid`);
   return { ...DEFAULT_DECODER_SETTINGS, ...settings };
 }
 
 export function validateMetadata(metadata: FrookyMetadata, platform: Platform) {
+  frooky.log.info(`Validating frooky metadata`);
   if (metadata.platform?.toLowerCase() !== platform.toLocaleLowerCase()) {
     frooky.log.warn(
       `The platform declared in the frooky configuration does not match the actual platform (${platform}). Not all hooks may be valid.`,
@@ -56,12 +91,10 @@ export function validateMetadata(metadata: FrookyMetadata, platform: Platform) {
   if (!result.success) {
     frooky.log.warn(`The metadata contains invalid entries: ${result.error}`);
   }
+  frooky.log.info(`frooky meta data are valid`);
 }
 
-export function validateConfig(
-  inputFrookyConfig: FrookyConfig,
-  platform: Platform,
-): { globalHookSettings: HookSettings; globalDecoderSettings: DecoderSettings } {
+export function validateConfig(inputFrookyConfig: FrookyConfig, platform: Platform): FrookySettings {
   if (inputFrookyConfig.metadata) {
     frooky.log.info(`Metadata are valid.`);
     validateMetadata(inputFrookyConfig.metadata, platform);
@@ -69,20 +102,9 @@ export function validateConfig(
   } else {
     frooky.log.warn(`No metadata declared.`);
   }
-
-  let globalHookSettings: HookSettings = DEFAULT_HOOK_SETTINGS;
-  if (inputFrookyConfig.globalSettings?.hookSettings) {
-    globalHookSettings = validateAndRepairHookSettings(inputFrookyConfig.globalSettings.hookSettings);
-    frooky.log.info(`Global settings are valid.`);
-    frooky.log.debug(`Global settings: ${JSON.stringify(inputFrookyConfig.globalSettings.hookSettings, null, 2)}`);
+  let settings: FrookySettings = DEFAULT_FROOKY_SETTINGS;
+  if (inputFrookyConfig.settings) {
+    settings = validateAndRepairFrookySettings(inputFrookyConfig.settings);
   }
-
-  let globalDecoderSettings: DecoderSettings = DEFAULT_DECODER_SETTINGS;
-  if (inputFrookyConfig.globalSettings?.decoderSettings) {
-    globalDecoderSettings = validateAndRepairDecoderSettings(inputFrookyConfig.globalSettings.decoderSettings);
-    frooky.log.info(`Global decoder settings are valid.`);
-    frooky.log.debug(`Global decoder settings: ${JSON.stringify(inputFrookyConfig.globalSettings.decoderSettings, null, 2)}`);
-  }
-
-  return { globalHookSettings, globalDecoderSettings };
+  return settings;
 }

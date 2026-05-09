@@ -1,7 +1,6 @@
 import { validateAndRepairDecoderSettings, validateAndRepairHookSettings } from "../configValidator";
-import { DecoderSettings } from "../decoders/decoderSettings";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../defaultValues";
-import { HookSettings } from "../hook/hookSettings";
+import { DecoderSettings, FrookySettings, HookSettings } from "../frookySettings";
 import { InputParam, InputRetType, normalizeInputParam, normalizeInputRetType } from "./inputDecodableTypes";
 import { InputDecoderSettings, InputHookSettings } from "./inputSettings";
 
@@ -91,19 +90,15 @@ function normalizeMethod(
 }
 
 // normalized hook group
-export function normalizeJavaHookGroup(
-  hookGroup: InputJavaHookGroup,
-  globalHookSettings: HookSettings,
-  globalDecoderSettings: DecoderSettings,
-): InputJavaHookGroup {
+export function normalizeJavaHookGroup(hookGroup: InputJavaHookGroup, settings: FrookySettings): InputJavaHookGroup {
   const mergedHookSettings: HookSettings = validateAndRepairHookSettings({
     ...DEFAULT_HOOK_SETTINGS,
-    ...globalHookSettings,
+    ...settings.hookSettings,
     ...hookGroup.hookSettings,
   });
   const mergedDecoderSettings: DecoderSettings = validateAndRepairDecoderSettings({
     ...DEFAULT_DECODER_SETTINGS,
-    ...globalDecoderSettings,
+    ...settings.decoderSettings,
     ...hookGroup.decoderSettings,
   });
 

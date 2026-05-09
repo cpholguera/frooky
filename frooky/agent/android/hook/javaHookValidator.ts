@@ -1,22 +1,17 @@
 import z from "zod";
-import { DecoderSettings } from "../../shared/decoders/decoderSettings";
 import { FrookyConfig } from "../../shared/frookyConfig";
-import { HookSettings } from "../../shared/hook/hookSettings";
+import { FrookySettings } from "../../shared/frookySettings";
 import { HookValidator } from "../../shared/hook/hookValidator";
 import { InputJavaHookGroup, InputJavaHookNormalized, isJavaHookScope, normalizeJavaHookGroup } from "../../shared/inputParsing/inputJavaHookGroup";
 import { inputJavaHookNormalizedSchema } from "../../shared/inputParsing/zodSchemas/inputJavaHookGroup.zod";
 
 export class JavaHookValidator implements HookValidator<InputJavaHookNormalized, InputJavaHookGroup> {
-  validateAndNormalizeHooks(
-    inputFrookyConfig: FrookyConfig,
-    globalHookSettings: HookSettings,
-    globalDecoderSettings: DecoderSettings,
-  ): InputJavaHookNormalized[] {
+  validateAndNormalizeHooks(inputFrookyConfig: FrookyConfig, settings: FrookySettings): InputJavaHookNormalized[] {
     const javaHookGroups = this.getPlatformHookGroups(inputFrookyConfig);
     const normalizedJavaHooks: InputJavaHookNormalized[] = [];
 
     for (const javaHookGroup of javaHookGroups) {
-      const normalizedJavaHookGroup = normalizeJavaHookGroup(javaHookGroup, globalHookSettings, globalDecoderSettings);
+      const normalizedJavaHookGroup = normalizeJavaHookGroup(javaHookGroup, settings);
       for (const inputJavaHook of normalizedJavaHookGroup.hooks) {
         try {
           normalizedJavaHooks.push(inputJavaHookNormalizedSchema.parse(inputJavaHook));

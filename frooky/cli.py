@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import sys
 import argparse
-from pathlib import Path
+import sys
 from importlib.resources import files
+from pathlib import Path
 
 from . import __version__
 from .frida_runner import FrookyRunner, RunnerOptions
@@ -28,15 +28,13 @@ def _add_common_args(subparser: argparse.ArgumentParser) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        prog="frooky",
-        description="Run Frooky hooks using Frida's Python bindings."
-    )
+    parser = argparse.ArgumentParser(prog="frooky", description="Run Frooky hooks using Frida's Python bindings.")
 
     parser.suggest_on_error = True
 
     parser.add_argument(
-        "-v", "--version",
+        "-v",
+        "--version",
         action="version",
         version=f"frooky {__version__}",
     )
@@ -62,17 +60,11 @@ def main() -> int:
     args = parser.parse_args()
 
     # Validate that the android and ios agents are compiled and accessible
-    agent_dist_path = files('frooky') / "agent" / "dist"
-    required_files = [
-        agent_dist_path / "version.json",
-        agent_dist_path / "agent-android.js",
-        agent_dist_path / "agent-ios.js"
-    ]
+    agent_dist_path = files("frooky") / "agent" / "dist"
+    required_files = [agent_dist_path / "version.json", agent_dist_path / "agent-android.js", agent_dist_path / "agent-ios.js"]
 
     if not all(file.exists() for file in required_files):
-        print(f"Frooky agent not found in: {agent_dist_path}\n"
-              f"If you don't use the distributed version, make sure to manually compile the agents first.\n",
-              file=sys.stderr)
+        print(f"Frooky agent not found in: {agent_dist_path}\nIf you don't use the distributed version, make sure to manually compile the agents first.\n", file=sys.stderr)
         sys.exit(1)
 
     # Validate device selection

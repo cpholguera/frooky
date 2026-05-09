@@ -1,7 +1,6 @@
 import z from "zod";
-import { DecoderSettings } from "../../shared/decoders/decoderSettings";
 import { FrookyConfig } from "../../shared/frookyConfig";
-import { HookSettings } from "../../shared/hook/hookSettings";
+import { FrookySettings } from "../../shared/frookySettings";
 import { HookValidator } from "../../shared/hook/hookValidator";
 import {
   InputNativeHookGroup,
@@ -12,16 +11,12 @@ import {
 import { inputNativeHookNormalizedSchema } from "../../shared/inputParsing/zodSchemas/inputNativeHookGroup.zod";
 
 export class NativeHookValidator implements HookValidator<InputNativeHookNormalized, InputNativeHookGroup> {
-  validateAndNormalizeHooks(
-    inputFrookyConfig: FrookyConfig,
-    globalHookSettings: HookSettings,
-    globalDecoderSettings: DecoderSettings,
-  ): InputNativeHookNormalized[] {
+  validateAndNormalizeHooks(inputFrookyConfig: FrookyConfig, settings: FrookySettings): InputNativeHookNormalized[] {
     const nativeHookGroups = this.getPlatformHookGroups(inputFrookyConfig);
     const normalizedNativeHooks: InputNativeHookNormalized[] = [];
 
     for (const nativeHookGroup of nativeHookGroups) {
-      const normalizedNativeHookGroup = normalizeNativeHookGroup(nativeHookGroup, globalHookSettings, globalDecoderSettings);
+      const normalizedNativeHookGroup = normalizeNativeHookGroup(nativeHookGroup, settings);
       for (const inputNativeHook of normalizedNativeHookGroup.hooks) {
         try {
           normalizedNativeHooks.push(inputNativeHookNormalizedSchema.parse(inputNativeHook));

@@ -1,11 +1,10 @@
-import fs from 'fs';
-import { spawnSync, spawn } from 'child_process';
-import path from 'path';
-import * as yaml from 'js-yaml';
+import { spawn, spawnSync } from 'child_process';
 import chokidar from 'chokidar';
+import fs from 'fs';
+import * as yaml from 'js-yaml';
 import minimist from 'minimist';
+import path, { join } from 'path';
 import { fileURLToPath } from 'url';
-import { join } from 'path'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -125,7 +124,7 @@ function generateHooksFile() {
     });
 
     const targetFile = path.join(buildDir, `index.${targetOption}.ts`);
-    const replacement = `frookyConfigs = ${JSON.stringify(frookyConfigs)} as FrookyConfig;`;
+    const replacement = `frookyConfigs = ${JSON.stringify(frookyConfigs)} as FrookyConfig[];`;
 
     const blockRegex = /(\/\/%%% REPLACE START\n)[\s\S]*?(\/\/%%% REPLACE STOP)/;
 

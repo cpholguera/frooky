@@ -1,8 +1,7 @@
-import { DecoderSettings } from "../decoders/decoderSettings";
 import { FrookyConfig } from "../frookyConfig";
-import { HookSettings } from "./hookSettings";
+import { FrookySettings } from "../frookySettings";
 
 export interface HookValidator<THookNormalized, THookGroup> {
-  validateAndNormalizeHooks(inputFrookyConfig: FrookyConfig, hookSettings: HookSettings, decoderSetting: DecoderSettings): THookNormalized[];
+  validateAndNormalizeHooks(inputFrookyConfig: FrookyConfig, settings: FrookySettings): THookNormalized[];
   getPlatformHookGroups(inputFrookyConfig: FrookyConfig): THookGroup[];
 }

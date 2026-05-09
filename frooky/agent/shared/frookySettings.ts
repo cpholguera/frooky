@@ -1,3 +1,22 @@
+import { LogLevel, LogTo } from "./logger";
+
+/**
+ * Metadata that describes a hook collection.
+ *
+ * @public
+ */
+export interface HookSettings {
+  /**
+   * Sets stackTraceLimit to the given value for all hooks.
+   */
+  stackTraceLimit: number;
+
+  /**
+   * Stack trace filters to apply.
+   */
+  eventFilter: string[];
+}
+
 /**
  * Decoder settings any kind of parameter or return type decoder
  *
@@ -31,4 +50,13 @@ export interface DecoderSettings {
    * @defaultValue false
    */
   fastDecode: boolean;
+}
+
+export interface FrookySettings {
+  verbose: true | false;
+  logLevel: LogLevel;
+  logTo: LogTo;
+  resolverTimeout: number;
+  hookSettings: HookSettings;
+  decoderSettings: DecoderSettings;
 }
