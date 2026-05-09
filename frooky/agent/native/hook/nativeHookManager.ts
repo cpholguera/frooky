@@ -1,4 +1,6 @@
-import { DecodedValue, HookManager, InputNativeHookNormalized } from "../../shared";
+import { DecodedValue } from "../../shared/decoders/decodedValue";
+import { HookManager } from "../../shared/hook/hookManager";
+import { InputNativeHookNormalized } from "../../shared/inputParsing/inputNativeHookGroup";
 import { NativeDecoder } from "../decoders/nativeDecoder";
 import { NativeHook } from "./nativeHook";
 import { buildAndDispatchEvent, buildNativeStackTrace, decodeNativeArgs } from "./nativeHookImpl";

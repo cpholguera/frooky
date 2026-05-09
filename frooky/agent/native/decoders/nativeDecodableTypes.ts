@@ -1,4 +1,4 @@
-import { DecodableType } from "../../shared";
+import { DecodableType } from "../../shared/decoders/decodableTypes";
 import { NativeType } from "./nativeTypeNormalizer";
 
 /**

@@ -1,5 +1,5 @@
 import Java from "frida-java-bridge";
-import { BaseDecoder } from "../../../../shared";
+import { BaseDecoder } from "../../../../shared/decoders/baseDecoder";
 import { JavaParam } from "../../../hook/javaParam";
 
 // Cache so we only reflect once

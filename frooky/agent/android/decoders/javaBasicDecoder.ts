@@ -1,5 +1,6 @@
 import type Java from "frida-java-bridge";
-import { BaseDecoder, DecodedValue } from "../../shared";
+import { BaseDecoder } from "../../shared/decoders/baseDecoder";
+import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { JavaParam } from "../hook/javaParam";
 
 export const JavaLongDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {

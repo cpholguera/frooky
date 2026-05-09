@@ -1,6 +1,6 @@
 import Java from "frida-java-bridge";
 import { FrookyAgent } from "../FrookyAgent";
-import { FrookyConfig } from "../shared";
+import { FrookyConfig } from "../shared/frookyConfig";
 import { JavaHookManager } from "./hook/javaHookManager";
 import { JavaHookValidator } from "./hook/javaHookValidator";
 

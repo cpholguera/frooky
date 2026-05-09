@@ -1,4 +1,5 @@
 import z from "zod";
+import { Platform } from "../shared/frookyMetadata";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_FROOKY_SETTINGS, DEFAULT_HOOK_SETTINGS } from "./defaultValues";
 import { FrookyConfig } from "./frookyConfig";
 import { FrookyMetadata } from "./frookyMetadata";

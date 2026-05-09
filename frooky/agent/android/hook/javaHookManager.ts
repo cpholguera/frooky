@@ -1,13 +1,9 @@
 import Java from "frida-java-bridge";
-import {
-  DecoderSettings,
-  DEFAULT_DECODER_SETTINGS,
-  DEFAULT_HOOK_SETTINGS,
-  HookManager,
-  InputJavaHookNormalized,
-  InputParam,
-  normalizeInputParam,
-} from "../../shared";
+import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../../shared/defaultValues";
+import { DecoderSettings } from "../../shared/frookySettings";
+import { HookManager } from "../../shared/hook/hookManager";
+import { InputParam, normalizeInputParam } from "../../shared/inputParsing/inputDecodableTypes";
+import { InputJavaHookNormalized } from "../../shared/inputParsing/inputJavaHookGroup";
 import { JavaDecoder } from "../decoders/javaDecoder";
 import { JavaHook } from "./javaHook";
 import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeJavaArgs } from "./javaHookImpl";

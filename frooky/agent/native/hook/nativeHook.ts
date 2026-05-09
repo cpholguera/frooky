@@ -1,4 +1,5 @@
-import { Hook, Param } from "../../shared";
+import { Param } from "../../shared/decoders/decodableTypes";
+import { Hook } from "../../shared/hook/hook";
 import { NativeDecodableType } from "../decoders/nativeDecodableTypes";
 
 /**

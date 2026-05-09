@@ -1,11 +1,12 @@
 import Java from "frida-java-bridge";
-import { runTests } from "../agent-test-framework";
+import { runTests } from "../testFramework";
 
-// Import all test files
-import "../../shared/utils.test";
-import "./platform.test";
+// The following test suite contains tests which test the test framework itself. It is disabled by default.
+import "../testFramework.test.ts";
 
-// init global logger
+// Import the dynamically generated index.test.ts
+import "../../shared/index.test";
+import "./index.test";
 
 Java.perform(() => {
   setTimeout(() => {

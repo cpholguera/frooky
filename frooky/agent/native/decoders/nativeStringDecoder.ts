@@ -1,4 +1,5 @@
-import { BaseDecoder, DecodedValue } from "../../shared";
+import { BaseDecoder } from "../../shared/decoders/baseDecoder";
+import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { NativeDecodableType } from "./nativeDecodableTypes";
 
 export const NativeStringDecoder: BaseDecoder<NativePointer, NativeDecodableType> = {

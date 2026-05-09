@@ -1,5 +1,5 @@
 import Java from "frida-java-bridge";
-import { HookEvent } from "../../shared";
+import { HookEvent } from "../../shared/event/hookEvent";
 import { FieldType } from "../hook/javaHookImpl";
 
 /**

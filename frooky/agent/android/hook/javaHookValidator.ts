@@ -1,13 +1,8 @@
 import z from "zod";
-import {
-  FrookyConfig,
-  FrookySettings,
-  HookValidator,
-  InputJavaHookGroup,
-  InputJavaHookNormalized,
-  isJavaHookScope,
-  normalizeJavaHookGroup,
-} from "../../shared";
+import { FrookyConfig } from "../../shared/frookyConfig";
+import { FrookySettings } from "../../shared/frookySettings";
+import { HookValidator } from "../../shared/hook/hookValidator";
+import { InputJavaHookGroup, InputJavaHookNormalized, isJavaHookScope, normalizeJavaHookGroup } from "../../shared/inputParsing/inputJavaHookGroup";
 import { inputJavaHookNormalizedSchema } from "../../shared/inputParsing/zodSchemas/inputJavaHookGroup.zod";
 
 export class JavaHookValidator implements HookValidator<InputJavaHookNormalized, InputJavaHookGroup> {

@@ -1,13 +1,14 @@
 import z from "zod";
+
+import { FrookyConfig } from "../../shared/frookyConfig";
+import { FrookySettings } from "../../shared/frookySettings";
+import { HookValidator } from "../../shared/hook/hookValidator";
 import {
-  FrookyConfig,
-  FrookySettings,
-  HookValidator,
   InputNativeHookGroup,
   InputNativeHookNormalized,
   isNativeHookGroup,
   normalizeNativeHookGroup,
-} from "../../shared";
+} from "../../shared/inputParsing/inputNativeHookGroup";
 import { inputNativeHookNormalizedSchema } from "../../shared/inputParsing/zodSchemas/inputNativeHookGroup.zod";
 
 export class NativeHookValidator implements HookValidator<InputNativeHookNormalized, InputNativeHookGroup> {

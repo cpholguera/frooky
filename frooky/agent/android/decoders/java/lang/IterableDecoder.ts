@@ -1,6 +1,8 @@
 // iterableDecoder.ts
 import type Java from "frida-java-bridge";
-import { DecodedValue, DecoderSettings, DEFAULT_DECODER_SETTINGS } from "../../../../shared";
+import { DecodedValue } from "../../../../shared/decoders/decodedValue";
+import { DEFAULT_DECODER_SETTINGS } from "../../../../shared/defaultValues";
+import { DecoderSettings } from "../../../../shared/frookySettings";
 import { JavaParam } from "../../../hook/javaParam";
 import { JavaDecoder } from "../../javaDecoder";
 

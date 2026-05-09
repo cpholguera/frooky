@@ -1,7 +1,11 @@
-import { runTests } from "../agent-test-framework";
+import { runTests } from "../testFramework.ts";
 
-// Import all ios test files
-import "./smoke.test";
+// The following test suite contains tests which test the test framework itself. It is disabled by default.
+import "../testFramework.test.ts";
+
+// Import the dynamically generated index.test.ts
+import "../../shared/index.test";
+import "./index.test.ts";
 
 setTimeout(() => {
   runTests(send);

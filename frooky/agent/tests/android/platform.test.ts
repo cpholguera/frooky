@@ -1,6 +1,6 @@
 import Java from "frida-java-bridge";
 
-describe("Android runtime smoke test", () => {
+describe("Android runtime", () => {
   it("should have Java available", () =>
     new Promise<void>((resolve, reject) => {
       Java.perform(() => {
@@ -41,3 +41,5 @@ describe("Android runtime smoke test", () => {
       });
     }));
 });
+
+export {};

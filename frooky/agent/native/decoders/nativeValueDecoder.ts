@@ -1,4 +1,6 @@
-import { BaseDecoder, DecodedValue, DecoderSettings } from "../../shared";
+import { BaseDecoder } from "../../shared/decoders/baseDecoder";
+import { DecodedValue } from "../../shared/decoders/decodedValue";
+import { DecoderSettings } from "../../shared/frookySettings";
 import { NativeDecodableType } from "./nativeDecodableTypes";
 import { FundamentalType } from "./nativeDecoder";
 import { NativeFallbackDecoder } from "./nativeFallbackDecoder";

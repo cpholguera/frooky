@@ -143,3 +143,5 @@ export async function runTests(sendCallback: (message: TestMessage) => void): Pr
     results: allResults,
   });
 }
+
+export {};

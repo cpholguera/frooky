@@ -1,6 +1,15 @@
 import { NativeHookManager } from "./native/hook/nativeHookManager";
 import { NativeHookValidator } from "./native/hook/nativeHookValidator";
-import { BaseEvent, FrookyConfig, HookEvent, HookManager, HookValidator, LogEvent, Logger, LogTo, startAsyncSender, validateConfig } from "./shared";
+import { validateConfig } from "./shared/configValidator";
+import { BaseEvent } from "./shared/event/baseEvent";
+import { startAsyncSender } from "./shared/event/eventSender";
+import { HookEvent } from "./shared/event/hookEvent";
+import { LogEvent } from "./shared/event/logEvent";
+import { FrookyConfig } from "./shared/frookyConfig";
+import { Platform } from "./shared/frookyMetadata";
+import { HookManager } from "./shared/hook/hookManager";
+import { HookValidator } from "./shared/hook/hookValidator";
+import { Logger, LogTo } from "./shared/logger";
 
 declare global {
   var frooky: FrookyAgent;

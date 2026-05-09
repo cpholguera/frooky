@@ -1,6 +1,6 @@
 import ObjC from "frida-objc-bridge";
 
-describe("iOS runtime smoke test", () => {
+describe("iOS runtime", () => {
   it("should have ObjC available", () => {
     expect(ObjC.available).toBeTruthy();
   });
@@ -18,3 +18,5 @@ describe("iOS runtime smoke test", () => {
     expect(Process.id > 0).toBeTruthy();
   });
 });
+
+export {};
