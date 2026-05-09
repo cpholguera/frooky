@@ -1,16 +1,12 @@
 import type Java from "frida-java-bridge";
-import {
-  CollectionDecoder,
-  IntentFlagDecoder,
-  JavaArrayDecoder,
-  JavaFallbackDecoder,
-  JavaLongDecoder,
-  JavaParam,
-  JavaPrimitiveDecoder,
-  KeyGenParameterSpecDecoder,
-  MapDecoder,
-} from "frooky/android";
-import { BaseDecoder, DecodedValue } from "frooky/shared";
+import { BaseDecoder, DecodedValue } from "../../shared";
+import { JavaParam } from "../hook/javaParam";
+import { IntentFlagDecoder } from "./android/content/IntentFlagDecoder";
+import { KeyGenParameterSpecDecoder } from "./android/security/keystore/KeyGenParameterSpecDecoder";
+import { CollectionDecoder } from "./java/util/CollectionDecoder";
+import { MapDecoder } from "./java/util/MapDecoder";
+import { JavaArrayDecoder } from "./javaArrayDecoder";
+import { JavaFallbackDecoder, JavaLongDecoder, JavaPrimitiveDecoder } from "./javaBasicDecoder";
 
 /*
  * This is the registry for non-primitive java decoders.

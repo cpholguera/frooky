@@ -1,4 +1,5 @@
-import { DecodeAt, DecoderSettings, FrookySettings, HookSettings } from "frooky/shared";
+import { DecodeAt } from "../decoders/decodableTypes";
+import { DecoderSettings, FrookySettings, HookSettings } from "../frookySettings";
 
 export type InputFrookySettings = Omit<Partial<FrookySettings>, "hookSettings" | "decoderSettings"> & {
   hookSettings?: InputHookSettings;

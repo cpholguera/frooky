@@ -1,3 +1,4 @@
+import z from "zod";
 import {
   FrookyConfig,
   FrookySettings,
@@ -6,9 +7,8 @@ import {
   InputNativeHookNormalized,
   isNativeHookGroup,
   normalizeNativeHookGroup,
-} from "frooky/shared";
-import { inputNativeHookNormalizedSchema } from "frooky/zod";
-import z from "zod";
+} from "../../shared";
+import { inputNativeHookNormalizedSchema } from "../../shared/inputParsing/zodSchemas/inputNativeHookGroup.zod";
 
 export class NativeHookValidator implements HookValidator<InputNativeHookNormalized, InputNativeHookGroup> {
   validateAndNormalizeHooks(inputFrookyConfig: FrookyConfig, settings: FrookySettings): InputNativeHookNormalized[] {

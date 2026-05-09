@@ -1,5 +1,9 @@
-import { buildNativeType, NativeDecodableType, NativeFallbackDecoder, NativeReferenceDecoder, NativeValueDecoder } from "frooky/native";
-import { BaseDecoder, DecodedValue, DecoderSettings } from "frooky/shared";
+import { BaseDecoder, DecodedValue, DecoderSettings } from "../../shared";
+import { NativeDecodableType } from "./nativeDecodableTypes";
+import { NativeFallbackDecoder } from "./nativeFallbackDecoder";
+import { NativeReferenceDecoder } from "./nativeReferenceDecoder";
+import { buildNativeType } from "./nativeTypeNormalizer";
+import { NativeValueDecoder } from "./nativeValueDecoder";
 
 export const FUNDAMENTAL_TYPES = [
   "void",

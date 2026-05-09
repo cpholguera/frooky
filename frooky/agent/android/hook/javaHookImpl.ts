@@ -1,6 +1,8 @@
 import Java from "frida-java-bridge";
-import { JavaDecoder, JavaHook, JavaHookEvent } from "frooky/android";
-import { DecodedValue, DecoderSettings, Param } from "frooky/shared";
+import { DecodedValue, DecoderSettings, Param } from "../../shared";
+import { JavaDecoder } from "../decoders/javaDecoder";
+import { JavaHookEvent } from "../event/javaHookEvent";
+import { JavaHook } from "./javaHook";
 
 export type FieldType = {
   fieldType: "static" | "instance";

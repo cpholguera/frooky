@@ -1,7 +1,8 @@
 // collectionDecoder.ts
 import Java from "frida-java-bridge";
-import { decodeIterable, JavaParam } from "frooky/android";
-import { BaseDecoder } from "frooky/shared";
+import { BaseDecoder } from "../../../../shared";
+import { JavaParam } from "../../../hook/javaParam";
+import { decodeIterable } from "../lang/IterableDecoder";
 
 export const CollectionDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
   decode: (value, param) => {

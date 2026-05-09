@@ -1,4 +1,4 @@
-import { LogLevel, LogTo } from "frooky/shared";
+import { LogLevel, LogTo } from "./logger";
 
 /**
  * Metadata that describes a hook collection.

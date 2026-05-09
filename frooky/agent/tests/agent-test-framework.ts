@@ -10,7 +10,8 @@ interface Matcher<T> {
 }
 
 declare global {
-  function test(name: string, fn: () => void | Promise<void>): void;
+  function describe(name: string, fn: () => void | Promise<void>): void;
+  function it(name: string, fn: () => void | Promise<void>): void;
   function expect<T>(actual: T): Matcher<T>;
 }
 
@@ -26,22 +27,16 @@ interface TestResult {
 
 type TestMessage = { type: "test-result"; result: TestResult } | { type: "test-complete"; success: boolean; results: TestResult[] };
 
-interface Matcher<T> {
-  toBe: (expected: T) => void;
-  toEqual: (expected: T) => void;
-  toBeTruthy: () => void;
-  toBeFalsy: () => void;
-  toThrow: (errorMatch?: string | Error) => void;
-  notToThrow(): void;
-}
+const topLevelTests: Array<{ name: string; fn: () => void | Promise<void> }> = [];
+const suiteStack: Array<Array<{ name: string; fn: () => void | Promise<void> }>> = [];
 
-const topLevelTests: Array<{ name: string; fn: () => void }> = [];
-const suiteStack: Array<Array<{ name: string; fn: () => void }>> = [];
-
-globalThis.test = (name: string, fn: () => void) => {
+const registerTest = (name: string, fn: () => void | Promise<void>) => {
   const current = suiteStack[suiteStack.length - 1];
   (current ?? topLevelTests).push({ name, fn });
 };
+
+globalThis.describe = registerTest;
+globalThis.it = registerTest;
 
 const assert = (condition: boolean, message: string) => {
   if (!condition) throw new Error(message);
@@ -66,18 +61,14 @@ globalThis.expect = <T>(actual: T): Matcher<T> => ({
 
   toThrow: (errorMatch) => {
     assert(typeof actual === "function", "Expected a function");
-
     let caughtError: unknown;
     try {
       (actual as () => void)();
     } catch (e) {
       caughtError = e;
     }
-
     assert(caughtError !== undefined, "Expected function to throw");
-
     if (!errorMatch || !(caughtError instanceof Error)) return;
-
     if (typeof errorMatch === "string") {
       assert(caughtError.message.includes(errorMatch), `Expected error message to include "${errorMatch}" but got "${caughtError.message}"`);
     } else {
@@ -87,16 +78,15 @@ globalThis.expect = <T>(actual: T): Matcher<T> => ({
       );
     }
   },
+
   notToThrow: () => {
     assert(typeof actual === "function", "Expected a function");
-
     let caughtError: unknown;
     try {
       (actual as () => void)();
     } catch (e) {
       caughtError = e;
     }
-
     assert(
       caughtError === undefined,
       `Expected function not to throw but got ${caughtError instanceof Error ? `${caughtError.constructor.name}: "${caughtError.message}"` : String(caughtError)}`,

@@ -1,20 +1,9 @@
-import { validateMetadata } from "../../shared/configValidator";
-import { FrookyMetadata } from "../../shared/frookyMetadata";
+import { uuidv4 } from "../../shared/utils";
 
-test("Test file validator.", () => {
-  test("validateMetadata()", () => {
-    test("successfully validates valid metadata.", () => {
-      const validMetadata: FrookyMetadata = {
-        platform: "Android",
-        name: "Test Metadata",
-        description: "Test Description",
-        category: "Test",
-        author: "frooky dev team",
-        version: "1.0",
-      };
-      expect(() => {
-        validateMetadata(validMetadata, "Android");
-      }).notToThrow();
-    });
+describe("uuidv4()", () => {
+  it("should generate a valid UUID v4", () => {
+    const uuid = uuidv4();
+    const uuidV4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    expect(uuidV4Regex.test(uuid)).toBeTruthy();
   });
 });

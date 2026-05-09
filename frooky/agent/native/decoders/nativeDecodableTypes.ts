@@ -1,4 +1,4 @@
-import { DecodableType } from "frooky/shared";
+import { DecodableType } from "../../shared";
 import { NativeType } from "./nativeTypeNormalizer";
 
 /**

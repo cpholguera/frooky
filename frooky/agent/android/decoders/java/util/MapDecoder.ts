@@ -1,6 +1,8 @@
 import Java from "frida-java-bridge";
-import { decodeIterable, JavaDecoder, JavaParam } from "frooky/android";
-import { BaseDecoder, DecodedValue } from "frooky/shared";
+import { BaseDecoder, DecodedValue } from "../../../../shared";
+import { JavaParam } from "../../../hook/javaParam";
+import { JavaDecoder } from "../../javaDecoder";
+import { decodeIterable } from "../lang/IterableDecoder";
 
 export const MapDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
   decode: (value, param) => {

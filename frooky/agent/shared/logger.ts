@@ -1,4 +1,4 @@
-import { LogEvent } from "frooky/shared";
+import { LogEvent } from ".";
 import { FrookyAgent } from "../FrookyAgent";
 
 export type LogLevel = "info" | "warn" | "error" | "debug";

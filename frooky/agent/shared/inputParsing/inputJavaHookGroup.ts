@@ -1,18 +1,8 @@
-import {
-  DecoderSettings,
-  DEFAULT_DECODER_SETTINGS,
-  DEFAULT_HOOK_SETTINGS,
-  FrookySettings,
-  HookSettings,
-  InputDecoderSettings,
-  InputHookSettings,
-  InputParam,
-  InputRetType,
-  normalizeInputParam,
-  normalizeInputRetType,
-  validateAndRepairDecoderSettings,
-  validateAndRepairHookSettings,
-} from "frooky/shared";
+import { validateAndRepairDecoderSettings, validateAndRepairHookSettings } from "../configValidator";
+import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../defaultValues";
+import { DecoderSettings, FrookySettings, HookSettings } from "../frookySettings";
+import { InputParam, InputRetType, normalizeInputParam, normalizeInputRetType } from "./inputDecodableTypes";
+import { InputDecoderSettings, InputHookSettings } from "./inputSettings";
 
 /**
  * Describes a specific Java method overload.

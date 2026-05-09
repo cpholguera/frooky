@@ -1,4 +1,5 @@
-import { FundamentalType, NativeDecodableType } from "frooky/native";
+import { NativeDecodableType } from "./nativeDecodableTypes";
+import { FundamentalType } from "./nativeDecoder";
 
 export interface NativeType {
   type: "pointer" | FundamentalType;

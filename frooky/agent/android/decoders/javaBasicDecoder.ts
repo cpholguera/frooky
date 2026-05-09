@@ -1,6 +1,6 @@
 import type Java from "frida-java-bridge";
-import { JavaParam } from "frooky/android";
-import { BaseDecoder, DecodedValue } from "frooky/shared";
+import { BaseDecoder, DecodedValue } from "../../shared";
+import { JavaParam } from "../hook/javaParam";
 
 export const JavaLongDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
   decode: (value, param): DecodedValue => ({

@@ -1,12 +1,8 @@
-import {
-  DecodableType,
-  DecoderSettings,
-  DEFAULT_DECODE_AT,
-  DEFAULT_DECODER_SETTINGS,
-  InputParamSettings,
-  Param,
-  validateAndRepairDecoderSettings,
-} from "frooky/shared";
+import { validateAndRepairDecoderSettings } from "../configValidator";
+import { DecodableType, Param } from "../decoders/decodableTypes";
+import { DEFAULT_DECODER_SETTINGS, DEFAULT_DECODE_AT } from "../defaultValues";
+import { DecoderSettings } from "../frookySettings";
+import { InputParamSettings } from "./inputSettings";
 
 /**
  * Flexible input format for defining a parameter in YAML configuration.

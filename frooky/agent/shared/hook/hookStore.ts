@@ -1,7 +1,7 @@
-import { isJavaHook, JavaHook } from "frooky/android";
-import { isObjcHook, ObjcHook } from "frooky/ios";
-import { isNativeHook, NativeHook } from "frooky/native";
-import { Hook } from "frooky/shared";
+import { JavaHook, isJavaHook } from "../../android/hook/javaHook";
+import { ObjcHook, isObjcHook } from "../../ios/hooks/objcHook";
+import { NativeHook, isNativeHook } from "../../native/hook/nativeHook";
+import { Hook } from "./hook";
 
 export class HookStore {
   private hooks: Hook[] = [];

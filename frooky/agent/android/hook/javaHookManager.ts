@@ -1,5 +1,4 @@
 import Java from "frida-java-bridge";
-import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeJavaArgs, JavaDecoder, JavaHook, JavaParam } from "frooky/android";
 import {
   DecoderSettings,
   DEFAULT_DECODER_SETTINGS,
@@ -8,7 +7,11 @@ import {
   InputJavaHookNormalized,
   InputParam,
   normalizeInputParam,
-} from "frooky/shared";
+} from "../../shared";
+import { JavaDecoder } from "../decoders/javaDecoder";
+import { JavaHook } from "./javaHook";
+import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeJavaArgs } from "./javaHookImpl";
+import { JavaParam } from "./javaParam";
 
 // resolve java classes, the method and their overloads
 export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHook> {

@@ -1,5 +1,7 @@
-import { NativeDecoder, NativeHook, NativeHookEvent } from "frooky/native";
-import { DecodedValue, Param } from "frooky/shared";
+import { DecodedValue, Param } from "../../shared";
+import { NativeDecoder } from "../decoders/nativeDecoder";
+import { NativeHookEvent } from "../event/nativeHookEvent";
+import { NativeHook } from "./nativeHook";
 
 export function buildNativeStackTrace(ctx: CpuContext, limit: number): string[] {
   const stackTrace: string[] = [];

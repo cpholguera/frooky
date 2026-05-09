@@ -1,4 +1,5 @@
-import { BaseEvent, SEND_INTERVAL_MS } from "frooky/shared";
+import { SEND_INTERVAL_MS } from "../defaultValues";
+import { BaseEvent } from "./baseEvent";
 
 let senderInterval: ReturnType<typeof setInterval> | null = null;
 

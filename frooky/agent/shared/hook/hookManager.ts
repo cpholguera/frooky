@@ -1,4 +1,5 @@
-import { Hook, HOOK_LOOKUP_INTERVAL_MS } from "frooky/shared";
+import { HOOK_LOOKUP_INTERVAL_MS } from "../defaultValues";
+import { Hook } from "./hook";
 
 export abstract class HookManager<TInputHook, THooks extends Hook> {
   public abstract resolveHooks(inputHooks: TInputHook[], timeout: number): Promise<Promise<THooks[] | null>[]>;

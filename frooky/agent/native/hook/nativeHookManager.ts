@@ -1,5 +1,7 @@
-import { buildAndDispatchEvent, buildNativeStackTrace, decodeNativeArgs, NativeDecoder, NativeHook } from "frooky/native";
-import { DecodedValue, HookManager, InputNativeHookNormalized } from "frooky/shared";
+import { DecodedValue, HookManager, InputNativeHookNormalized } from "../../shared";
+import { NativeDecoder } from "../decoders/nativeDecoder";
+import { NativeHook } from "./nativeHook";
+import { buildAndDispatchEvent, buildNativeStackTrace, decodeNativeArgs } from "./nativeHookImpl";
 
 export class NativeHookManager extends HookManager<InputNativeHookNormalized, NativeHook> {
   public async resolveHooks(inputHooks: InputNativeHookNormalized[], timeout: number): Promise<Promise<NativeHook[] | null>[]> {

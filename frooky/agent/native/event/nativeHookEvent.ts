@@ -1,4 +1,4 @@
-import { HookEvent } from "frooky/shared";
+import { HookEvent } from "../../shared/event/hookEvent";
 
 /**
  * Represents a native hook event created by frooky.

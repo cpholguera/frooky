@@ -1,6 +1,6 @@
 import Java from "frida-java-bridge";
-import { JavaParam } from "frooky/android";
-import { BaseDecoder } from "frooky/shared";
+import { BaseDecoder } from "../../../../shared";
+import { JavaParam } from "../../../hook/javaParam";
 
 // Cache so we only reflect once
 let FLAG_CACHE: Array<{ name: string; value: number }> | null = null;

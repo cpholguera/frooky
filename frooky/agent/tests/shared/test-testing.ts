@@ -1,11 +1,11 @@
-test("Tests for the testing framework. They may be moved to a dedicated test suite later.", () => {
-  test("toBe", () => {
-    test("passes when values are strictly equal", () => {
+describe("Tests for the testing framework. They may be moved to a dedicated test suite later.", () => {
+  describe("toBe", () => {
+    it("should pass when values are strictly equal", () => {
       expect(1).toBe(1);
       expect("hello").toBe("hello");
     });
 
-    test("fails when values are not strictly equal", () => {
+    it("should fail when values are not strictly equal", () => {
       expect(() => {
         expect(1).toBe(2);
       }).toThrow();
@@ -15,13 +15,13 @@ test("Tests for the testing framework. They may be moved to a dedicated test sui
     });
   });
 
-  test("toEqual", () => {
-    test("passes when values are deeply equal", () => {
+  describe("toEqual", () => {
+    it("should pass when values are deeply equal", () => {
       expect({ a: 1 }).toEqual({ a: 1 });
       expect([1, 2, 3]).toEqual([1, 2, 3]);
     });
 
-    test("fails when values are not deeply equal", () => {
+    it("should fail when values are not deeply equal", () => {
       expect(() => {
         expect({ a: 1 }).toEqual({ a: 2 });
       }).toThrow();
@@ -31,14 +31,14 @@ test("Tests for the testing framework. They may be moved to a dedicated test sui
     });
   });
 
-  test("toBeTruthy", () => {
-    test("passes for truthy values", () => {
+  describe("toBeTruthy", () => {
+    it("should pass for truthy values", () => {
       expect(true).toBeTruthy();
       expect(1).toBeTruthy();
       expect("non-empty").toBeTruthy();
     });
 
-    test("fails for falsy values", () => {
+    it("should fail for falsy values", () => {
       expect(() => {
         expect(false).toBeTruthy();
       }).toThrow();
@@ -51,15 +51,15 @@ test("Tests for the testing framework. They may be moved to a dedicated test sui
     });
   });
 
-  test("toBeFalsy", () => {
-    test("passes for falsy values", () => {
+  describe("toBeFalsy", () => {
+    it("should pass for falsy values", () => {
       expect(false).toBeFalsy();
       expect(0).toBeFalsy();
       expect(null).toBeFalsy();
       expect(undefined).toBeFalsy();
     });
 
-    test("fails for truthy values", () => {
+    it("should fail for truthy values", () => {
       expect(() => {
         expect(true).toBeFalsy();
       }).toThrow();
@@ -72,20 +72,20 @@ test("Tests for the testing framework. They may be moved to a dedicated test sui
     });
   });
 
-  test("toThrow", () => {
-    test("passes when function throws with matching type", () => {
+  describe("toThrow", () => {
+    it("should pass when function throws with matching type", () => {
       expect(() => {
         throw new Error("boom");
       }).toThrow(new Error("boom"));
     });
 
-    test("passes when function throws with matching sub-message", () => {
+    it("should pass when function throws with matching sub-message", () => {
       expect(() => {
         throw new Error("zapp boom zoink");
       }).toThrow("boom");
     });
 
-    test("correctly rejects message mismatch", () => {
+    it("should reject a message mismatch", () => {
       expect(() => {
         expect(() => {
           throw new Error("cholula");
@@ -93,7 +93,7 @@ test("Tests for the testing framework. They may be moved to a dedicated test sui
       }).toThrow();
     });
 
-    test("correctly rejects type mismatch", () => {
+    it("should reject a type mismatch", () => {
       expect(() => {
         expect(() => {
           throw new Error("boom");
@@ -101,7 +101,7 @@ test("Tests for the testing framework. They may be moved to a dedicated test sui
       }).toThrow();
     });
 
-    test("correctly rejects non-throwing function", () => {
+    it("should reject a non-throwing function", () => {
       expect(() => {
         expect(() => {
           return 42;
@@ -110,14 +110,14 @@ test("Tests for the testing framework. They may be moved to a dedicated test sui
     });
   });
 
-  test("asyncTest", () => {
-    test("asyncResolve1", () =>
+  describe("asyncTest", () => {
+    it("should resolve promise 1", () =>
       new Promise<void>((resolve) => {
         setTimeout(() => {
           resolve();
         }, 100);
       }));
-    test("asyncResolve2", () =>
+    it("should resolve promise 2", () =>
       new Promise<void>((resolve) => {
         setTimeout(() => {
           resolve();
@@ -125,18 +125,24 @@ test("Tests for the testing framework. They may be moved to a dedicated test sui
       }));
   });
 
-  test("nestedTests", () => {
-    test("level 1", () => {
+  describe("nestedTests", () => {
+    it("should pass basic assertions at level 1", () => {
       expect(false).toBeFalsy();
       expect(true).toBeTruthy();
-      test("level 2", () => {
+    });
+
+    describe("level 2", () => {
+      it("should pass basic assertions at level 2", () => {
         expect(false).toBeFalsy();
         expect(true).toBeTruthy();
-        test("level 3 - 1", () => {
+      });
+
+      describe("level 3", () => {
+        it("should pass basic assertions at level 3 - 1", () => {
           expect(false).toBeFalsy();
           expect(true).toBeTruthy();
         });
-        test("level 3 - 2", () => {
+        it("should pass basic assertions at level 3 - 2", () => {
           expect(false).toBeFalsy();
           expect(true).toBeTruthy();
         });

@@ -1,6 +1,6 @@
 import Java from "frida-java-bridge";
-import { FieldType } from "frooky/android";
-import { HookEvent } from "frooky/shared";
+import { HookEvent } from "../../shared";
+import { FieldType } from "../hook/javaHookImpl";
 
 /**
  * Class representing a java hook event

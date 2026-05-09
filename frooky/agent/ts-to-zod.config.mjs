@@ -23,6 +23,11 @@ export default [
 
     // 2. Types used in the input YAMLs. They usually have less strict requirements or multiple ways of declaring a method, function parameter etc.
     // These are the types used to validate the input YAML
+   {
+        "name": "hook_decoder_settings_input",
+        "input": "shared/inputParsing/inputSettings.ts",
+        "output": "shared/inputParsing/zodSchemas/inputSettings.zod.ts"
+    },
     
     {
         "name": "java_hook_scope",
@@ -52,10 +57,5 @@ export default [
         "name": "frooky_metadata",
         "input": "shared/frookyMetadata.ts",
         "output": "shared/inputParsing/zodSchemas/frookyMetadata.zod.ts"
-    },
-    {
-        "name": "hook_decoder_settings_input",
-        "input": "shared/inputParsing/inputSettings.ts",
-        "output": "shared/inputParsing/zodSchemas/inputSettings.zod.ts"
-    },
+    }
 ]

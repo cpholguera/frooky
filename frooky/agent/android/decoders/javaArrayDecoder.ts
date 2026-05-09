@@ -1,7 +1,7 @@
 import type Java from "frida-java-bridge";
-import { BaseDecoder, DecodedValue } from "frooky/shared";
-import { JavaDecoder } from "..";
+import { BaseDecoder, DecodedValue } from "../../shared";
 import { JavaParam } from "../hook/javaParam";
+import { JavaDecoder } from "./javaDecoder";
 
 const PRIMITIVE_TYPES = new Set(["int", "long", "short", "byte", "char", "boolean", "float", "double"]);
 

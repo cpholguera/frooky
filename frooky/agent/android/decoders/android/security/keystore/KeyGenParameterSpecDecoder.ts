@@ -1,6 +1,7 @@
 import Java from "frida-java-bridge";
-import { JavaDecoder, JavaParam } from "frooky/android";
-import { BaseDecoder } from "frooky/shared";
+import { BaseDecoder } from "../../../../../shared";
+import { JavaParam } from "../../../../hook/javaParam";
+import { JavaDecoder } from "../../../javaDecoder";
 
 const getters = [
   "getAlgorithmParameterSpec",
