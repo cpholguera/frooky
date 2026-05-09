@@ -1,9 +1,7 @@
 import { runTests } from "../agent-test-framework";
 
 // Import all ios test files
-import "../shared/test-testing";
-import "./test-method-resolver";
-import "./test-runtime";
+import "./smoke.test";
 
 setTimeout(() => {
   runTests(send);

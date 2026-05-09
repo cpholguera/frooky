@@ -2,12 +2,8 @@ import Java from "frida-java-bridge";
 import { runTests } from "../agent-test-framework";
 
 // Import all test files
-import "./test-decoder";
-import "./test-runtime";
-import "./test-util";
-
-// Import shared tests
-import "../shared/import-shared-tests";
+import "../../shared/utils.test";
+import "./platform.test";
 
 // init global logger
 
