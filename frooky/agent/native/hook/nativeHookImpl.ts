@@ -1,5 +1,6 @@
 import { Param } from "../../shared/decoders/decodableTypes";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
+import { NativeDecodableType } from "../decoders/nativeDecodableTypes";
 import { NativeDecoder } from "../decoders/nativeDecoder";
 import { NativeHookEvent } from "../event/nativeHookEvent";
 import { NativeHook } from "./nativeHook";
@@ -26,7 +27,7 @@ export function decodeNativeArgs(args: NativePointer[], params: Param[]): Decode
   const decodedArgs: DecodedValue[] = [];
   if (params.length > 0) {
     params.forEach((param: Param, i: number) => {
-      decodedArgs.push(NativeDecoder.decode(args[i], param, param.decoderSettings));
+      decodedArgs.push(NativeDecoder.decode(args[i], param as NativeDecodableType, param.decoderSettings));
     });
   }
   return decodedArgs;

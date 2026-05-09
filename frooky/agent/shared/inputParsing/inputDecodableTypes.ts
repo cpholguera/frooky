@@ -7,13 +7,13 @@ import { InputParamSettings } from "./inputSettings";
 /**
  * Flexible input format for defining a parameter in YAML configuration.
  *
- * | Case | Form                   | Type                              | Example                                                               |
- * |------|------------------------|-----------------------------------|-----------------------------------------------------------------------|
- * | 1    | Type only              | `string`                          | `"java.lang.String"`                                                  |
- * | 2    | Type + name            | `[string, string]`                | `["java.lang.String", "value"]`                                       |
- * | 3    | Type + settings        | `[string, ParamSettings]`         | `["[I", "vector" { decodeAt: "exit", maxRecursion: 5 }]`              |
- * | 4    | Type + name + settings | `[string, string, ParamSettings]` | `["[B", "encryptedOutput", { decodeAt: "exit", magicDecode: false }]` |
- * | 5    | Normalized object      | `Param`                           | `{ type: int, name: age, decodeAt: "exit", settings: { ... }}`        |
+ * | Case | Form                   | Type                                    | Example                                                               |
+ * |------|------------------------|----------------------------------------|-----------------------------------------------------------------------|
+ * | 1    | Type only              | `string`                               | `"java.lang.String"`                                                  |
+ * | 2    | Type + name            | `[string, string]`                     | `["java.lang.String", "value"]`                                       |
+ * | 3    | Type + settings        | `[string, InputParamSettings]`         | `["[I", "vector" { decodeAt: "exit", maxRecursion: 5 }]`              |
+ * | 4    | Type + name + settings | `[string, string, InputParamSettings]` | `["[B", "encryptedOutput", { decodeAt: "exit", magicDecode: false }]` |
+ * | 5    | Normalized object      | `Param`                                | `{ type: int, name: age, decodeAt: "exit", settings: { ... }}`        |
  *
  * Note: Internally we only use the normalized version. The other forms are used to add flexibility for the frooky input file.
  *

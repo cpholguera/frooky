@@ -53,7 +53,8 @@ const deepEqual = <T>(a: T, b: T): boolean => {
 globalThis.expect = <T>(actual: T): Matcher<T> => ({
   toBe: (expected) => assert(actual === expected, `Expected ${actual} to be ${expected}`),
 
-  toEqual: (expected) => assert(deepEqual(actual, expected), `Expected ${JSON.stringify(actual)} to equal ${JSON.stringify(expected)}`),
+  toEqual: (expected) =>
+    assert(deepEqual(actual, expected), `Expected ${JSON.stringify(actual, null, 2)} to equal ${JSON.stringify(expected, null, 2)}`),
 
   toBeTruthy: () => assert(!!actual, `Expected ${actual} to be truthy`),
 

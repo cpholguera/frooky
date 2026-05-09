@@ -44,5 +44,5 @@ export interface Param extends DecodableType {
    * @example "exit"
    * @example "both"
    */
-  decodeAt?: DecodeAt;
+  decodeAt: DecodeAt;
 }
