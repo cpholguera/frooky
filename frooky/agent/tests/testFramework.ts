@@ -1,12 +1,14 @@
 // very simple testing framework runnable in a frida environment
 
 interface Matcher<T> {
-  toBe(expected: T): void;
-  toEqual(expected: T): void;
-  toBeTruthy(): void;
-  toBeFalsy(): void;
-  toThrow(errorMatch?: string | Error): void;
-  notToThrow(): void;
+  toBe: (expected: T) => void;
+  toEqual: (expected: T) => void;
+  toBeTruthy: () => void;
+  toBeFalsy: () => void;
+  toThrow: (errorMatch?: string | Error) => void;
+  notToThrow: () => void;
+  toLogWarn: (expected: string) => void;
+  toLogError: (expected: string) => void;
 }
 
 declare global {
@@ -14,8 +16,6 @@ declare global {
   function it(name: string, fn: () => void | Promise<void>): void;
   function expect<T>(actual: T): Matcher<T>;
 }
-
-export {};
 
 interface TestResult {
   name: string;
@@ -91,6 +91,37 @@ globalThis.expect = <T>(actual: T): Matcher<T> => ({
       caughtError === undefined,
       `Expected function not to throw but got ${caughtError instanceof Error ? `${caughtError.constructor.name}: "${caughtError.message}"` : String(caughtError)}`,
     );
+  },
+  toLogWarn: (expected: string) => {
+    assert(typeof actual === "function", "Expected a function");
+    const original = frooky.log.warn;
+    let captured: string | undefined;
+    frooky.log.warn = (msg: string) => {
+      captured = msg;
+    };
+    try {
+      (actual as () => void)();
+    } finally {
+      frooky.log.warn = original;
+    }
+    assert(captured !== undefined, `Expected frooky.log.warn to be called`);
+    assert(captured!.includes(expected), `Expected frooky.log.warn to be called with "${expected}" but got "${captured}"`);
+  },
+
+  toLogError: (expected: string) => {
+    assert(typeof actual === "function", "Expected a function");
+    const original = frooky.log.error;
+    let captured: string | undefined;
+    frooky.log.error = (msg: string) => {
+      captured = msg;
+    };
+    try {
+      (actual as () => void)();
+    } finally {
+      frooky.log.error = original;
+    }
+    assert(captured !== undefined, `Expected frooky.log.error to be called`);
+    assert(captured!.includes(expected), `Expected frooky.log.error to be called with "${expected}" but got "${captured}"`);
   },
 });
 

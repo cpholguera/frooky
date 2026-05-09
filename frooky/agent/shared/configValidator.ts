@@ -90,7 +90,8 @@ export function validateMetadata(metadata: FrookyMetadata, platform: Platform) {
   }
   const result = frookyMetadataSchema.safeParse(metadata);
   if (!result.success) {
-    frooky.log.warn(`The metadata contains invalid entries: ${result.error}`);
+    const pretty = z.prettifyError(result.error);
+    frooky.log.warn(`The metadata contains invalid entries: ${pretty}`);
   }
   frooky.log.info(`frooky meta data are valid`);
 }
