@@ -1,4 +1,4 @@
-import { DecoderSettings } from "../frookySettings";
+import { DecodableType } from "./decodableTypes";
 import { DecodedValue } from "./decodedValue";
 
 /**
@@ -7,7 +7,7 @@ import { DecodedValue } from "./decodedValue";
  * @template TValue - The raw input type to decode.
  * @template TParam - The parameter descriptor type, extending {@link Param}.
  */
-export interface BaseDecoder<TValue, TDecodableType> {
+export interface BaseDecoder<TValue, TDecodableType extends DecodableType> {
   /**
    * Decodes a raw value into a {@link DecodedValue}.
    *
@@ -16,5 +16,5 @@ export interface BaseDecoder<TValue, TDecodableType> {
    * @param args - Arguments passed to the decoder.
    * @returns The decoded representation of `value`.
    */
-  decode: (value: TValue, type: TDecodableType, decoderSetting: DecoderSettings, args?: any[]) => DecodedValue;
+  decode: (value: TValue, type: TDecodableType, args?: any[]) => DecodedValue;
 }

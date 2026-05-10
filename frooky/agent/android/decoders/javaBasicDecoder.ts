@@ -6,7 +6,7 @@ import { JavaParam } from "../hook/javaParam";
 export const JavaLongDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
   decode: (value, param): DecodedValue => ({
     type: param.type,
-    name: param.paramNname,
+    name: param.name,
     value: value.toString(),
   }),
 };
@@ -14,7 +14,7 @@ export const JavaLongDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
 export const JavaPrimitiveDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
   decode: (value, param): DecodedValue => ({
     type: param.type,
-    name: param.paramNname,
+    name: param.name,
     value: value,
   }),
 };
@@ -23,7 +23,7 @@ export const JavaFallbackDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
   decode: (value, param): DecodedValue => {
     return {
       type: param.implementationType ?? param.type,
-      name: param.paramNname,
+      name: param.name,
       value: value.toString(),
     };
   },

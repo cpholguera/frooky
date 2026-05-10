@@ -35,6 +35,13 @@ export function validateAndRepairFrookySettings(settings: InputFrookySettings): 
       ]);
     }
   }
+
+  const knownKeys = Object.keys(DEFAULT_FROOKY_SETTINGS);
+  const extraKeys = Object.keys(settings).filter((k) => !knownKeys.includes(k));
+  if (extraKeys.length > 0) {
+    frooky.log.warn(`Frooky settings contain unknown properties: ${extraKeys.join(", ")}`);
+  }
+
   frooky.log.info(`Frooky config is valid`);
   return { ...DEFAULT_FROOKY_SETTINGS, ...validatedSettings };
 }
@@ -56,6 +63,13 @@ export function validateAndRepairHookSettings(settings: InputHookSettings): Hook
       ]);
     }
   }
+
+  const knownKeys = Object.keys(DEFAULT_HOOK_SETTINGS);
+  const extraKeys = Object.keys(settings).filter((k) => !knownKeys.includes(k));
+  if (extraKeys.length > 0) {
+    frooky.log.warn(`Hook settings contain unknown properties: ${extraKeys.join(", ")}`);
+  }
+
   frooky.log.info(`frooky hook settings are valid`);
   return { ...DEFAULT_HOOK_SETTINGS, ...settings };
 }
@@ -77,6 +91,13 @@ export function validateAndRepairDecoderSettings(settings: InputDecoderSettings)
       ]);
     }
   }
+
+  const knownKeys = Object.keys(DEFAULT_DECODER_SETTINGS);
+  const extraKeys = Object.keys(settings).filter((k) => !knownKeys.includes(k));
+  if (extraKeys.length > 0) {
+    frooky.log.warn(`Decoder settings contain unknown properties: ${extraKeys.join(", ")}`);
+  }
+
   frooky.log.info(`frooky decoder settings are valid`);
   return { ...DEFAULT_DECODER_SETTINGS, ...settings };
 }

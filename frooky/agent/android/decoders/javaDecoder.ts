@@ -33,7 +33,7 @@ const javaDecoderRegistry: Record<string, BaseDecoder<Java.Wrapper, JavaParam>> 
  * on `param.decoder` so subsequent calls skip this dispatch entirely.
  */
 export const JavaDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
-  decode: (input, param, settings?): DecodedValue => {
+  decode: (input, param, settings): DecodedValue => {
     const cachedDecoder = param.decoder;
     if (cachedDecoder) {
       // use the cached decoder immediately

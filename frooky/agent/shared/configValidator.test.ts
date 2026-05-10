@@ -1,7 +1,7 @@
-import { validateAndRepairHookSettings, validateMetadata } from "./configValidator";
-import { DEFAULT_HOOK_SETTINGS } from "./defaultValues";
+import { validateAndRepairDecoderSettings, validateAndRepairHookSettings, validateMetadata } from "./configValidator";
+import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "./defaultValues";
 import { FrookyMetadata } from "./frookyMetadata";
-import { InputHookSettings } from "./inputParsing/inputSettings";
+import { InputDecoderSettings, InputHookSettings } from "./inputParsing/inputSettings";
 
 describe("configValidator", () => {
   describe("validateMetadata()", () => {
@@ -41,14 +41,53 @@ describe("configValidator", () => {
       });
     });
     it("should set the default value if value is not according to schema", () => {
-      const incompleteInputHookSettings: InputHookSettings = {
+      const incorrectInputHookSettings: InputHookSettings = {
         stackTraceLimit: "incorrect" as unknown as number,
         eventFilter: ["a", "b"],
       };
-      expect(validateAndRepairHookSettings(incompleteInputHookSettings)).toEqual({
+      expect(validateAndRepairHookSettings(incorrectInputHookSettings)).toEqual({
         stackTraceLimit: DEFAULT_HOOK_SETTINGS.stackTraceLimit,
         eventFilter: ["a", "b"],
       });
+    });
+    it("should warn if there are unknown properties in the setting", () => {
+      const unknownInputHookSettings = {
+        stackTraceLumit: 10,
+      };
+      expect(() => {
+        validateAndRepairHookSettings(unknownInputHookSettings as InputHookSettings);
+      }).toLogWarn("Hook settings contain unknown properties");
+    });
+  });
+
+  describe("validateAndRepairDecoderSettings()", () => {
+    it("should return a valid DecoderSettings for valid InputDecoderSettings", () => {
+      expect(validateAndRepairDecoderSettings(DEFAULT_DECODER_SETTINGS)).toEqual(DEFAULT_DECODER_SETTINGS);
+    });
+    it("should set the default value if not set", () => {
+      const incompleteInputDecoderSettings: InputDecoderSettings = {
+        decodeLimit: 30,
+      };
+      expect(validateAndRepairDecoderSettings(incompleteInputDecoderSettings)).toEqual({
+        fastDecode: false,
+        magicDecode: false,
+        maxRecursion: 10,
+        decodeLimit: 30,
+      });
+    });
+    it("should set the default value if value is not according to schema", () => {
+      const incompleteInputDecoderSettings: InputDecoderSettings = {
+        decodeLimit: false as unknown as number,
+      };
+      expect(validateAndRepairDecoderSettings(incompleteInputDecoderSettings)).toEqual(DEFAULT_DECODER_SETTINGS);
+    });
+    it("should warn if there are unknown properties in the setting", () => {
+      const unknownInputDecoderSettings = {
+        someOtherSetting: false,
+      };
+      expect(() => {
+        validateAndRepairDecoderSettings(unknownInputDecoderSettings as InputDecoderSettings);
+      }).toLogWarn("Decoder settings contain unknown properties");
     });
   });
 });
