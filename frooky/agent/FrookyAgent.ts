@@ -1,12 +1,13 @@
 import { NativeHookManager } from "./native/hook/nativeHookManager";
 import { NativeHookValidator } from "./native/hook/nativeHookValidator";
-import { validateConfig } from "./shared/configValidator";
+import { validateAndRepairFrookyConfig } from "./shared/configValidator";
 import { BaseEvent } from "./shared/event/baseEvent";
 import { startAsyncSender } from "./shared/event/eventSender";
 import { HookEvent } from "./shared/event/hookEvent";
 import { LogEvent } from "./shared/event/logEvent";
 import { FrookyConfig } from "./shared/frookyConfig";
 import { Platform } from "./shared/frookyMetadata";
+import { FrookySettings } from "./shared/frookySettings";
 import { HookManager } from "./shared/hook/hookManager";
 import { HookValidator } from "./shared/hook/hookValidator";
 import { Logger, LogTo } from "./shared/logger";
@@ -90,18 +91,26 @@ export class FrookyAgent {
 
     // validate frooky config
     this.log.info("Validating frooky configuration");
-    const settings = validateConfig(inputFrookyConfig, this.platform);
+    let validFrookyConfig: FrookyConfig;
+    try {
+      validFrookyConfig = validateAndRepairFrookyConfig(inputFrookyConfig, this.platform);
+    } catch (e) {
+      frooky.log.warn(`Skipping frooky config: ${e}`);
+      return;
+    }
+
+    const validatedFrookySettings = validFrookyConfig.settings as FrookySettings;
 
     // validate the platform hooks
     this.log.info(`Validating '${this.platform}' hooks`);
-    const validPlatformHooks = this.platformHookValidator.validateAndNormalizeHooks(inputFrookyConfig, settings);
+    const validPlatformHooks = this.platformHookValidator.validateAndNormalizeHooks(inputFrookyConfig, validatedFrookySettings);
 
     this.log.info(`Validating 'native' hooks`);
-    const validNativeHook = this.nativeHookValidator.validateAndNormalizeHooks(inputFrookyConfig, settings);
+    const validNativeHook = this.nativeHookValidator.validateAndNormalizeHooks(inputFrookyConfig, validatedFrookySettings);
 
     // async resolve platform hooks and register them
     const platformPromises = this.platformHookManger
-      .resolveHooks(validPlatformHooks, settings.resolverTimeout)
+      .resolveHooks(validPlatformHooks, validatedFrookySettings.resolverTimeout)
       .then((platformHookPromises) => {
         for (const platformHookPromise of platformHookPromises) {
           platformHookPromise.then((platformHooks) => {
@@ -117,7 +126,7 @@ export class FrookyAgent {
 
     // async resolve native hooks and register them
     const nativePromises = this.nativeHookManager
-      .resolveHooks(validNativeHook, settings.resolverTimeout)
+      .resolveHooks(validNativeHook, validatedFrookySettings.resolverTimeout)
       .then((nativeHookPromises) => {
         for (const nativeHookPromise of nativeHookPromises) {
           nativeHookPromise.then((nativeHooks) => {

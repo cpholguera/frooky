@@ -1,12 +1,8 @@
-import {
-  validateAndRepairDecoderSettings,
-  validateAndRepairFrookySettings,
-  validateAndRepairHookSettings,
-  validateMetadata,
-} from "./configValidator";
+import { validateAndRepairDecoderSettings, validateAndRepairFrookyConfig, validateAndRepairHookSettings, validateMetadata } from "./configValidator";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_FROOKY_SETTINGS, DEFAULT_HOOK_SETTINGS } from "./defaultValues";
+import { FrookyConfig } from "./frookyConfig";
 import { FrookyMetadata } from "./frookyMetadata";
-import { InputDecoderSettings, InputFrookySettings, InputHookSettings } from "./inputParsing/inputSettings";
+import { InputDecoderSettings, InputHookSettings } from "./inputParsing/inputSettings";
 import { LogLevel } from "./logger";
 
 describe("configValidator", () => {
@@ -105,48 +101,98 @@ describe("configValidator", () => {
     });
   });
 
-  describe("validateAndRepairFrookySettings()", () => {
-    it("should return a valid FrookySettings for valid InputDecoderSettings", () => {
-      expect(validateAndRepairFrookySettings(DEFAULT_FROOKY_SETTINGS)).toEqual(DEFAULT_FROOKY_SETTINGS);
+  describe("validateAndRepairFrookyConfig()", () => {
+    const validFrookyConfig: FrookyConfig = {
+      metadata: {
+        name: "Test Config",
+        platform: "Android",
+      },
+      settings: DEFAULT_FROOKY_SETTINGS,
+      hookGroup: [],
+    };
+    it("should return a valid FrookyConfig for valid FrookyConfig", () => {
+      expect(validateAndRepairFrookyConfig(validFrookyConfig, "Android")).toEqual(validFrookyConfig);
     });
 
-    it("should set the default value if not set", () => {
-      const targetFrookySettings = DEFAULT_FROOKY_SETTINGS;
-      targetFrookySettings.verbose = true;
-      targetFrookySettings.hookSettings.stackTraceLimit = 55;
-      targetFrookySettings.decoderSettings.magicDecode = false;
-      const incompleteInputFrookySettings: InputFrookySettings = {
-        verbose: true,
-        hookSettings: {
-          stackTraceLimit: 55,
+    it("should return a valid FrookyConfig with default settings if no settings are passed", () => {
+      const missingSettingsFrookyConfig: FrookyConfig = {
+        metadata: {
+          name: "Test Config",
+          platform: "Android",
         },
-        decoderSettings: {
-          magicDecode: false,
-        },
+        hookGroup: [],
       };
-      expect(validateAndRepairFrookySettings(incompleteInputFrookySettings)).toEqual(targetFrookySettings);
+      expect(validateAndRepairFrookyConfig(missingSettingsFrookyConfig, "Android")).toEqual(validFrookyConfig);
     });
 
-    it("should set the default value if value is not according to schema", () => {
-      const invalidInputFrookySettings: InputFrookySettings = {
-        logLevel: false as unknown as LogLevel,
-        hookSettings: {
-          stackTraceLimit: "10" as unknown as number,
+    it("should set the default setting values if only partially set", () => {
+      const partialSettingsFrookyConfig: FrookyConfig = {
+        metadata: {
+          name: "Test Config",
+          platform: "Android",
         },
-        decoderSettings: {
-          fastDecode: 10 as unknown as boolean,
+        settings: {
+          verbose: true,
+          hookSettings: {
+            stackTraceLimit: 55,
+          },
+          decoderSettings: {
+            magicDecode: false,
+          },
         },
+        hookGroup: [],
       };
-      expect(validateAndRepairFrookySettings(invalidInputFrookySettings)).toEqual(DEFAULT_FROOKY_SETTINGS);
+      const expectedFrookyConfig = partialSettingsFrookyConfig;
+      expectedFrookyConfig.settings = { ...DEFAULT_FROOKY_SETTINGS, ...partialSettingsFrookyConfig.settings };
+      expectedFrookyConfig.settings!.hookSettings = { ...DEFAULT_HOOK_SETTINGS, ...partialSettingsFrookyConfig.settings!.hookSettings };
+      expectedFrookyConfig.settings!.decoderSettings = { ...DEFAULT_DECODER_SETTINGS, ...partialSettingsFrookyConfig.settings!.decoderSettings };
+      expect(validateAndRepairFrookyConfig(partialSettingsFrookyConfig, "Android")).toEqual(expectedFrookyConfig);
+    });
+
+    it("should set the default values if settings are not according to schema", () => {
+      const invalidSettingsFrookyConfig: FrookyConfig = {
+        metadata: {
+          name: "Test Config",
+          platform: "Android",
+        },
+        settings: {
+          logLevel: false as unknown as LogLevel,
+          hookSettings: {
+            stackTraceLimit: "10" as unknown as number,
+          },
+          decoderSettings: {
+            fastDecode: 10 as unknown as boolean,
+          },
+        },
+        hookGroup: [],
+      };
+      expect(validateAndRepairFrookyConfig(invalidSettingsFrookyConfig, "Android")).toEqual(validFrookyConfig);
     });
 
     it("should warn if there are unknown properties in the setting", () => {
-      const unknownInputFrookySettings = {
-        someOtherSetting: false,
+      const invalidSettingsFrookyConfig = {
+        myCustomSettings: {},
+        metadata: {
+          name: "Test Config",
+          platform: "Android",
+        },
+        hookGroup: [],
       };
       expect(() => {
-        validateAndRepairFrookySettings(unknownInputFrookySettings as InputFrookySettings);
-      }).toLogWarn("Frooky settings contain unknown properties");
+        validateAndRepairFrookyConfig(invalidSettingsFrookyConfig as FrookyConfig, "Android");
+      }).toLogWarn("Frooky config contains unknown properties");
+    });
+
+    it("should warn in case of an OS mismatch", () => {
+      expect(() => {
+        validateAndRepairFrookyConfig(validFrookyConfig, "iOS");
+      }).toLogWarn("The platform declared in the frooky configuration does not match the actual platform (iOS). Not all hooks may be valid.");
+    });
+
+    it("should throw an exception if no hookGroup is set", () => {
+      expect(() => {
+        validateAndRepairFrookyConfig({ metadata: { name: "Config w/o hookGroup" } } as FrookyConfig, "iOS");
+      }).toThrow("Frooky config Config w/o hookGroup, as it has no 'hookGroup'.");
     });
   });
 });

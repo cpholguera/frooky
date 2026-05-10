@@ -6,28 +6,60 @@ import { FrookyMetadata } from "./frookyMetadata";
 import { DecoderSettings, FrookySettings, HookSettings } from "./frookySettings";
 import { InputDecoderSettings, InputFrookySettings, InputHookSettings } from "./inputParsing/inputSettings";
 import { frookyMetadataSchema } from "./inputParsing/zodSchemas/frookyMetadata.zod";
-import { frookySettingsSchema } from "./inputParsing/zodSchemas/frookySettings.zod";
-import { inputDecoderSettingsSchema, inputHookSettingsSchema } from "./inputParsing/zodSchemas/inputSettings.zod";
+import { inputDecoderSettingsSchema, inputFrookySettingsSchema, inputHookSettingsSchema } from "./inputParsing/zodSchemas/inputSettings.zod";
 
-// validates the config settings
-export function validateAndRepairFrookySettings(settings: InputFrookySettings): FrookySettings {
-  frooky.log.info(`Validating frooky config settings`);
-  const validatedSettings = DEFAULT_FROOKY_SETTINGS;
+// validates the settings of a frooky config
+export function validateAndRepairFrookyConfig(frookyConfig: FrookyConfig, platform: Platform): FrookyConfig {
+  frooky.log.info(`Validating frooky config`);
 
-  if (settings.hookSettings) {
-    validatedSettings.hookSettings = validateAndRepairHookSettings(settings.hookSettings);
+  if (frookyConfig.metadata) {
+    validateMetadata(frookyConfig.metadata, platform);
   }
 
-  if (settings.decoderSettings) {
-    validatedSettings.decoderSettings = validateAndRepairDecoderSettings(settings.decoderSettings);
+  if (!frookyConfig.hookGroup) {
+    throw Error(`Frooky config ${frookyConfig.metadata?.name ? frookyConfig.metadata?.name : ""}, as it has no 'hookGroup'.`);
   }
 
-  const result = frookySettingsSchema.safeParse(validatedSettings);
+  // warn, if the hook config contains unknown entries
+  const knownKeys: (keyof FrookyConfig)[] = ["metadata", "settings", "hookGroup"];
+  const extraKeys = Object.keys(frookyConfig).filter((k) => !knownKeys.includes(k as keyof FrookyConfig));
+  if (extraKeys.length > 0) {
+    frooky.log.warn(`Frooky config contains unknown properties: ${extraKeys.join(", ")}`);
+  }
 
+  if (!frookyConfig.settings) {
+    frookyConfig.settings = DEFAULT_FROOKY_SETTINGS;
+    return frookyConfig;
+  } else {
+    // validate and repair settings
+    if (frookyConfig.settings) {
+      frookyConfig.settings = validateAndRepairFrookySettings(frookyConfig.settings);
+    }
+    frooky.log.info(`Frooky config is valid`);
+    return frookyConfig;
+  }
+}
+
+export function validateAndRepairFrookySettings(inputSettings: InputFrookySettings): FrookySettings {
+  frooky.log.info(`Validating frooky settings`);
+  const validFrookySettings: FrookySettings = DEFAULT_FROOKY_SETTINGS;
+
+  // validate and repair hook settings
+  if (inputSettings.hookSettings) {
+    validFrookySettings.hookSettings = validateAndRepairHookSettings(inputSettings.hookSettings);
+  }
+
+  // validate and repair decoder settings
+  if (inputSettings.decoderSettings) {
+    validFrookySettings.decoderSettings = validateAndRepairDecoderSettings(inputSettings.decoderSettings);
+  }
+
+  // validate and repair flat fields (verbose, logLevel, logTo, resolverTimeout, ...)
+  const result = inputFrookySettingsSchema.safeParse(inputSettings);
   if (!result.success) {
     for (const issue of result.error.issues) {
-      const key = issue.path[0] as keyof FrookySettings;
-      (settings as Record<keyof FrookySettings, unknown>)[key] = DEFAULT_FROOKY_SETTINGS[key];
+      const key = issue.path[0] as keyof Omit<FrookySettings, "hookSettings" | "decoderSettings">;
+      (inputSettings as Record<string, unknown>)[key] = DEFAULT_FROOKY_SETTINGS[key];
       frooky.log.warn([
         `Frooky setting "'${key}'" contains invalid data:`,
         z.prettifyError(result.error),
@@ -37,13 +69,13 @@ export function validateAndRepairFrookySettings(settings: InputFrookySettings): 
   }
 
   const knownKeys = Object.keys(DEFAULT_FROOKY_SETTINGS);
-  const extraKeys = Object.keys(settings).filter((k) => !knownKeys.includes(k));
+  const extraKeys = Object.keys(inputSettings).filter((k) => !knownKeys.includes(k));
   if (extraKeys.length > 0) {
     frooky.log.warn(`Frooky settings contain unknown properties: ${extraKeys.join(", ")}`);
   }
 
-  frooky.log.info(`Frooky config is valid`);
-  return { ...DEFAULT_FROOKY_SETTINGS, ...validatedSettings };
+  frooky.log.info(`Frooky settings are valid`);
+  return { ...DEFAULT_FROOKY_SETTINGS, ...validFrookySettings };
 }
 
 // validates hook settings and replaces invalid settings with valid default values
@@ -115,19 +147,4 @@ export function validateMetadata(metadata: FrookyMetadata, platform: Platform) {
     frooky.log.warn(`The metadata contains invalid entries: ${pretty}`);
   }
   frooky.log.info(`frooky meta data are valid`);
-}
-
-export function validateConfig(inputFrookyConfig: FrookyConfig, platform: Platform): FrookySettings {
-  if (inputFrookyConfig.metadata) {
-    frooky.log.info(`Metadata are valid.`);
-    validateMetadata(inputFrookyConfig.metadata, platform);
-    frooky.log.debug(`Metadata: ${JSON.stringify(inputFrookyConfig.metadata, null, 2)}`);
-  } else {
-    frooky.log.warn(`No metadata declared.`);
-  }
-  let settings: FrookySettings = DEFAULT_FROOKY_SETTINGS;
-  if (inputFrookyConfig.settings) {
-    settings = validateAndRepairFrookySettings(inputFrookyConfig.settings);
-  }
-  return settings;
 }

@@ -17,7 +17,7 @@ export const DEFAULT_HOOK_SETTINGS: HookSettings = {
 
 export const DEFAULT_FROOKY_SETTINGS: FrookySettings = {
   verbose: false,
-  logLevel: "error",
+  logLevel: "warn",
   logTo: "frooky",
   resolverTimeout: 5,
   hookSettings: DEFAULT_HOOK_SETTINGS,
