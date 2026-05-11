@@ -6,10 +6,10 @@ metadata:
 
 # global settings for the hooks in this hook file.
 settings:
-  verbose: true,
+  verbose: true
   logLevel: "debug"
-  logTo: "frida"
-  resolverTimeout: 5,
+  logTo: "device"
+  resolverTimeout: 5
   hookSettings:
     stackTraceLimit: 11               # Sets stackTraceLimit to 10 for all hooks
     eventFilter: ['^(?!android).*']   # Stack trace filters to apply.

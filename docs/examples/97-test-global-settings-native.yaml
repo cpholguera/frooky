@@ -72,12 +72,12 @@ metadata:
 
 # global settings for the hooks in this hook file.
 settings:
-  verbose: true,
+  verbose: true
   logLevel: "debug"
-  logTo: "frida"
-  resolverTimeout: 5,
+  logTo: "device"
+  resolverTimeout: 5
   hookSettings:
-    stackTraceLimit: 11               # Sets stackTraceLimit to 10 for all hooks
+    stackTraceLimit: 0                # Sets stackTraceLimit to 10 for all hooks
     eventFilter: ['^(?!android).*']   # Stack trace filters to apply.
   decoderSettings:
     fastDecode: true                  # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
@@ -99,12 +99,29 @@ hookGroup:
   # PARTIAL local hook settings take priority over global setting, simple function declaration
   - module: libreceiveFundamentalValue.so
     hookSettings:
-      stackTraceLimit: 2
+      stackTraceLimit: 0
     decoderSettings:
       decodeLimit: 22
     hooks:
-      - receive_int
-      - receive_char
+      - symbol: receive_int
+        params: [int]
+      - symbol: receive_char
+        params: [char]
+
+
+# decode argument: null terminated string 
+  - module: libreceiveString.so
+    hookSettings:
+      stackTraceLimit: 0
+    decoderSettings:
+      magicDecode: false
+    hooks:
+      - symbol: receive_cstring
+        params: 
+          - [char *, string]
+      - symbol: receive_utf8
+        params: 
+          - [char *, string]
 
   # PARTIAL local hook settings take priority over global setting, simple function declaration
   - module: libreceiveFundamentalValue.so
@@ -127,18 +144,14 @@ hookGroup:
 
   # PARTIAL local parameter settings take priority over global setting, form [type, settings]
   - module: libreceiveFundamentalValue.so
-    hookSettings:
-      stackTraceLimit: 0
     hooks:
       - symbol: receive_llong
-        params:
-          - [llong, { decodeLimit: 55 }]
+        params: [ llong, llong ]
 
   # PARTIAL local parameter settings take priority over global setting, form [type, name, settings]
   - module: libreceiveFundamentalValue.so
-    hookSettings:
-      stackTraceLimit: 4
     hooks:
-      - symbol: receive_ulong
+      - symbol: receive_ullong
         params:
-          - [llong, astronomicUnit, { decodeLimit: 66 }]
+          - [ullong, minValue]
+          - [ullong, maxValue]

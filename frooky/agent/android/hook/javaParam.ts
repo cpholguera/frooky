@@ -1,4 +1,4 @@
-import { Param } from "../../shared/decoders/decodableTypes";
+import { Param } from "../../shared/decoders/decodable";
 
 /**
  * Canonical definition of a parameter to be decoded during function hooking.

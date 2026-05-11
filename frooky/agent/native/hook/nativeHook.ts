@@ -1,6 +1,5 @@
-import { Param } from "../../shared/decoders/decodableTypes";
+import { Param, RetType } from "../../shared/decoders/decodable";
 import { Hook } from "../../shared/hook/hook";
-import { NativeDecodableType } from "../decoders/nativeDecodableTypes";
 
 /**
  * Contains all information to hook a native function.
@@ -13,7 +12,7 @@ export interface NativeHook extends Hook {
   symbolName: string;
   symbolAddress: NativePointer;
   params?: Param[];
-  retType?: NativeDecodableType;
+  retType?: RetType;
 }
 
 export function isNativeHook(hook: Hook): hook is NativeHook {

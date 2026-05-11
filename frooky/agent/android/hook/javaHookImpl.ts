@@ -1,5 +1,5 @@
 import Java from "frida-java-bridge";
-import { Param } from "../../shared/decoders/decodableTypes";
+import { Param } from "../../shared/decoders/decodable";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { DecoderSettings } from "../../shared/frookySettings";
 import { JavaDecoder } from "../decoders/javaDecoder";

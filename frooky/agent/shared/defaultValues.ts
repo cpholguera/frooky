@@ -1,4 +1,4 @@
-import { DecodeAt } from "./decoders/decodableTypes";
+import { DecodeAt } from "./decoders/decodable";
 import { DecoderSettings, FrookySettings, HookSettings } from "./frookySettings";
 
 export const DEFAULT_DECODE_AT: DecodeAt = "enter";

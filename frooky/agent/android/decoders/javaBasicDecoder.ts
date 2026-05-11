@@ -1,9 +1,9 @@
 import type Java from "frida-java-bridge";
-import { BaseDecoder } from "../../shared/decoders/baseDecoder";
+import { Decoder } from "../../shared/decoders/baseDecoder";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { JavaParam } from "../hook/javaParam";
 
-export const JavaLongDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
+export const JavaLongDecoder: Decoder<Java.Wrapper, JavaParam> = {
   decode: (value, param): DecodedValue => ({
     type: param.type,
     name: param.name,
@@ -11,7 +11,7 @@ export const JavaLongDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
   }),
 };
 
-export const JavaPrimitiveDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
+export const JavaPrimitiveDecoder: Decoder<Java.Wrapper, JavaParam> = {
   decode: (value, param): DecodedValue => ({
     type: param.type,
     name: param.name,
@@ -19,7 +19,7 @@ export const JavaPrimitiveDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
   }),
 };
 
-export const JavaFallbackDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
+export const JavaFallbackDecoder: Decoder<Java.Wrapper, JavaParam> = {
   decode: (value, param): DecodedValue => {
     return {
       type: param.implementationType ?? param.type,

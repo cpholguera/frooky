@@ -1,13 +1,11 @@
-import { BaseDecoder } from "../../shared/decoders/baseDecoder";
+import { Decoder } from "../../shared/decoders/baseDecoder";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
-import { NativeDecodableType } from "./nativeDecodableTypes";
 
-export const NativeFallbackDecoder: BaseDecoder<NativePointer, NativeDecodableType> = {
-  decode: (value: NativePointer, type: NativeDecodableType): DecodedValue => {
+export class NativeFallbackDecoder extends Decoder<NativePointer> {
+  public decode(value: NativePointer): DecodedValue {
     return {
-      type: type.type,
-      name: type.name,
+      type: this.decodable.type,
       value: value.toString(),
     };
-  },
-};
+  }
+}

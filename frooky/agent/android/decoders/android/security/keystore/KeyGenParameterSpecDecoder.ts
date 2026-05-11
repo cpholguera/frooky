@@ -1,5 +1,5 @@
 import Java from "frida-java-bridge";
-import { BaseDecoder } from "../../../../../shared/decoders/baseDecoder";
+import { Decoder } from "../../../../../shared/decoders/baseDecoder";
 import { JavaParam } from "../../../../hook/javaParam";
 import { JavaDecoder } from "../../../javaDecoder";
 
@@ -51,7 +51,7 @@ function stripPrefix(name: string): string {
   return name;
 }
 
-export const KeyGenParameterSpecDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
+export const KeyGenParameterSpecDecoder: Decoder<Java.Wrapper, JavaParam> = {
   decode: (spec, param) => {
     if (!KeyGenParameterSpec) {
       KeyGenParameterSpec = Java.use("android.security.keystore.KeyGenParameterSpec");

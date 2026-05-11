@@ -1,4 +1,5 @@
 import { DecodedValue } from "../decoders/decodedValue";
+import { DecodedArgs } from "../hook/hookManager";
 import { BaseEvent } from "./baseEvent";
 
 /**
@@ -19,10 +20,25 @@ export abstract class HookEvent extends BaseEvent {
   /**
    * Decoded input argument values passed to the hooked function / method.
    */
-  args?: DecodedValue[];
+  argsOnEnter?: DecodedValue[];
+
+  /**
+   * Decoded input argument values passed to the hooked function / method.
+   */
+  argsOnExit?: DecodedValue[];
 
   /**
    * Decoded return value from the hooked function / method.
    */
   returnValue?: DecodedValue;
+
+  constructor(decodedArgs?: DecodedArgs, returnValue?: DecodedValue, stackTrace?: string[]) {
+    super();
+    if (decodedArgs) {
+      this.argsOnEnter = decodedArgs.enter;
+      this.argsOnExit = decodedArgs.exit;
+    }
+    this.returnValue = returnValue;
+    this.stackTrace = stackTrace;
+  }
 }

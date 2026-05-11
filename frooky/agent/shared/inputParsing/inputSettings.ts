@@ -1,4 +1,4 @@
-import { DecodeAt } from "../decoders/decodableTypes";
+import { DecodeAt } from "../decoders/decodable";
 import { DecoderSettings, FrookySettings, HookSettings } from "../frookySettings";
 
 export type InputFrookySettings = Omit<Partial<FrookySettings>, "hookSettings" | "decoderSettings"> & {

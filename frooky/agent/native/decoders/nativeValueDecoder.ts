@@ -1,11 +1,11 @@
-import { BaseDecoder } from "../../shared/decoders/baseDecoder";
+import { Decoder } from "../../shared/decoders/baseDecoder";
+import { Decodable } from "../../shared/decoders/decodable";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
-import { DecoderSettings } from "../../shared/frookySettings";
-import { NativeDecodableType } from "./nativeDecodableTypes";
-import { FundamentalType } from "./nativeDecoder";
-import { NativeFallbackDecoder } from "./nativeFallbackDecoder";
+import { FridaFundamentalType } from "./nativeFridaType";
 
-const valueDecoders: Record<FundamentalType, (input: NativePointer) => null | number | boolean> = {
+type FundamentalValueDecoder = (input: NativePointer) => null | number | boolean;
+
+const valueDecoders: Record<FridaFundamentalType, FundamentalValueDecoder> = {
   void: () => null,
   bool: (input) => input.toInt32() !== 0,
   char: (input) => {
@@ -37,17 +37,22 @@ const valueDecoders: Record<FundamentalType, (input: NativePointer) => null | nu
   double: (input) => input.toInt32(),
 };
 
-export const NativeValueDecoder: BaseDecoder<NativePointer, NativeDecodableType> = {
-  decode: (value: NativePointer, type: NativeDecodableType, settings: DecoderSettings, args?: any[]): DecodedValue => {
-    const valueDecoder = valueDecoders[type.type as FundamentalType];
-    if (valueDecoder) {
-      return {
-        type: type.type,
-        name: type.name,
-        value: valueDecoder(value),
-      };
-    } else {
-      return NativeFallbackDecoder.decode(value, type, settings);
+export class NativeValueDecoder extends Decoder<NativePointer> {
+  fridaReferenceType: FridaFundamentalType;
+  cachedValueDecoder: FundamentalValueDecoder | null = null;
+
+  constructor(decodable: Decodable, fridaReferenceType: FridaFundamentalType) {
+    super(decodable);
+    this.fridaReferenceType = fridaReferenceType;
+  }
+
+  public decode(value: NativePointer): DecodedValue {
+    if (this.cachedValueDecoder === null) {
+      this.cachedValueDecoder = valueDecoders[this.fridaReferenceType as FridaFundamentalType];
     }
-  },
-};
+    return {
+      type: this.decodable.type,
+      value: this.cachedValueDecoder(value),
+    };
+  }
+}

@@ -1,5 +1,5 @@
 import type Java from "frida-java-bridge";
-import { BaseDecoder } from "../../shared/decoders/baseDecoder";
+import { Decoder } from "../../shared/decoders/baseDecoder";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { JavaParam } from "../hook/javaParam";
 import { JavaDecoder } from "./javaDecoder";
@@ -44,7 +44,7 @@ function elementTypeFromSignature(element: string): string {
   return element;
 }
 
-export const JavaArrayDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
+export const JavaArrayDecoder: Decoder<Java.Wrapper, JavaParam> = {
   decode: (value, param, settings): DecodedValue => {
     const signature = param.implementationType ?? param.type;
     const elementSignature = signature.startsWith("[") ? signature.substring(1) : signature;

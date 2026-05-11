@@ -1,4 +1,7 @@
+import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { HookEvent } from "../../shared/event/hookEvent";
+import { DecodedArgs } from "../../shared/hook/hookManager";
+import { NativeHook } from "../hook/nativeHook";
 
 /**
  * Represents a native hook event created by frooky.
@@ -16,10 +19,10 @@ export class NativeHookEvent extends HookEvent {
   /** Address of the hooked function. */
   address?: NativePointer;
 
-  constructor(module: string, symbol: string) {
-    super();
+  constructor(hook: NativeHook, decodedArgs?: DecodedArgs, returnValue?: DecodedValue, stackTrace?: string[]) {
+    super(decodedArgs, returnValue, stackTrace);
     this.type += "-native";
-    this.module = module;
-    this.symbol = symbol;
+    this.module = hook.module.name;
+    this.symbol = hook.symbolName;
   }
 }

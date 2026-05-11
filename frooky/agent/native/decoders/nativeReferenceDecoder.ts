@@ -1,11 +1,11 @@
-import { BaseDecoder } from "../../shared/decoders/baseDecoder";
+import { Decoder } from "../../shared/decoders/baseDecoder";
+import { Decodable } from "../../shared/decoders/decodable";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
-import { DecoderSettings } from "../../shared/frookySettings";
-import { NativeDecodableType } from "./nativeDecodableTypes";
-import { FundamentalType } from "./nativeDecoder";
-import { NativeFallbackDecoder } from "./nativeFallbackDecoder";
+import { FridaFundamentalType, FridaReferenceType } from "./nativeFridaType";
 
-const referenceValueDecoders: Record<FundamentalType, (input: NativePointer) => null | number | boolean | string> = {
+type ReferenceDecoder = (input: NativePointer) => null | number | boolean | string;
+
+const referenceDecoders: Record<FridaFundamentalType, ReferenceDecoder> = {
   void: () => null,
   bool: (input) => input.readU8() !== 0,
   char: (input) => {
@@ -42,18 +42,22 @@ const referenceValueDecoders: Record<FundamentalType, (input: NativePointer) => 
   double: (input) => input.readDouble(),
 };
 
-export const NativeReferenceDecoder: BaseDecoder<NativePointer, NativeDecodableType> = {
-  decode: (value: NativePointer, type: NativeDecodableType, settings: DecoderSettings, args?: any[]): DecodedValue => {
-    const pointeeType = type.nativeType?.pointee as FundamentalType;
-    const referenceValueDecoder = referenceValueDecoders[pointeeType];
-    if (referenceValueDecoder) {
-      return {
-        type: type.type,
-        name: type.name,
-        value: referenceValueDecoder(value),
-      };
-    } else {
-      return NativeFallbackDecoder.decode(value, type, settings, args);
+export class NativeReferenceDecoder extends Decoder<NativePointer> {
+  fridaReferenceType: FridaReferenceType;
+  cachedDecoder: ReferenceDecoder | null = null;
+
+  constructor(decodable: Decodable, fridaReferenceType: FridaReferenceType) {
+    super(decodable);
+    this.fridaReferenceType = fridaReferenceType;
+  }
+
+  public decode(value: NativePointer): DecodedValue {
+    if (this.cachedDecoder === null) {
+      this.cachedDecoder = referenceDecoders[this.fridaReferenceType.pointee];
     }
-  },
-};
+    return {
+      type: this.decodable.type,
+      value: this.cachedDecoder(value),
+    };
+  }
+}

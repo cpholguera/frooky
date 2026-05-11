@@ -1,5 +1,17 @@
+import { Decoder } from "../decoders/baseDecoder";
+import { DecodedValue } from "../decoders/decodedValue";
 import { HOOK_LOOKUP_INTERVAL_MS } from "../defaultValues";
 import { Hook } from "./hook";
+
+export type ParamDecoders<TValue> = {
+  enter: Decoder<TValue>[];
+  exit: Decoder<TValue>[];
+};
+
+export type DecodedArgs = {
+  enter?: DecodedValue[];
+  exit?: DecodedValue[];
+};
 
 export abstract class HookManager<TInputHook, THooks extends Hook> {
   public abstract resolveHooks(inputHooks: TInputHook[], timeout: number): Promise<Promise<THooks[] | null>[]>;

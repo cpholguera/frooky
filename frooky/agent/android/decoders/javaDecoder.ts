@@ -1,5 +1,5 @@
 import type Java from "frida-java-bridge";
-import { BaseDecoder } from "../../shared/decoders/baseDecoder";
+import { Decoder } from "../../shared/decoders/baseDecoder";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { JavaParam } from "../hook/javaParam";
 import { IntentFlagDecoder } from "./android/content/IntentFlagDecoder";
@@ -12,7 +12,7 @@ import { JavaFallbackDecoder, JavaLongDecoder, JavaPrimitiveDecoder } from "./ja
 /*
  * This is the registry for non-primitive java decoders.
  */
-const javaDecoderRegistry: Record<string, BaseDecoder<Java.Wrapper, JavaParam>> = {
+const javaDecoderRegistry: Record<string, Decoder<Java.Wrapper, JavaParam>> = {
   // special java decoders
   JavaArrayDecoder: JavaArrayDecoder,
   JavaLongDecoder: JavaLongDecoder,
@@ -32,7 +32,7 @@ const javaDecoderRegistry: Record<string, BaseDecoder<Java.Wrapper, JavaParam>> 
  * Called only on the first invocation for a given Param; the result is cached
  * on `param.decoder` so subsequent calls skip this dispatch entirely.
  */
-export const JavaDecoder: BaseDecoder<Java.Wrapper, JavaParam> = {
+export const JavaDecoder: Decoder<Java.Wrapper, JavaParam> = {
   decode: (input, param, settings): DecodedValue => {
     const cachedDecoder = param.decoder;
     if (cachedDecoder) {

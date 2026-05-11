@@ -1,9 +1,11 @@
+import { Decoder } from "../../shared/decoders/baseDecoder";
+import { Param, RetType } from "../../shared/decoders/decodable";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
-import { HookManager } from "../../shared/hook/hookManager";
+import { DecodedArgs, HookManager, ParamDecoders } from "../../shared/hook/hookManager";
 import { InputNativeHookNormalized } from "../../shared/inputParsing/inputNativeHookGroup";
-import { NativeDecoder } from "../decoders/nativeDecoder";
+import { NativeDecoderResolver } from "../decoders/nativeDecoderResolver";
+import { NativeHookEvent } from "../event/nativeHookEvent";
 import { NativeHook } from "./nativeHook";
-import { buildAndDispatchEvent, buildNativeStackTrace, decodeNativeArgs } from "./nativeHookImpl";
 
 export class NativeHookManager extends HookManager<InputNativeHookNormalized, NativeHook> {
   public async resolveHooks(inputHooks: InputNativeHookNormalized[], timeout: number): Promise<Promise<NativeHook[] | null>[]> {
@@ -47,27 +49,47 @@ export class NativeHookManager extends HookManager<InputNativeHookNormalized, Na
   public registerHooks(hooks: NativeHook[]): NativeHook[] {
     for (const hook of hooks) {
       let stackTrace: string[];
-      let decodedArgs: DecodedValue[];
-      let decodedReturnValue: DecodedValue;
+
+      // resolve the decoders used for this hook and cache it locally
+      let cachedParamDecoders: ParamDecoders<NativePointer>;
+      if (hook.params) {
+        cachedParamDecoders = this.resolveParamDecoders(hook.params);
+      }
+      let cachedRetTypeDecoder: Decoder<NativePointer>;
+      if (hook.retType) {
+        cachedRetTypeDecoder = this.resolveRetTypeDecoder(hook.retType);
+      }
+      let decodedArgs: DecodedArgs = {
+        enter: [],
+        exit: [],
+      };
+      var currentArgs: NativePointer[];
+      const hookManager = this;
+
       Interceptor.attach(hook.symbolAddress, {
         onEnter: function (args: NativePointer[]) {
-          // collect the stack trace from Frida
+          // safe the current arguments in case they need not be decoded again in the onLeave function
+          currentArgs = args;
+
+          // build stack trace
           const stackTraceLimit: number = hook.hookSettings.stackTraceLimit;
-          stackTrace = buildNativeStackTrace(this.context, stackTraceLimit);
-          // decode the arguments passed to this function
+          stackTrace = hookManager.buildNativeStackTrace(this.context, stackTraceLimit);
+
           if (hook.params) {
-            decodedArgs = decodeNativeArgs(args, hook.params);
+            decodedArgs.enter = hookManager.decodeNativeArgs(args, cachedParamDecoders.enter);
           }
         },
         onLeave: (returnValue: InvocationReturnValue) => {
-          // decode the return value
-          if (hook.retType) {
-            decodedReturnValue = NativeDecoder.decode(returnValue, hook.retType, hook.decoderSettings);
-          } else {
-            decodedReturnValue = { type: "void", value: null };
+          let decodedRetValue: DecodedValue | undefined;
+          if (hook.params) {
+            decodedArgs.exit = hookManager.decodeNativeArgs(currentArgs, cachedParamDecoders.exit);
           }
-          // create a frooky hook event and send it to the event cache
-          buildAndDispatchEvent(hook, decodedArgs, decodedReturnValue, stackTrace);
+
+          if (hook.retType) {
+            decodedRetValue = cachedRetTypeDecoder.decode(returnValue);
+          }
+
+          frooky.addEvent(new NativeHookEvent(hook, decodedArgs, decodedRetValue, stackTrace));
         },
       });
     }
@@ -100,5 +122,51 @@ export class NativeHookManager extends HookManager<InputNativeHookNormalized, Na
       moduleName,
       timeout,
     );
+  }
+
+  private buildNativeStackTrace(ctx: CpuContext, limit: number): string[] {
+    const stackTrace: string[] = [];
+    try {
+      const btFull = Thread.backtrace(ctx, Backtracer.FUZZY);
+      const count = Math.min(limit, btFull.length);
+      for (let i = 0; i < count; i++) {
+        try {
+          stackTrace.push(DebugSymbol.fromAddress(btFull[i]).toString());
+        } catch (e) {
+          frooky.log.error(`Error during stack trace capture: ${e}`);
+        }
+      }
+    } catch (e) {
+      frooky.log.warn(`Native backtrace unavailable: ${e}`);
+    }
+    return stackTrace;
+  }
+
+  private resolveParamDecoders(params: Param[]): ParamDecoders<NativePointer> {
+    const paramDecoders: ParamDecoders<NativePointer> = {
+      enter: [],
+      exit: [],
+    };
+    for (const param of params) {
+      const { decodeAt, ...decodable } = param;
+      if (param.decodeAt === "both" || param.decodeAt === "enter") {
+        paramDecoders.enter.push(NativeDecoderResolver.resolveDecoder(decodable));
+      } else if (param.decodeAt === "exit") {
+        paramDecoders.exit.push(NativeDecoderResolver.resolveDecoder(decodable));
+      }
+    }
+    return paramDecoders;
+  }
+
+  private resolveRetTypeDecoder(retType: RetType): Decoder<NativePointer> {
+    return NativeDecoderResolver.resolveDecoder(retType);
+  }
+
+  private decodeNativeArgs(args: NativePointer[], decoderCache: Decoder<NativePointer>[]): DecodedValue[] {
+    const decodedArgs: DecodedValue[] = [];
+    decoderCache.forEach((decoder: Decoder<NativePointer>, i: number) => {
+      decodedArgs.push(decoder.decode(args[i]));
+    });
+    return decodedArgs;
   }
 }

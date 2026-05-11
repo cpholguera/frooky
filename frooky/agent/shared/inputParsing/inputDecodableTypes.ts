@@ -1,5 +1,5 @@
 import { validateAndRepairDecoderSettings } from "../configValidator";
-import { DecodableType, Param } from "../decoders/decodableTypes";
+import { Param, Decodable as RetType } from "../decoders/decodable";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_DECODE_AT } from "../defaultValues";
 import { DecoderSettings } from "../frookySettings";
 import { InputParamSettings } from "./inputSettings";
@@ -65,9 +65,9 @@ export function normalizeInputParam(input: InputParam, decoderSettings?: Decoder
  *
  * @public
  */
-export type InputRetType = string | [string, Partial<DecoderSettings>] | DecodableType;
+export type InputRetType = string | [string, Partial<DecoderSettings>] | RetType;
 
-export function normalizeInputRetType(input: InputRetType, decoderSettings?: DecoderSettings): DecodableType {
+export function normalizeInputRetType(input: InputRetType, decoderSettings?: DecoderSettings): RetType {
   const mergedSettings = decoderSettings ? { ...DEFAULT_DECODER_SETTINGS, ...decoderSettings } : DEFAULT_DECODER_SETTINGS;
 
   // validate and repair merged settings
