@@ -38,30 +38,16 @@ const getters = [
   "isUserPresenceRequired",
 ];
 
-// Cache class wrapper at module scope (avoid re-resolving per call)
-let KeyGenParameterSpec: Java.Wrapper | null = null;
-
-function stripPrefix(name: string): string {
-  if (name.startsWith("get") && name.length > 3) {
-    return name[3].toLowerCase() + name.slice(4);
-  }
-  if (name.startsWith("is") && name.length > 2) {
-    return name[2].toLowerCase() + name.slice(3);
-  }
-  return name;
-}
-
 export class KeyGenParameterSpecDecoder extends Decoder<Java.Wrapper> {
+  keyGenParameterSpec: Java.Wrapper = Java.use("android.security.keystore.KeyGenParameterSpec");
+
   decode(value: Java.Wrapper) {
-    if (!KeyGenParameterSpec) {
-      KeyGenParameterSpec = Java.use("android.security.keystore.KeyGenParameterSpec");
-    }
-    const typedSpec: Java.Wrapper = Java.cast(value, KeyGenParameterSpec);
+    const typedSpec: Java.Wrapper = Java.cast(value, this.keyGenParameterSpec);
 
     const decodedProperties: Record<string, unknown> = {};
 
-    for (const name of getters) {
-      const fn: Java.MethodDispatcher = typedSpec[name];
+    for (const getter of getters) {
+      const fn: Java.MethodDispatcher = typedSpec[getter];
       if (typeof fn?.call !== "function") {
         // Not present on this API level, skip silently
         continue;
@@ -73,9 +59,9 @@ export class KeyGenParameterSpecDecoder extends Decoder<Java.Wrapper> {
           settings: this.settings,
         };
         const propertyDecoder = JavaDecoderResolver.resolveDecoder(type);
-        decodedProperties[stripPrefix(name)] = propertyDecoder.decode(raw);
+        decodedProperties[this.stripPrefix(getter)] = propertyDecoder.decode(raw);
       } catch (e) {
-        decodedProperties[stripPrefix(name)] = `Error when decoding : ${e}>`;
+        decodedProperties[this.stripPrefix(getter)] = `Error when decoding : ${e}>`;
       }
     }
 
@@ -83,5 +69,15 @@ export class KeyGenParameterSpecDecoder extends Decoder<Java.Wrapper> {
       type: this.type,
       value: decodedProperties,
     };
+  }
+
+  stripPrefix(name: string): string {
+    if (name.startsWith("get") && name.length > 3) {
+      return name[3].toLowerCase() + name.slice(4);
+    }
+    if (name.startsWith("is") && name.length > 2) {
+      return name[2].toLowerCase() + name.slice(3);
+    }
+    return name;
   }
 }
