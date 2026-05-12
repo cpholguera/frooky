@@ -8,6 +8,7 @@ import { runTests } from "../testFramework";
 import "../testFramework.test.ts";
 
 // Import the dynamically generated index.test.ts
+import "../../android/index.test";
 import "../../shared/index.test";
 import "./index.test";
 

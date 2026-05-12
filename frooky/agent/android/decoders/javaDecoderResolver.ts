@@ -3,7 +3,7 @@ import { Decoder } from "../../shared/decoders/baseDecoder";
 import { Decodable } from "../../shared/decoders/decodable";
 import { DecoderResolver } from "../../shared/decoders/decoderResolver";
 import { JavaArrayDecoder } from "./javaArrayDecoder";
-import { JavaLongDecoder, JavaPrimitiveDecoder } from "./javaBasicDecoder";
+import { JavaPrimitiveDecoder } from "./javaBasicDecoder";
 import { JavaClassDecoder } from "./javaClassDecoder";
 
 export const JAVA_PRIMITIVE_TYPES = new Set(["int", "long", "short", "byte", "char", "boolean", "float", "double"]);
@@ -19,9 +19,6 @@ export const JavaDecoderResolver: DecoderResolver<Java.Wrapper> = {
     } else if (decodable.type.startsWith("[")) {
       // java array decoder
       return new JavaArrayDecoder(decodable.type, decodable.settings);
-    } else if (decodable.type === "long") {
-      // long decoder using .toString() due to the numbers length larger than the JS number type
-      return new JavaLongDecoder(decodable.type, decodable.settings);
     } else if (JAVA_PRIMITIVE_TYPES.has(decodable.type) || decodable.type === "void") {
       // other Java primitive types and void
       return new JavaPrimitiveDecoder(decodable.type, decodable.settings);

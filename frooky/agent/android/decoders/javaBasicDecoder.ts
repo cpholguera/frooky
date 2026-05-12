@@ -2,20 +2,11 @@ import type Java from "frida-java-bridge";
 import { Decoder } from "../../shared/decoders/baseDecoder";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
 
-export class JavaLongDecoder extends Decoder<Java.Wrapper> {
-  decode(value: Java.Wrapper): DecodedValue {
-    return {
-      type: this.type,
-      value: value.toString(),
-    };
-  }
-}
-
 export class JavaPrimitiveDecoder extends Decoder<Java.Wrapper> {
   decode(value: Java.Wrapper): DecodedValue {
     return {
       type: this.type,
-      value: value,
+      value: this.type === "long" ? value.toString() : value,
     };
   }
 }
