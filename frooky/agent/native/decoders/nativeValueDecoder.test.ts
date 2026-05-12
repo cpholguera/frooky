@@ -107,14 +107,14 @@ describe("NativeValueDecoder", () => {
       const decoder = new NativeValueDecoder("int64", DEFAULT_DECODER_SETTINGS);
       const result = decoder.decode(ptr(12345));
       expect(result.type).toBe("int64");
-      expect(result.value).toBe(int64(ptr(12345).toString()).valueOf());
+      expect(result.value).toBe(12345);
     });
 
     it("should decode uint64", () => {
       const decoder = new NativeValueDecoder("uint64", DEFAULT_DECODER_SETTINGS);
       const result = decoder.decode(ptr(12345));
       expect(result.type).toBe("uint64");
-      expect(result.value).toBe(uint64(ptr(12345).toString()).valueOf());
+      expect(result.value).toBe(12345);
     });
 
     it("should decode float (raw int32 of pointer address)", () => {
