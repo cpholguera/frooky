@@ -1,10 +1,7 @@
 import type Java from "frida-java-bridge";
 import { Decoder } from "../../shared/decoders/baseDecoder";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
-import { JavaDecodable } from "./javaDecodable";
-import { JavaDecoderResolver } from "./javaDecoderResolver";
-
-const PRIMITIVE_TYPES = new Set(["int", "long", "short", "byte", "char", "boolean", "float", "double"]);
+import { JAVA_PRIMITIVE_TYPES, JavaDecoderResolver } from "./javaDecoderResolver";
 
 /**
  * Convert a JNI array element signature into a JavaParam-compatible `type` string.
@@ -44,14 +41,14 @@ function elementTypeFromSignature(element: string): string {
   return element;
 }
 
-export class JavaArrayDecoder extends Decoder<JavaDecodable, Java.Wrapper> {
+export class JavaArrayDecoder extends Decoder<Java.Wrapper> {
   decode(value: Java.Wrapper): DecodedValue {
     const signature = this.kind.implementationType ?? this.kind.type;
     const elementSignature = signature.startsWith("[") ? signature.substring(1) : signature;
     const elementType = elementTypeFromSignature(elementSignature);
     let arrayValue: unknown[];
 
-    if (PRIMITIVE_TYPES.has(elementType)) {
+    if (JAVA_PRIMITIVE_TYPES.has(elementType)) {
       // Frida unwraps primitive arrays to a JS-iterable directly
       arrayValue = Array.from(value as unknown as ArrayLike<unknown>);
     } else {

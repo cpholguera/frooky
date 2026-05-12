@@ -1,6 +1,6 @@
 import Java from "frida-java-bridge";
 import { Decoder } from "../../../../../shared/decoders/baseDecoder";
-import { JavaDecodable } from "../../../javaDecodable";
+import { Decodable } from "../../../../../shared/decoders/decodable";
 import { JavaDecoderResolver } from "../../../javaDecoderResolver";
 
 const getters = [
@@ -51,7 +51,7 @@ function stripPrefix(name: string): string {
   return name;
 }
 
-export class KeyGenParameterSpecDecoder extends Decoder<JavaDecodable, Java.Wrapper> {
+export class KeyGenParameterSpecDecoder extends Decoder<Java.Wrapper> {
   decode(value: Java.Wrapper) {
     if (!KeyGenParameterSpec) {
       KeyGenParameterSpec = Java.use("android.security.keystore.KeyGenParameterSpec");
@@ -68,10 +68,9 @@ export class KeyGenParameterSpecDecoder extends Decoder<JavaDecodable, Java.Wrap
       }
       try {
         const raw = fn.call(typedSpec);
-        const type: JavaDecodable = {
+        const type: Decodable = {
           type: fn.returnType.className ?? "void",
-          implementationType: fn.returnType.className ?? "void",
-          decoderSettings: this.kind.decoderSettings,
+          decoderSettings: this.settings,
         };
         const propertyDecoder = JavaDecoderResolver.resolveDecoder(type);
         decodedProperties[stripPrefix(name)] = propertyDecoder.decode(raw);
@@ -81,7 +80,7 @@ export class KeyGenParameterSpecDecoder extends Decoder<JavaDecodable, Java.Wrap
     }
 
     return {
-      type: this.kind.implementationType ?? this.kind.type,
+      type: this.type,
       value: decodedProperties,
     };
   }

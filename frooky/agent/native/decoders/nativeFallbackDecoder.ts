@@ -1,11 +1,10 @@
 import { Decoder } from "../../shared/decoders/baseDecoder";
-import { Decodable } from "../../shared/decoders/decodable";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
 
-export class NativeFallbackDecoder extends Decoder<Decodable, NativePointer> {
+export class NativeFallbackDecoder extends Decoder<NativePointer> {
   public decode(value: NativePointer): DecodedValue {
     return {
-      type: this.kind.type,
+      type: this.type,
       value: value.toString(),
     };
   }

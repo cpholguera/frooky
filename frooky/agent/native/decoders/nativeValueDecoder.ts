@@ -1,6 +1,5 @@
 import { Decoder } from "../../shared/decoders/baseDecoder";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
-import { NativeValueDecodable } from "./nativeDecodable";
 import { FridaFundamentalType } from "./nativeFridaType";
 
 type FundamentalValueDecoder = (input: NativePointer) => null | number | boolean;
@@ -37,15 +36,15 @@ const valueDecoders: Record<FridaFundamentalType, FundamentalValueDecoder> = {
   double: (input) => input.toInt32(),
 };
 
-export class NativeValueDecoder extends Decoder<NativeValueDecodable, NativePointer> {
+export class NativeValueDecoder extends Decoder<NativePointer> {
   cachedValueDecoder: FundamentalValueDecoder | null = null;
 
   public decode(value: NativePointer): DecodedValue {
     if (this.cachedValueDecoder === null) {
-      this.cachedValueDecoder = valueDecoders[this.kind.fridaType];
+      this.cachedValueDecoder = valueDecoders[this.type as FridaFundamentalType];
     }
     return {
-      type: this.kind.type,
+      type: this.type,
       value: this.cachedValueDecoder(value),
     };
   }

@@ -1,11 +1,10 @@
 import Java from "frida-java-bridge";
 import { Decoder } from "../../../../shared/decoders/baseDecoder";
 import { DecodedValue } from "../../../../shared/decoders/decodedValue";
-import { JavaDecodable } from "../../javaDecodable";
 import { JavaDecoderResolver } from "../../javaDecoderResolver";
 import { decodeIterable } from "../lang/IterableDecoder";
 
-export class MapDecoder extends Decoder<JavaDecodable, Java.Wrapper> {
+export class MapDecoder extends Decoder<Java.Wrapper> {
   decode(value) {
     const map = value.entrySet ? value : Java.cast(value, Java.use("java.util.Map"));
     const entrySet = map.entrySet();

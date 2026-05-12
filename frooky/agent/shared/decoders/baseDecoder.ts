@@ -1,3 +1,4 @@
+import { DecoderSettings } from "../frookySettings";
 import { Decodable } from "./decodable";
 import { DecodedValue } from "./decodedValue";
 
@@ -7,11 +8,13 @@ import { DecodedValue } from "./decodedValue";
  * @template TValue - The raw input type to decode.
  * @template TDecodable - The parameter descriptor type, extending {@link Decodable}.
  */
-export abstract class Decoder<TKind extends Decodable, TValue> {
-  protected kind: TKind;
+export abstract class Decoder<TValue> {
+  protected type: string;
+  protected settings: DecoderSettings;
 
-  constructor(kind: TKind) {
-    this.kind = kind;
+  constructor(type: string, settings: DecoderSettings) {
+    this.type = type;
+    this.settings = settings;
   }
 
   /**

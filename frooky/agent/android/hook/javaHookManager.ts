@@ -1,13 +1,12 @@
 import Java from "frida-java-bridge";
 import { Decoder } from "../../shared/decoders/baseDecoder";
-import { Param, RetType } from "../../shared/decoders/decodable";
+import { Decodable, Param, RetType } from "../../shared/decoders/decodable";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../../shared/defaultValues";
 import { DecoderSettings } from "../../shared/frookySettings";
 import { DecodedArgs, HookManager, ParamDecoders } from "../../shared/hook/hookManager";
 import { InputParam, normalizeInputParam } from "../../shared/inputParsing/inputDecodableTypes";
 import { InputJavaHookNormalized } from "../../shared/inputParsing/inputJavaHookGroup";
-import { JavaDecodable } from "../decoders/javaDecodable";
 import { JavaDecoderResolver } from "../decoders/javaDecoderResolver";
 import { JavaHookEvent } from "../event/javaHookEvent";
 import { JavaHook } from "./javaHook";
@@ -44,8 +43,8 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
     });
   }
 
-  private resolveParamDecoders(params: Param[]): ParamDecoders<JavaDecodable, Java.Wrapper> {
-    const paramDecoders: ParamDecoders<JavaDecodable, Java.Wrapper> = {
+  private resolveParamDecoders(params: Param[]): ParamDecoders<Decodable, Java.Wrapper> {
+    const paramDecoders: ParamDecoders<Decodable, Java.Wrapper> = {
       enter: [],
       exit: [],
     };
@@ -60,7 +59,7 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
     return paramDecoders;
   }
 
-  private resolveRetTypeDecoder(retType: RetType): Decoder<JavaDecodable, Java.Wrapper> {
+  private resolveRetTypeDecoder(retType: RetType): Decoder<Java.Wrapper> {
     return JavaDecoderResolver.resolveDecoder(retType);
   }
 
@@ -70,9 +69,9 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
       let stackTrace: string[];
 
       // // resolve the decoders used for this hook and cache it locally
-      let cachedParamDecoders: ParamDecoders<JavaDecodable, Java.Wrapper>;
+      let paramDecoders: ParamDecoders<Decodable, Java.Wrapper>;
       if (hook.params) {
-        cachedParamDecoders = this.resolveParamDecoders(hook.params);
+        paramDecoders = this.resolveParamDecoders(hook.params);
       }
       // const cachedRetTypeDecoder = this.resolveRetTypeDecoder(hook.method.returnType.type);
       let decodedArgs: DecodedArgs = {
@@ -81,7 +80,7 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
       };
 
       // resolve the return type
-      let retTypeDecoder: Decoder<JavaDecodable, Java.Wrapper>;
+      let retTypeDecoder: Decoder<Java.Wrapper>;
       if (hook.method.returnType.className) {
         const retType = {
           type: hook.method.returnType.className,
@@ -94,7 +93,7 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
         try {
           // decode arguments onEnter
           if (hook.params) {
-            decodedArgs.enter = hookManager.decodeJavaArgs(args, cachedParamDecoders.enter);
+            decodedArgs.enter = hookManager.decodeJavaArgs(args, paramDecoders.enter);
           }
         } catch (e) {
           frooky.log.error(`Error during the 'onEnter' argument decoding of ${hook.method.holder.$className}.${hook.methodName}: ${e}`);
@@ -104,7 +103,7 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
         try {
           // decode arguments onExit
           if (hook.params) {
-            decodedArgs.exit = hookManager.decodeJavaArgs(args, cachedParamDecoders.exit);
+            decodedArgs.exit = hookManager.decodeJavaArgs(args, paramDecoders.exit);
           }
 
           // decode the return value
@@ -215,32 +214,13 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
    * @param args - The actual argument values passed to the method
    * @param params- The optional frooky parameters for additional context information
    */
-  private decodeJavaArgs(args: Java.Wrapper[], decoderCache: Decoder<JavaDecodable, Java.Wrapper>[]): DecodedValue[] {
+  private decodeJavaArgs(args: Java.Wrapper[], decoderCache: Decoder<Java.Wrapper>[]): DecodedValue[] {
     const decodedArgs: DecodedValue[] = [];
-    decoderCache.forEach((decoder: Decoder<JavaDecodable, Java.Wrapper>, i: number) => {
+    decoderCache.forEach((decoder: Decoder<Java.Wrapper>, i: number) => {
       decodedArgs.push(decoder.decode(args[i]));
     });
     return decodedArgs;
   }
-
-  // private decodeJavaArgs(args: Java.Wrapper[], params: Param[], settings?: DecoderSettings): DecodedValue[] {
-  //   if (args.length === 0) {
-  //     throw Error("Empty args passed");
-  //   }
-  //   if (args.length !== params?.length) {
-  //     throw Error("The actual argument length does not match the declared frooky parameter length");
-  //   }
-
-  //   const decodedArgs: DecodedValue[] = [];
-  //   try {
-  //     args.forEach((arg: Java.Wrapper, i: number) => {
-  //       decodedArgs.push(JavaDecoderResolver.decode(arg, params[i]));
-  //     });
-  //   } catch (e) {
-  //     frooky.log.error(`Error decoding input parameter: ${e}`);
-  //   }
-  //   return decodedArgs;
-  // }
 
   private buildFieldType(method: Java.Wrapper): FieldType {
     const fieldType = method === null ? "static" : "instance";

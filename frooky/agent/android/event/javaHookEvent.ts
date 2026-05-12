@@ -18,7 +18,7 @@ export class JavaHookEvent extends HookEvent {
   constructor(hook: JavaHook, fieldType: FieldType, decodedArgs?: DecodedArgs, returnValue?: DecodedValue, stackTrace?: string[]) {
     super(decodedArgs, returnValue, stackTrace);
     this.type += "-java";
-    this.javaClassName = String(hook.method.holder);
+    this.javaClassName = String(hook.method.holder.$className);
     this.method = hook.methodName;
     this.fieldType = fieldType;
   }

@@ -11,7 +11,7 @@ settings:
   logTo: "device"
   resolverTimeout: 5
   hookSettings:
-    stackTraceLimit: 11               # Sets stackTraceLimit to 10 for all hooks
+    stackTraceLimit: 0                # Sets stackTraceLimit to 10 for all hooks
     eventFilter: ['^(?!android).*']   # Stack trace filters to apply.
   decoderSettings:
     fastDecode: true                  # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
@@ -103,11 +103,13 @@ hookGroup:
           - params:
             - [int, flags, { decoder: android.content.IntentFlagDecoder }]
 
-
   - javaClass: java.security.KeyPairGenerator
     hooks:
-      - initialize
-                  
+      - method: initialize
+        overloads:
+        - params: 
+          - [java.security.spec.AlgorithmParameterSpec, params]
+
   - javaClass: android.app.Activity 
     hooks:
       - startActivity
