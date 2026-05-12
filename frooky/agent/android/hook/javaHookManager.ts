@@ -8,8 +8,8 @@ import { DecodedArgs, HookManager, ParamDecoders } from "../../shared/hook/hookM
 import { InputParam, normalizeInputParam } from "../../shared/inputParsing/inputDecodableTypes";
 import { InputJavaHookNormalized } from "../../shared/inputParsing/inputJavaHookGroup";
 import { JavaDecoderResolver } from "../decoders/javaDecoderResolver";
-import { JavaHookEvent } from "../event/javaHookEvent";
 import { JavaHook } from "./javaHook";
+import { JavaHookEvent } from "./javaHookEvent";
 
 export type FieldType = {
   fieldType: "static" | "instance";

@@ -1,7 +1,7 @@
 import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { HookEvent } from "../../shared/event/hookEvent";
 import { DecodedArgs } from "../../shared/hook/hookManager";
-import { NativeHook } from "../hook/nativeHook";
+import { NativeHook } from "./nativeHook";
 
 /**
  * Represents a native hook event created by frooky.

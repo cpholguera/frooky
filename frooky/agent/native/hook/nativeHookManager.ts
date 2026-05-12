@@ -4,8 +4,8 @@ import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { DecodedArgs, HookManager, ParamDecoders } from "../../shared/hook/hookManager";
 import { InputNativeHookNormalized } from "../../shared/inputParsing/inputNativeHookGroup";
 import { NativeDecoderResolver } from "../decoders/nativeDecoderResolver";
-import { NativeHookEvent } from "../event/nativeHookEvent";
 import { NativeHook } from "./nativeHook";
+import { NativeHookEvent } from "./nativeHookEvent";
 
 export class NativeHookManager extends HookManager<InputNativeHookNormalized, NativeHook> {
   public async resolveHooks(inputHooks: InputNativeHookNormalized[], timeout: number): Promise<Promise<NativeHook[] | null>[]> {
