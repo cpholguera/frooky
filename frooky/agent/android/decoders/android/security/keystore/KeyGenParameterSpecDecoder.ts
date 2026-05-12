@@ -1,7 +1,7 @@
 import Java from "frida-java-bridge";
 import { Decoder } from "../../../../../shared/decoders/baseDecoder";
-import { JavaParam } from "../../../../hook/javaParam";
-import { JavaDecoder } from "../../../javaDecoder";
+import { JavaDecodable } from "../../../javaDecodable";
+import { JavaDecoderResolver } from "../../../javaDecoderResolver";
 
 const getters = [
   "getAlgorithmParameterSpec",
@@ -51,14 +51,14 @@ function stripPrefix(name: string): string {
   return name;
 }
 
-export const KeyGenParameterSpecDecoder: Decoder<Java.Wrapper, JavaParam> = {
-  decode: (spec, param) => {
+export class KeyGenParameterSpecDecoder extends Decoder<JavaDecodable, Java.Wrapper> {
+  decode(value: Java.Wrapper) {
     if (!KeyGenParameterSpec) {
       KeyGenParameterSpec = Java.use("android.security.keystore.KeyGenParameterSpec");
     }
-    const typedSpec: Java.Wrapper = Java.cast(spec, KeyGenParameterSpec);
+    const typedSpec: Java.Wrapper = Java.cast(value, KeyGenParameterSpec);
 
-    const value: Record<string, unknown> = {};
+    const decodedProperties: Record<string, unknown> = {};
 
     for (const name of getters) {
       const fn: Java.MethodDispatcher = typedSpec[name];
@@ -68,21 +68,21 @@ export const KeyGenParameterSpecDecoder: Decoder<Java.Wrapper, JavaParam> = {
       }
       try {
         const raw = fn.call(typedSpec);
-        const type: JavaParam = {
+        const type: JavaDecodable = {
           type: fn.returnType.className ?? "void",
           implementationType: fn.returnType.className ?? "void",
-          decoderSettings: param.decoderSettings,
-          decodeAt: param.decodeAt,
+          decoderSettings: this.kind.decoderSettings,
         };
-        value[stripPrefix(name)] = JavaDecoder.decode(raw, type);
+        const propertyDecoder = JavaDecoderResolver.resolveDecoder(type);
+        decodedProperties[stripPrefix(name)] = propertyDecoder.decode(raw);
       } catch (e) {
-        value[stripPrefix(name)] = `Error when decoding : ${e}>`;
+        decodedProperties[stripPrefix(name)] = `Error when decoding : ${e}>`;
       }
     }
 
     return {
-      type: param.implementationType ?? param.type,
-      value,
+      type: this.kind.implementationType ?? this.kind.type,
+      value: decodedProperties,
     };
-  },
-};
+  }
+}

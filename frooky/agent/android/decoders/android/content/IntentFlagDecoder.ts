@@ -1,6 +1,7 @@
 import Java from "frida-java-bridge";
 import { Decoder } from "../../../../shared/decoders/baseDecoder";
-import { JavaParam } from "../../../hook/javaParam";
+import { DecodedValue } from "../../../../shared/decoders/decodedValue";
+import { JavaDecodable } from "../../javaDecodable";
 
 // Cache so we only reflect once
 let FLAG_CACHE: Array<{ name: string; value: number }> | null = null;
@@ -21,23 +22,23 @@ function loadIntentFlags() {
   return flags;
 }
 
-export const IntentFlagDecoder: Decoder<Java.Wrapper, JavaParam> = {
-  decode: (input) => {
-    const bitmask = Number(input) >>> 0;
+export class IntentFlagDecoder extends Decoder<JavaDecodable, Java.Wrapper> {
+  decode(value: Java.Wrapper): DecodedValue {
+    const bitmask = Number(value) >>> 0;
 
     const flags = loadIntentFlags();
-    const value: string[] = [];
+    const decodedFlags: string[] = [];
 
     for (const { name, value: flag } of flags) {
       if (flag === 0) continue;
       if ((bitmask & flag) === flag) {
-        value.push(name);
+        decodedFlags.push(name);
       }
     }
 
     return {
       type: "android.content.IntentFlag",
-      value,
+      value: decodedFlags,
     };
-  },
-};
+  }
+}

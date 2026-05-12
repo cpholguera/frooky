@@ -1,18 +1,19 @@
 import Java from "frida-java-bridge";
 import { Decoder } from "../../../../shared/decoders/baseDecoder";
-import { JavaParam } from "../../../hook/javaParam";
-import { JavaDecoder } from "../../javaDecoder";
+import { DecodedValue } from "../../../../shared/decoders/decodedValue";
+import { JavaDecodable } from "../../javaDecodable";
+import { JavaDecoderResolver } from "../../javaDecoderResolver";
 import { decodeIterable } from "../lang/IterableDecoder";
 
-export const MapDecoder: Decoder<Java.Wrapper, JavaParam> = {
-  decode: (value, param) => {
+export class MapDecoder extends Decoder<JavaDecodable, Java.Wrapper> {
+  decode(value) {
     const map = value.entrySet ? value : Java.cast(value, Java.use("java.util.Map"));
     const entrySet = map.entrySet();
 
     // Cache the Map. Entry class once per call
     const MapEntry = Java.use("java.util.Map$Entry");
 
-    return decodeIterable(entrySet, param, (entry) => {
+    return decodeIterable(entrySet, this.kind, (entry) => {
       const typedEntry = entry!.getKey ? entry! : Java.cast(entry!, MapEntry);
 
       const key = typedEntry.getKey();
@@ -24,10 +25,11 @@ export const MapDecoder: Decoder<Java.Wrapper, JavaParam> = {
       return {
         type: "java.util.Map.Entry",
         value: [
-          { ...JavaDecoder.decode(key, { type: keyType, decoderSettings: param.decoderSettings }), name: "key" },
-          { ...JavaDecoder.decode(value, { type: valueType, decoderSettings: param.decoderSettings }), name: "value" },
+          // TODO: get the decoder and then decode
+          { ...JavaDecoderResolver.decode(key, { type: keyType, decoderSettings: this.kind.decoderSettings }), name: "key" },
+          { ...JavaDecoderResolver.decode(value, { type: valueType, decoderSettings: this.kind.decoderSettings }), name: "value" },
         ],
       } as DecodedValue;
     });
-  },
-};
+  }
+}

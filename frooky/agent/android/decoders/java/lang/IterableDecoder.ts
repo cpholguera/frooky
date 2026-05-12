@@ -2,27 +2,31 @@
 import type Java from "frida-java-bridge";
 import { DecodedValue } from "../../../../shared/decoders/decodedValue";
 import { DEFAULT_DECODER_SETTINGS } from "../../../../shared/defaultValues";
-import { DecoderSettings } from "../../../../shared/frookySettings";
-import { JavaParam } from "../../../hook/javaParam";
-import { JavaDecoder } from "../../javaDecoder";
+import { JavaDecodable } from "../../javaDecodable";
+import { JavaDecoderResolver } from "../../javaDecoderResolver";
 
-function defaultElementDecoder(element: Java.Wrapper, settings: DecoderSettings): DecodedValue {
+function defaultElementDecoder(element: Java.Wrapper): DecodedValue {
   const elementType = element == null ? "java.lang.Object" : (element.$className ?? "java.lang.Object");
-  return JavaDecoder.decode(element, { type: elementType, decoderSettings: settings });
+  // TODO: get the decoder and then decode, but cache it...
+  return JavaDecoderResolver.decode(element, { type: elementType, decoderSettings: settings });
 }
 
 /**
  * Decode any java.lang.Iterable by walking its iterator().
  */
-export function decodeIterable(iterable: Java.Wrapper, param: JavaParam, customElementDecoder?: (entry: Java.Wrapper) => DecodedValue): DecodedValue {
+export function decodeIterable(
+  iterable: Java.Wrapper,
+  kind: JavaDecodable,
+  customElementDecoder?: (entry: Java.Wrapper) => DecodedValue,
+): DecodedValue {
   const values: DecodedValue[] = [];
   const iterator = iterable.iterator();
-  const limit = param.decoderSettings.decodeLimit ?? DEFAULT_DECODER_SETTINGS.decodeLimit;
+  const limit = kind.decoderSettings.decodeLimit ?? DEFAULT_DECODER_SETTINGS.decodeLimit;
 
   let count = 0;
   while (iterator.hasNext() && count < limit) {
     const element = iterator.next();
-    values.push(customElementDecoder ? customElementDecoder(element) : defaultElementDecoder(element, param.decoderSettings));
+    values.push(customElementDecoder ? customElementDecoder(element) : defaultElementDecoder(element, kind.decoderSettings));
     count++;
   }
 
@@ -34,8 +38,7 @@ export function decodeIterable(iterable: Java.Wrapper, param: JavaParam, customE
   }
 
   return {
-    type: param.implementationType ?? param.type,
-    name: param.paramNname,
+    type: kind.implementationType ?? kind.type,
     value: values,
   };
 }

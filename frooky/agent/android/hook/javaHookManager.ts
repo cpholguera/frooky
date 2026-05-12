@@ -1,13 +1,21 @@
 import Java from "frida-java-bridge";
+import { Decoder } from "../../shared/decoders/baseDecoder";
+import { Param, RetType } from "../../shared/decoders/decodable";
+import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../../shared/defaultValues";
 import { DecoderSettings } from "../../shared/frookySettings";
-import { HookManager } from "../../shared/hook/hookManager";
+import { DecodedArgs, HookManager, ParamDecoders } from "../../shared/hook/hookManager";
 import { InputParam, normalizeInputParam } from "../../shared/inputParsing/inputDecodableTypes";
 import { InputJavaHookNormalized } from "../../shared/inputParsing/inputJavaHookGroup";
-import { JavaDecoder } from "../decoders/javaDecoder";
+import { JavaDecodable } from "../decoders/javaDecodable";
+import { JavaDecoderResolver } from "../decoders/javaDecoderResolver";
+import { JavaHookEvent } from "../event/javaHookEvent";
 import { JavaHook } from "./javaHook";
-import { buildAndDispatchEvent, buildFieldType, buildJavaStackTrace, decodeJavaArgs } from "./javaHookImpl";
-import { JavaParam } from "./javaParam";
+
+export type FieldType = {
+  fieldType: "static" | "instance";
+  instanceId?: number;
+};
 
 // resolve java classes, the method and their overloads
 export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHook> {
@@ -27,53 +35,107 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
           if (!resolvedJavaClass) return null;
           try {
             const method = this.resolveMethod(resolvedJavaClass, inputHook);
-            frooky.log.debug(`Java method '${resolvedJavaClass.$className}.${method.methodName}' found: ${method.handle}.`);
             return this.resolveOverloads(method, inputHook);
           } catch (e) {
-            frooky.log.warn(`${e}`);
+            frooky.log.warn(e instanceof Error ? e.message : String(e));
             return null;
           }
         });
     });
   }
 
-  registerHooks(javaHooks: JavaHook[]): JavaHook[] {
-    for (const javaHook of javaHooks) {
-      let returnParam: JavaParam;
-      javaHook.method.implementation = function (...args: Java.Wrapper[]) {
-        // call the original implementation
-        const returnValue = javaHook.method.apply(this, args);
+  private resolveParamDecoders(params: Param[]): ParamDecoders<JavaDecodable, Java.Wrapper> {
+    const paramDecoders: ParamDecoders<JavaDecodable, Java.Wrapper> = {
+      enter: [],
+      exit: [],
+    };
+    for (const param of params) {
+      const { decodeAt, ...decodable } = param;
+      if (param.decodeAt === "both" || param.decodeAt === "enter") {
+        paramDecoders.enter.push(JavaDecoderResolver.resolveDecoder(decodable));
+      } else if (param.decodeAt === "exit") {
+        paramDecoders.exit.push(JavaDecoderResolver.resolveDecoder(decodable));
+      }
+    }
+    return paramDecoders;
+  }
+
+  private resolveRetTypeDecoder(retType: RetType): Decoder<JavaDecodable, Java.Wrapper> {
+    return JavaDecoderResolver.resolveDecoder(retType);
+  }
+
+  registerHooks(hooks: JavaHook[]): JavaHook[] {
+    const hookManager = this;
+    for (const hook of hooks) {
+      let stackTrace: string[];
+
+      // // resolve the decoders used for this hook and cache it locally
+      let cachedParamDecoders: ParamDecoders<JavaDecodable, Java.Wrapper>;
+      if (hook.params) {
+        cachedParamDecoders = this.resolveParamDecoders(hook.params);
+      }
+      // const cachedRetTypeDecoder = this.resolveRetTypeDecoder(hook.method.returnType.type);
+      let decodedArgs: DecodedArgs = {
+        enter: [],
+        exit: [],
+      };
+
+      // resolve the return type
+      let retTypeDecoder: Decoder<JavaDecodable, Java.Wrapper>;
+      if (hook.method.returnType.className) {
+        const retType = {
+          type: hook.method.returnType.className,
+          decoderSettings: hook.decoderSettings,
+        };
+        retTypeDecoder = this.resolveRetTypeDecoder(retType);
+      }
+
+      hook.method.implementation = function (...args: Java.Wrapper[]) {
         try {
-          // decode the return value
-          if (!returnParam) {
-            const returnType = javaHook.method.returnType.className ?? "void";
-            returnParam = { type: returnType, implementationType: returnType, decoderSettings: javaHook.decoderSettings };
+          // decode arguments onEnter
+          if (hook.params) {
+            decodedArgs.enter = hookManager.decodeJavaArgs(args, cachedParamDecoders.enter);
           }
-          const decodedReturnValue = JavaDecoder.decode(returnValue, returnParam, javaHook.decoderSettings);
-          // collect the stack trace from Frida
-          const stackTraceLimit: number = javaHook.hookSettings.stackTraceLimit;
-          const stackTrace = buildJavaStackTrace(stackTraceLimit);
-          // collect the field type and (optional) instance hash
-          const fieldType = buildFieldType(this as Java.Wrapper);
-          // decode the arguments passed to the method
-          const decodedArgs = decodeJavaArgs(args, javaHook.params, javaHook.decoderSettings);
-          // create a frooky hook event and send it to the event cache
-          buildAndDispatchEvent(javaHook, decodedArgs, decodedReturnValue, stackTrace, fieldType);
         } catch (e) {
-          frooky.log.error(`Error during the execution of ${javaHook.method.holder.$className}.${javaHook.methodName}: ${e}`);
+          frooky.log.error(`Error during the 'onEnter' argument decoding of ${hook.method.holder.$className}.${hook.methodName}: ${e}`);
+        }
+        // call the original implementation
+        const returnValue = hook.method.apply(this, args);
+        try {
+          // decode arguments onExit
+          if (hook.params) {
+            decodedArgs.exit = hookManager.decodeJavaArgs(args, cachedParamDecoders.exit);
+          }
+
+          // decode the return value
+          let decodedRetValue: DecodedValue | undefined;
+          if (retTypeDecoder) {
+            decodedRetValue = retTypeDecoder.decode(returnValue);
+          }
+
+          // collect the stack trace from Frida
+          const stackTraceLimit: number = hook.hookSettings.stackTraceLimit;
+          const stackTrace = hookManager.buildJavaStackTrace(stackTraceLimit);
+
+          // collect the field type and (optional) instance hash
+          const fieldType = hookManager.buildFieldType(this as Java.Wrapper);
+
+          frooky.addEvent(new JavaHookEvent(hook, fieldType, decodedArgs, decodedRetValue, stackTrace));
+        } catch (e) {
+          frooky.log.error(`Error during the execution of ${hook.method.holder.$className}.${hook.methodName}: ${e}`);
         }
         return returnValue;
       };
     }
-    return javaHooks;
+    return hooks;
   }
 
-  private buildParamsFromArgumentTypes(argTypes: Java.Type[], decoderSettings: DecoderSettings): JavaParam[] {
-    return argTypes.reduce((params: JavaParam[], type: Java.Type) => {
+  private buildParamsFromArgumentTypes(argTypes: Java.Type[], decoderSettings: DecoderSettings): Param[] {
+    return argTypes.reduce((params: Param[], type: Java.Type) => {
       if (type.className) {
         params.push({
           type: type.className,
-          implementationType: type.className,
+          decodeAt: "enter",
           decoderSettings: decoderSettings,
         });
       } else {
@@ -117,9 +179,9 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
     if (inputHook.overloads?.length) {
       // Only get declared overloaded methods
       for (const overload of inputHook.overloads) {
-        const normalizedParams: JavaParam[] = overload.params.map((inputParam: InputParam) => normalizeInputParam(inputParam) as JavaParam);
+        const normalizedParams: Param[] = overload.params.map((inputParam: InputParam) => normalizeInputParam(inputParam) as Param);
         // extract a list of java parameter types e.g. ["int", "java.lang.String", "double"] to be used to look up the overload
-        const paramTypes: string[] = normalizedParams.map((param: JavaParam) => param.type);
+        const paramTypes: string[] = normalizedParams.map((param: Param) => param.type);
         try {
           result.push({
             methodName: method.methodName,
@@ -135,7 +197,7 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
     } else {
       // Get all overloaded methods
       for (const javaMethod of method.overloads) {
-        const params: JavaParam[] = this.buildParamsFromArgumentTypes(javaMethod.argumentTypes, inputHook.decoderSettings!);
+        const params: Param[] = this.buildParamsFromArgumentTypes(javaMethod.argumentTypes, inputHook.decoderSettings!);
         result.push({
           methodName: method.methodName,
           method: javaMethod,
@@ -146,5 +208,52 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
       }
     }
     return result;
+  }
+  /**
+   * Decodes the arguments passed to this method
+   *
+   * @param args - The actual argument values passed to the method
+   * @param params- The optional frooky parameters for additional context information
+   */
+  private decodeJavaArgs(args: Java.Wrapper[], decoderCache: Decoder<JavaDecodable, Java.Wrapper>[]): DecodedValue[] {
+    const decodedArgs: DecodedValue[] = [];
+    decoderCache.forEach((decoder: Decoder<JavaDecodable, Java.Wrapper>, i: number) => {
+      decodedArgs.push(decoder.decode(args[i]));
+    });
+    return decodedArgs;
+  }
+
+  // private decodeJavaArgs(args: Java.Wrapper[], params: Param[], settings?: DecoderSettings): DecodedValue[] {
+  //   if (args.length === 0) {
+  //     throw Error("Empty args passed");
+  //   }
+  //   if (args.length !== params?.length) {
+  //     throw Error("The actual argument length does not match the declared frooky parameter length");
+  //   }
+
+  //   const decodedArgs: DecodedValue[] = [];
+  //   try {
+  //     args.forEach((arg: Java.Wrapper, i: number) => {
+  //       decodedArgs.push(JavaDecoderResolver.decode(arg, params[i]));
+  //     });
+  //   } catch (e) {
+  //     frooky.log.error(`Error decoding input parameter: ${e}`);
+  //   }
+  //   return decodedArgs;
+  // }
+
+  private buildFieldType(method: Java.Wrapper): FieldType {
+    const fieldType = method === null ? "static" : "instance";
+    const instanceId = fieldType === "instance" ? method.hashCode() : undefined;
+    return { fieldType, instanceId };
+  }
+
+  private buildJavaStackTrace(limit: number): string[] {
+    const fridaStackTrace = Java.backtrace({ limit: limit });
+
+    return Array.from({ length: Math.min(limit, fridaStackTrace.frames.length) }, (_, i) => {
+      const frame = fridaStackTrace.frames[i];
+      return `${frame.className}.${frame.methodName} (${frame.fileName}:${frame.lineNumber})`;
+    });
   }
 }

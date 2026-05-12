@@ -1,6 +1,6 @@
 import Java from "frida-java-bridge";
+import { Param } from "../../shared/decoders/decodable";
 import { Hook } from "../../shared/hook/hook";
-import type { JavaParam } from "./javaParam";
 
 /**
  * Contains all information to hook a java method
@@ -10,7 +10,7 @@ import type { JavaParam } from "./javaParam";
 export interface JavaHook extends Hook {
   method: Java.Method;
   methodName: string;
-  params: JavaParam[];
+  params?: Param[];
 }
 
 export function isJavaHook(hook: Hook): hook is JavaHook {

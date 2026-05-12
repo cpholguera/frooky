@@ -5,13 +5,13 @@ import { DecodedValue } from "./decodedValue";
  * Base interface for value decoders.
  *
  * @template TValue - The raw input type to decode.
- * @template TParam - The parameter descriptor type, extending {@link Param}.
+ * @template TDecodable - The parameter descriptor type, extending {@link Decodable}.
  */
-export abstract class Decoder<TValue> {
-  protected decodable: Decodable;
+export abstract class Decoder<TKind extends Decodable, TValue> {
+  protected kind: TKind;
 
-  constructor(decodable: Decodable) {
-    this.decodable = decodable;
+  constructor(kind: TKind) {
+    this.kind = kind;
   }
 
   /**

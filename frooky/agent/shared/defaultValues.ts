@@ -11,7 +11,7 @@ export const DEFAULT_DECODER_SETTINGS: DecoderSettings = {
 };
 
 export const DEFAULT_HOOK_SETTINGS: HookSettings = {
-  stackTraceLimit: 10,
+  stackTraceLimit: 0,
   eventFilter: [],
 };
 

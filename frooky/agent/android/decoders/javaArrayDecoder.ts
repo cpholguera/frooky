@@ -1,8 +1,8 @@
 import type Java from "frida-java-bridge";
 import { Decoder } from "../../shared/decoders/baseDecoder";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
-import { JavaParam } from "../hook/javaParam";
-import { JavaDecoder } from "./javaDecoder";
+import { JavaDecodable } from "./javaDecodable";
+import { JavaDecoderResolver } from "./javaDecoderResolver";
 
 const PRIMITIVE_TYPES = new Set(["int", "long", "short", "byte", "char", "boolean", "float", "double"]);
 
@@ -44,9 +44,9 @@ function elementTypeFromSignature(element: string): string {
   return element;
 }
 
-export const JavaArrayDecoder: Decoder<Java.Wrapper, JavaParam> = {
-  decode: (value, param, settings): DecodedValue => {
-    const signature = param.implementationType ?? param.type;
+export class JavaArrayDecoder extends Decoder<JavaDecodable, Java.Wrapper> {
+  decode(value: Java.Wrapper): DecodedValue {
+    const signature = this.kind.implementationType ?? this.kind.type;
     const elementSignature = signature.startsWith("[") ? signature.substring(1) : signature;
     const elementType = elementTypeFromSignature(elementSignature);
     let arrayValue: unknown[];
@@ -56,24 +56,23 @@ export const JavaArrayDecoder: Decoder<Java.Wrapper, JavaParam> = {
       arrayValue = Array.from(value as unknown as ArrayLike<unknown>);
     } else {
       // complex java types
-      const elementParam: JavaParam = {
+      const elementDecodable: JavaDecodable = {
         ...param,
         type: elementType,
         implementationType: undefined,
-        decoder: undefined,
       };
       const len = value.length;
       arrayValue = new Array(len);
       for (let i = 0; i < len; i++) {
         const el = value[i];
-        arrayValue[i] = el == null ? null : JavaDecoder.decode(el, elementParam, settings).value;
+        // TODO: get the decoder and then decode
+        arrayValue[i] = el == null ? null : JavaDecoderResolver.resolveDecoder(el, elementDecodable, settings).value;
       }
     }
 
     return {
-      type: param.type,
-      name: param.paramNname,
+      type: this.kind.type,
       value: arrayValue,
     };
-  },
-};
+  }
+}

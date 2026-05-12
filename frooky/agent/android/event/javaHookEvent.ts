@@ -1,6 +1,8 @@
-import Java from "frida-java-bridge";
+import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { HookEvent } from "../../shared/event/hookEvent";
-import { FieldType } from "../hook/javaHookImpl";
+import { DecodedArgs } from "../../shared/hook/hookManager";
+import { JavaHook } from "../hook/javaHook";
+import { FieldType } from "../hook/javaHookManager";
 
 /**
  * Class representing a java hook event
@@ -13,11 +15,11 @@ export class JavaHookEvent extends HookEvent {
   readonly method: string;
   readonly fieldType: FieldType;
 
-  constructor(method: Java.Method, fieldType: FieldType) {
-    super();
+  constructor(hook: JavaHook, fieldType: FieldType, decodedArgs?: DecodedArgs, returnValue?: DecodedValue, stackTrace?: string[]) {
+    super(decodedArgs, returnValue, stackTrace);
     this.type += "-java";
-    this.javaClassName = method.holder.$className;
-    this.method = method.methodName;
+    this.javaClassName = String(hook.method.holder);
+    this.method = hook.methodName;
     this.fieldType = fieldType;
   }
 }

@@ -1,7 +1,7 @@
 import { Decoder } from "../../shared/decoders/baseDecoder";
-import { Decodable } from "../../shared/decoders/decodable";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
-import { FridaFundamentalType, FridaReferenceType } from "./nativeFridaType";
+import { NativeReferenceDecodable } from "./nativeDecodable";
+import { FridaFundamentalType } from "./nativeFridaType";
 
 type ReferenceDecoder = (input: NativePointer) => null | number | boolean | string;
 
@@ -42,21 +42,15 @@ const referenceDecoders: Record<FridaFundamentalType, ReferenceDecoder> = {
   double: (input) => input.readDouble(),
 };
 
-export class NativeReferenceDecoder extends Decoder<NativePointer> {
-  fridaReferenceType: FridaReferenceType;
+export class NativeReferenceDecoder extends Decoder<NativeReferenceDecodable, NativePointer> {
   cachedDecoder: ReferenceDecoder | null = null;
-
-  constructor(decodable: Decodable, fridaReferenceType: FridaReferenceType) {
-    super(decodable);
-    this.fridaReferenceType = fridaReferenceType;
-  }
 
   public decode(value: NativePointer): DecodedValue {
     if (this.cachedDecoder === null) {
-      this.cachedDecoder = referenceDecoders[this.fridaReferenceType.pointee];
+      this.cachedDecoder = referenceDecoders[this.kind.fridaType.pointee];
     }
     return {
-      type: this.decodable.type,
+      type: this.kind.type,
       value: this.cachedDecoder(value),
     };
   }

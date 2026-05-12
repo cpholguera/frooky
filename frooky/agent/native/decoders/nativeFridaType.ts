@@ -100,7 +100,7 @@ function createPointerType(normalizedType: string): FridaReferenceType {
  *   => { type: "pointer", pointee: "char", depth: 2 }
  *
  */
-export function parseNativeFridaType(type: string): FridaReferenceType | FridaFundamentalType | undefined {
+export function parseNativeFridaType(type: string): FridaFundamentalType | FridaReferenceType | undefined {
   // basic normalization
   const normalized = type
     .trim()
