@@ -38,6 +38,12 @@
     "Backtracer",
     "frooky",
     "JNIEXPORT",
-    "jobject"
+    "jobject",
+    "Ljava",
+    "llong",
+    "schar",
+    "ssize",
+    "uchar",
+    "ullong"
   ]
 }
