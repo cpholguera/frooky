@@ -13,7 +13,10 @@ export const JAVA_PRIMITIVE_TYPES = new Set(["int", "long", "short", "byte", "ch
  */
 export const JavaDecoderResolver: DecoderResolver<Java.Wrapper> = {
   resolveDecoder(decodable: Decodable): Decoder<Java.Wrapper> {
-    if (decodable.type.startsWith("[")) {
+    if (decodable.settings.customDecoder) {
+      // return the custom decoder (if implemented)
+      return new JavaClassDecoder(decodable.settings.customDecoder, decodable.settings);
+    } else if (decodable.type.startsWith("[")) {
       // java array decoder
       return new JavaArrayDecoder(decodable.type, decodable.settings);
     } else if (decodable.type === "long") {

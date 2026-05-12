@@ -25,6 +25,7 @@ describe("inputDecodableTypes", () => {
           decodeLimit: 10,
           fastDecode: false,
           magicDecode: true,
+          customDecoder: null,
         },
       });
     });
@@ -44,6 +45,7 @@ describe("inputDecodableTypes", () => {
           decodeLimit: 10,
           fastDecode: false,
           magicDecode: true,
+          customDecoder: null,
         },
       });
     });
@@ -58,6 +60,7 @@ describe("inputDecodableTypes", () => {
             decodeLimit: 10,
             fastDecode: false,
             magicDecode: true,
+            customDecoder: null,
           },
         }),
       ).toEqual({
@@ -69,6 +72,7 @@ describe("inputDecodableTypes", () => {
           decodeLimit: 10,
           fastDecode: false,
           magicDecode: true,
+          customDecoder: null,
         },
       });
     });

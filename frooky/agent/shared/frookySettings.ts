@@ -50,6 +50,13 @@ export interface DecoderSettings {
    * @defaultValue false
    */
   fastDecode: boolean;
+
+  /**
+   * Overrides the type decoder.
+   *
+   * @defaultValue null
+   */
+  customDecoder: string | null;
 }
 
 export interface FrookySettings {

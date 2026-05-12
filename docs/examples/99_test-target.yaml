@@ -38,18 +38,18 @@ hookGroup:
       - method: receiveString
         overloads:
           - params:
-            - [java.lang.String, receivedString, {decoderSettings: {elementLimit: 10}}]
+            - [java.lang.String, receivedString, {decodeLimit: 10}]
 
 
   # primitive java arrays
   - javaClass: org.owasp.mastestapp.MastgTest
-    settings:
+    hookSettings:
       stackTraceLimit: 5
-      decoderSettings:
-        fastDecode: false
-        magicDecode: false
-        maxRecursion: 5
-        decodeLimit: 5
+    decoderSettings:
+      fastDecode: false
+      magicDecode: false
+      maxRecursion: 5
+      decodeLimit: 5
     hooks:
       - receiveStringArray
       - receiveBooleanArray
@@ -58,7 +58,7 @@ hookGroup:
       - method: receiveIntArray
         overloads:
           - params:
-            - ["[I", receivedInteger, {decoderSettings: {decodeLimit: 50}}]
+            - ["[I", receivedInteger, { decodeLimit: 50 }]
       - receiveIntArray
       - receiveLongArray
       - receiveFloatArray
@@ -101,7 +101,7 @@ hookGroup:
       - method: setFlags
         overloads:
           - params:
-            - [int, flags, { decoder: android.content.IntentFlagDecoder }]
+            - [int, flags, { customDecoder: android.content.IntentFlagDecoder }]
 
   - javaClass: java.security.KeyPairGenerator
     hooks:
@@ -247,8 +247,7 @@ hookGroup:
 
 # decode argument: null terminated string 
   - module: libreceiveString.so
-    settings:
-      decoderSettings:
+    decoderSettings:
         magicDecode: false
     hooks:
       - symbol: receive_cstring

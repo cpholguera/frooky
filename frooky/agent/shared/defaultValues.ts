@@ -8,6 +8,7 @@ export const DEFAULT_DECODER_SETTINGS: DecoderSettings = {
   magicDecode: false,
   maxRecursion: 10,
   decodeLimit: 1000,
+  customDecoder: null,
 };
 
 export const DEFAULT_HOOK_SETTINGS: HookSettings = {

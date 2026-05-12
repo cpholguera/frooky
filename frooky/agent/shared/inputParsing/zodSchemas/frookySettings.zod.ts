@@ -12,7 +12,8 @@ export const decoderSettingsSchema = z.object({
     maxRecursion: z.number(),
     decodeLimit: z.number(),
     magicDecode: z.boolean(),
-    fastDecode: z.boolean()
+    fastDecode: z.boolean(),
+    customDecoder: z.string().nullable()
 });
 
 export const frookySettingsSchema = z.object({

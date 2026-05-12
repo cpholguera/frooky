@@ -28,9 +28,10 @@ export class JavaClassDecoder extends Decoder<Java.Wrapper> {
   decode(value: Java.Wrapper): DecodedValue {
     if (!this.implementationDecoder) {
       // Try to find a decoder in the registry with fall back to JavaFallbackDecoder
-      const DecoderClass = javaClassDecoderRegistry[value.$className];
+      const implementationType = value.$className ?? this.type;
+      const DecoderClass = javaClassDecoderRegistry[implementationType];
       this.implementationDecoder = DecoderClass
-        ? new DecoderClass(value.$className, this.settings)
+        ? new DecoderClass(implementationType, this.settings)
         : new JavaFallbackDecoder(this.type, this.settings);
     }
 
