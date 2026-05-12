@@ -50,9 +50,10 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
     };
     for (const param of params) {
       const { decodeAt, ...decodable } = param;
-      if (param.decodeAt === "both" || param.decodeAt === "enter") {
+      if (decodeAt === "both" || decodeAt === "enter") {
         paramDecoders.enter.push(JavaDecoderResolver.resolveDecoder(decodable));
-      } else if (param.decodeAt === "exit") {
+      }
+      if (decodeAt === "both" || decodeAt === "exit") {
         paramDecoders.exit.push(JavaDecoderResolver.resolveDecoder(decodable));
       }
     }

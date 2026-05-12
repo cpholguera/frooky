@@ -1,5 +1,5 @@
 import { Decoder } from "../../shared/decoders/baseDecoder";
-import { Decodable, Param, RetType } from "../../shared/decoders/decodable";
+import { Param, RetType } from "../../shared/decoders/decodable";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { DecodedArgs, HookManager, ParamDecoders } from "../../shared/hook/hookManager";
 import { InputNativeHookNormalized } from "../../shared/inputParsing/inputNativeHookGroup";
@@ -52,11 +52,11 @@ export class NativeHookManager extends HookManager<InputNativeHookNormalized, Na
       let stackTrace: string[];
 
       // resolve the decoders used for this hook and cache it locally
-      let paramDecoders: ParamDecoders<Decodable, NativePointer>;
+      let paramDecoders: ParamDecoders<NativePointer>;
       if (hook.params) {
         paramDecoders = this.resolveParamDecoders(hook.params);
       }
-      let retTypeDecoder: Decoder<Decodable, NativePointer>;
+      let retTypeDecoder: Decoder<NativePointer>;
       if (hook.retType) {
         retTypeDecoder = this.resolveRetTypeDecoder(hook.retType);
       }
@@ -64,26 +64,26 @@ export class NativeHookManager extends HookManager<InputNativeHookNormalized, Na
         enter: [],
         exit: [],
       };
-      var currentArgs: NativePointer[];
 
       Interceptor.attach(hook.symbolAddress, {
         onEnter: function (args: NativePointer[]) {
-          // safe the current arguments in case they need not be decoded again in the onLeave function
-          currentArgs = args;
-
           // build stack trace
           const stackTraceLimit: number = hook.hookSettings.stackTraceLimit;
           stackTrace = hookManager.buildNativeStackTrace(this.context, stackTraceLimit);
 
-          // decode arguments onEnter
           if (hook.params) {
+            // decode arguments onEnter
+            this.savedArgs = [];
+            for (let i = 0; i < hook.params.length; i++) {
+              this.savedArgs[i] = args[i];
+            }
             decodedArgs.enter = hookManager.decodeNativeArgs(args, paramDecoders.enter);
           }
         },
-        onLeave: (returnValue: InvocationReturnValue) => {
-          // decode arguments onExit
+        onLeave: function (returnValue: InvocationReturnValue) {
           if (hook.params) {
-            decodedArgs.exit = hookManager.decodeNativeArgs(currentArgs, paramDecoders.exit);
+            // decode arguments onExit
+            decodedArgs.exit = hookManager.decodeNativeArgs(this.savedArgs, paramDecoders.exit);
           }
 
           let decodedRetValue: DecodedValue | undefined;
@@ -144,29 +144,30 @@ export class NativeHookManager extends HookManager<InputNativeHookNormalized, Na
     return stackTrace;
   }
 
-  private resolveParamDecoders(params: Param[]): ParamDecoders<Decodable, NativePointer> {
-    const paramDecoders: ParamDecoders<Decodable, NativePointer> = {
+  private resolveParamDecoders(params: Param[]): ParamDecoders<NativePointer> {
+    const paramDecoders: ParamDecoders<NativePointer> = {
       enter: [],
       exit: [],
     };
     for (const param of params) {
       const { decodeAt, ...decodable } = param;
-      if (param.decodeAt === "both" || param.decodeAt === "enter") {
+      if (decodeAt === "both" || decodeAt === "enter") {
         paramDecoders.enter.push(NativeDecoderResolver.resolveDecoder(decodable));
-      } else if (param.decodeAt === "exit") {
+      }
+      if (decodeAt === "both" || decodeAt === "exit") {
         paramDecoders.exit.push(NativeDecoderResolver.resolveDecoder(decodable));
       }
     }
     return paramDecoders;
   }
 
-  private resolveRetTypeDecoder(retType: RetType): Decoder<Decodable, NativePointer> {
+  private resolveRetTypeDecoder(retType: RetType): Decoder<NativePointer> {
     return NativeDecoderResolver.resolveDecoder(retType);
   }
 
-  private decodeNativeArgs(args: NativePointer[], decoderCache: Decoder<Decodable, NativePointer>[]): DecodedValue[] {
+  private decodeNativeArgs(args: NativePointer[], decoderCache: Decoder<NativePointer>[]): DecodedValue[] {
     const decodedArgs: DecodedValue[] = [];
-    decoderCache.forEach((decoder: Decoder<Decodable, NativePointer>, i: number) => {
+    decoderCache.forEach((decoder: Decoder<NativePointer>, i: number) => {
       decodedArgs.push(decoder.decode(args[i]));
     });
     return decodedArgs;

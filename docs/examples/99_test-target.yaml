@@ -255,4 +255,4 @@ hookGroup:
           - [char *, string]
       - symbol: receive_utf8
         params:
-          - [ char *, {decodeAt: exit, magicDecode: true}]
+          - [ char *, {decodeAt: both, magicDecode: true}]
