@@ -84,7 +84,7 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
       if (hook.method.returnType.className) {
         const retType = {
           type: hook.method.returnType.className,
-          decoderSettings: hook.decoderSettings,
+          settings: hook.decoderSettings,
         };
         retTypeDecoder = this.resolveRetTypeDecoder(retType);
       }
@@ -96,22 +96,32 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
             decodedArgs.enter = hookManager.decodeJavaArgs(args, paramDecoders.enter);
           }
         } catch (e) {
-          frooky.log.error(`Error during the 'onEnter' argument decoding of ${hook.method.holder.$className}.${hook.methodName}: ${e}`);
+          frooky.log.error(`Decoder error during 'onEnter' argument decoding of ${hook.method.holder.$className}.${hook.methodName}: ${e}`);
         }
+
         // call the original implementation
         const returnValue = hook.method.apply(this, args);
+
         try {
-          // decode arguments onExit
+          // decode arguments onEnter
           if (hook.params) {
             decodedArgs.exit = hookManager.decodeJavaArgs(args, paramDecoders.exit);
           }
+        } catch (e) {
+          frooky.log.error(`Decoder error during 'onExit' argument decoding of ${hook.method.holder.$className}.${hook.methodName}: ${e}`);
+        }
 
+        let decodedRetValue: DecodedValue | undefined;
+        try {
           // decode the return value
-          let decodedRetValue: DecodedValue | undefined;
           if (retTypeDecoder) {
             decodedRetValue = retTypeDecoder.decode(returnValue);
           }
+        } catch (e) {
+          frooky.log.error(`Decoder error during return value decoding of ${hook.method.holder.$className}.${hook.methodName}: ${e}`);
+        }
 
+        try {
           // collect the stack trace from Frida
           const stackTraceLimit: number = hook.hookSettings.stackTraceLimit;
           const stackTrace = hookManager.buildJavaStackTrace(stackTraceLimit);
@@ -121,7 +131,7 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
 
           frooky.addEvent(new JavaHookEvent(hook, fieldType, decodedArgs, decodedRetValue, stackTrace));
         } catch (e) {
-          frooky.log.error(`Error during the execution of ${hook.method.holder.$className}.${hook.methodName}: ${e}`);
+          frooky.log.error(`Error during the execution of the hooked method ${hook.method.holder.$className}.${hook.methodName}: ${e}`);
         }
         return returnValue;
       };

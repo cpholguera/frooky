@@ -1,28 +1,23 @@
-// export class MapDecoder extends Decoder<Java.Wrapper> {
-//   decode(value: Java.Wrapper): DecodedValue {
-//     const map = value.entrySet ? value : Java.cast(value, Java.use("java.util.Map"));
-//     const entrySet = map.entrySet();
+import Java from "frida-java-bridge";
+import { Decoder } from "../../../../shared/decoders/baseDecoder";
+import { DecodedValue } from "../../../../shared/decoders/decodedValue";
+import { IterableDecoder } from "../lang/IterableDecoder";
 
-//     // Cache the Map. Entry class once per call
-//     const MapEntry = Java.use("java.util.Map$Entry");
+export class MapDecoder extends Decoder<Java.Wrapper> {
+  decode(value: Java.Wrapper): DecodedValue {
+    const valueCollection = value.values();
+    const iterableDecoder = new IterableDecoder(this.type, this.settings);
+    const decodedValues = iterableDecoder.decode(valueCollection);
 
-//     return decodeIterable(entrySet, this.type, (entry) => {
-//       const typedEntry = entry!.getKey ? entry! : Java.cast(entry!, MapEntry);
+    const keySet = value.keySet();
+    const decodedKeySet = iterableDecoder.decode(keySet);
 
-//       const key = typedEntry.getKey();
-//       const value = typedEntry.getValue();
-
-//       const keyType = key == null ? "java.lang.Object" : (key.$className ?? "java.lang.Object");
-//       const valueType = value == null ? "java.lang.Object" : (value.$className ?? "java.lang.Object");
-
-//       return {
-//         type: "java.util.Map.Entry",
-//         value: [
-//           // TODO: get the decoder and then decode
-//           { ...JavaDecoderResolver.decode(key, { type: keyType, decoderSettings: this.kind.decoderSettings }), name: "key" },
-//           { ...JavaDecoderResolver.decode(value, { type: valueType, decoderSettings: this.kind.decoderSettings }), name: "value" },
-//         ],
-//       } as DecodedValue;
-//     });
-//   }
-// }
+    return {
+      type: this.type,
+      value: [
+        { ...decodedKeySet, name: "key" },
+        { ...decodedValues, name: "value" },
+      ],
+    };
+  }
+}

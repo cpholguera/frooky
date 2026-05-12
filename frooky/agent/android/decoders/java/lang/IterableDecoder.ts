@@ -11,7 +11,8 @@ import { JavaDecoderResolver } from "../../javaDecoderResolver";
 export class IterableDecoder extends Decoder<Java.Wrapper> {
   decode(value: Java.Wrapper): DecodedValue {
     const values: DecodedValue[] = [];
-    const iterator = value.iterator();
+    let iterator: Java.Wrapper;
+    iterator = value.iterator();
     const decodeLimit = this.settings.decodeLimit ?? DEFAULT_DECODER_SETTINGS.decodeLimit;
 
     let iteratorDecoder: Decoder<Java.Wrapper> | undefined;
