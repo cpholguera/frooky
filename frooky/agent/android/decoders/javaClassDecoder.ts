@@ -4,17 +4,17 @@ import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { DecoderSettings } from "../../shared/frookySettings";
 import { IntentFlagDecoder } from "./android/content/IntentFlagDecoder";
 import { KeyGenParameterSpecDecoder } from "./android/security/keystore/KeyGenParameterSpecDecoder";
-import { CollectionDecoder } from "./java/util/CollectionDecoder";
-import { MapDecoder } from "./java/util/MapDecoder";
+
+import { IterableDecoder } from "./java/lang/IterableDecoder";
 import { JavaFallbackDecoder } from "./javaBasicDecoder";
 
 type DecoderConstructor = { new (type: string, settings: DecoderSettings): Decoder<Java.Wrapper> };
 
 const javaClassDecoderRegistry: Record<string, DecoderConstructor> = {
   // common java and android decoders
-  "java.util.LinkedHashSet": CollectionDecoder,
-  "java.util.Arrays$ArrayList": CollectionDecoder,
-  "java.util.Collections$SingletonMap": MapDecoder,
+  "java.util.LinkedHashSet": IterableDecoder,
+  "java.util.Arrays$ArrayList": IterableDecoder,
+  // "java.util.Collections$SingletonMap": MapDecoder,
   "android.security.keystore.KeyGenParameterSpec": KeyGenParameterSpecDecoder,
 
   // built in custom decoders

@@ -11,7 +11,7 @@ export interface Decodable {
   name?: string;
 
   /** Settings applied when running the decoder. */
-  decoderSettings: DecoderSettings;
+  settings: DecoderSettings;
 }
 
 /**

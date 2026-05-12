@@ -26,24 +26,24 @@ export function normalizeInputParam(input: InputParam, decoderSettings?: Decoder
 
   // Case 1: Type only - "java.lang.String"
   if (typeof input === "string") {
-    return { type: input, decodeAt: DEFAULT_DECODE_AT, decoderSettings: mergedSettings };
+    return { type: input, decodeAt: DEFAULT_DECODE_AT, settings: mergedSettings };
   } else if (Array.isArray(input)) {
     // Case 2: Type + name - ["java.lang.String", "value"]
     if (input.length === 2 && typeof input[1] === "string") {
       const [type, name] = input;
-      return { type, decodeAt: DEFAULT_DECODE_AT, decoderSettings: mergedSettings, name };
+      return { type, decodeAt: DEFAULT_DECODE_AT, settings: mergedSettings, name };
     }
     // Case 3: Type + options - ["[I", { decodeAt: "exit", maxRecursion: 5 }]
     if (input.length === 2 && typeof input[1] === "object") {
       const [type, { decodeAt, ...inlineDecoderSettings }] = input as [string, InputParamSettings];
       const validatedDecoderSettings = validateAndRepairDecoderSettings({ ...DEFAULT_DECODER_SETTINGS, ...inlineDecoderSettings });
-      return { type, decodeAt: decodeAt ?? DEFAULT_DECODE_AT, decoderSettings: validatedDecoderSettings };
+      return { type, decodeAt: decodeAt ?? DEFAULT_DECODE_AT, settings: validatedDecoderSettings };
     }
     // Case 4: Type + name + options - ["[B", "encryptedOutput", { decodeAt: "exit", magicDecode: false }]
     if (input.length === 3) {
       const [type, name, { decodeAt, ...inlineDecoderSettings }] = input as [string, string, InputParamSettings];
       const validatedDecoderSettings = validateAndRepairDecoderSettings({ ...DEFAULT_DECODER_SETTINGS, ...inlineDecoderSettings });
-      return { type, decodeAt: decodeAt ?? DEFAULT_DECODE_AT, decoderSettings: validatedDecoderSettings, name };
+      return { type, decodeAt: decodeAt ?? DEFAULT_DECODE_AT, settings: validatedDecoderSettings, name };
     }
   } else if (typeof input === "object") {
     // Case 5: Normalized object
@@ -75,11 +75,11 @@ export function normalizeInputRetType(input: InputRetType, decoderSettings?: Dec
 
   // Case 1: Type only - "int"
   if (typeof input === "string") {
-    return { type: input, decoderSettings: validatedMergedSettings };
+    return { type: input, settings: validatedMergedSettings };
   } else if (Array.isArray(input)) {
     // Case 2: Type + decoder settings - ["android.database.sqlite.SQLiteCursor", { decodeLimit: 10 }]
     const [type, inlineSettings] = input as [string, Partial<DecoderSettings>];
-    return { type, decoderSettings: { ...validatedMergedSettings, ...inlineSettings } };
+    return { type, settings: { ...validatedMergedSettings, ...inlineSettings } };
   } else if (typeof input === "object") {
     // Case 3: Normalized object
     return input;

@@ -70,7 +70,7 @@ export class KeyGenParameterSpecDecoder extends Decoder<Java.Wrapper> {
         const raw = fn.call(typedSpec);
         const type: Decodable = {
           type: fn.returnType.className ?? "void",
-          decoderSettings: this.settings,
+          settings: this.settings,
         };
         const propertyDecoder = JavaDecoderResolver.resolveDecoder(type);
         decodedProperties[stripPrefix(name)] = propertyDecoder.decode(raw);

@@ -4,14 +4,14 @@ import { normalizeInputParam } from "./inputDecodableTypes";
 describe("inputDecodableTypes", () => {
   describe("normalizeInputParam()", () => {
     it("should normalize a valid string to Param", () => {
-      expect(normalizeInputParam("testParam")).toEqual({ type: "testParam", decodeAt: "enter", decoderSettings: DEFAULT_DECODER_SETTINGS });
+      expect(normalizeInputParam("testParam")).toEqual({ type: "testParam", decodeAt: "enter", settings: DEFAULT_DECODER_SETTINGS });
     });
     it("should normalize [string, string] to a valid Param", () => {
       expect(normalizeInputParam(["testParam", "paramName"])).toEqual({
         type: "testParam",
         name: "paramName",
         decodeAt: "enter",
-        decoderSettings: DEFAULT_DECODER_SETTINGS,
+        settings: DEFAULT_DECODER_SETTINGS,
       });
     });
     it("should normalize a valid [string, InputParamSettings] to Param", () => {
@@ -20,7 +20,7 @@ describe("inputDecodableTypes", () => {
       ).toEqual({
         type: "testParam",
         decodeAt: "exit",
-        decoderSettings: {
+        settings: {
           maxRecursion: 10,
           decodeLimit: 10,
           fastDecode: false,
@@ -39,7 +39,7 @@ describe("inputDecodableTypes", () => {
         type: "testParam",
         name: "paramName",
         decodeAt: "exit",
-        decoderSettings: {
+        settings: {
           maxRecursion: 10,
           decodeLimit: 10,
           fastDecode: false,
@@ -53,7 +53,7 @@ describe("inputDecodableTypes", () => {
           type: "testParam",
           name: "paramName",
           decodeAt: "exit",
-          decoderSettings: {
+          settings: {
             maxRecursion: 10,
             decodeLimit: 10,
             fastDecode: false,
@@ -64,7 +64,7 @@ describe("inputDecodableTypes", () => {
         type: "testParam",
         name: "paramName",
         decodeAt: "exit",
-        decoderSettings: {
+        settings: {
           maxRecursion: 10,
           decodeLimit: 10,
           fastDecode: false,

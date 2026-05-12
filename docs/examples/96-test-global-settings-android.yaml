@@ -78,7 +78,6 @@ settings:
   logTo: "device"
   resolverTimeout: 5
   hookSettings:
-    stackTraceLimit: 11               # Sets stackTraceLimit to 10 for all hooks
     eventFilter: ['^(?!android).*']   # Stack trace filters to apply.
   decoderSettings:
     fastDecode: true                  # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
@@ -140,10 +139,18 @@ hookGroup:
 
   # PARTIAL local parameter settings take priority over global setting, form [type, name, settings]
   - javaClass: org.owasp.mastestapp.MastgTest
-    hookSettings:
-      stackTraceLimit: 4
     hooks:
       - method: receiveNestedPrimitivesArray
         overloads:
           - params:
-            - ["[[[I", {decodeLimit: 66}]
+            - ["[[[I", {decodeLimit: 66, decodeAt: toBeFixed}]
+
+  # complex common java types
+  - javaClass: org.owasp.mastestapp.MastgTest
+    hooks:
+      - receiveBigInteger
+      - receiveBigDecimal
+      - receiveList
+      - receiveMap
+      - receiveSet
+      - receiveEnum

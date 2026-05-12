@@ -56,7 +56,7 @@ export class JavaArrayDecoder extends Decoder<Java.Wrapper> {
       // complex java types or nested array
       const elementDecodable: Decodable = {
         type: elementType,
-        decoderSettings: this.settings,
+        settings: this.settings,
       };
       const elementDecoder = JavaDecoderResolver.resolveDecoder(elementDecodable);
       const len = value.length;

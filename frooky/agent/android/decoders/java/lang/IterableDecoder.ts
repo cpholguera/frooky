@@ -1,44 +1,46 @@
 // iterableDecoder.ts
 import type Java from "frida-java-bridge";
+import { Decoder } from "../../../../shared/decoders/baseDecoder";
 import { DecodedValue } from "../../../../shared/decoders/decodedValue";
 import { DEFAULT_DECODER_SETTINGS } from "../../../../shared/defaultValues";
-import { JavaDecodable } from "../../javaDecodable";
 import { JavaDecoderResolver } from "../../javaDecoderResolver";
-
-function defaultElementDecoder(element: Java.Wrapper): DecodedValue {
-  const elementType = element == null ? "java.lang.Object" : (element.$className ?? "java.lang.Object");
-  // TODO: get the decoder and then decode, but cache it...
-  return JavaDecoderResolver.decode(element, { type: elementType, decoderSettings: settings });
-}
 
 /**
  * Decode any java.lang.Iterable by walking its iterator().
  */
-export function decodeIterable(
-  iterable: Java.Wrapper,
-  kind: JavaDecodable,
-  customElementDecoder?: (entry: Java.Wrapper) => DecodedValue,
-): DecodedValue {
-  const values: DecodedValue[] = [];
-  const iterator = iterable.iterator();
-  const limit = kind.decoderSettings.decodeLimit ?? DEFAULT_DECODER_SETTINGS.decodeLimit;
+export class IterableDecoder extends Decoder<Java.Wrapper> {
+  decode(value: Java.Wrapper): DecodedValue {
+    const values: DecodedValue[] = [];
+    const iterator = value.iterator();
+    const decodeLimit = this.settings.decodeLimit ?? DEFAULT_DECODER_SETTINGS.decodeLimit;
 
-  let count = 0;
-  while (iterator.hasNext() && count < limit) {
-    const element = iterator.next();
-    values.push(customElementDecoder ? customElementDecoder(element) : defaultElementDecoder(element, kind.decoderSettings));
-    count++;
+    let iteratorDecoder: Decoder<Java.Wrapper> | undefined;
+
+    let count = 0;
+    while (iterator.hasNext() && count < decodeLimit) {
+      const element = iterator.next();
+
+      if (!iteratorDecoder) {
+        iteratorDecoder = JavaDecoderResolver.resolveDecoder({
+          type: element.$className,
+          settings: this.settings,
+        });
+      }
+
+      values.push(iteratorDecoder.decode(element));
+      count++;
+    }
+
+    if (iterator.hasNext()) {
+      values.push({
+        type: "java.lang.String",
+        value: `[truncated at ${decodeLimit}]`,
+      } as DecodedValue);
+    }
+
+    return {
+      type: this.type,
+      value: values,
+    };
   }
-
-  if (iterator.hasNext()) {
-    values.push({
-      type: "java.lang.String",
-      value: `[truncated at ${limit}]`,
-    } as DecodedValue);
-  }
-
-  return {
-    type: kind.implementationType ?? kind.type,
-    value: values,
-  };
 }

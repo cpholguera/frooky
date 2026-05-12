@@ -135,7 +135,7 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
         params.push({
           type: type.className,
           decodeAt: "enter",
-          decoderSettings: decoderSettings,
+          settings: decoderSettings,
         });
       } else {
         frooky.log.warn(`No Frida type name for the VM type ${type.name} found.`);

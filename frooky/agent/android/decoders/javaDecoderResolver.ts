@@ -15,17 +15,16 @@ export const JavaDecoderResolver: DecoderResolver<Java.Wrapper> = {
   resolveDecoder(decodable: Decodable): Decoder<Java.Wrapper> {
     if (decodable.type.startsWith("[")) {
       // java array decoder
-      return new JavaArrayDecoder(decodable.type, decodable.decoderSettings);
+      return new JavaArrayDecoder(decodable.type, decodable.settings);
     } else if (decodable.type === "long") {
       // long decoder using .toString() due to the numbers length larger than the JS number type
-      return new JavaLongDecoder(decodable.type, decodable.decoderSettings);
+      return new JavaLongDecoder(decodable.type, decodable.settings);
     } else if (JAVA_PRIMITIVE_TYPES.has(decodable.type) || decodable.type === "void") {
       // other Java primitive types and void
-      return new JavaPrimitiveDecoder(decodable.type, decodable.decoderSettings);
+      return new JavaPrimitiveDecoder(decodable.type, decodable.settings);
     }
     // at this time we don't know the implementation class
     // this decoders resolves the implementation type at first time decode() is called
-    console.log("return new class decoder");
-    return new JavaClassDecoder(decodable.type, decodable.decoderSettings);
+    return new JavaClassDecoder(decodable.type, decodable.settings);
   },
 };

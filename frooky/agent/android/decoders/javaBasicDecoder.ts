@@ -24,7 +24,7 @@ export class JavaFallbackDecoder extends Decoder<Java.Wrapper> {
   decode(value: Java.Wrapper): DecodedValue {
     return {
       type: this.type,
-      value: value,
+      value: value.toString(),
     };
   }
 }
