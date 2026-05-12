@@ -5,10 +5,11 @@ interface Matcher<T> {
   toEqual: (expected: T) => void;
   toBeTruthy: () => void;
   toBeFalsy: () => void;
+  toBeNull: () => void;
   toThrow: (errorMatch?: string | Error) => void;
-  notToThrow: () => void;
   toLogWarn: (expected: string) => void;
   toLogError: (expected: string) => void;
+  not: Matcher<T>;
 }
 
 declare global {
@@ -50,81 +51,89 @@ const deepEqual = <T>(a: T, b: T): boolean => {
   return keysA.every((k) => deepEqual((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]));
 };
 
-globalThis.expect = <T>(actual: T): Matcher<T> => ({
-  toBe: (expected) => assert(actual === expected, `Expected ${actual} to be ${expected}`),
+const createMatcher = <T>(actual: T, negated = false): Matcher<T> => {
+  const check = (condition: boolean, message: string) => assert(negated ? !condition : condition, message);
 
-  toEqual: (expected) =>
-    assert(deepEqual(actual, expected), `Expected ${JSON.stringify(actual, null, 2)} to equal ${JSON.stringify(expected, null, 2)}`),
+  const matcher: Matcher<T> = {
+    toBe: (expected) => check(actual === expected, negated ? `Expected ${actual} not to be ${expected}` : `Expected ${actual} to be ${expected}`),
 
-  toBeTruthy: () => assert(!!actual, `Expected ${actual} to be truthy`),
+    toEqual: (expected) =>
+      check(
+        deepEqual(actual, expected),
+        negated
+          ? `Expected ${JSON.stringify(actual, null, 2)} not to equal ${JSON.stringify(expected, null, 2)}`
+          : `Expected ${JSON.stringify(actual, null, 2)} to equal ${JSON.stringify(expected, null, 2)}`,
+      ),
 
-  toBeFalsy: () => assert(!actual, `Expected ${actual} to be falsy`),
+    toBeTruthy: () => check(!!actual, negated ? `Expected ${actual} not to be truthy` : `Expected ${actual} to be truthy`),
 
-  toThrow: (errorMatch) => {
-    assert(typeof actual === "function", "Expected a function");
-    let caughtError: unknown;
-    try {
-      (actual as () => void)();
-    } catch (e) {
-      caughtError = e;
-    }
-    assert(caughtError !== undefined, "Expected function to throw");
-    if (!errorMatch || !(caughtError instanceof Error)) return;
-    if (typeof errorMatch === "string") {
-      assert(caughtError.message.includes(errorMatch), `Expected error message to include "${errorMatch}" but got "${caughtError.message}"`);
-    } else {
-      assert(
-        caughtError instanceof errorMatch.constructor && caughtError.message === errorMatch.message,
-        `Expected ${errorMatch.constructor.name}: "${errorMatch.message}" but got ${(caughtError as Error).constructor.name}: "${caughtError.message}"`,
-      );
-    }
-  },
+    toBeFalsy: () => check(!actual, negated ? `Expected ${actual} not to be falsy` : `Expected ${actual} to be falsy`),
 
-  notToThrow: () => {
-    assert(typeof actual === "function", "Expected a function");
-    let caughtError: unknown;
-    try {
-      (actual as () => void)();
-    } catch (e) {
-      caughtError = e;
-    }
-    assert(
-      caughtError === undefined,
-      `Expected function not to throw but got ${caughtError instanceof Error ? `${caughtError.constructor.name}: "${caughtError.message}"` : String(caughtError)}`,
-    );
-  },
-  toLogWarn: (expected: string) => {
-    assert(typeof actual === "function", "Expected a function");
-    const original = frooky.log.warn;
-    let captured: string | undefined;
-    frooky.log.warn = (msg: string) => {
-      captured = msg;
-    };
-    try {
-      (actual as () => void)();
-    } finally {
-      frooky.log.warn = original;
-    }
-    assert(captured !== undefined, `Expected frooky.log.warn to be called`);
-    assert(captured!.includes(expected), `Expected frooky.log.warn to be called with "${expected}" but got "${captured}"`);
-  },
+    toBeNull: () => check(actual === null, negated ? `Expected ${actual} not to be null` : `Expected ${actual} to be null`),
 
-  toLogError: (expected: string) => {
-    assert(typeof actual === "function", "Expected a function");
-    const original = frooky.log.error;
-    let captured: string | undefined;
-    frooky.log.error = (msg: string) => {
-      captured = msg;
-    };
-    try {
-      (actual as () => void)();
-    } finally {
-      frooky.log.error = original;
-    }
-    assert(captured !== undefined, `Expected frooky.log.error to be called`);
-    assert(captured!.includes(expected), `Expected frooky.log.error to be called with "${expected}" but got "${captured}"`);
-  },
-});
+    toThrow: (errorMatch) => {
+      assert(typeof actual === "function", "Expected a function");
+      let caughtError: unknown;
+      try {
+        (actual as () => void)();
+      } catch (e) {
+        caughtError = e;
+      }
+      check(caughtError !== undefined, negated ? "Expected function not to throw" : "Expected function to throw");
+      if (negated || !errorMatch || !(caughtError instanceof Error)) return;
+      if (typeof errorMatch === "string") {
+        assert(caughtError.message.includes(errorMatch), `Expected error message to include "${errorMatch}" but got "${caughtError.message}"`);
+      } else {
+        assert(
+          caughtError instanceof errorMatch.constructor && caughtError.message === errorMatch.message,
+          `Expected ${errorMatch.constructor.name}: "${errorMatch.message}" but got ${(caughtError as Error).constructor.name}: "${caughtError.message}"`,
+        );
+      }
+    },
+
+    toLogWarn: (expected: string) => {
+      assert(typeof actual === "function", "Expected a function");
+      const original = frooky.log.warn;
+      let captured: string | undefined;
+      frooky.log.warn = (msg: string) => {
+        captured = msg;
+      };
+      try {
+        (actual as () => void)();
+      } finally {
+        frooky.log.warn = original;
+      }
+      check(captured !== undefined, negated ? `Expected frooky.log.warn not to be called` : `Expected frooky.log.warn to be called`);
+      if (negated || captured === undefined) return;
+      assert(captured.includes(expected), `Expected frooky.log.warn to be called with "${expected}" but got "${captured}"`);
+    },
+
+    toLogError: (expected: string) => {
+      assert(typeof actual === "function", "Expected a function");
+      const original = frooky.log.error;
+      let captured: string | undefined;
+      frooky.log.error = (msg: string) => {
+        captured = msg;
+      };
+      try {
+        (actual as () => void)();
+      } finally {
+        frooky.log.error = original;
+      }
+      check(captured !== undefined, negated ? `Expected frooky.log.error not to be called` : `Expected frooky.log.error to be called`);
+      if (negated || captured === undefined) return;
+      assert(captured.includes(expected), `Expected frooky.log.error to be called with "${expected}" but got "${captured}"`);
+    },
+
+    get not() {
+      return createMatcher(actual, !negated);
+    },
+  };
+
+  return matcher;
+};
+
+globalThis.expect = <T>(actual: T): Matcher<T> => createMatcher(actual);
 
 async function runSuite(name: string, fn: () => void | Promise<void>, depth: number): Promise<TestResult> {
   const children: Array<{ name: string; fn: () => void | Promise<void> }> = [];

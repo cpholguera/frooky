@@ -40,7 +40,7 @@ export class NativeValueDecoder extends Decoder<NativePointer> {
   cachedValueDecoder: FundamentalValueDecoder | null = null;
 
   public decode(value: NativePointer): DecodedValue {
-    if (this.cachedValueDecoder === null) {
+    if (!this.cachedValueDecoder) {
       this.cachedValueDecoder = valueDecoders[this.type as FridaFundamentalType];
     }
     return {
