@@ -1,6 +1,6 @@
 import Java from "frida-java-bridge";
 import { Decoder } from "../../shared/decoders/baseDecoder";
-import { Decodable, Param, RetType } from "../../shared/decoders/decodable";
+import { Param, RetType } from "../../shared/decoders/decodable";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_HOOK_SETTINGS } from "../../shared/defaultValues";
 import { DecoderSettings } from "../../shared/frookySettings";
@@ -43,8 +43,8 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
     });
   }
 
-  private resolveParamDecoders(params: Param[]): ParamDecoders<Decodable, Java.Wrapper> {
-    const paramDecoders: ParamDecoders<Decodable, Java.Wrapper> = {
+  private resolveParamDecoders(params: Param[]): ParamDecoders<Java.Wrapper> {
+    const paramDecoders: ParamDecoders<Java.Wrapper> = {
       enter: [],
       exit: [],
     };
@@ -69,7 +69,7 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
       let stackTrace: string[];
 
       // // resolve the decoders used for this hook and cache it locally
-      let paramDecoders: ParamDecoders<Decodable, Java.Wrapper>;
+      let paramDecoders: ParamDecoders<Java.Wrapper>;
       if (hook.params) {
         paramDecoders = this.resolveParamDecoders(hook.params);
       }

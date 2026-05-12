@@ -1,12 +1,11 @@
 import { Decoder } from "../decoders/baseDecoder";
-import { Decodable } from "../decoders/decodable";
 import { DecodedValue } from "../decoders/decodedValue";
 import { HOOK_LOOKUP_INTERVAL_MS } from "../defaultValues";
 import { Hook } from "./hook";
 
-export type ParamDecoders<TDecodable extends Decodable, TValue> = {
-  enter: Decoder<TDecodable, TValue>[];
-  exit: Decoder<TDecodable, TValue>[];
+export type ParamDecoders<TValue> = {
+  enter: Decoder<TValue>[];
+  exit: Decoder<TValue>[];
 };
 
 export type DecodedArgs = {
