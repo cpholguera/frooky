@@ -1,20 +1,6 @@
 import { DEFAULT_DECODER_SETTINGS } from "../../shared/defaultValues";
 import { NativeValueDecoder } from "./nativeValueDecoder";
 
-// Helper: allocate a NativePointer with a 32-bit integer value
-function ptr32(value: number): NativePointer {
-  const buf = Memory.alloc(4);
-  buf.writeS32(value);
-  return buf;
-}
-
-// Helper: allocate a NativePointer with a 64-bit integer value
-function ptr64(value: number | Int64 | UInt64): NativePointer {
-  const buf = Memory.alloc(8);
-  buf.writeS64(value);
-  return buf;
-}
-
 describe("NativeValueDecoder", () => {
   describe("decode()", () => {
     it("should decode void as null", () => {
