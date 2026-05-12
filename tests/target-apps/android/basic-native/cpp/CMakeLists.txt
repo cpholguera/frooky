@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.31.6)
+cmake_minimum_required(VERSION 3.22.1)
 project("basic-native")
 
 add_library(receiveFundamentalValue SHARED receiveFundamentalValue.c)
