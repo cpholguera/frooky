@@ -1,5 +1,6 @@
 import type Java from "frida-java-bridge";
 import { Decoder } from "../../shared/decoders/baseDecoder";
+import { Decodable } from "../../shared/decoders/decodable";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { JAVA_PRIMITIVE_TYPES, JavaDecoderResolver } from "./javaDecoderResolver";
 
@@ -43,7 +44,7 @@ function elementTypeFromSignature(element: string): string {
 
 export class JavaArrayDecoder extends Decoder<Java.Wrapper> {
   decode(value: Java.Wrapper): DecodedValue {
-    const signature = this.kind.implementationType ?? this.kind.type;
+    const signature = this.type;
     const elementSignature = signature.startsWith("[") ? signature.substring(1) : signature;
     const elementType = elementTypeFromSignature(elementSignature);
     let arrayValue: unknown[];
@@ -52,23 +53,22 @@ export class JavaArrayDecoder extends Decoder<Java.Wrapper> {
       // Frida unwraps primitive arrays to a JS-iterable directly
       arrayValue = Array.from(value as unknown as ArrayLike<unknown>);
     } else {
-      // complex java types
-      const elementDecodable: JavaDecodable = {
-        ...param,
+      // complex java types or nested array
+      const elementDecodable: Decodable = {
         type: elementType,
-        implementationType: undefined,
+        decoderSettings: this.settings,
       };
+      const elementDecoder = JavaDecoderResolver.resolveDecoder(elementDecodable);
       const len = value.length;
       arrayValue = new Array(len);
       for (let i = 0; i < len; i++) {
         const el = value[i];
-        // TODO: get the decoder and then decode
-        arrayValue[i] = el == null ? null : JavaDecoderResolver.resolveDecoder(el, elementDecodable, settings).value;
+        arrayValue[i] = el == null ? null : elementDecoder.decode(el).value;
       }
     }
 
     return {
-      type: this.kind.type,
+      type: this.type,
       value: arrayValue,
     };
   }

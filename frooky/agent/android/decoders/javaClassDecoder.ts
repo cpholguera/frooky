@@ -22,19 +22,20 @@ const javaClassDecoderRegistry: Record<string, DecoderConstructor> = {
 };
 
 export class JavaClassDecoder extends Decoder<Java.Wrapper> {
-  implDecoder: Decoder<Java.Wrapper> | undefined;
+  implementationDecoder: Decoder<Java.Wrapper> | undefined;
 
   decode(value: Java.Wrapper): DecodedValue {
-    console.log(value.$className);
-    if (!this.implDecoder) {
-      // Try to find a decoder in the registry, fall back to JavaFallbackDecoder
+    if (!this.implementationDecoder) {
+      // Try to find a decoder in the registry with fall back to JavaFallbackDecoder
       const DecoderClass = javaClassDecoderRegistry[value.$className];
-      this.implDecoder = DecoderClass ? new DecoderClass(value.$className, this.settings) : new JavaFallbackDecoder(this.type, this.settings);
+      this.implementationDecoder = DecoderClass
+        ? new DecoderClass(value.$className, this.settings)
+        : new JavaFallbackDecoder(this.type, this.settings);
     }
 
     return {
       type: this.type,
-      value: this.implDecoder.decode(value),
+      value: this.implementationDecoder.decode(value),
     };
   }
 }
