@@ -42,7 +42,7 @@ const referenceDecoders: Record<FridaFundamentalType, ReferenceDecoder> = {
       }
       return input.readUtf8String();
     } catch (e) {
-      frooky.log.warn(`Unable to decode ucar: ${e}`);
+      frooky.log.warn(`Unable to decode uchar *: ${e}`);
       return null;
     }
   },
