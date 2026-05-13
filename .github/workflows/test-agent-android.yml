@@ -27,8 +27,8 @@ jobs:
       - name: Download MAS app Android artifact
         uses: actions/download-artifact@v8
         with:
-          name: target-app-android
-          path: target-app-android
+          name: target-apps-android
+          path: target-apps-android
 
       - name: Setup Agent Test Environment
         uses: ./.github/actions/setup-agent-test-env
@@ -47,30 +47,28 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: |
-            chmod +x .github/scripts/android/prep-device.sh
-            chmod +x .github/scripts/android/install-frida-server.sh
-
             echo "Starting adb as root"
             .github/scripts/android/prep-device.sh
 
             echo "Installing frida server"
             .github/scripts/android/install-frida-server.sh
 
-            echo "Installing target app"
-            adb install target-app-android/MASTestApp.apk
+            echo "Installing target apps"
+            .github/scripts/android/install-target-apps.sh
+
+            echo "Launching all target apps"
+            .github/scripts/android/launch-target-apps.sh
 
             echo "Running Android agent tests"
-            npm --prefix frooky/agent run test:android -- --appIdentifier org.owasp.mastestapp > test-results-android.txt
+            npm --prefix frooky/agent run test:android -- -i basic_parameter.frooky.target.app -o test-results.txt
 
-            cat test-results-android.txt
-
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat test-results-android.txt >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat frooky/agent/test-results.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: test-results-android
-          path: test-results-android.txt
+          name: test-results
+          path: frooky/agent/test-results.txt
