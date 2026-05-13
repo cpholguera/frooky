@@ -21,8 +21,13 @@ NOINLINE EXPORT void receive_ullong_ref(unsigned long long *minValue, unsigned l
 NOINLINE EXPORT void receive_float_ref(float *minValue, float *maxValue) {}
 NOINLINE EXPORT void receive_double_ref(double *minValue, double *maxValue) {}
 NOINLINE EXPORT void receive_ldouble_ref(long double *minValue, long double *maxValue) {}
-NOINLINE EXPORT void receive_byte_array(unsigned char *data, int length) {}
-
+NOINLINE EXPORT void receive_byte_array(unsigned char *data, int length)
+{
+    for (int i = 0; i < length; i++)
+    {
+        data[i] = data[i] ^ 0xFF; // invert each byte
+    }
+}
 JNIEXPORT jstring JNICALL
 Java_org_owasp_mastestapp_MastgTest_receiveFundamentalReferenceJNI(JNIEnv *env, jobject thiz)
 {
@@ -43,7 +48,7 @@ Java_org_owasp_mastestapp_MastgTest_receiveFundamentalReferenceJNI(JNIEnv *env, 
     float minF = -3.4028235e38f, maxF = 3.4028235e38f;
     double minD = -1.7976931348623157e308, maxD = 1.7976931348623157e308;
     long double minLd = -1.18973149535723176e4932L, maxLd = 1.18973149535723176e4932L;
-    unsigned char data[] = {0x00, 0x01, 0x02, 0xFF, 0xFE};
+    unsigned char data[] = {0x48, 0x65, 0x6C, 0x6C, 0x6F};
 
     receive_bool_ref(&minBool, &maxBool);
     receive_char_ref(&minChar, &maxChar);
@@ -60,7 +65,7 @@ Java_org_owasp_mastestapp_MastgTest_receiveFundamentalReferenceJNI(JNIEnv *env, 
     receive_float_ref(&minF, &maxF);
     receive_double_ref(&minD, &maxD);
     receive_ldouble_ref(&minLd, &maxLd);
-    receive_byte_array(data, 4);
+    receive_byte_array(data, 5);
 
     return (*env)->NewStringUTF(env, "Called functions with primitives received by reference (e.g. void receive_int(int *minValue, int *maxValue)).");
 }
