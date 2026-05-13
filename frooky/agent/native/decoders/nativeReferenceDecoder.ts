@@ -4,7 +4,7 @@ import { DecoderSettings } from "../../shared/frookySettings";
 import { toHexAndAscii } from "../../shared/utils";
 import { FridaFundamentalType, FridaReferenceType } from "./nativeFridaType";
 
-type ReferenceDecoder = (input: NativePointer, args?: DecoderArgs<NativePointer>[]) => null | number | boolean | string;
+type ReferenceDecoder = (input: NativePointer, args?: DecoderArgs<NativePointer>[]) => any;
 
 const referenceDecoders: Record<FridaFundamentalType, ReferenceDecoder> = {
   void: () => null,
