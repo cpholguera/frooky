@@ -1,7 +1,7 @@
 import { Decoder, DecoderArgs } from "../../shared/decoders/baseDecoder";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { DecoderSettings } from "../../shared/frookySettings";
-import { toHex } from "../../shared/utils";
+import { toHexAndAscii } from "../../shared/utils";
 import { FridaFundamentalType, FridaReferenceType } from "./nativeFridaType";
 
 type ReferenceDecoder = (input: NativePointer, args?: DecoderArgs<NativePointer>[]) => null | number | boolean | string;
@@ -35,7 +35,7 @@ const referenceDecoders: Record<FridaFundamentalType, ReferenceDecoder> = {
             frooky.log.debug(`uchar * Decoder: Successfully read ${decodedArg.value} bytes of uchar *`);
             if (rawBytes !== null) {
               var bytes = new Uint8Array(rawBytes);
-              return toHex(bytes);
+              return toHexAndAscii(bytes);
             }
           }
         }
