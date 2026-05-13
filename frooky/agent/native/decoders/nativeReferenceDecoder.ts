@@ -1,9 +1,10 @@
-import { Decoder } from "../../shared/decoders/baseDecoder";
+import { Decoder, DecoderArgs } from "../../shared/decoders/baseDecoder";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { DecoderSettings } from "../../shared/frookySettings";
+import { toHex } from "../../shared/utils";
 import { FridaFundamentalType, FridaReferenceType } from "./nativeFridaType";
 
-type ReferenceDecoder = (input: NativePointer) => null | number | boolean | string;
+type ReferenceDecoder = (input: NativePointer, args?: DecoderArgs<NativePointer>[]) => null | number | boolean | string;
 
 const referenceDecoders: Record<FridaFundamentalType, ReferenceDecoder> = {
   void: () => null,
@@ -17,12 +18,32 @@ const referenceDecoders: Record<FridaFundamentalType, ReferenceDecoder> = {
     }
   },
   int8: (input) => input.readS8(),
-  uchar: (input) => {
-    // TODO: May be replaced in the future by a better string decoder
+  uchar: (input, args) => {
+    // TODO: should be generalized to be usable by other reference decoders (char *, int8....)
+    // for now, we assume, that the first argument is the length of the array as an int
     try {
+      if (args && args[0]) {
+        frooky.log.debug(`uchar * Decoder: One argument passed.`);
+        var decodedArg = args[0].decoder.decode(args[0].arg);
+        frooky.log.debug(`uchar * Decoder: Decoded argument: ${JSON.stringify(decodedArg, null, 2)}`);
+
+        if (typeof decodedArg.value != "number") {
+          frooky.log.warn(`Argument passed to uchar decoder is not a number.`);
+        } else {
+          if (decodedArg.value) {
+            var rawBytes = input.readByteArray(decodedArg.value);
+            frooky.log.debug(`uchar * Decoder: Successfully read ${decodedArg.value} bytes of uchar *`);
+            if (rawBytes !== null) {
+              var bytes = new Uint8Array(rawBytes);
+              return toHex(bytes);
+            }
+          }
+        }
+      }
       return input.readUtf8String();
     } catch (e) {
-      return input.readS8();
+      frooky.log.warn(`Unable to decode ucar: ${e}`);
+      return null;
     }
   },
   uint8: (input) => input.readU8(),
@@ -51,13 +72,13 @@ export class NativeReferenceDecoder extends Decoder<NativePointer> {
     this.fridaReference = fridaReference;
   }
 
-  public decode(value: NativePointer): DecodedValue {
+  public decode(value: NativePointer, args?: DecoderArgs<NativePointer>[]): DecodedValue {
     if (this.cachedDecoder === null) {
       this.cachedDecoder = referenceDecoders[this.fridaReference.pointee];
     }
     return {
       type: this.type,
-      value: this.cachedDecoder(value),
+      value: this.cachedDecoder(value, args),
     };
   }
 }

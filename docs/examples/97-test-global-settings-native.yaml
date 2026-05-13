@@ -108,7 +108,6 @@ hookGroup:
       - symbol: receive_char
         params: [char]
 
-
 # decode argument: null terminated string 
   - module: libreceiveString.so
     hookSettings:
@@ -155,3 +154,11 @@ hookGroup:
         params:
           - [ullong, minValue]
           - [ullong, maxValue]
+
+  # use parameter to decode a native uchar *
+  - module: libreceiveFundamentalReference.so
+    hooks:
+      - symbol: receive_byte_array
+        params:
+          - [unsigned char *, data, { decoderArgs: [ length ] } ]
+          - [int, length]

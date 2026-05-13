@@ -8,7 +8,8 @@ export const DEFAULT_DECODER_SETTINGS: DecoderSettings = {
   magicDecode: false,
   maxRecursion: 10,
   decodeLimit: 1000,
-  customDecoder: null,
+  customDecoder: "",
+  decoderArgs: [],
 };
 
 export const DEFAULT_HOOK_SETTINGS: HookSettings = {
@@ -18,7 +19,7 @@ export const DEFAULT_HOOK_SETTINGS: HookSettings = {
 
 export const DEFAULT_FROOKY_SETTINGS: FrookySettings = {
   verbose: false,
-  logLevel: "warn",
+  logLevel: "debug",
   logTo: "frooky",
   resolverTimeout: 5,
   hookSettings: DEFAULT_HOOK_SETTINGS,

@@ -13,7 +13,8 @@ export const decoderSettingsSchema = z.object({
     decodeLimit: z.number(),
     magicDecode: z.boolean(),
     fastDecode: z.boolean(),
-    customDecoder: z.string().nullable()
+    customDecoder: z.string(),
+    decoderArgs: z.array(z.string())
 });
 
 export const frookySettingsSchema = z.object({

@@ -12,7 +12,7 @@ if (Java.available) {
   //%%% REPLACE STOP
 
   Java.perform(() => {
-    globalThis.frooky = new FrookyAgent("Android", new JavaHookValidator(), new JavaHookManager(), 3, "device");
+    globalThis.frooky = new FrookyAgent("Android", new JavaHookValidator(), new JavaHookManager(), 4, "device");
     frooky.run(frookyConfigs);
   });
 } else {

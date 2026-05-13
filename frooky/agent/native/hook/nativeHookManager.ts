@@ -1,4 +1,4 @@
-import { Decoder } from "../../shared/decoders/baseDecoder";
+import { Decoder, DecoderArgs } from "../../shared/decoders/baseDecoder";
 import { Param, RetType } from "../../shared/decoders/decodable";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
 import { DecodedArgs, HookManager, ParamDecoders } from "../../shared/hook/hookManager";
@@ -77,13 +77,13 @@ export class NativeHookManager extends HookManager<InputNativeHookNormalized, Na
             for (let i = 0; i < hook.params.length; i++) {
               this.savedArgs[i] = args[i];
             }
-            decodedArgs.enter = hookManager.decodeNativeArgs(args, paramDecoders.enter);
+            decodedArgs.enter = hookManager.decodeNativeArgs(args, paramDecoders.enter, hook.params);
           }
         },
         onLeave: function (returnValue: InvocationReturnValue) {
           if (hook.params) {
             // decode arguments onExit
-            decodedArgs.exit = hookManager.decodeNativeArgs(this.savedArgs, paramDecoders.exit);
+            decodedArgs.exit = hookManager.decodeNativeArgs(this.savedArgs, paramDecoders.exit, hook.params);
           }
 
           let decodedRetValue: DecodedValue | undefined;
@@ -165,10 +165,25 @@ export class NativeHookManager extends HookManager<InputNativeHookNormalized, Na
     return NativeDecoderResolver.resolveDecoder(retType);
   }
 
-  private decodeNativeArgs(args: NativePointer[], decoderCache: Decoder<NativePointer>[]): DecodedValue[] {
+  private decodeNativeArgs(args: NativePointer[], decoderCache: Decoder<NativePointer>[], params?: Param[]): DecodedValue[] {
     const decodedArgs: DecodedValue[] = [];
     decoderCache.forEach((decoder: Decoder<NativePointer>, i: number) => {
-      decodedArgs.push(decoder.decode(args[i]));
+      // TODO: Should be generalized to be reused by android and ios code
+      let decoderArgs: DecoderArgs<NativePointer>[] = [];
+      if (params && params[i].settings.decoderArgs.length > 0) {
+        for (const argName of params[i].settings.decoderArgs) {
+          params.forEach((param: Param, j: number) => {
+            if (param.name === argName) {
+              decoderArgs.push({
+                arg: args[j],
+                decoder: NativeDecoderResolver.resolveDecoder(param),
+                name: param.name,
+              });
+            }
+          });
+        }
+      }
+      decodedArgs.push(decoder.decode(args[i], decoderArgs));
     });
     return decodedArgs;
   }

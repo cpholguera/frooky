@@ -56,7 +56,14 @@ export interface DecoderSettings {
    *
    * @defaultValue null
    */
-  customDecoder: string | null;
+  customDecoder: string;
+
+  /**
+   * Arguments form the arguments list passed to the decoder.
+   *
+   * @defaultValue null
+   */
+  decoderArgs: string[];
 }
 
 export interface FrookySettings {
