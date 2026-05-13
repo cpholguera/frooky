@@ -44,11 +44,18 @@ jobs:
       - name: Install and run all apps on simulator
         run: |
           set -eo pipefail
+          shopt -s nullglob
 
-          for app in target-apps-ios/*.target-app.app; do
+          apps=(target-apps-ios/*.target-app.app)
+          if [ ${#apps[@]} -eq 0 ]; then
+            echo "ERROR: No .target-app.app bundles found. Contents:"
+            find target-apps-ios -print
+            exit 1
+          fi
+
+          for app in "${apps[@]}"; do
             TARGET_APP=$(basename "$app" .target-app.app)
             APP_ID="${TARGET_APP//-/_}.mastestapp"
-
             echo "=== Installing $app (bundle ID: $APP_ID) ==="
             xcrun simctl install booted "$app"
 
