@@ -13,7 +13,7 @@ There are different accepted ways to declare a parameter. The following chapters
   - [Named Objective-C Parameters](#named-objective-c-parameters)
   - [Named Native Parameters](#named-native-parameters)
 - [Decoders](#decoders)
-  - [`decodeAt`-Option: Declare the Time of Decoding](#decodeat-option-declare-the-time-of-decoding)
+  - [`direction`-Option: Declare the Time of Decoding](#direction-option-declare-the-time-of-decoding)
     - [Explicit Time of Decoding in Java](#explicit-time-of-decoding-in-java)
     - [Explicit Time of Decoding in Objective-C](#explicit-time-of-decoding-in-objective-c)
     - [Explicit Time of Decoding in Native](#explicit-time-of-decoding-in-native)
@@ -21,7 +21,6 @@ There are different accepted ways to declare a parameter. The following chapters
     - [Pass Arguments to Decoder in Java](#pass-arguments-to-decoder-in-java)
     - [Pass Arguments to Decoder in Objective-C](#pass-arguments-to-decoder-in-objective-c)
     - [Pass Arguments to Decoder in Native](#pass-arguments-to-decoder-in-native)
-
 
 ## Unnamed Parameters
 
@@ -183,7 +182,7 @@ You can configure a decoder by adding a decoder configuration object to a parame
 
 This is done using a decoder configuration added to any [unnamed](#unnamed-parameters) and [named](#named-parameters) parameters. It can contain the following options:
 
-- `decodeAt`
+- `direction`
 - `decodeArgs`
 
 ```yaml
@@ -191,7 +190,7 @@ params:
   - [ <type>,                                    # Parameter type
       <name>,                                    # Parameter name
       {                                          # Decoder configuration
-        decodeAt: <enter|exit|both>,             # When to decode the parameter. Default: enter
+        direction: <in|out|inout>,               # When to decode the parameter. Default: in
         decoderArgs: [<param_name>]              # List of arguments passed to the decoder. Must be a valid parameter name
       }
     ]
@@ -199,7 +198,7 @@ params:
 
 The following chapters will explain the concepts through practical examples.
 
-### `decodeAt`-Option: Declare the Time of Decoding
+### `direction`-Option: Declare the Time of Decoding
 
 By default, arguments are decoded when the function or method is called. Larger data structures, such as arrays, are often passed by reference to allow manipulation within the function or method, as the following example shows:
 
@@ -212,8 +211,8 @@ This Java method from the class `javax.crypto.Cipher` encrypts or decrypts the d
 
 To accommodate these cases, you can specify the timing of decoding using the following decoder options:
 
-- After the function or method completes (`decodeAt: exit`)
-- Both at the beginning and after the function or method completes (`decodeAt: both`)
+- After the function or method completes (`direction: out`)
+- Both at the beginning and after the function or method completes (`direction: inout`)
 
 #### Explicit Time of Decoding in Java
 
@@ -223,7 +222,7 @@ methods:
   - name: doFinal
     overloads:
       - params:
-        - [ "[B", output, { decodeAt: exit } ]
+        - [ "[B", output, { direction: out } ]
         - [ int, outputOffset ]
  ```
 
@@ -245,7 +244,7 @@ methods:
     returnType: "(NSArray<NSString *> *)"
     params:
       - [ "(NSString *)", path ]
-      - [ "(NSError * *)", error, { decodeAt: exit } ]
+      - [ "(NSError * *)", error, { direction: out } ]
 ```
 
 This example hooks the following method from [NSFileManager](https://developer.apple.com/documentation/foundation/filemanager/contentsofdirectory(atpath:)?language=objc):
@@ -265,7 +264,7 @@ functions:
   - symbol: realpath
     params:
       - [ "const char *restrict", file_name ]
-      - [ "char *restrict", resolved_name, { decodeAt: exit } ]
+      - [ "char *restrict", resolved_name, { direction: out } ]
 ```
 
 This example hooks the following method from the [C standard library on iOS](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/realpath.3.html):
@@ -294,7 +293,6 @@ int EVP_EncryptUpdate(EVP_CIPHER_CTX *ctx,       // Cipher context
 This function encrypts `inl` bytes from the `in` buffer and writes the encrypted result to the `out` buffer. Depending on the encryption algorithm used, it is unclear how many bytes will be written when the function is called.
 
 If we want to decode the `out` buffer, we must pass its length (`outl`) to the buffer decoder.
-
 
 #### Pass Arguments to Decoder in Java
 
@@ -348,7 +346,7 @@ functions:
     returnType: int
     params:
       - [ "EVP_MD_CTX *", ctx ]
-      - [ "unsigned char *", md, { decodeAt: exit, decoderArgs: [ ctx ] } ]
+      - [ "unsigned char *", md, { direction: out, decoderArgs: [ ctx ] } ]
       - [ "unsigned int *", s ]
 ```
 

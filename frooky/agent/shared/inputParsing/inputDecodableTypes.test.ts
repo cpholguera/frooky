@@ -1,0 +1,84 @@
+import { DEFAULT_DECODER_SETTINGS } from "../defaultValues";
+import { normalizeInputParam } from "./inputDecodableTypes";
+
+describe("inputDecodableTypes", () => {
+  describe("normalizeInputParam()", () => {
+    it("should normalize a valid string to Param", () => {
+      expect(normalizeInputParam("testParam")).toEqual({ type: "testParam", direction: "in", settings: DEFAULT_DECODER_SETTINGS });
+    });
+    it("should normalize [string, string] to a valid Param", () => {
+      expect(normalizeInputParam(["testParam", "paramName"])).toEqual({
+        type: "testParam",
+        name: "paramName",
+        direction: "in",
+        settings: DEFAULT_DECODER_SETTINGS,
+      });
+    });
+    it("should normalize a valid [string, InputParamSettings] to Param", () => {
+      expect(
+        normalizeInputParam(["testParam", { direction: "out", maxRecursion: 10, decodeLimit: 10, fastDecode: false, magicDecode: true }]),
+      ).toEqual({
+        type: "testParam",
+        direction: "out",
+        settings: {
+          maxRecursion: 10,
+          decodeLimit: 10,
+          fastDecode: false,
+          magicDecode: true,
+          customDecoder: "",
+          decoderArgs: [],
+        },
+      });
+    });
+    it("should normalize to a valid [string, string, InputParamSettings] to Param", () => {
+      expect(
+        normalizeInputParam([
+          "testParam",
+          "paramName",
+          { direction: "out", maxRecursion: 10, decodeLimit: 10, fastDecode: false, magicDecode: true },
+        ]),
+      ).toEqual({
+        type: "testParam",
+        name: "paramName",
+        direction: "out",
+        settings: {
+          maxRecursion: 10,
+          decodeLimit: 10,
+          fastDecode: false,
+          magicDecode: true,
+          customDecoder: "",
+          decoderArgs: [],
+        },
+      });
+    });
+    it("should return Param unchanged", () => {
+      expect(
+        normalizeInputParam({
+          type: "testParam",
+          name: "paramName",
+          direction: "out",
+          settings: {
+            maxRecursion: 10,
+            decodeLimit: 10,
+            fastDecode: false,
+            magicDecode: true,
+            customDecoder: "",
+            decoderArgs: [],
+          },
+        }),
+      ).toEqual({
+        type: "testParam",
+        name: "paramName",
+        direction: "out",
+        settings: {
+          maxRecursion: 10,
+          decodeLimit: 10,
+          fastDecode: false,
+          magicDecode: true,
+          customDecoder: "",
+          decoderArgs: [],
+        },
+      });
+    });
+  });
+});

@@ -1,0 +1,156 @@
+metadata:
+  name: Test Settings Native
+  description: |
+    This frooky config uses different kind of settings:
+
+      1. Global Settings
+
+        Global settings can be of the type `HookSettings` and `DecoderSettings`. They apply to all hooks and their decoders (Parameter and Return Type), if they are not already set locally.
+
+        Example: 
+
+        ```
+        globalSettings
+          hookSettings:
+            hookTimeout:     1
+            stackTraceLimit: 10
+            eventFilter: ['^(?!android).*']
+          decoderSettings:
+            fastDecode: true
+            magicDecode: true 
+            maxRecursion: 5
+            decodeLimit: 100
+        ``` 
+
+      2. Hook and Decoder Settings 
+
+        Hook and decoder settings define the behavior of the local hook.
+
+        Example: 
+        
+        ```
+        <specific-hook>
+          hookSettings:
+            stackTraceLimit: 10
+            eventFilter: ['^(?!android).*']
+          decoderSettings:
+            fastDecode: true
+            magicDecode: true 
+            maxRecursion: 5
+            decodeLimit: 100
+        ```
+
+      3. Parameter Settings
+
+        Parameter settings (`ParamSettings`) define when a parameter is decoded (`direction`), as well as the settings defined in `DecoderSettings`.
+
+        Example: 
+        
+        ```
+        direction: out
+        fastDecode: true
+        magicDecode: true 
+        maxRecursion: 5
+        decodeLimit: 100
+        ```
+
+      4. Return Type Settings
+
+        Return type settings are `DecoderSettings` applied when the return value is decoded
+
+        Example: 
+        
+        ```
+        fastDecode: true
+        magicDecode: true 
+        maxRecursion: 5
+        decodeLimit: 100
+        ```
+  version: 1
+  author: frooky dev
+  platform: Android
+
+# global settings for the hooks in this hook file.
+settings:
+  hookSettings:
+    stackTraceLimit: 10               # Sets stackTraceLimit to 10 for all hooks
+    eventFilter: ['^(?!android).*']   # Stack trace filters to apply.
+  decoderSettings:
+    fastDecode: true                  # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
+    magicDecode: true                 # If set, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime
+    maxRecursion: 1                   # Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
+    decodeLimit: 11                   # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
+
+hookGroup:
+  # simple function declaration
+  - module: libreceiveFundamentalValue.so
+    hooks:
+      - receive_bool
+
+  # object with ONLY symbol provided, technically the same form as the one before
+  - module: libreceiveFundamentalValue.so
+    hooks:
+      - symbol: receive_short
+
+  # PARTIAL local hook settings take priority over global setting, simple function declaration
+  - module: libreceiveFundamentalValue.so
+    hookSettings:
+      stackTraceLimit: 0
+    decoderSettings:
+      decodeLimit: 22
+    hooks:
+      - symbol: receive_int
+        params: [int]
+      - symbol: receive_char
+        params: [char]
+
+# decode argument: null terminated string 
+  - module: libreceiveString.so
+    hookSettings:
+      stackTraceLimit: 0
+    decoderSettings:
+      magicDecode: false
+    hooks:
+      - symbol: receive_cstring
+        params: 
+          - [char *, string]
+      - symbol: receive_utf8
+        params: 
+          - [char *, string]
+
+  # PARTIAL local hook settings take priority over global setting, simple function declaration
+  - module: libreceiveFundamentalValue.so
+    decoderSettings:
+      decodeLimit: 33
+    hooks:
+      - symbol: receive_long
+
+  # PARTIAL local hook settings take priority over global setting, object with ONLY symbol provided
+  - module: libreceiveFundamentalValue.so
+    decoderSettings:
+      decodeLimit: 44
+    hooks:
+      - receive_schar
+      - receive_ullong
+
+  # PARTIAL local parameter settings take priority over global setting, form [type, settings]
+  - module: libreceiveFundamentalValue.so
+    hooks:
+      - symbol: receive_llong
+        params: [ llong, llong ]
+
+  # PARTIAL local parameter settings take priority over global setting, form [type, name, settings]
+  - module: libreceiveFundamentalValue.so
+    hooks:
+      - symbol: receive_ullong
+        params:
+          - [ullong, minValue]
+          - [ullong, maxValue]
+
+  # use parameter to decode a native uchar *
+  - module: libreceiveFundamentalReference.so
+    hooks:
+      - symbol: receive_byte_array
+        params:
+          - [unsigned char *, data, { decoderArgs: [ length ], direction: inout } ]
+          - [int, length]

@@ -1,8 +1,8 @@
 // run-tests.js
 
-import fs from "node:fs";
 import frida from "frida";
 import minimist from "minimist";
+import fs from "node:fs";
 
 const argv = minimist(process.argv.slice(2), {
   string: ["appIdentifier", "agentPath"],
@@ -35,18 +35,19 @@ async function runTests() {
   device = usb ? await frida.getUsbDevice() : await frida.getLocalDevice();
 
   if (Number.isFinite(appIdentifier)) {
-    // Attach to an already-running process by PID
     pid = appIdentifier;
     session = await device.attach(pid);
   } else {
-    // String input supports both bundle/package identifier (spawn) and process name (attach)
     try {
       pid = await device.spawn(appIdentifier);
       wasSpawned = true;
       session = await device.attach(pid);
     } catch {
       const processes = await device.enumerateProcesses();
-      const target = processes.find((proc) => proc.name === appIdentifier) || processes.find((proc) => proc.name.toLowerCase() === String(appIdentifier).toLowerCase()) || processes.find((proc) => proc.name.toLowerCase().includes(String(appIdentifier).toLowerCase()));
+      const target =
+        processes.find((proc) => proc.name === appIdentifier) ||
+        processes.find((proc) => proc.name.toLowerCase() === String(appIdentifier).toLowerCase()) ||
+        processes.find((proc) => proc.name.toLowerCase().includes(String(appIdentifier).toLowerCase()));
 
       if (!target) {
         throw new Error(`Unable to spawn or attach to process using '${appIdentifier}'. If attaching by name, launch the app first.`);
@@ -69,11 +70,20 @@ async function runTests() {
       if (payload.type === "test-result") {
         const printResult = (result) => {
           const indent = "  ".repeat(result.depth ?? 0);
-          if (result.passed) {
-            console.log(`${indent}✅ PASS: ${result.name}`);
+          if (result.kind === "suite") {
+            if (result.passed) {
+              console.log(`${indent}${result.name}`);
+            } else {
+              const error = result.error ? `: ${result.error}` : "";
+              console.error(`${indent}❌ ${result.name}${error}`);
+            }
           } else {
-            const error = result.error ? `: ${result.error}` : "";
-            console.error(`${indent}❌ FAIL: ${result.name}${error}`);
+            if (result.passed) {
+              console.log(`${indent}✅ ${result.name}`);
+            } else {
+              const error = result.error ? `: ${result.error}` : "";
+              console.error(`${indent}❌ ${result.name}${error}`);
+            }
           }
           for (const child of result.children ?? []) {
             printResult(child);
@@ -84,10 +94,10 @@ async function runTests() {
         testComplete = true;
 
         if (payload.success) {
-          console.log("\n✅ PASS: All tests passed.");
+          console.log("\n✅ All tests passed.");
           exitCode = 0;
         } else {
-          console.error("\n❌ FAIL: Some tests failed.");
+          console.error("\n❌ Some tests failed.");
           exitCode = 1;
         }
       }
@@ -103,7 +113,6 @@ async function runTests() {
     await device.resume(pid);
   }
 
-  // Wait for test completion (with timeout)
   const timeout = 30000;
   const startTime = Date.now();
 

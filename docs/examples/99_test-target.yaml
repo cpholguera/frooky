@@ -1,0 +1,276 @@
+metadata:
+  name: Android Hooks for Testing
+  version: 1
+  author: frooky dev
+  platform: Android
+
+# global settings for the hooks in this hook file.
+settings:
+  hookSettings:
+    stackTraceLimit: 10               # Sets stackTraceLimit to 10 for all hooks
+    eventFilter: ['^(?!android).*']   # Stack trace filters to apply.
+  decoderSettings:
+    fastDecode: true                  # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
+    magicDecode: true                 # If set, frooky tries to guess the type of a value in case it is not declared in the hook, or it is not possible to deduct it at runtime
+    maxRecursion: 1                   # Sets the cutoff limit for the recursion depth when decoding nested data structures, such as nested arrays, lists, sets, maps, structs etc.
+    decodeLimit: 11                   # Sets the limit of how many elements of a enumerable data structures, such as arrays, lists, dictionaries etc. are decoded
+
+hookGroup:
+    # java primitive types
+  - javaClass: org.owasp.mastestapp.MastgTest
+    hooks:
+      - receiveBoolean
+      - receiveByte
+      - receiveShort
+      - receiveInt
+      - receiveLong
+      - receiveFloat
+      - receiveDouble
+      - receiveChar
+
+    # java types which are converted to "string" type in javascript
+  - javaClass: org.owasp.mastestapp.MastgTest
+    hooks:
+      - method: receiveString
+        overloads:
+          - params:
+            - [java.lang.String, receivedString, {decodeLimit: 10}]
+
+
+  # primitive java arrays
+  - javaClass: org.owasp.mastestapp.MastgTest
+    hookSettings:
+      stackTraceLimit: 5
+    decoderSettings:
+      fastDecode: false
+      magicDecode: false
+      maxRecursion: 5
+      decodeLimit: 5
+    hooks:
+      - receiveStringArray
+      - receiveBooleanArray
+      - receiveByteArray
+      - receiveShortArray
+      - method: receiveIntArray
+        overloads:
+          - params:
+            - ["[I", receivedInteger, { decodeLimit: 50 }]
+      - receiveIntArray
+      - receiveLongArray
+      - receiveFloatArray
+      - receiveDoubleArray
+      - receiveCharArray
+      - receiveNestedPrimitivesArray
+      - receiveNestedObjectArray
+
+  # complex common java types
+  - javaClass: org.owasp.mastestapp.MastgTest
+    hooks:
+      - receiveBigInteger
+      - receiveBigDecimal
+      - receiveList
+      - receiveMap
+      - receiveSet
+      - receiveEnum
+
+  - javaClass: androidx.security.crypto.EncryptedSharedPreferences$Editor
+    hooks:
+      - putString
+      - putStringSet
+
+  # 3 different overloads with different ways of param declaration 
+  - javaClass: android.content.Intent 
+    hooks:
+      - method: $init
+        overloads:
+          - params:
+            - android.content.Intent
+          - params: 
+            - [ android.content.Context, packageContext]
+            - [ java.lang.Class, cls]
+          - params:
+            - { type: java.lang.String, name: action}
+            - android.net.Uri
+
+  - javaClass: android.content.Intent 
+    hooks:
+      - method: setFlags
+        overloads:
+          - params:
+            - [int, flags, { customDecoder: android.content.IntentFlagDecoder }]
+
+  - javaClass: java.security.KeyPairGenerator
+    hooks:
+      - method: initialize
+        overloads:
+        - params: 
+          - [java.security.spec.AlgorithmParameterSpec, params]
+
+  - javaClass: android.app.Activity 
+    hooks:
+      - startActivity
+
+  - module: libcrypto.so
+    hooks:
+      - X509_new
+      - symbol: RSA_parse_public_key
+      - EVP_EncryptUpdate
+      - HMAC
+      - RSA_public_encrypt
+      - EVP_DecryptUpdate
+      - EVP_DigestUpdate
+
+
+# decode arguments passed by value
+  - module: libreceiveFundamentalValue.so
+    hooks:
+      - symbol: receive_bool
+        params:
+          - [bool, falseBool]
+          - [bool, trueBool]
+      - symbol: receive_char
+        params:
+          - [char, minAscii]
+          - [char, maxAscii]
+      - symbol: receive_schar
+        params:
+          - [schar, minSchar]
+          - [schar, maxSchar]
+      - symbol: receive_uchar
+        params:
+          - [uchar, minUchar]
+          - [uchar, maxUchar]
+      - symbol: receive_short
+        params:
+          - [short, minShort]
+          - [short, maxShort]
+      - symbol: receive_ushort
+        params:
+          - [ushort, minUshort]
+          - [ushort, maxUshort]
+      - symbol: receive_int
+        params:
+          - [int, minInt]
+          - [int, maxInt]
+      - symbol: receive_uint
+        params:
+          - [uint, minUint]
+          - [uint, maxUint]
+      - symbol: receive_long
+        params:
+          - [long, minLong]
+          - [long, maxLong]
+      - symbol: receive_ulong
+        params:
+          - [ulong, minUlong]
+          - [ulong, maxUlong]
+      - symbol: receive_llong
+        params:
+          - [llong, minLlong]
+          - [llong, maxLlong]
+      - symbol: receive_ullong
+        params:
+          - [ullong, minUllong]
+          - [ullong, maxUllong]
+      - symbol: receive_float
+        params:
+          - [float, minFloat]
+          - [float, maxFloat]
+      - symbol: receive_double
+        params:
+          - [double, minDouble]
+          - [double, maxDouble]
+
+# decode arguments passed by reference
+  - module: libreceiveFundamentalReference.so
+    hooks:
+      - symbol: receive_bool_ref
+        params:
+          - [bool*, falseBoolRef]
+          - [bool*, trueBoolRef]
+      - symbol: receive_char_ref
+        params:
+          - [char*, minAsciiRef]
+          - [char*, maxAsciiRef]
+      - symbol: receive_schar_ref
+        params:
+          - [schar*, minScharRef]
+          - [schar*, maxScharRef]
+      - symbol: receive_uchar_ref
+        params:
+          - [uchar*, minUcharRef]
+          - [uchar*, maxUcharRef]
+      - symbol: receive_short_ref
+        params:
+          - [short*, minShortRef]
+          - [short*, maxShortRef]
+      - symbol: receive_ushort_ref
+        params:
+          - [ushort*, minUshortRef]
+          - [ushort*, maxUshortRef]
+      - symbol: receive_int_ref
+        params:
+          - [int*, minIntRef]
+          - [int*, maxIntRef]
+      - symbol: receive_uint_ref
+        params:
+          - [uint*, minUintRef]
+          - [uint*, maxUintRef]
+      - symbol: receive_long_ref
+        params:
+          - [long*, minLongRef]
+          - [long*, maxLongRef]
+      - symbol: receive_ulong_ref
+        params:
+          - [ulong*, minUlongRef]
+          - [ulong*, maxUlongRef]
+      - symbol: receive_llong_ref
+        params:
+          - [llong*, minLlongRef]
+          - [llong*, maxLlongRef]
+      - symbol: receive_ullong_ref
+        params:
+          - [ullong*, minUllongRef]
+          - [ullong*, maxUllongRef]
+      - symbol: receive_float_ref
+        params:
+          - [float*, minFloatRef]
+          - [float*, maxFloatRef]
+      - symbol: receive_double_ref
+        params:
+          - [double*, minDoubleRef]
+          - [double*, maxDoubleRef]
+
+# decode argument: null terminated string 
+  - module: libreceiveString.so
+    decoderSettings:
+        magicDecode: false
+    hooks:
+      - symbol: receive_cstring
+        params:
+          - [char *, string]
+      - symbol: receive_utf8
+        params:
+          - [ char *, {direction: inout}]
+
+  # use parameter to decode a native uchar *
+  - module: libreceiveFundamentalReference.so
+    hooks:
+      - symbol: receive_byte_array
+        params:
+          - [unsigned char *, data, { decoderArgs: [ length ], direction: inout } ]
+          - [int, length]
+
+# decode argument: null terminated string 
+  - module: libreceiveString.so
+    hookSettings:
+      stackTraceLimit: 0
+    decoderSettings:
+      magicDecode: false
+    hooks:
+      - symbol: receive_cstring
+        params: 
+          - [char *, string]
+      - symbol: receive_utf8
+        params: 
+          - [char *, string]

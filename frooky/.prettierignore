@@ -1,0 +1,4 @@
+dist
+build
+zodSchemas
+**/index.test.ts
