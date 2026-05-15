@@ -1,4 +1,4 @@
-import { DecoderSettings } from "../frookySettings";
+import { Decodable } from "./decodable";
 import { DecodedValue } from "./decodedValue";
 
 export type DecoderArgs<TValue> = {
@@ -13,12 +13,10 @@ export type DecoderArgs<TValue> = {
  * @template TValue - The raw input type to decode.
  */
 export abstract class Decoder<TValue> {
-  protected type: string;
-  protected settings: DecoderSettings;
+  protected decodable: Decodable;
 
-  constructor(type: string, settings: DecoderSettings) {
-    this.type = type;
-    this.settings = settings;
+  constructor(decodable: Decodable) {
+    this.decodable = decodable;
   }
 
   /**

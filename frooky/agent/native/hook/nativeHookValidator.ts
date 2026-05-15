@@ -1,6 +1,6 @@
 import z from "zod";
 
-import { FrookyConfig } from "../../shared/frookyConfig";
+import { InputFrookyConfig } from "../../shared/frookyConfig";
 import { FrookySettings } from "../../shared/frookySettings";
 import { HookValidator } from "../../shared/hook/hookValidator";
 import {
@@ -12,7 +12,7 @@ import {
 import { inputNativeHookNormalizedSchema } from "../../shared/inputParsing/zodSchemas/inputNativeHookGroup.zod";
 
 export class NativeHookValidator implements HookValidator<InputNativeHookNormalized, InputNativeHookGroup> {
-  validateAndNormalizeHooks(inputFrookyConfig: FrookyConfig, settings: FrookySettings): InputNativeHookNormalized[] {
+  validateAndNormalizeHooks(inputFrookyConfig: InputFrookyConfig, settings: FrookySettings): InputNativeHookNormalized[] {
     const nativeHookGroups = this.getPlatformHookGroups(inputFrookyConfig);
     const normalizedNativeHooks: InputNativeHookNormalized[] = [];
 
@@ -33,7 +33,7 @@ export class NativeHookValidator implements HookValidator<InputNativeHookNormali
     return normalizedNativeHooks;
   }
 
-  getPlatformHookGroups(inputFrookyConfig: FrookyConfig): InputNativeHookGroup[] {
+  getPlatformHookGroups(inputFrookyConfig: InputFrookyConfig): InputNativeHookGroup[] {
     const platformHookGroup: InputNativeHookGroup[] = [];
     for (const hookScope of inputFrookyConfig.hookGroup) {
       if (isNativeHookGroup(hookScope)) {

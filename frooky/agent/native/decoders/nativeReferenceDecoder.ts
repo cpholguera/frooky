@@ -1,6 +1,6 @@
 import { Decoder, DecoderArgs } from "../../shared/decoders/baseDecoder";
+import { Decodable } from "../../shared/decoders/decodable";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
-import { DecoderSettings } from "../../shared/frookySettings";
 import { toHexAndAscii } from "../../shared/utils";
 import { FridaFundamentalType, FridaReferenceType } from "./nativeFridaType";
 
@@ -39,8 +39,13 @@ const referenceDecoders: Record<FridaFundamentalType, ReferenceDecoder> = {
             }
           }
         }
+      } else {
+        try {
+          return input.readUtf8String();
+        } catch (e) {
+          return input.readS8();
+        }
       }
-      return input.readUtf8String();
     } catch (e) {
       frooky.log.warn(`Unable to decode uchar *: ${e}`);
       return null;
@@ -67,8 +72,8 @@ export class NativeReferenceDecoder extends Decoder<NativePointer> {
   protected fridaReference: FridaReferenceType;
   protected cachedDecoder: ReferenceDecoder | null = null;
 
-  constructor(type: string, settings: DecoderSettings, fridaReference: FridaReferenceType) {
-    super(type, settings);
+  constructor(decodable: Decodable, fridaReference: FridaReferenceType) {
+    super(decodable);
     this.fridaReference = fridaReference;
   }
 
@@ -77,7 +82,8 @@ export class NativeReferenceDecoder extends Decoder<NativePointer> {
       this.cachedDecoder = referenceDecoders[this.fridaReference.pointee];
     }
     return {
-      type: this.type,
+      type: this.decodable.type,
+      name: this.decodable.name,
       value: this.cachedDecoder(value, args),
     };
   }

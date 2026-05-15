@@ -46,8 +46,9 @@ const assert = (condition: boolean, message: string) => {
 const deepEqual = <T>(a: T, b: T): boolean => {
   if (a === b) return true;
   if (a == null || b == null || typeof a !== "object" || typeof b !== "object") return false;
-  const keysA = Object.keys(a);
-  if (keysA.length !== Object.keys(b).length) return false;
+  const keysA = Object.keys(a).filter((k) => (a as Record<string, unknown>)[k] !== undefined);
+  const keysB = Object.keys(b).filter((k) => (b as Record<string, unknown>)[k] !== undefined);
+  if (keysA.length !== keysB.length) return false;
   return keysA.every((k) => deepEqual((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]));
 };
 
@@ -57,13 +58,14 @@ const createMatcher = <T>(actual: T, negated = false): Matcher<T> => {
   const matcher: Matcher<T> = {
     toBe: (expected) => check(actual === expected, negated ? `Expected ${actual} not to be ${expected}` : `Expected ${actual} to be ${expected}`),
 
-    toEqual: (expected) =>
-      check(
+    toEqual: (expected) => {
+      return check(
         deepEqual(actual, expected),
         negated
           ? `Expected ${JSON.stringify(actual, null, 2)} not to equal ${JSON.stringify(expected, null, 2)}`
           : `Expected ${JSON.stringify(actual, null, 2)} to equal ${JSON.stringify(expected, null, 2)}`,
-      ),
+      );
+    },
 
     toBeTruthy: () => check(!!actual, negated ? `Expected ${actual} not to be truthy` : `Expected ${actual} to be truthy`),
 

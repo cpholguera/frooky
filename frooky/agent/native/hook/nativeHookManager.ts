@@ -9,7 +9,7 @@ import { NativeHookEvent } from "./nativeHookEvent";
 
 export class NativeHookManager extends HookManager<InputNativeHookNormalized, NativeHook> {
   public async resolveHooks(inputHooks: InputNativeHookNormalized[], timeout: number): Promise<Promise<NativeHook[] | null>[]> {
-    frooky.log.info(`Resolving native hooks`);
+    frooky.log.debug(`Resolving native hooks`);
 
     const uniqueModules: string[] = [...new Map(inputHooks.map((inputHook) => [inputHook.module, inputHook])).keys()];
 
@@ -26,7 +26,7 @@ export class NativeHookManager extends HookManager<InputNativeHookNormalized, Na
           if (!resolvedModule) return null;
           try {
             const symbolAddress = this.resolveSymbol(inputHook.symbol, resolvedModule);
-            frooky.log.info(`Address of function symbol '${inputHook.symbol}' found: ${symbolAddress}.`);
+            frooky.log.debug(`Address of function symbol '${inputHook.symbol}' found: ${symbolAddress}.`);
             return [
               {
                 module: resolvedModule,
@@ -46,8 +46,10 @@ export class NativeHookManager extends HookManager<InputNativeHookNormalized, Na
     });
   }
 
-  public registerHooks(hooks: NativeHook[]): NativeHook[] {
+  public registerHooks(hooks: NativeHook[]): number {
     const hookManager = this;
+    let countSuccessfulHooks = 0;
+
     for (const hook of hooks) {
       let stackTrace: string[];
 
@@ -61,8 +63,8 @@ export class NativeHookManager extends HookManager<InputNativeHookNormalized, Na
         retTypeDecoder = this.resolveRetTypeDecoder(hook.retType);
       }
       let decodedArgs: DecodedArgs = {
-        enter: [],
-        exit: [],
+        in: [],
+        out: [],
       };
 
       Interceptor.attach(hook.symbolAddress, {
@@ -77,13 +79,13 @@ export class NativeHookManager extends HookManager<InputNativeHookNormalized, Na
             for (let i = 0; i < hook.params.length; i++) {
               this.savedArgs[i] = args[i];
             }
-            decodedArgs.enter = hookManager.decodeNativeArgs(args, paramDecoders.enter, hook.params);
+            decodedArgs.in = hookManager.decodeNativeArgs(args, paramDecoders.in, hook.params);
           }
         },
         onLeave: function (returnValue: InvocationReturnValue) {
           if (hook.params) {
             // decode arguments onExit
-            decodedArgs.exit = hookManager.decodeNativeArgs(this.savedArgs, paramDecoders.exit, hook.params);
+            decodedArgs.out = hookManager.decodeNativeArgs(this.savedArgs, paramDecoders.out, hook.params);
           }
 
           let decodedRetValue: DecodedValue | undefined;
@@ -91,11 +93,12 @@ export class NativeHookManager extends HookManager<InputNativeHookNormalized, Na
             decodedRetValue = retTypeDecoder.decode(returnValue);
           }
 
-          frooky.addEvent(new NativeHookEvent(hook, decodedArgs, decodedRetValue, stackTrace));
+          frooky.addEventToLog(new NativeHookEvent(hook, decodedArgs, decodedRetValue, stackTrace));
         },
       });
+      countSuccessfulHooks++;
     }
-    return hooks;
+    return countSuccessfulHooks;
   }
 
   private resolveSymbol(symbol: string, module: Module): NativePointer {
@@ -107,14 +110,14 @@ export class NativeHookManager extends HookManager<InputNativeHookNormalized, Na
     }
   }
 
-  private async resolveModule(moduleName: string, timeout: number): Promise<Module> {
-    frooky.log.info(`Resolving native module ${moduleName} with a timeout of ${timeout} seconds.`);
+  private async resolveModule(moduleName: string, timeoutSeconds: number): Promise<Module> {
+    frooky.log.debug(`Resolving native module ${moduleName} with a timeout of ${timeoutSeconds} seconds.`);
     return this.pollUntilResolved(
       () => {
         try {
           frooky.log.debug(`Trying to resolve module '${moduleName}'.`);
           const module = Process.getModuleByName(moduleName);
-          frooky.log.info(`Module '${moduleName}' successfully loaded.`);
+          frooky.log.debug(`Module '${moduleName}' successfully loaded.`);
           return module;
         } catch (_) {
           frooky.log.debug(`Module '${moduleName}' not resolved yet.`);
@@ -122,7 +125,7 @@ export class NativeHookManager extends HookManager<InputNativeHookNormalized, Na
         }
       },
       moduleName,
-      timeout,
+      timeoutSeconds,
     );
   }
 
@@ -146,16 +149,16 @@ export class NativeHookManager extends HookManager<InputNativeHookNormalized, Na
 
   private resolveParamDecoders(params: Param[]): ParamDecoders<NativePointer> {
     const paramDecoders: ParamDecoders<NativePointer> = {
-      enter: [],
-      exit: [],
+      in: [],
+      out: [],
     };
     for (const param of params) {
-      const { decodeAt, ...decodable } = param;
-      if (decodeAt === "both" || decodeAt === "enter") {
-        paramDecoders.enter.push(NativeDecoderResolver.resolveDecoder(decodable));
+      const { direction, ...decodable } = param;
+      if (direction === "inout" || direction === "in") {
+        paramDecoders.in.push(NativeDecoderResolver.resolveDecoder(decodable));
       }
-      if (decodeAt === "both" || decodeAt === "exit") {
-        paramDecoders.exit.push(NativeDecoderResolver.resolveDecoder(decodable));
+      if (direction === "inout" || direction === "out") {
+        paramDecoders.out.push(NativeDecoderResolver.resolveDecoder(decodable));
       }
     }
     return paramDecoders;

@@ -4,22 +4,22 @@ import { normalizeInputParam } from "./inputDecodableTypes";
 describe("inputDecodableTypes", () => {
   describe("normalizeInputParam()", () => {
     it("should normalize a valid string to Param", () => {
-      expect(normalizeInputParam("testParam")).toEqual({ type: "testParam", decodeAt: "enter", settings: DEFAULT_DECODER_SETTINGS });
+      expect(normalizeInputParam("testParam")).toEqual({ type: "testParam", direction: "in", settings: DEFAULT_DECODER_SETTINGS });
     });
     it("should normalize [string, string] to a valid Param", () => {
       expect(normalizeInputParam(["testParam", "paramName"])).toEqual({
         type: "testParam",
         name: "paramName",
-        decodeAt: "enter",
+        direction: "in",
         settings: DEFAULT_DECODER_SETTINGS,
       });
     });
     it("should normalize a valid [string, InputParamSettings] to Param", () => {
       expect(
-        normalizeInputParam(["testParam", { decodeAt: "exit", maxRecursion: 10, decodeLimit: 10, fastDecode: false, magicDecode: true }]),
+        normalizeInputParam(["testParam", { direction: "out", maxRecursion: 10, decodeLimit: 10, fastDecode: false, magicDecode: true }]),
       ).toEqual({
         type: "testParam",
-        decodeAt: "exit",
+        direction: "out",
         settings: {
           maxRecursion: 10,
           decodeLimit: 10,
@@ -35,12 +35,12 @@ describe("inputDecodableTypes", () => {
         normalizeInputParam([
           "testParam",
           "paramName",
-          { decodeAt: "exit", maxRecursion: 10, decodeLimit: 10, fastDecode: false, magicDecode: true },
+          { direction: "out", maxRecursion: 10, decodeLimit: 10, fastDecode: false, magicDecode: true },
         ]),
       ).toEqual({
         type: "testParam",
         name: "paramName",
-        decodeAt: "exit",
+        direction: "out",
         settings: {
           maxRecursion: 10,
           decodeLimit: 10,
@@ -56,7 +56,7 @@ describe("inputDecodableTypes", () => {
         normalizeInputParam({
           type: "testParam",
           name: "paramName",
-          decodeAt: "exit",
+          direction: "out",
           settings: {
             maxRecursion: 10,
             decodeLimit: 10,
@@ -69,7 +69,7 @@ describe("inputDecodableTypes", () => {
       ).toEqual({
         type: "testParam",
         name: "paramName",
-        decodeAt: "exit",
+        direction: "out",
         settings: {
           maxRecursion: 10,
           decodeLimit: 10,

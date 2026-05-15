@@ -1,16 +1,17 @@
 import { NativeHookManager } from "./native/hook/nativeHookManager";
 import { NativeHookValidator } from "./native/hook/nativeHookValidator";
 import { validateAndRepairFrookyConfig } from "./shared/configValidator";
+import { DEFAULT_SETTING_LOG_LEVEL, DEFAULT_SETTING_LOG_TO, DEFAULT_SETTING_RESOLVER_TIMEOUT_SECONDS } from "./shared/defaultValues";
 import { BaseEvent } from "./shared/event/baseEvent";
 import { startAsyncSender } from "./shared/event/eventSender";
 import { HookEvent } from "./shared/event/hookEvent";
 import { LogEvent } from "./shared/event/logEvent";
-import { FrookyConfig } from "./shared/frookyConfig";
+import { InputFrookyConfig } from "./shared/frookyConfig";
 import { Platform } from "./shared/frookyMetadata";
 import { FrookySettings } from "./shared/frookySettings";
 import { HookManager } from "./shared/hook/hookManager";
 import { HookValidator } from "./shared/hook/hookValidator";
-import { Logger, LogTo } from "./shared/logger";
+import { Logger, LogLevel, LogTo } from "./shared/logger";
 
 declare global {
   var frooky: FrookyAgent;
@@ -27,10 +28,10 @@ export class FrookyAgent {
   private platformHookManger: HookManager<any, any>;
   private nativeHookValidator = new NativeHookValidator();
   private nativeHookManager = new NativeHookManager();
+  private resolverTimeoutSeconds: number;
 
   /** Logger instance for this for frooky. */
   public log: Logger;
-  public verbosity: number;
 
   /**
    * @param platform - The target platform to instrument.
@@ -41,8 +42,9 @@ export class FrookyAgent {
     platform: Platform,
     platformInputHookValidator: HookValidator<any, any>,
     platformHookResolver: HookManager<any, any>,
-    verbosity: number = 3,
-    logTo: LogTo = "device",
+    logLevel: LogLevel = DEFAULT_SETTING_LOG_LEVEL,
+    logTo: LogTo = DEFAULT_SETTING_LOG_TO,
+    resolverTimeoutSeconds: number = DEFAULT_SETTING_RESOLVER_TIMEOUT_SECONDS,
   ) {
     //initialize asynchronous sender
     startAsyncSender(this.eventCache);
@@ -50,19 +52,18 @@ export class FrookyAgent {
     this.platform = platform;
     this.platformHookValidator = platformInputHookValidator;
     this.platformHookManger = platformHookResolver;
-
-    this.verbosity = verbosity;
+    this.resolverTimeoutSeconds = resolverTimeoutSeconds;
 
     // setup logger
-    this.log = new Logger(this, verbosity, logTo);
+    this.log = new Logger(this, logLevel, logTo);
     this.log.info("Logger initialized");
 
     // printing some context infos
     this.log.info("Initializing frooky");
     this.log.info(`Declared target platform: ${this.platform}`);
-    this.log.info(`Target platform: ${Process.platform}}`);
+    this.log.info(`Target platform: ${Process.platform}`);
     this.log.info(`Target frida version: ${Frida.version}`);
-    this.log.info(`Target arch: ${Process.arch}}`);
+    this.log.info(`Target arch: ${Process.arch}`);
     this.log.debug(`Target process:\n${JSON.stringify(Process, null, 2)}}`);
   }
 
@@ -71,7 +72,7 @@ export class FrookyAgent {
    *
    * @param inputFrookyConfigs - The frooky config to add.
    */
-  public async run(inputFrookyConfigs: FrookyConfig[]) {
+  public async loadFrookyConfigs(inputFrookyConfigs: InputFrookyConfig[]) {
     for (const inputFrookyConfig of inputFrookyConfigs) {
       try {
         await this.loadFrookyConfig(inputFrookyConfig);
@@ -82,16 +83,16 @@ export class FrookyAgent {
   }
 
   /**
-   * Validates and registers a {@link FrookyConfig}.
+   * Validates and registers a {@link InputFrookyConfig}.
    *
    * @param inputFrookyConfig - The configuration to add.
    */
-  public async loadFrookyConfig(inputFrookyConfig: FrookyConfig) {
-    this.log.info("Loading frooky configuration.");
+  public async loadFrookyConfig(inputFrookyConfig: InputFrookyConfig) {
+    this.log.debug("Loading frooky configuration.");
 
     // validate frooky config
-    this.log.info("Validating frooky configuration");
-    let validFrookyConfig: FrookyConfig;
+    this.log.debug("Validating frooky configuration");
+    let validFrookyConfig: InputFrookyConfig;
     try {
       validFrookyConfig = validateAndRepairFrookyConfig(inputFrookyConfig, this.platform);
     } catch (e) {
@@ -102,46 +103,72 @@ export class FrookyAgent {
     const validatedFrookySettings = validFrookyConfig.settings as FrookySettings;
 
     // validate the platform hooks
-    this.log.info(`Validating '${this.platform}' hooks`);
+    this.log.debug(`Validating '${this.platform}' hooks`);
     const validPlatformHooks = this.platformHookValidator.validateAndNormalizeHooks(inputFrookyConfig, validatedFrookySettings);
 
-    this.log.info(`Validating 'native' hooks`);
+    this.log.debug(`Validating 'native' hooks`);
     const validNativeHook = this.nativeHookValidator.validateAndNormalizeHooks(inputFrookyConfig, validatedFrookySettings);
+
+    // preparing stats
+    const countDeclaredPlatformHooks = validPlatformHooks.length;
+    const countDeclaredNativeHooks = validNativeHook.length;
+    let countSuccessfulPlatformHooks = 0;
+    let countSuccessfulNativeHooks = 0;
 
     // async resolve platform hooks and register them
     const platformPromises = this.platformHookManger
-      .resolveHooks(validPlatformHooks, validatedFrookySettings.resolverTimeout)
+      .resolveHooks(validPlatformHooks, this.resolverTimeoutSeconds)
       .then((platformHookPromises) => {
-        for (const platformHookPromise of platformHookPromises) {
-          platformHookPromise.then((platformHooks) => {
-            if (platformHooks) {
-              this.platformHookManger.registerHooks(platformHooks);
-            }
-          });
-        }
+        return Promise.allSettled(
+          platformHookPromises.map((platformHookPromise) =>
+            platformHookPromise.then((platformHooks) => {
+              if (platformHooks) {
+                countSuccessfulPlatformHooks += this.platformHookManger.registerHooks(platformHooks);
+              }
+            }),
+          ),
+        );
       })
       .catch((e) => {
-        this.log.error(`Error while resolving native hooks: ${String(e)}`);
+        this.log.error(`Error while resolving platform hooks: ${String(e)}`);
       });
 
     // async resolve native hooks and register them
     const nativePromises = this.nativeHookManager
-      .resolveHooks(validNativeHook, validatedFrookySettings.resolverTimeout)
+      .resolveHooks(validNativeHook, this.resolverTimeoutSeconds)
       .then((nativeHookPromises) => {
-        for (const nativeHookPromise of nativeHookPromises) {
-          nativeHookPromise.then((nativeHooks) => {
-            if (nativeHooks) {
-              this.nativeHookManager.registerHooks(nativeHooks);
-            }
-          });
-        }
+        return Promise.allSettled(
+          nativeHookPromises.map((nativeHookPromise) =>
+            nativeHookPromise.then((nativeHooks) => {
+              if (nativeHooks) {
+                countSuccessfulNativeHooks += this.nativeHookManager.registerHooks(nativeHooks);
+              }
+            }),
+          ),
+        );
       })
       .catch((e) => {
         this.log.error(`Error while resolving native hooks: ${String(e)}`);
       });
 
-    // wait until all promises are resolved
-    await Promise.all([platformPromises, nativePromises]);
+    const configName = inputFrookyConfig.metadata?.name;
+    const nameSuffix = configName ? ` '${configName}'` : "";
+    const hookSuffix = configName ? ` from frooky configuration '${configName}'` : "";
+
+    this.log.info(`Frooky configuration${nameSuffix} successfully parsed`);
+
+    await Promise.all([
+      Promise.all([platformPromises]).then(() => {
+        if (countDeclaredPlatformHooks > 0) {
+          this.log.info(`Successfully hooked ${countSuccessfulPlatformHooks}/${countDeclaredPlatformHooks} ${this.platform} methods${hookSuffix}`);
+        }
+      }),
+      Promise.all([nativePromises]).then(() => {
+        if (countDeclaredNativeHooks > 0) {
+          this.log.info(`Successfully hooked ${countSuccessfulNativeHooks}/${countDeclaredNativeHooks} native functions${hookSuffix}`);
+        }
+      }),
+    ]);
   }
 
   /**
@@ -149,7 +176,7 @@ export class FrookyAgent {
    *
    * @param event - The event to cache.
    */
-  public addEvent(event: LogEvent | HookEvent): void {
+  public addEventToLog(event: LogEvent | HookEvent): void {
     this.eventCache.push(event);
   }
 }

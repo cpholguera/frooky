@@ -15,16 +15,16 @@ export const JavaDecoderResolver: DecoderResolver<Java.Wrapper> = {
   resolveDecoder(decodable: Decodable): Decoder<Java.Wrapper> {
     if (decodable.settings.customDecoder) {
       // return the custom decoder (if implemented)
-      return new JavaClassDecoder(decodable.settings.customDecoder, decodable.settings);
+      return new JavaClassDecoder(decodable);
     } else if (decodable.type.startsWith("[")) {
       // java array decoder
-      return new JavaArrayDecoder(decodable.type, decodable.settings);
+      return new JavaArrayDecoder(decodable);
     } else if (JAVA_PRIMITIVE_TYPES.has(decodable.type) || decodable.type === "void") {
       // other Java primitive types and void
-      return new JavaPrimitiveDecoder(decodable.type, decodable.settings);
+      return new JavaPrimitiveDecoder(decodable);
     }
     // at this time we don't know the implementation class
     // this decoders resolves the implementation type at first time decode() is called
-    return new JavaClassDecoder(decodable.type, decodable.settings);
+    return new JavaClassDecoder(decodable);
   },
 };

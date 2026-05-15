@@ -1,9 +1,8 @@
 import { validateAndRepairDecoderSettings, validateAndRepairFrookyConfig, validateAndRepairHookSettings, validateMetadata } from "./configValidator";
 import { DEFAULT_DECODER_SETTINGS, DEFAULT_FROOKY_SETTINGS, DEFAULT_HOOK_SETTINGS } from "./defaultValues";
-import { FrookyConfig } from "./frookyConfig";
+import { InputFrookyConfig } from "./frookyConfig";
 import { FrookyMetadata } from "./frookyMetadata";
 import { InputDecoderSettings, InputHookSettings } from "./inputParsing/inputSettings";
-import { LogLevel } from "./logger";
 
 describe("configValidator", () => {
   describe("validateMetadata()", () => {
@@ -104,7 +103,7 @@ describe("configValidator", () => {
   });
 
   describe("validateAndRepairFrookyConfig()", () => {
-    const validFrookyConfig: FrookyConfig = {
+    const validFrookyConfig: InputFrookyConfig = {
       metadata: {
         name: "Test Config",
         platform: "Android",
@@ -117,7 +116,7 @@ describe("configValidator", () => {
     });
 
     it("should return a valid FrookyConfig with default settings if no settings are passed", () => {
-      const missingSettingsFrookyConfig: FrookyConfig = {
+      const missingSettingsFrookyConfig: InputFrookyConfig = {
         metadata: {
           name: "Test Config",
           platform: "Android",
@@ -128,13 +127,12 @@ describe("configValidator", () => {
     });
 
     it("should set the default setting values if only partially set", () => {
-      const partialSettingsFrookyConfig: FrookyConfig = {
+      const partialSettingsFrookyConfig: InputFrookyConfig = {
         metadata: {
           name: "Test Config",
           platform: "Android",
         },
         settings: {
-          verbose: true,
           hookSettings: {
             stackTraceLimit: 55,
           },
@@ -152,13 +150,12 @@ describe("configValidator", () => {
     });
 
     it("should set the default values if settings are not according to schema", () => {
-      const invalidSettingsFrookyConfig: FrookyConfig = {
+      const invalidSettingsFrookyConfig: InputFrookyConfig = {
         metadata: {
           name: "Test Config",
           platform: "Android",
         },
         settings: {
-          logLevel: false as unknown as LogLevel,
           hookSettings: {
             stackTraceLimit: "10" as unknown as number,
           },
@@ -181,7 +178,7 @@ describe("configValidator", () => {
         hookGroup: [],
       };
       expect(() => {
-        validateAndRepairFrookyConfig(invalidSettingsFrookyConfig as FrookyConfig, "Android");
+        validateAndRepairFrookyConfig(invalidSettingsFrookyConfig as InputFrookyConfig, "Android");
       }).toLogWarn("Frooky config contains unknown properties");
     });
 
@@ -193,7 +190,7 @@ describe("configValidator", () => {
 
     it("should throw an exception if no hookGroup is set", () => {
       expect(() => {
-        validateAndRepairFrookyConfig({ metadata: { name: "Config w/o hookGroup" } } as FrookyConfig, "iOS");
+        validateAndRepairFrookyConfig({ metadata: { name: "Config w/o hookGroup" } } as InputFrookyConfig, "iOS");
       }).toThrow("Frooky config Config w/o hookGroup, as it has no 'hookGroup'.");
     });
   });

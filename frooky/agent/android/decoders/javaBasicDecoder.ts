@@ -5,8 +5,9 @@ import { DecodedValue } from "../../shared/decoders/decodedValue";
 export class JavaPrimitiveDecoder extends Decoder<Java.Wrapper> {
   decode(value: Java.Wrapper): DecodedValue {
     return {
-      type: this.type,
-      value: this.type === "long" ? value.toString() : value,
+      type: this.decodable.type,
+      name: this.decodable.name,
+      value: this.decodable.type === "long" ? value.toString() : value,
     };
   }
 }
@@ -14,7 +15,8 @@ export class JavaPrimitiveDecoder extends Decoder<Java.Wrapper> {
 export class JavaFallbackDecoder extends Decoder<Java.Wrapper> {
   decode(value: Java.Wrapper): DecodedValue {
     return {
-      type: this.type,
+      type: this.decodable.type,
+      name: this.decodable.name,
       value: value.toString(),
     };
   }

@@ -1,7 +1,7 @@
-import { FrookyConfig } from "../frookyConfig";
+import { InputFrookyConfig } from "../frookyConfig";
 import { FrookySettings } from "../frookySettings";
 
 export interface HookValidator<THookNormalized, THookGroup> {
-  validateAndNormalizeHooks(inputFrookyConfig: FrookyConfig, settings: FrookySettings): THookNormalized[];
-  getPlatformHookGroups(inputFrookyConfig: FrookyConfig): THookGroup[];
+  validateAndNormalizeHooks(inputFrookyConfig: InputFrookyConfig, settings: FrookySettings): THookNormalized[];
+  getPlatformHookGroups(inputFrookyConfig: InputFrookyConfig): THookGroup[];
 }

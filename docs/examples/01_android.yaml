@@ -80,21 +80,21 @@ hookGroup:
               - ["java.lang.String", name]
               - ["[B", value]
 
-  # Use `decodeAt: exit` to decode output parameters after method execution.
+  # Use `direction: out` to decode output parameters after method execution.
   # Docs: https://developer.android.com/reference/javax/crypto/Cipher#doFinal(byte[],%20int)
   - javaClass: javax.crypto.Cipher
     hooks:
       - methodName: doFinal
         overloads:
           - params:
-              - ["[B", output, { decodeAt: exit }]
+              - ["[B", output, { direction: out }]
               - [int, outputOffset]
 
-  # Use `decodeAt: both` to decode a parameter before and after execution.
+  # Use `direction: inout` to decode a parameter before and after execution.
   # Docs: https://developer.android.com/reference/java/nio/ByteBuffer#put(byte[])
   - javaClass: java.nio.ByteBuffer
     hooks:
       - methodName: put
         overloads:
           - params:
-              - ["[B", src, { decodeAt: both }]
+              - ["[B", src, { direction: inout }]

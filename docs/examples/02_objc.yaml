@@ -75,14 +75,14 @@ hookGroup:
           - ["(SecKeyAlgorithm)", algorithm]
           - ["(void (^)(NSData *, NSError *))", handler]
 
-  # Use `decodeAt: exit` to decode output parameters after method execution.
+  # Use `direction: out` to decode output parameters after method execution.
   # Docs: https://developer.apple.com/documentation/CoreData/NSManagedObjectContext/save()?language=objc
   - objcClass: NSManagedObjectContext
     hooks:
       - methodName: "- save:"
         returnType: "(BOOL)"
         params:
-          - ["(NSError **)", error, { decodeAt: exit }]
+          - ["(NSError **)", error, { direction: out }]
 
   # Use `stackTraceFilter` with regex to include only relevant stack frames.
   # Docs: https://developer.apple.com/documentation/foundation/urlsession/datatask(with:completionhandler:)-e6xv?language=objc
@@ -100,10 +100,10 @@ hookGroup:
       - "^(?!Foundation)"
       - "^(?!libsystem_)"
 
-  # Use `decodeAt: both` to decode a parameter before and after execution.
+  # Use `direction: inout` to decode a parameter before and after execution.
   # Docs: https://developer.apple.com/documentation/foundation/nsmutabledata/append(_:)?language=objc
   - objcClass: NSMutableData
     hooks:
       - methodName: "- appendData:"
         params:
-          - ["(NSData *)", data, { decodeAt: both }]
+          - ["(NSData *)", data, { direction: inout }]

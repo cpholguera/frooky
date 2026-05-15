@@ -1,5 +1,3 @@
-import { LogLevel, LogTo } from "./logger";
-
 /**
  * Metadata that describes a hook collection.
  *
@@ -67,10 +65,6 @@ export interface DecoderSettings {
 }
 
 export interface FrookySettings {
-  verbose: true | false;
-  logLevel: LogLevel;
-  logTo: LogTo;
-  resolverTimeout: number;
   hookSettings: HookSettings;
   decoderSettings: DecoderSettings;
 }

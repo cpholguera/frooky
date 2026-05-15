@@ -13,7 +13,7 @@ export class IterableDecoder extends Decoder<Java.Wrapper> {
     const values: DecodedValue[] = [];
     let iterator: Java.Wrapper;
     iterator = value.iterator();
-    const decodeLimit = this.settings.decodeLimit ?? DEFAULT_DECODER_SETTINGS.decodeLimit;
+    const decodeLimit = this.decodable.settings.decodeLimit ?? DEFAULT_DECODER_SETTINGS.decodeLimit;
 
     let iteratorDecoder: Decoder<Java.Wrapper> | undefined;
 
@@ -24,7 +24,8 @@ export class IterableDecoder extends Decoder<Java.Wrapper> {
       if (!iteratorDecoder) {
         iteratorDecoder = JavaDecoderResolver.resolveDecoder({
           type: element.$className,
-          settings: this.settings,
+          name: this.decodable.name,
+          settings: this.decodable.settings,
         });
       }
 
@@ -40,7 +41,8 @@ export class IterableDecoder extends Decoder<Java.Wrapper> {
     }
 
     return {
-      type: this.type,
+      type: this.decodable.type,
+      name: this.decodable.name,
       value: values,
     };
   }

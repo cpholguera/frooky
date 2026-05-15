@@ -15,7 +15,7 @@ import "./index.test";
 
 Java.perform(() => {
   setTimeout(() => {
-    globalThis.frooky = new FrookyAgent("Android", new JavaHookValidator(), new JavaHookManager(), 0, "device");
+    globalThis.frooky = new FrookyAgent("Android", new JavaHookValidator(), new JavaHookManager(), "none", "console");
     runTests(send);
   }, 1000);
 });

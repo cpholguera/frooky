@@ -43,12 +43,12 @@ metadata:
 
       3. Parameter Settings
 
-        Parameter settings (`ParamSettings`) define when a parameter is decoded (`decodeAt`), as well as the settings defined in `DecoderSettings`.
+        Parameter settings (`ParamSettings`) define when a parameter is decoded (`direction`), as well as the settings defined in `DecoderSettings`.
 
         Example: 
         
         ```
-        decodeAt: exit
+        direction: out
         fastDecode: true
         magicDecode: true 
         maxRecursion: 5
@@ -73,11 +73,8 @@ metadata:
 
 # global settings for the hooks in this hook file.
 settings:
-  verbose: true
-  logLevel: "debug"
-  logTo: "device"
-  resolverTimeout: 5
   hookSettings:
+    stackTraceLimit: 10
     eventFilter: ['^(?!android).*']   # Stack trace filters to apply.
   decoderSettings:
     fastDecode: true                  # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
@@ -143,7 +140,7 @@ hookGroup:
       - method: receiveNestedPrimitivesArray
         overloads:
           - params:
-            - ["[[[I", {decodeLimit: 66, decodeAt: toBeFixed}]
+            - ["[[[I", nestedIntegerInput ]
 
   # complex common java types
   - javaClass: org.owasp.mastestapp.MastgTest

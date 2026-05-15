@@ -15,6 +15,13 @@ def _add_common_args(subparser: argparse.ArgumentParser) -> None:
     device_group.add_argument("-D", "--device", metavar="ID", help="Connect to device with the given ID")
     device_group.add_argument("-U", "--usb", action="store_true", help="Connect to USB device")
 
+    # frooky agent options group
+    agent_options = subparser.add_argument_group("frooky agent options")
+    agent_options.add_argument("-l", "--log-level", metavar="LEVEL", default="info", choices=["none", "error", "warning", "info", "debug"], help="Log verbosity level: none, error, warning, info, debug (default: info)")
+    agent_options.add_argument("-d", "--log-to", metavar="DESTINATION", default="console", choices=["console", "file"], help="Log destination: console or file (default: console)")
+    agent_options.add_argument("--log-file", metavar="PATH", help="Path to log file when --log-to=file (default: Output JSON file)")
+    agent_options.add_argument("-t", "--resolver-timeout", metavar="SECONDS", type=int, default=5, help="Timeout in seconds for module/class lookup (default: 5)")
+
     # Target selection group (mutually exclusive)
     target_group = subparser.add_mutually_exclusive_group(required=True)
     target_group.add_argument("-F", "--attach-frontmost", action="store_true", help="Attach to frontmost app")
@@ -25,6 +32,7 @@ def _add_common_args(subparser: argparse.ArgumentParser) -> None:
 
     subparser.add_argument("hooks", nargs="+", help="Path(s) to your input hook YAML file(s)")
     subparser.add_argument("-o", "--output", default="output.json", help="Output JSON file")
+    subparser.add_argument("-e", "--print-events", action="store_true", default=False, help="Print the captured events to the terminal")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -59,6 +67,9 @@ def main() -> int:
 
     args = parser.parse_args()
 
+    if args.resolver_timeout <= 0:
+        raise argparse.ArgumentTypeError(f"--resolver-timeout ({args.resolver_timeout}) is not a positive integer")
+
     # Validate that the android and ios agents are compiled and accessible
     agent_dist_path = files("frooky") / "agent" / "dist"
     required_files = [agent_dist_path / "version.json", agent_dist_path / "agent-android.js", agent_dist_path / "agent-ios.js"]
@@ -90,6 +101,11 @@ def main() -> int:
         attach_identifier=args.attach_identifier,
         attach_pid=args.attach_pid,
         spawn=args.spawn,
+        agent_option_log_level=args.log_level,
+        agent_option_log_to=args.log_to,
+        agent_option_log_file=args.log_file,
+        agent_option_resolver_timeout=args.resolver_timeout,
+        print_events=args.print_events,
     )
 
     runner = FrookyRunner(options)

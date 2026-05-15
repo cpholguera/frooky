@@ -8,8 +8,7 @@ This document describes the architecture of the frooky agent. The frooky agent i
 1. Decoder Resolver
 1. Decoder
 1. Hooking
-2. Event Sender
-
+1. Event Sender
 
 ## Start of frooky: Initializing and Hooking the Target Functions/Methods
 
@@ -44,19 +43,19 @@ sequenceDiagram
 Here the responsibilities for the different components:
 
 1. **Bootstrap**  
-    Initializes variables, caches and the messaging system. 
-    
+    Initializes variables, caches and the messaging system.
+
     The code is shared between all platforms.
 
 1. **Hook File Validator**  
     Validates the syntax and the semantic of the JSON. For example, a hook for `Android` should raise an error when run on an `iOS` target.
 
-    The validator creates the datastructure passed to the hook lookup component. 
+    The validator creates the datastructure passed to the hook lookup component.
 
     The code is shared between all platforms.
 
 1. **Hook Resolver**  
-    Does the lookup of the target function or method. 
+    Does the lookup of the target function or method.
 
     This depends on the platform. Android, iOS both have their own implementation of the hook lookup for platform hooks (Java and Objective-C).
 
@@ -67,22 +66,18 @@ Here the responsibilities for the different components:
 
     The decoder is then stored in the hook structure for faster access when the hook fires.
 
-
 1. **Hooking**  
    The target function is actually hooked.
-   
+
    This depends on the platform. Android, iOS both have their own implementation of the hook lookup for platform hooks (Java and Objective-C).
 
    The native lookup is shared between all platforms.
 
    Once all hooks are set up, the hooking is complete.
 
-
-
 ## Handling a Hooked Function/Method
 
 The following graph shows what happens, once a registered hook is fired:
-
 
 ```mermaid
 sequenceDiagram
@@ -97,7 +92,7 @@ sequenceDiagram
         H->>H: Create event
         H->>H: Collect metadata
 
-        alt decodeAt == enter|both
+        alt direction == enter|both
             H->>D: Decode arguments
             D-->>H: Decoded arguments
         end
@@ -106,7 +101,7 @@ sequenceDiagram
         H->>D: Decode return value
         D-->>H: Decoded return value
 
-        alt decodeAt == exit|both
+        alt direction == exit|both
             H->>D: Decode arguments
             D-->>H: Decoded arguments
         end
@@ -125,16 +120,14 @@ Here the responsibilities for the different components:
 
     The native lookup is shared between all platforms.
 
-
 1. **Decoder**  
-    Implements how the different types are actually decoded.     
-    
+    Implements how the different types are actually decoded.
+
     This depends on the platform. Android, iOS both have their own implementation of the hook lookup for platform hooks (Java and Objective-C).
 
     The native lookup is shared between all platforms.
 
-
-## Event Sender 
+## Event Sender
 
 The Event Sender periodically checks if the event cache has new events, and sends them to the frooky host if this is the case. Then, the cache is cleared.
 

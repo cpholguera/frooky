@@ -124,7 +124,7 @@ function generateHooksFile() {
     });
 
     const targetFile = path.join(buildDir, `index.${targetOption}.ts`);
-    const replacement = `frookyConfigs = ${JSON.stringify(frookyConfigs)} as FrookyConfig[];`;
+    const replacement = `frookyConfigs = ${JSON.stringify(frookyConfigs)} as InputFrookyConfig[];`;
 
     const blockRegex = /(\/\/%%% REPLACE START\n)[\s\S]*?(\/\/%%% REPLACE STOP)/;
 

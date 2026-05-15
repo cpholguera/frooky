@@ -1,14 +1,9 @@
 import Java from "frida-java-bridge";
 import { Decoder } from "../../../../shared/decoders/baseDecoder";
 import { DecodedValue } from "../../../../shared/decoders/decodedValue";
-import { DecoderSettings } from "../../../../shared/frookySettings";
 
 export class IntentFlagDecoder extends Decoder<Java.Wrapper> {
   flags = this.loadIntentFlags();
-
-  constructor(type: string, settings: DecoderSettings) {
-    super(type, settings);
-  }
 
   decode(value: Java.Wrapper): DecodedValue {
     const bitmask = Number(value) >>> 0;

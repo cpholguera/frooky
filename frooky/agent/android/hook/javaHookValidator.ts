@@ -1,12 +1,12 @@
 import z from "zod";
-import { FrookyConfig } from "../../shared/frookyConfig";
+import { InputFrookyConfig } from "../../shared/frookyConfig";
 import { FrookySettings } from "../../shared/frookySettings";
 import { HookValidator } from "../../shared/hook/hookValidator";
 import { InputJavaHookGroup, InputJavaHookNormalized, isJavaHookScope, normalizeJavaHookGroup } from "../../shared/inputParsing/inputJavaHookGroup";
 import { inputJavaHookNormalizedSchema } from "../../shared/inputParsing/zodSchemas/inputJavaHookGroup.zod";
 
 export class JavaHookValidator implements HookValidator<InputJavaHookNormalized, InputJavaHookGroup> {
-  validateAndNormalizeHooks(inputFrookyConfig: FrookyConfig, settings: FrookySettings): InputJavaHookNormalized[] {
+  validateAndNormalizeHooks(inputFrookyConfig: InputFrookyConfig, settings: FrookySettings): InputJavaHookNormalized[] {
     const javaHookGroups = this.getPlatformHookGroups(inputFrookyConfig);
     const normalizedJavaHooks: InputJavaHookNormalized[] = [];
 
@@ -27,7 +27,7 @@ export class JavaHookValidator implements HookValidator<InputJavaHookNormalized,
     return normalizedJavaHooks;
   }
 
-  getPlatformHookGroups(inputFrookyConfig: FrookyConfig): InputJavaHookGroup[] {
+  getPlatformHookGroups(inputFrookyConfig: InputFrookyConfig): InputJavaHookGroup[] {
     const platformHookGroup: InputJavaHookGroup[] = [];
     for (const hookScope of inputFrookyConfig.hookGroup) {
       if (isJavaHookScope(hookScope)) {

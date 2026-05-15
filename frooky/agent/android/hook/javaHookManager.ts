@@ -19,7 +19,7 @@ export type FieldType = {
 // resolve java classes, the method and their overloads
 export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHook> {
   async resolveHooks(inputHooks: InputJavaHookNormalized[], timeout: number): Promise<Promise<JavaHook[] | null>[]> {
-    frooky.log.info(`Resolving Java hooks`);
+    frooky.log.debug(`Resolving Java hooks`);
 
     const uniqueClasses: string[] = [...new Map(inputHooks.map((inputHook) => [inputHook.javaClass, inputHook])).keys()];
     return uniqueClasses.flatMap((javaClass) => {
@@ -45,16 +45,16 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
 
   private resolveParamDecoders(params: Param[]): ParamDecoders<Java.Wrapper> {
     const paramDecoders: ParamDecoders<Java.Wrapper> = {
-      enter: [],
-      exit: [],
+      in: [],
+      out: [],
     };
     for (const param of params) {
-      const { decodeAt, ...decodable } = param;
-      if (decodeAt === "both" || decodeAt === "enter") {
-        paramDecoders.enter.push(JavaDecoderResolver.resolveDecoder(decodable));
+      const { direction, ...decodable } = param;
+      if (direction === "inout" || direction === "in") {
+        paramDecoders.in.push(JavaDecoderResolver.resolveDecoder(decodable));
       }
-      if (decodeAt === "both" || decodeAt === "exit") {
-        paramDecoders.exit.push(JavaDecoderResolver.resolveDecoder(decodable));
+      if (direction === "inout" || direction === "out") {
+        paramDecoders.out.push(JavaDecoderResolver.resolveDecoder(decodable));
       }
     }
     return paramDecoders;
@@ -64,8 +64,10 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
     return JavaDecoderResolver.resolveDecoder(retType);
   }
 
-  registerHooks(hooks: JavaHook[]): JavaHook[] {
+  registerHooks(hooks: JavaHook[]): number {
     const hookManager = this;
+    let countSuccessfulHooks = 0;
+
     for (const hook of hooks) {
       let stackTrace: string[];
 
@@ -76,8 +78,8 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
       }
       // const cachedRetTypeDecoder = this.resolveRetTypeDecoder(hook.method.returnType.type);
       let decodedArgs: DecodedArgs = {
-        enter: [],
-        exit: [],
+        in: [],
+        out: [],
       };
 
       // resolve the return type
@@ -94,7 +96,7 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
         try {
           // decode arguments onEnter
           if (hook.params) {
-            decodedArgs.enter = hookManager.decodeJavaArgs(args, paramDecoders.enter);
+            decodedArgs.in = hookManager.decodeJavaArgs(args, paramDecoders.in);
           }
         } catch (e) {
           frooky.log.error(`Decoder error during 'onEnter' argument decoding of ${hook.method.holder.$className}.${hook.methodName}: ${e}`);
@@ -106,7 +108,7 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
         try {
           // decode arguments onEnter
           if (hook.params) {
-            decodedArgs.exit = hookManager.decodeJavaArgs(args, paramDecoders.exit);
+            decodedArgs.out = hookManager.decodeJavaArgs(args, paramDecoders.out);
           }
         } catch (e) {
           frooky.log.error(`Decoder error during 'onExit' argument decoding of ${hook.method.holder.$className}.${hook.methodName}: ${e}`);
@@ -130,14 +132,15 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
           // collect the field type and (optional) instance hash
           const fieldType = hookManager.buildFieldType(this as Java.Wrapper);
 
-          frooky.addEvent(new JavaHookEvent(hook, fieldType, decodedArgs, decodedRetValue, stackTrace));
+          frooky.addEventToLog(new JavaHookEvent(hook, fieldType, decodedArgs, decodedRetValue, stackTrace));
         } catch (e) {
           frooky.log.error(`Error during the execution of the hooked method ${hook.method.holder.$className}.${hook.methodName}: ${e}`);
         }
         return returnValue;
       };
+      countSuccessfulHooks++;
     }
-    return hooks;
+    return countSuccessfulHooks;
   }
 
   private buildParamsFromArgumentTypes(argTypes: Java.Type[], decoderSettings: DecoderSettings): Param[] {
@@ -145,7 +148,7 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
       if (type.className) {
         params.push({
           type: type.className,
-          decodeAt: "enter",
+          direction: "in",
           settings: decoderSettings,
         });
       } else {
@@ -155,15 +158,15 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
     }, []);
   }
 
-  private async resolveJavaClass(javaClassName: string, timeout: number): Promise<Java.Wrapper> {
-    frooky.log.info(`Resolving java class ${javaClassName} with a timeout of ${timeout}ms.`);
+  private async resolveJavaClass(javaClassName: string, timeoutSeconds: number): Promise<Java.Wrapper> {
+    frooky.log.debug(`Resolving java class ${javaClassName} with a timeout of ${timeoutSeconds} seconds.`);
     return this.pollUntilResolved(
       () => {
         try {
           frooky.log.debug(`Trying to resolve Java class '${javaClassName}'.`);
 
           const resolvedJavaClass = Java.use(javaClassName);
-          frooky.log.info(`Java class '${javaClassName}' resolved.`);
+          frooky.log.debug(`Java class '${javaClassName}' resolved.`);
           return resolvedJavaClass;
         } catch (_) {
           frooky.log.debug(`Java class '${javaClassName}' not resolved yet.`);
@@ -171,7 +174,7 @@ export class JavaHookManager extends HookManager<InputJavaHookNormalized, JavaHo
         }
       },
       javaClassName,
-      timeout,
+      timeoutSeconds,
     );
   }
 

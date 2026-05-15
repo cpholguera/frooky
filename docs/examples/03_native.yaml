@@ -59,7 +59,7 @@ hookGroup:
           - ["X509_STORE *", trusted_store]
           - ["X509 *", cert]
 
-  # Use `decodeAt: exit` to decode buffer contents after function execution.
+  # Use `direction: out` to decode buffer contents after function execution.
   # Since `buf` is a pointer, we need to decode it at exit using the `count` parameter for the length.
   # Pass `decoderArgs` with the length parameter name/index.
   # Docs: https://www.man7.org/linux/man-pages/man2/read.2.html
@@ -69,7 +69,7 @@ hookGroup:
         returnType: ssize_t
         params:
           - [int, fd]
-          - ["void *", buf, { decodeAt: exit, decoderArgs: [count] }]
+          - ["void *", buf, { direction: out, decoderArgs: [count] }]
           - [size_t, count]
 
   # Use `decoderArgs` to pass a related parameter for decoding context.

@@ -4,18 +4,18 @@ import { HOOK_LOOKUP_INTERVAL_MS } from "../defaultValues";
 import { Hook } from "./hook";
 
 export type ParamDecoders<TValue> = {
-  enter: Decoder<TValue>[];
-  exit: Decoder<TValue>[];
+  in: Decoder<TValue>[];
+  out: Decoder<TValue>[];
 };
 
 export type DecodedArgs = {
-  enter?: DecodedValue[];
-  exit?: DecodedValue[];
+  in?: DecodedValue[];
+  out?: DecodedValue[];
 };
 
 export abstract class HookManager<TInputHook, THooks extends Hook> {
   public abstract resolveHooks(inputHooks: TInputHook[], timeout: number): Promise<Promise<THooks[] | null>[]>;
-  public abstract registerHooks(hooks: THooks[]): THooks[];
+  public abstract registerHooks(hooks: THooks[]): number;
 
   protected async pollUntilResolved<T>(fn: () => T | null, label: string, timeoutSeconds: number): Promise<T> {
     if (timeoutSeconds < 0) throw Error(`Timeout must not be less than 0.`);

@@ -42,12 +42,12 @@ metadata:
 
       3. Parameter Settings
 
-        Parameter settings (`ParamSettings`) define when a parameter is decoded (`decodeAt`), as well as the settings defined in `DecoderSettings`.
+        Parameter settings (`ParamSettings`) define when a parameter is decoded (`direction`), as well as the settings defined in `DecoderSettings`.
 
         Example: 
         
         ```
-        decodeAt: exit
+        direction: out
         fastDecode: true
         magicDecode: true 
         maxRecursion: 5
@@ -72,12 +72,8 @@ metadata:
 
 # global settings for the hooks in this hook file.
 settings:
-  verbose: true
-  logLevel: "debug"
-  logTo: "device"
-  resolverTimeout: 5
   hookSettings:
-    stackTraceLimit: 0                # Sets stackTraceLimit to 10 for all hooks
+    stackTraceLimit: 10               # Sets stackTraceLimit to 10 for all hooks
     eventFilter: ['^(?!android).*']   # Stack trace filters to apply.
   decoderSettings:
     fastDecode: true                  # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
@@ -124,8 +120,6 @@ hookGroup:
 
   # PARTIAL local hook settings take priority over global setting, simple function declaration
   - module: libreceiveFundamentalValue.so
-    hookSettings:
-      stackTraceLimit: 3
     decoderSettings:
       decodeLimit: 33
     hooks:
@@ -133,8 +127,6 @@ hookGroup:
 
   # PARTIAL local hook settings take priority over global setting, object with ONLY symbol provided
   - module: libreceiveFundamentalValue.so
-    hookSettings:
-      stackTraceLimit: 4
     decoderSettings:
       decodeLimit: 44
     hooks:
@@ -160,5 +152,5 @@ hookGroup:
     hooks:
       - symbol: receive_byte_array
         params:
-          - [unsigned char *, data, { decoderArgs: [ length ], decodeAt: "both" } ]
+          - [unsigned char *, data, { decoderArgs: [ length ], direction: inout } ]
           - [int, length]

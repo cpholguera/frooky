@@ -11,6 +11,11 @@ from typing import Optional
 
 import frida
 import yaml
+from rich.console import Console
+from rich.live import Live
+from rich.text import Text
+
+from frooky.pp_hook_event import pp_hook_event
 
 from ._version import __version__ as frooky_version
 
@@ -31,6 +36,11 @@ class RunnerOptions:
     attach_identifier: Optional[str] = None
     attach_pid: Optional[int] = None
     spawn: Optional[str] = None
+    agent_option_log_level: Optional[str] = None
+    agent_option_log_to: Optional[str] = None
+    agent_option_log_file: Optional[Path] = None
+    agent_option_resolver_timeout: Optional[int] = None
+    print_events: bool = False
 
 
 class FrookyRunner:
@@ -46,6 +56,21 @@ class FrookyRunner:
         self.last_event: str = "Waiting for events..."
         self.total_hooks: Optional[int] = None
         self.total_errors: int = 0
+        self._console = Console(stderr=False)
+        self._live = Live("", console=self._console, refresh_per_second=4, transient=False)
+        self._live.start()
+
+    def _stop_live_terminal(self):
+        self._live.stop()
+
+    def _update_status_line(self) -> None:
+        max_event_len = 60
+        event_display = self.last_event[:max_event_len]
+        if len(self.last_event) > max_event_len:
+            event_display += "..."
+
+        status = f"  Events: {self.event_count:,}  |  Last: {event_display}"
+        self._live.update(Text(status, style="reverse"))
 
     def _prepare_targets(self) -> dict:
         """Load hook JSON files and merge their category and hooks into a single target."""
@@ -80,26 +105,20 @@ class FrookyRunner:
                     json.dump(payload, f)
                     f.write("\n")
 
-                # Check if this is a summary event
-                if isinstance(payload, dict):
-                    event_type = payload.get("type")
+                for event in payload:
+                    self.event_count += 1
+                    if event.get("symbol"):
+                        self.last_event = f"{event.get('symbol')}"
+                    elif event.get("method"):
+                        self.last_event = f"{event.get('method')}"
+                    self._update_status_line()
 
-                    if event_type == "summary":
-                        # Store summary info and print once
-                        self.total_hooks = payload.get("totalHooks", 0)
-                        self.total_errors = payload.get("totalErrors", 0)
-                        self._print_hooks_line()
-                    elif event_type in ("hook", "native-hook", "objc-hook"):
-                        # Count all hook event types
-                        self.event_count += 1
-                        # Extract event info for status line
-                        method = payload.get("method", payload.get("symbol", "unknown"))
-                        class_name = payload.get("class", "")
-                        if class_name:
-                            self.last_event = f"{class_name}.{method}"
-                        else:
-                            self.last_event = method
-                        self._update_status_line()
+                    if self.options.print_events:
+                        if event.get("symbol"):
+                            self.last_event = f"{event.get('symbol')}"
+                        elif event.get("method"):
+                            self.last_event = f"{event.get('method')}"
+                        pp_hook_event(event)
             else:
                 try:
                     parsed = json.loads(payload)
@@ -131,28 +150,6 @@ class FrookyRunner:
                     print("MSG", payload)
 
         return on_message
-
-    def _print_hooks_line(self) -> None:
-        """Print the hooks summary line once when summary event arrives."""
-        hook_line = f"\n  Resolved Hooks: {self.total_hooks}"
-        if self.total_errors > 0:
-            hook_line += f" | Errors: {self.total_errors}"
-        print(hook_line)
-        # Print initial events line
-        self._update_status_line()
-
-    def _update_status_line(self) -> None:
-        """Update the live status line with event count and last event."""
-        # Truncate last_event if too long
-        max_event_len = 60
-        event_display = self.last_event[:max_event_len]
-        if len(self.last_event) > max_event_len:
-            event_display += "..."
-
-        status = f"\r  Events: {self.event_count:,} \t\t| Last: {event_display}"
-        # Pad with spaces to clear previous content
-        status = status.ljust(100)
-        print(status, end="", flush=True)
 
     def _get_target_description(self) -> str:
         """Get a description of the target for the header."""
@@ -286,9 +283,12 @@ class FrookyRunner:
             self.script.on("message", self._create_message_handler())
             self.script.load()
 
-            # Combine the user provided hooks.json and send the to the agent
+            # init the frooky agent with the provided settings
+            self.script.exports_sync.init_frooky_agent(self.options.agent_option_log_level, self.options.agent_option_log_to, self.options.agent_option_resolver_timeout)
+
+            # Combine the user provided hooks.yaml and send the to the agent
             targets = self._prepare_targets()
-            self.script.exports_sync.run_frooky_agent(targets)
+            self.script.exports_sync.load_frooky_configs(targets)
 
             # Resume if spawned
             if self.options.spawn:
@@ -296,7 +296,7 @@ class FrookyRunner:
 
             # Main loop
             while True:
-                time.sleep(0.2)
+                time.sleep(0.5)
 
         except KeyboardInterrupt:
             # Overwrite the ^C characters
@@ -318,5 +318,6 @@ class FrookyRunner:
                     self.session.detach()
                 except Exception:
                     pass
+            self._stop_live_terminal()
 
         return 0

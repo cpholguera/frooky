@@ -6,12 +6,8 @@ metadata:
 
 # global settings for the hooks in this hook file.
 settings:
-  verbose: true
-  logLevel: "debug"
-  logTo: "device"
-  resolverTimeout: 5
   hookSettings:
-    stackTraceLimit: 0                # Sets stackTraceLimit to 10 for all hooks
+    stackTraceLimit: 10               # Sets stackTraceLimit to 10 for all hooks
     eventFilter: ['^(?!android).*']   # Stack trace filters to apply.
   decoderSettings:
     fastDecode: true                  # If set, the decoders are instructed to prioritize speed over details. Mostly, this mean avoiding expensive Frida <-> native roundtrip.
@@ -255,4 +251,26 @@ hookGroup:
           - [char *, string]
       - symbol: receive_utf8
         params:
-          - [ char *, {decodeAt: both, magicDecode: true}]
+          - [ char *, {direction: inout}]
+
+  # use parameter to decode a native uchar *
+  - module: libreceiveFundamentalReference.so
+    hooks:
+      - symbol: receive_byte_array
+        params:
+          - [unsigned char *, data, { decoderArgs: [ length ], direction: inout } ]
+          - [int, length]
+
+# decode argument: null terminated string 
+  - module: libreceiveString.so
+    hookSettings:
+      stackTraceLimit: 0
+    decoderSettings:
+      magicDecode: false
+    hooks:
+      - symbol: receive_cstring
+        params: 
+          - [char *, string]
+      - symbol: receive_utf8
+        params: 
+          - [char *, string]

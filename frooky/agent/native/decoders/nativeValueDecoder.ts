@@ -41,10 +41,11 @@ export class NativeValueDecoder extends Decoder<NativePointer> {
 
   public decode(value: NativePointer): DecodedValue {
     if (!this.cachedValueDecoder) {
-      this.cachedValueDecoder = valueDecoders[this.type as FridaFundamentalType];
+      this.cachedValueDecoder = valueDecoders[this.decodable.type as FridaFundamentalType];
     }
     return {
-      type: this.type,
+      type: this.decodable.type,
+      name: this.decodable.name,
       value: this.cachedValueDecoder(value),
     };
   }

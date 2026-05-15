@@ -12,13 +12,18 @@ export const NativeDecoderResolver: DecoderResolver<NativePointer> = {
     const nativeFridaType = parseNativeFridaType(decodable.type);
     if (!nativeFridaType) {
       // it was not possible to resolve a decoder
-      return new NativeFallbackDecoder(decodable.type, decodable.settings);
+      return new NativeFallbackDecoder(decodable);
     }
     if (typeof nativeFridaType === "object") {
       // the declared type is a reference (e.g. 'char*')
-      return new NativeReferenceDecoder(decodable.type, decodable.settings, nativeFridaType);
+      return new NativeReferenceDecoder(decodable, nativeFridaType);
+    } else {
+      // the declared type is a fundamental (e.g. 'int')
+      return new NativeValueDecoder({
+        type: nativeFridaType,
+        name: decodable.name,
+        settings: decodable.settings,
+      });
     }
-    // the declared type is a fundamental (e.g. 'int')
-    return new NativeValueDecoder(nativeFridaType, decodable.settings);
   },
 };

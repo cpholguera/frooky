@@ -1,15 +1,15 @@
 import Java from "frida-java-bridge";
 import { Decoder } from "../../shared/decoders/baseDecoder";
 import { DecodedValue } from "../../shared/decoders/decodedValue";
-import { DecoderSettings } from "../../shared/frookySettings";
 import { IntentFlagDecoder } from "./android/content/IntentFlagDecoder";
 
+import { Decodable } from "../../shared/decoders/decodable";
 import { KeyGenParameterSpecDecoder } from "./android/security/keystore/KeyGenParameterSpecDecoder";
 import { IterableDecoder } from "./java/lang/IterableDecoder";
 import { MapDecoder } from "./java/util/MapDecoder";
 import { JavaFallbackDecoder } from "./javaBasicDecoder";
 
-type DecoderConstructor = { new (type: string, settings: DecoderSettings): Decoder<Java.Wrapper> };
+type DecoderConstructor = { new (decodable: Decodable): Decoder<Java.Wrapper> };
 
 const iterableClasses: string[] = [
   // java.util - Lists
@@ -107,15 +107,20 @@ export class JavaClassDecoder extends Decoder<Java.Wrapper> {
   decode(value: Java.Wrapper): DecodedValue {
     if (!this.implementationDecoder) {
       // Try to find a decoder in the registry with fall back to JavaFallbackDecoder
-      const implementationType = value.$className ?? this.type;
+      const implementationType = value.$className ?? this.decodable.type;
       const DecoderClass = javaClassDecoderRegistry[implementationType];
       this.implementationDecoder = DecoderClass
-        ? new DecoderClass(implementationType, this.settings)
-        : new JavaFallbackDecoder(this.type, this.settings);
+        ? new DecoderClass({
+            type: implementationType,
+            name: this.decodable.name,
+            settings: this.decodable.settings,
+          })
+        : new JavaFallbackDecoder(this.decodable);
     }
 
     return {
-      type: this.type,
+      type: this.decodable.type,
+      name: this.decodable.name,
       value: this.implementationDecoder.decode(value),
     };
   }

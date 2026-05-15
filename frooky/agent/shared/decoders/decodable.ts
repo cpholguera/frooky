@@ -23,7 +23,7 @@ export interface Decodable {
  *
  * @public
  */
-export type DecodeAt = "enter" | "exit" | "both";
+export type direction = "in" | "out" | "inout";
 
 /**
  * Describes a parameter of a function or method signature.
@@ -34,11 +34,11 @@ export interface Param extends Decodable {
   /**
    * When the decoder should be applied.
    *
-   * @defaultValue "enter"
-   * @example "exit"
-   * @example "both"
+   * @defaultValue "in"
+   * @example "out"
+   * @example "inout"
    */
-  decodeAt: DecodeAt;
+  direction: direction;
 }
 
 /**

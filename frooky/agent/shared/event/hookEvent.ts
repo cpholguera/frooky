@@ -20,12 +20,12 @@ export abstract class HookEvent extends BaseEvent {
   /**
    * Decoded input argument values passed to the hooked function / method.
    */
-  argsOnEnter?: DecodedValue[];
+  argsIn?: DecodedValue[];
 
   /**
    * Decoded input argument values passed to the hooked function / method.
    */
-  argsOnExit?: DecodedValue[];
+  argsOut?: DecodedValue[];
 
   /**
    * Decoded return value from the hooked function / method.
@@ -35,8 +35,8 @@ export abstract class HookEvent extends BaseEvent {
   constructor(decodedArgs?: DecodedArgs, returnValue?: DecodedValue, stackTrace?: string[]) {
     super();
     if (decodedArgs) {
-      this.argsOnEnter = decodedArgs.enter;
-      this.argsOnExit = decodedArgs.exit;
+      this.argsIn = decodedArgs.in;
+      this.argsOut = decodedArgs.out;
     }
     this.returnValue = returnValue;
     this.stackTrace = stackTrace;

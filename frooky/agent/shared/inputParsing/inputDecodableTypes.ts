@@ -11,9 +11,9 @@ import { InputParamSettings } from "./inputSettings";
  * |------|------------------------|----------------------------------------|-----------------------------------------------------------------------|
  * | 1    | Type only              | `string`                               | `"java.lang.String"`                                                  |
  * | 2    | Type + name            | `[string, string]`                     | `["java.lang.String", "value"]`                                       |
- * | 3    | Type + settings        | `[string, InputParamSettings]`         | `["[I", "vector" { decodeAt: "exit", maxRecursion: 5 }]`              |
- * | 4    | Type + name + settings | `[string, string, InputParamSettings]` | `["[B", "encryptedOutput", { decodeAt: "exit", magicDecode: false }]` |
- * | 5    | Normalized object      | `Param`                                | `{ type: int, name: age, decodeAt: "exit", settings: { ... }}`        |
+ * | 3    | Type + settings        | `[string, InputParamSettings]`         | `["[I", "vector" { direction: "exit", maxRecursion: 5 }]`              |
+ * | 4    | Type + name + settings | `[string, string, InputParamSettings]` | `["[B", "encryptedOutput", { direction: "exit", magicDecode: false }]` |
+ * | 5    | Normalized object      | `Param`                                | `{ type: int, name: age, direction: "exit", settings: { ... }}`        |
  *
  * Note: Internally we only use the normalized version. The other forms are used to add flexibility for the frooky input file.
  *
@@ -26,24 +26,24 @@ export function normalizeInputParam(input: InputParam, decoderSettings?: Decoder
 
   // Case 1: Type only - "java.lang.String"
   if (typeof input === "string") {
-    return { type: input, decodeAt: DEFAULT_DECODE_AT, settings: mergedSettings };
+    return { type: input, direction: DEFAULT_DECODE_AT, settings: mergedSettings };
   } else if (Array.isArray(input)) {
     // Case 2: Type + name - ["java.lang.String", "value"]
     if (input.length === 2 && typeof input[1] === "string") {
       const [type, name] = input;
-      return { type, decodeAt: DEFAULT_DECODE_AT, settings: mergedSettings, name };
+      return { type, direction: DEFAULT_DECODE_AT, settings: mergedSettings, name };
     }
-    // Case 3: Type + options - ["[I", { decodeAt: "exit", maxRecursion: 5 }]
+    // Case 3: Type + options - ["[I", { direction: "exit", maxRecursion: 5 }]
     if (input.length === 2 && typeof input[1] === "object") {
-      const [type, { decodeAt, ...inlineDecoderSettings }] = input as [string, InputParamSettings];
+      const [type, { direction, ...inlineDecoderSettings }] = input as [string, InputParamSettings];
       const validatedDecoderSettings = validateAndRepairDecoderSettings({ ...DEFAULT_DECODER_SETTINGS, ...inlineDecoderSettings });
-      return { type, decodeAt: decodeAt ?? DEFAULT_DECODE_AT, settings: validatedDecoderSettings };
+      return { type, direction: direction ?? DEFAULT_DECODE_AT, settings: validatedDecoderSettings };
     }
-    // Case 4: Type + name + options - ["[B", "encryptedOutput", { decodeAt: "exit", magicDecode: false }]
+    // Case 4: Type + name + options - ["[B", "encryptedOutput", { direction: "exit", magicDecode: false }]
     if (input.length === 3) {
-      const [type, name, { decodeAt, ...inlineDecoderSettings }] = input as [string, string, InputParamSettings];
+      const [type, name, { direction, ...inlineDecoderSettings }] = input as [string, string, InputParamSettings];
       const validatedDecoderSettings = validateAndRepairDecoderSettings({ ...DEFAULT_DECODER_SETTINGS, ...inlineDecoderSettings });
-      return { type, decodeAt: decodeAt ?? DEFAULT_DECODE_AT, settings: validatedDecoderSettings, name };
+      return { type, direction: direction ?? DEFAULT_DECODE_AT, settings: validatedDecoderSettings, name };
     }
   } else if (typeof input === "object") {
     // Case 5: Normalized object
