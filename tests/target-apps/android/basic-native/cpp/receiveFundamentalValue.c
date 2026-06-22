@@ -6,28 +6,27 @@
 #define EXPORT __attribute__((visibility("default")))
 
 /* ---------- receive by value ---------- */
-NOINLINE EXPORT void receive_bool(bool minValue, bool maxValue) {}
-NOINLINE EXPORT void receive_char(char minValue, char maxValue) {}
-NOINLINE EXPORT void receive_schar(signed char minValue, signed char maxValue) {}
-NOINLINE EXPORT void receive_uchar(unsigned char minValue, unsigned char maxValue) {}
-NOINLINE EXPORT void receive_short(short minValue, short maxValue) {}
-NOINLINE EXPORT void receive_ushort(unsigned short minValue, unsigned short maxValue) {}
-NOINLINE EXPORT void receive_int(int minValue, int maxValue) {}
-NOINLINE EXPORT void receive_uint(unsigned int minValue, unsigned int maxValue) {}
-NOINLINE EXPORT void receive_long(long minValue, long maxValue) {}
-NOINLINE EXPORT void receive_ulong(unsigned long minValue, unsigned long maxValue) {}
-NOINLINE EXPORT void receive_llong(long long minValue, long long maxValue) {}
-NOINLINE EXPORT void receive_ullong(unsigned long long minValue, unsigned long long maxValue) {}
-NOINLINE EXPORT void receive_float(float minValue, float maxValue) {}
-NOINLINE EXPORT void receive_double(double minValue, double maxValue) {}
-NOINLINE EXPORT void receive_ldouble(long double minValue, long double maxValue) {}
+NOINLINE EXPORT bool receive_bool(bool minValue, bool maxValue) { return minValue; }
+NOINLINE EXPORT char receive_char(char minValue, char maxValue) { return minValue; }
+NOINLINE EXPORT signed char receive_schar(signed char minValue, signed char maxValue) { return minValue; }
+NOINLINE EXPORT unsigned char receive_uchar(unsigned char minValue, unsigned char maxValue) { return minValue; }
+NOINLINE EXPORT short receive_short(short minValue, short maxValue) { return minValue; }
+NOINLINE EXPORT unsigned short receive_ushort(unsigned short minValue, unsigned short maxValue) { return minValue; }
+NOINLINE EXPORT int receive_int(int minValue, int maxValue) { return minValue; }
+NOINLINE EXPORT unsigned int receive_uint(unsigned int minValue, unsigned int maxValue) { return minValue; }
+NOINLINE EXPORT long receive_long(long minValue, long maxValue) { return minValue; }
+NOINLINE EXPORT unsigned long receive_ulong(unsigned long minValue, unsigned long maxValue) { return minValue; }
+NOINLINE EXPORT long long receive_llong(long long minValue, long long maxValue) { return minValue; }
+NOINLINE EXPORT unsigned long long receive_ullong(unsigned long long minValue, unsigned long long maxValue) { return minValue; }
+NOINLINE EXPORT float receive_float(float minValue, float maxValue) { return minValue; }
+NOINLINE EXPORT double receive_double(double minValue, double maxValue) { return minValue; }
+NOINLINE EXPORT long double receive_ldouble(long double minValue, long double maxValue) { return minValue; }
 
 JNIEXPORT jstring JNICALL
 Java_org_owasp_mastestapp_MastgTest_receiveFundamentalValueJNI(JNIEnv *env, jobject thiz)
 {
     (void)thiz;
 
-    /* by value */
     receive_bool(false, true);
     receive_char('A', 'Z');
     receive_schar(-128, 127);

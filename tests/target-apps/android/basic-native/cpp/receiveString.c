@@ -2,15 +2,13 @@
 #include <string.h>
 #include <jni.h>
 
-void receive_cstring(const char *s) {}
+const char *receive_cstring(const char *s) { return s; }
 
-void receive_utf8(const char *s) {}
+const char *receive_utf8(const char *s) { return s; }
 
 JNIEXPORT jstring JNICALL
 Java_org_owasp_mastestapp_MastgTest_receiveStringsJNI(JNIEnv *env, jobject thiz)
 {
-
-    // NUL-terminated variants
     receive_cstring("Hello, CString!");
     receive_utf8("Hello, UTF-8! ❤️");
 

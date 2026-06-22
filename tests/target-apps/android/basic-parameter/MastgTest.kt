@@ -53,21 +53,21 @@ class MastgTest(private val context: Context) {
         }
 
         // Single types
-        fun receiveString(arg: String) {}
-        fun receiveBoolean(arg: Boolean) {}
-        fun receiveByte(arg: Byte) {}
-        fun receiveShort(arg: Short) {}
-        fun receiveInt(arg: Int) {}
-        fun receiveLong(arg: Long) {}
-        fun receiveFloat(arg: Float) {}
-        fun receiveDouble(arg: Double) {}
-        fun receiveChar(arg: Char) {}
+        fun receiveString(arg: String): String = arg
+        fun receiveBoolean(arg: Boolean): Boolean = arg
+        fun receiveByte(arg: Byte): Byte = arg
+        fun receiveShort(arg: Short): Short = arg
+        fun receiveInt(arg: Int): Int = arg
+        fun receiveLong(arg: Long): Long = arg
+        fun receiveFloat(arg: Float): Float = arg
+        fun receiveDouble(arg: Double): Double = arg
+        fun receiveChar(arg: Char): Char = arg
 
-        fun receiveBigInteger(arg: BigInteger) {}
-        fun receiveBigDecimal(arg: BigDecimal) {}
-        fun receiveList(arg: List<String>) {}
-        fun receiveMap(arg: Map<String, String>) {}
-        fun receiveSet(arg: Set<String>) {}
+        fun receiveBigInteger(arg: BigInteger): BigInteger = arg
+        fun receiveBigDecimal(arg: BigDecimal): BigDecimal = arg
+        fun receiveList(arg: List<String>): List<String> = arg
+        fun receiveMap(arg: Map<String, String>): Map<String, String> = arg
+        fun receiveSet(arg: Set<String>): Set<String> = arg
 
         enum class Direction {
                 NORTH,
@@ -75,24 +75,22 @@ class MastgTest(private val context: Context) {
                 EAST,
                 WEST
         }
-        fun receiveEnum(arg: Direction) {}
+        fun receiveEnum(arg: Direction): Direction = arg
 
         // Arrays
-        fun receiveStringArray(arg: Array<String>) {}
-        fun receiveBooleanArray(arg: BooleanArray) {}
-        fun receiveByteArray(arg: ByteArray) {}
-        fun receiveShortArray(arg: ShortArray) {}
-        fun receiveIntArray(arg: IntArray) {}
-        fun receiveLongArray(arg: LongArray) {}
-        fun receiveFloatArray(arg: FloatArray) {}
-        fun receiveDoubleArray(arg: DoubleArray) {}
-        fun receiveCharArray(arg: CharArray) {}
+        fun receiveStringArray(arg: Array<String>): Array<String> = arg
+        fun receiveBooleanArray(arg: BooleanArray): BooleanArray = arg
+        fun receiveByteArray(arg: ByteArray): ByteArray = arg
+        fun receiveShortArray(arg: ShortArray): ShortArray = arg
+        fun receiveIntArray(arg: IntArray): IntArray = arg
+        fun receiveLongArray(arg: LongArray): LongArray = arg
+        fun receiveFloatArray(arg: FloatArray): FloatArray = arg
+        fun receiveDoubleArray(arg: DoubleArray): DoubleArray = arg
+        fun receiveCharArray(arg: CharArray): CharArray = arg
         fun receiveNestedObjectArray(
                 arg: Array<Array<Array<String>>>
-        ) {} // nested array of objects with depth of 3
-        fun receiveNestedPrimitivesArray(
-                arg: Array<Array<IntArray>>
-        ) {} // nested array of integer primitives with depth of 3
+        ): Array<Array<Array<String>>> = arg
+        fun receiveNestedPrimitivesArray(arg: Array<Array<IntArray>>): Array<Array<IntArray>> = arg
 
         fun mastgTest(): String {
                 val r = DemoResults("basic-parameter")
