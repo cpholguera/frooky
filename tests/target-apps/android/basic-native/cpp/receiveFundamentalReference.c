@@ -6,21 +6,21 @@
 #define EXPORT __attribute__((visibility("default")))
 
 /* ---------- receive by reference ---------- */
-NOINLINE EXPORT bool receive_bool_ref(bool *minValue, bool *maxValue) { return *minValue; }
-NOINLINE EXPORT char receive_char_ref(char *minValue, char *maxValue) { return *minValue; }
-NOINLINE EXPORT signed char receive_schar_ref(signed char *minValue, signed char *maxValue) { return *minValue; }
-NOINLINE EXPORT unsigned char receive_uchar_ref(unsigned char *minValue, unsigned char *maxValue) { return *minValue; }
-NOINLINE EXPORT short receive_short_ref(short *minValue, short *maxValue) { return *minValue; }
-NOINLINE EXPORT unsigned short receive_ushort_ref(unsigned short *minValue, unsigned short *maxValue) { return *minValue; }
-NOINLINE EXPORT int receive_int_ref(int *minValue, int *maxValue) { return *minValue; }
-NOINLINE EXPORT unsigned int receive_uint_ref(unsigned int *minValue, unsigned int *maxValue) { return *minValue; }
-NOINLINE EXPORT long receive_long_ref(long *minValue, long *maxValue) { return *minValue; }
-NOINLINE EXPORT unsigned long receive_ulong_ref(unsigned long *minValue, unsigned long *maxValue) { return *minValue; }
-NOINLINE EXPORT long long receive_llong_ref(long long *minValue, long long *maxValue) { return *minValue; }
-NOINLINE EXPORT unsigned long long receive_ullong_ref(unsigned long long *minValue, unsigned long long *maxValue) { return *minValue; }
-NOINLINE EXPORT float receive_float_ref(float *minValue, float *maxValue) { return *minValue; }
-NOINLINE EXPORT double receive_double_ref(double *minValue, double *maxValue) { return *minValue; }
-NOINLINE EXPORT long double receive_ldouble_ref(long double *minValue, long double *maxValue) { return *minValue; }
+NOINLINE EXPORT bool *receive_bool_ref(bool *minValue, bool *maxValue) { return minValue; }
+NOINLINE EXPORT char *receive_char_ref(char *minValue, char *maxValue) { return minValue; }
+NOINLINE EXPORT signed char *receive_schar_ref(signed char *minValue, signed char *maxValue) { return minValue; }
+NOINLINE EXPORT unsigned char *receive_uchar_ref(unsigned char *minValue, unsigned char *maxValue) { return minValue; }
+NOINLINE EXPORT short *receive_short_ref(short *minValue, short *maxValue) { return minValue; }
+NOINLINE EXPORT unsigned short *receive_ushort_ref(unsigned short *minValue, unsigned short *maxValue) { return minValue; }
+NOINLINE EXPORT int *receive_int_ref(int *minValue, int *maxValue) { return minValue; }
+NOINLINE EXPORT unsigned int *receive_uint_ref(unsigned int *minValue, unsigned int *maxValue) { return minValue; }
+NOINLINE EXPORT long *receive_long_ref(long *minValue, long *maxValue) { return minValue; }
+NOINLINE EXPORT unsigned long *receive_ulong_ref(unsigned long *minValue, unsigned long *maxValue) { return minValue; }
+NOINLINE EXPORT long long *receive_llong_ref(long long *minValue, long long *maxValue) { return minValue; }
+NOINLINE EXPORT unsigned long long *receive_ullong_ref(unsigned long long *minValue, unsigned long long *maxValue) { return minValue; }
+NOINLINE EXPORT float *receive_float_ref(float *minValue, float *maxValue) { return minValue; }
+NOINLINE EXPORT double *receive_double_ref(double *minValue, double *maxValue) { return minValue; }
+NOINLINE EXPORT long double *receive_ldouble_ref(long double *minValue, long double *maxValue) { return minValue; }
 NOINLINE EXPORT unsigned char *receive_byte_array(unsigned char *data, int length)
 {
     for (int i = 0; i < length; i++)
