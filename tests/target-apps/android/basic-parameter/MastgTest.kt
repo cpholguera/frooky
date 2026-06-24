@@ -95,8 +95,8 @@ class MastgTest(private val context: Context) {
         fun mastgTest(): String {
                 val r = DemoResults("basic-parameter")
 
-                receiveString("Test String")
-                r.add(Status.PASS, "Test String")
+                receiveString("Welcome the first OWASP MASCon 📱❤️")
+                r.add(Status.PASS, "Welcome the first OWASP MASCon 📱❤️")
 
                 receiveBoolean(true)
                 r.add(Status.PASS, true.toString())
