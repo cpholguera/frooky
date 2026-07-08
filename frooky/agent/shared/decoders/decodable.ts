@@ -1,0 +1,48 @@
+import { DecoderSettings } from "../frookySettings";
+
+/**
+ * Base structure for a type that can be decoded.
+ */
+export interface Decodable {
+  /** Declared parameter type such as primitive type, array, class, interface, or native structs. */
+  type: string;
+
+  /** Optional name for the value. */
+  name?: string;
+
+  /** Settings applied when running the decoder. */
+  settings: DecoderSettings;
+}
+
+/**
+ * Specifies when a decoder should be applied during function execution.
+ *
+ * @example "in" - Decode when the function/method is entered (before execution)
+ * @example "out" - Decode when the function/method returns (after execution)
+ * @example "inout" - Decode at both times
+ *
+ * @public
+ */
+export type Direction = "in" | "out" | "inout";
+
+/**
+ * Describes a parameter of a function or method signature.
+ *
+ * Extends {@link Decodable} with an optional name and controls when decoding is applied (on function entry, exit, or both).
+ */
+export interface Param extends Decodable {
+  /**
+   * When the decoder should be applied.
+   *
+   * @defaultValue "in"
+   * @example "out"
+   * @example "inout"
+   */
+  direction: Direction;
+}
+
+/**
+ * Is used for for return types. Not technically necessary, but make code more readable.
+ *
+ */
+export interface RetType extends Decodable {}

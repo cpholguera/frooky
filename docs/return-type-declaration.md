@@ -2,13 +2,14 @@
 
 The return type declaration is a simpler variant of a [parameter declaration](./parameter-declaration.md).
 
-- [Return Type vs. Parameter Declaration](#return-type-vs-parameter-declaration)
-- [Basic Usage](#basic-usage)
-  - [Java Return Types](#java-return-types)
-  - [Objective-C Return Types](#objective-c-return-types)
-  - [Native Return Types](#native-return-types)
-- [Decoders](#decoders)
-    - [Pass Arguments to Decoder in Objective-C](#pass-arguments-to-decoder-in-objective-c)
+- [Return Type Declaration](#return-type-declaration)
+  - [Return Type vs. Parameter Declaration](#return-type-vs-parameter-declaration)
+  - [Basic Usage](#basic-usage)
+    - [Java Return Types](#java-return-types)
+    - [Objective-C Return Types](#objective-c-return-types)
+    - [Native Return Types](#native-return-types)
+  - [Decoders](#decoders)
+      - [Pass Arguments to Decoder in Objective-C](#pass-arguments-to-decoder-in-objective-c)
 
 ## Return Type vs. Parameter Declaration
 
@@ -34,7 +35,7 @@ In Java, the method signature can be retrieved at runtime. Unless you want to ov
 objcClass: NSURL
 methods:
   - name: "+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:"
-    returnType: (NSURL *)
+    retType: (NSURL *)
     params: [ "(const char *)", "(BOOL)", "(NSURL *)" ]
 ```
 
@@ -48,14 +49,13 @@ This example hooks the following class method from [NSURL](https://developer.app
                                   relativeToURL:(NSURL *) baseURL;
 ```
 
-
 ### Native Return Types
 
 ```yaml
 module: libssl.so
 functions:
   - symbol: EVP_DigestFinal_ex
-    returnType: int
+    retType: int
     params:
       - [ "EVP_MD_CTX *", ctx ]
       - [ "unsigned char *", md ]
@@ -76,7 +76,7 @@ The function returns an integer. It returns 1 on success and 0 on failure.
 
 If you want to configure the decoder for the return value, you can use the following option:
 
-- `decoderArgs`
+- `decoderArg`
 
 The following chapters will explain the concepts with a practical example.
 
@@ -86,7 +86,7 @@ The following chapters will explain the concepts with a practical example.
 objcClass: NSString
 methods:
   - name: "- dataUsingEncoding"
-    returnType: [ "(NSData *)", { decoderArgs: [ encoding ] }  ]
+    retType: [ "(NSData *)", { decoderArg: encoding }  ]
     params: [ ["(NSStringEncoding)", encoding ] ]
 ```
 

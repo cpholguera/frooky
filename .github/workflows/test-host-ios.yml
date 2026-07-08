@@ -32,8 +32,8 @@ jobs:
       - name: Download MAS app iOS artifact
         uses: actions/download-artifact@v8
         with:
-          name: target-app-ios
-          path: target-app-ios
+          name: target-apps-ios
+          path: target-apps-ios
 
       - name: Setup Host Test Environment
         uses: ./.github/actions/setup-host-test-env
@@ -47,7 +47,7 @@ jobs:
           xcrun simctl bootstatus "$SIM_ID" -b
 
       - name: Install app on simulator
-        run: xcrun simctl install booted target-app-ios/MASTestApp.app
+        run: xcrun simctl install booted target-apps-ios/MASTestApp.app
 
       - name: Run tests
         shell: bash

@@ -7,7 +7,7 @@ frooky supports the following settings that can be used regardless of hook type:
 
 ## Event Filter Based on Stack Trace
 
-If you hook a method that is used widely, you may capture many events you are not interested in. This makes the analysis more difficult. 
+If you hook a method that is used widely, you may capture many events you are not interested in. This makes the analysis more difficult.
 
 To filter out events that do not originate from the target app, frooky can filter events based on the stack trace. The following `<hook_configuration>` will capture only events where the target package name matches the stack trace:
 
@@ -15,11 +15,10 @@ To filter out events that do not originate from the target app, frooky can filte
 javaClass: android.app.SharedPreferencesImpl$EditorImpl
 methods:
   - name: putString
-  - eventFilter: ["^org\.owasp\.mastestapp"]
+  - stackTraceFilter: ["^org\.owasp\.mastestapp"]
 ```
 
 With this filter, noise can be reduced.
-
 
 **Example: `SharedPreferences` used by Android**
 
@@ -64,10 +63,8 @@ This method call is initiated by Android when `EncryptedSharedPreferences` are i
 
 These events are usually not of interest to security testers, who want to test the target app rather than OS libraries.
 
-
 ## Stack Trace Limits
 
-By default, frooky will show all function calls of a stack trace. If this is too much, you can set a limit using the `stackTraceLimit` property. 
+By default, frooky will show all function calls of a stack trace. If this is too much, you can set a limit using the `stackTraceLimit` property.
 
 This is supported by Java, Objective-C and native hooks.
-

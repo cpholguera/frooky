@@ -2,9 +2,10 @@
 
 This documentation explains how to write native hook declarations.
 
-- [Structure of a `NativeHook` Declaration](#structure-of-a-nativehook-declaration)
-- [Basic Usage](#basic-usage)
-- [Decoding Arguments and Return Values](#decoding-arguments-and-return-values)
+- [`NativeHook` Declaration](#nativehook-declaration)
+  - [Structure](#structure)
+  - [Basic Usage](#basic-usage)
+  - [Decoding Arguments and Return Values](#decoding-arguments-and-return-values)
 
 ## Structure
 
@@ -15,7 +16,7 @@ module: <module name>
 functions:
   - <symbol name>
   - symbol: <symbol name>
-    returnType: <type>                # Optional
+    retType: <type>                   # Optional
     params:                           # Optional
       - <parameter declaration>
 ```
@@ -38,7 +39,7 @@ Use the **expanded form** when you want frooky to decode arguments and or the re
 module: <module name>
 functions:
   - symbol: <symbol name>
-    returnType: <type>                # Optional
+    retType: <type>                   # Optional
     params:                           # Optional
       - <parameter declaration>
 ```
@@ -46,7 +47,7 @@ functions:
 In the expanded form:
 
 - `symbol`: Native symbol name.
-- `returnType`: Optional return type of the function.
+- `retType`: Optional return type of the function.
 - `params`: Optional list of parameter declarations.
 
 > [!IMPORTANT]
@@ -86,13 +87,13 @@ void ENGINE_cleanup(void);
 
 When a function accepts parameters or returns a value, frooky needs to know how to decode them.
 
-You can provide that information by declaring `returnType` and `params` for each function. The type syntax follows standard [C function declaration](https://en.cppreference.com/w/c/language/function_declaration.html) style.
+You can provide that information by declaring `retType` and `params` for each function. The type syntax follows standard [C function declaration](https://en.cppreference.com/w/c/language/function_declaration.html) style.
 
 ```yaml
 module: <module name>
 functions:
   - symbol: <symbol name>
-    returnType: <type>                # Optional
+    retType: <type>                   # Optional
     params:                           # Optional
       - <parameter declaration>
 ```
@@ -103,7 +104,7 @@ functions:
 module: libssl.so
 functions:
   - symbol: OSSL_CMP_validate_cert_path
-    returnType: int
+    retType: int
     params:
       - ["const OSSL_CMP_CTX *", ctx]
       - ["X509_STORE *", trusted_store]
@@ -121,4 +122,3 @@ int OSSL_CMP_validate_cert_path(const OSSL_CMP_CTX *ctx,
 When these types are declared, frooky can decode arguments and return values using its built in decoders.
 
 If a type is more complex, you may need to use [custom decoders](./parameter-declaration.md#custom-decoder-in-native).
-

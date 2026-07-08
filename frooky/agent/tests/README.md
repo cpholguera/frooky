@@ -38,13 +38,15 @@ To run the tests, you need to:
 
 ## Writing Tests
 
-Tests are written using `test('testName', () => {});` and `expect(actualValue).to*(expectedValue)`.
+Tests are written using `describe('testObject', () => {});`, `ìt('should do something', () => {})` and `expect(actualValue).to*(expectedValue)`.
 
 The basic syntax is:
 
 ```typescript
-test('my test', () => {
-    expect(1).toBe(1);
+describe('frooky', () => {
+    it('should throw an exception of no hook file is provided.', () => {
+        expect(1).toBe(1);
+    })
 });
 ```
 
@@ -69,33 +71,37 @@ The framework implicitly loads all files starting with `test_*.ts` located in th
 | `.toThrow()`          | Exception thrown                            |
 | `.toThrow('message')` | Exception thrown  with matching sub-message |
 | `.toThrow(error)`     | Exception thrown instance of class          |
+| `.notToThrow(error)`  | Exception is not thrown                     |
 
 ### Async tests
 
 Example with `Promise`:
 
 ```typescript
-test('asyncTest', () => {
-    return new Promise<void>(resolve => {
-        setTimeout(() => { resolve(); }, 100);
-    }
-  )
-);
+describe("classLoader", () => {
+  it("should load the class asynchronously", () => {
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 100);
+    });
+  });
+});
 ```
 
 The top level of the whole suite is run in sequence, this means, that if there are multiple asynchronous tests in one test suite, all of them need to be resolved before the next top level suite will be executed.
 
 ### Nested tests (suites)
 
-A `test()` can contain child `test()` calls. A parent passes only if all children pass.
+A `describe()` can contain child `describe()` calls. A parent passes only if all children pass.
 
 ```typescript
-test('math', () => {
-    test('addition', () => {
+describe('math', () => {
+    it('should do addition right', () => {
         expect(1 + 1).toBe(2);
     });
 
-    test('subtraction', () => {
+    it('should do subtraction right', () => {
         expect(5 - 3).toBe(2);
     });
 });

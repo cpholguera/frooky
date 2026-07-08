@@ -4,24 +4,24 @@ frooky needs to know a function or method's signature to hook it correctly. Part
 
 There are different accepted ways to declare a parameter. The following chapters explain them.
 
-- [Unnamed Parameters](#unnamed-parameters)
-  - [Unnamed Java Parameters](#unnamed-java-parameters)
-  - [Unnamed Objective-C Parameters](#unnamed-objective-c-parameters)
-  - [Unnamed Native Parameters](#unnamed-native-parameters)
-- [Named Parameters](#named-parameters)
-  - [Named Java Parameters](#named-java-parameters)
-  - [Named Objective-C Parameters](#named-objective-c-parameters)
-  - [Named Native Parameters](#named-native-parameters)
-- [Decoders](#decoders)
-  - [`decodeAt`-Option: Declare the Time of Decoding](#decodeat-option-declare-the-time-of-decoding)
-    - [Explicit Time of Decoding in Java](#explicit-time-of-decoding-in-java)
-    - [Explicit Time of Decoding in Objective-C](#explicit-time-of-decoding-in-objective-c)
-    - [Explicit Time of Decoding in Native](#explicit-time-of-decoding-in-native)
-  - [`decoderArgs`-Option: Pass Arguments to Decoder](#decoderargs-option-pass-arguments-to-decoder)
-    - [Pass Arguments to Decoder in Java](#pass-arguments-to-decoder-in-java)
-    - [Pass Arguments to Decoder in Objective-C](#pass-arguments-to-decoder-in-objective-c)
-    - [Pass Arguments to Decoder in Native](#pass-arguments-to-decoder-in-native)
-
+- [Parameter Declaration](#parameter-declaration)
+  - [Unnamed Parameters](#unnamed-parameters)
+    - [Unnamed Java Parameters](#unnamed-java-parameters)
+    - [Unnamed Objective-C Parameters](#unnamed-objective-c-parameters)
+    - [Unnamed Native Parameters](#unnamed-native-parameters)
+  - [Named Parameters](#named-parameters)
+    - [Named Java Parameters](#named-java-parameters)
+    - [Named Objective-C Parameters](#named-objective-c-parameters)
+    - [Named Native Parameters](#named-native-parameters)
+  - [Decoders](#decoders)
+    - [`direction`-Option: Declare the Time of Decoding](#direction-option-declare-the-time-of-decoding)
+      - [Explicit Time of Decoding in Java](#explicit-time-of-decoding-in-java)
+      - [Explicit Time of Decoding in Objective-C](#explicit-time-of-decoding-in-objective-c)
+      - [Explicit Time of Decoding in Native](#explicit-time-of-decoding-in-native)
+    - [`decoderArg`-Option: Pass Arguments to Decoder](#decoderarg-option-pass-arguments-to-decoder)
+      - [Pass Arguments to Decoder in Java](#pass-arguments-to-decoder-in-java)
+      - [Pass Arguments to Decoder in Objective-C](#pass-arguments-to-decoder-in-objective-c)
+      - [Pass Arguments to Decoder in Native](#pass-arguments-to-decoder-in-native)
 
 ## Unnamed Parameters
 
@@ -57,7 +57,7 @@ WebView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, privateBrowsi
 objcClass: NSURL
 methods:
   - name: "+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:"
-    returnType: (NSURL *)
+    retType: (NSURL *)
     params: [ "(const char *)", "(BOOL)", "(NSURL *)" ]
 ```
 
@@ -75,7 +75,7 @@ This example hooks the following class method from [`NSURL`](https://developer.a
 module: sqlite3.so
 functions:
   - symbol: sqlite3_exec
-    returnType: int
+    retType: int
     params: [ "sqlite3*", "const char *", "void *", "void *", "char **" ]
 ```
 
@@ -131,7 +131,7 @@ WebView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, privateBrowsi
 objcClass: NSURL
 methods:
   - name: "+ fileURLWithFileSystemRepresentation:isDirectory:relativeToURL:"
-    returnType: (NSURL *)
+    retType: (NSURL *)
     params:
       - [ "(const char *)",  path ]
       - [ "(BOOL)", isDir ]
@@ -152,7 +152,7 @@ This example hooks the following class method from [`NSURL`](https://developer.a
 module: sqlite3.so
 functions:
   - symbol: sqlite3_exec
-    returnType: int
+    retType: int
     params: 
       - "sqlite3*"
       - [ "const char *", sql ]
@@ -183,7 +183,7 @@ You can configure a decoder by adding a decoder configuration object to a parame
 
 This is done using a decoder configuration added to any [unnamed](#unnamed-parameters) and [named](#named-parameters) parameters. It can contain the following options:
 
-- `decodeAt`
+- `direction`
 - `decodeArgs`
 
 ```yaml
@@ -191,15 +191,15 @@ params:
   - [ <type>,                                    # Parameter type
       <name>,                                    # Parameter name
       {                                          # Decoder configuration
-        decodeAt: <enter|exit|both>,             # When to decode the parameter. Default: enter
-        decoderArgs: [<param_name>]              # List of arguments passed to the decoder. Must be a valid parameter name
+        direction: <in|out|inout>,               # When to decode the parameter. Default: in
+        decoderArg: <param_name>                 # Argument passed to the decoder. Must be a valid parameter name
       }
     ]
 ```
 
 The following chapters will explain the concepts through practical examples.
 
-### `decodeAt`-Option: Declare the Time of Decoding
+### `direction`-Option: Declare the Time of Decoding
 
 By default, arguments are decoded when the function or method is called. Larger data structures, such as arrays, are often passed by reference to allow manipulation within the function or method, as the following example shows:
 
@@ -212,8 +212,8 @@ This Java method from the class `javax.crypto.Cipher` encrypts or decrypts the d
 
 To accommodate these cases, you can specify the timing of decoding using the following decoder options:
 
-- After the function or method completes (`decodeAt: exit`)
-- Both at the beginning and after the function or method completes (`decodeAt: both`)
+- After the function or method completes (`direction: out`)
+- Both at the beginning and after the function or method completes (`direction: inout`)
 
 #### Explicit Time of Decoding in Java
 
@@ -223,7 +223,7 @@ methods:
   - name: doFinal
     overloads:
       - params:
-        - [ "[B", output, { decodeAt: exit } ]
+        - [ "[B", output, { direction: out } ]
         - [ int, outputOffset ]
  ```
 
@@ -242,10 +242,10 @@ In order to access the decrypted data, the `output` parameter must be decoded at
 objcClass:  NSFileManager
 methods:
   - name: "- contentsOfDirectoryAtPath"
-    returnType: "(NSArray<NSString *> *)"
+    retType: "(NSArray<NSString *> *)"
     params:
       - [ "(NSString *)", path ]
-      - [ "(NSError * *)", error, { decodeAt: exit } ]
+      - [ "(NSError * *)", error, { direction: out } ]
 ```
 
 This example hooks the following method from [NSFileManager](https://developer.apple.com/documentation/foundation/filemanager/contentsofdirectory(atpath:)?language=objc):
@@ -265,7 +265,7 @@ functions:
   - symbol: realpath
     params:
       - [ "const char *restrict", file_name ]
-      - [ "char *restrict", resolved_name, { decodeAt: exit } ]
+      - [ "char *restrict", resolved_name, { direction: out } ]
 ```
 
 This example hooks the following method from the [C standard library on iOS](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/realpath.3.html):
@@ -277,7 +277,7 @@ char *realpath(const char *restrict file_name,
 
 The `resolved_name` parameter must be decoded at exit because it contains an absolute pathname after resolution.
 
-### `decoderArgs`-Option: Pass Arguments to Decoder
+### `decoderArg`-Option: Pass Arguments to Decoder
 
 In native functions, primitive arrays are passed by reference. In some cases, we need additional context to decode the parameter.
 
@@ -295,7 +295,6 @@ This function encrypts `inl` bytes from the `in` buffer and writes the encrypted
 
 If we want to decode the `out` buffer, we must pass its length (`outl`) to the buffer decoder.
 
-
 #### Pass Arguments to Decoder in Java
 
 ```yaml
@@ -304,7 +303,7 @@ methods:
   - name: read
     overloads:
       - params:
-        - [ "[B", buffer, { decoderArgs: [ len ] } ]
+        - [ "[B", buffer, { decoderArg: len } ]
         - [ int, off ]
         - [ int, len ]
 ```
@@ -326,7 +325,7 @@ objcClass: NSData
 methods:
   - name: "- getBytes"
     params:
-      - [ "(void *)", buffer, { decoderArgs: [ range ] } ]
+      - [ "(void *)", buffer, { decoderArg: range } ]
       - [ "(NSUInteger)", range ]
 ```
 
@@ -345,10 +344,10 @@ The `buffer` decoder uses the `length` parameter to specify how many bytes to de
 module: libssl.so
 functions:
   - symbol: EVP_DigestFinal_ex
-    returnType: int
+    retType: int
     params:
       - [ "EVP_MD_CTX *", ctx ]
-      - [ "unsigned char *", md, { decodeAt: exit, decoderArgs: [ ctx ] } ]
+      - [ "unsigned char *", md, { direction: out, decoderArg: ctx } ]
       - [ "unsigned int *", s ]
 ```
 

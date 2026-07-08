@@ -1,0 +1,190 @@
+// very simple testing framework runnable in a frida environment
+
+interface Matcher<T> {
+  toBe: (expected: T) => void;
+  toEqual: (expected: T) => void;
+  toBeTruthy: () => void;
+  toBeFalsy: () => void;
+  toBeNull: () => void;
+  toThrow: (errorMatch?: string | Error) => void;
+  toLogWarn: (expected: string) => void;
+  toLogError: (expected: string) => void;
+  not: Matcher<T>;
+}
+
+declare global {
+  function describe(name: string, fn: () => void | Promise<void>): void;
+  function it(name: string, fn: () => void | Promise<void>): void;
+  function expect<T>(actual: T): Matcher<T>;
+}
+
+interface TestResult {
+  name: string;
+  passed: boolean;
+  depth: number;
+  error?: string;
+  children?: TestResult[];
+}
+
+type TestMessage = { type: "test-result"; result: TestResult } | { type: "test-complete"; success: boolean; results: TestResult[] };
+
+const topLevelTests: Array<{ name: string; fn: () => void | Promise<void> }> = [];
+const suiteStack: Array<Array<{ name: string; fn: () => void | Promise<void> }>> = [];
+
+const registerTest = (name: string, fn: () => void | Promise<void>) => {
+  const current = suiteStack[suiteStack.length - 1];
+  (current ?? topLevelTests).push({ name, fn });
+};
+
+globalThis.describe = registerTest;
+globalThis.it = registerTest;
+
+const assert = (condition: boolean, message: string) => {
+  if (!condition) throw new Error(message);
+};
+
+const deepEqual = <T>(a: T, b: T): boolean => {
+  if (a === b) return true;
+  if (a == null || b == null || typeof a !== "object" || typeof b !== "object") return false;
+  const keysA = Object.keys(a).filter((k) => (a as Record<string, unknown>)[k] !== undefined);
+  const keysB = Object.keys(b).filter((k) => (b as Record<string, unknown>)[k] !== undefined);
+  if (keysA.length !== keysB.length) return false;
+  return keysA.every((k) => deepEqual((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]));
+};
+
+const createMatcher = <T>(actual: T, negated = false): Matcher<T> => {
+  const check = (condition: boolean, message: string) => assert(negated ? !condition : condition, message);
+
+  const matcher: Matcher<T> = {
+    toBe: (expected) => check(actual === expected, negated ? `Expected ${actual} not to be ${expected}` : `Expected ${actual} to be ${expected}`),
+
+    toEqual: (expected) => {
+      return check(
+        deepEqual(actual, expected),
+        negated
+          ? `Expected ${JSON.stringify(actual, null, 2)} not to equal ${JSON.stringify(expected, null, 2)}`
+          : `Expected ${JSON.stringify(actual, null, 2)} to equal ${JSON.stringify(expected, null, 2)}`,
+      );
+    },
+
+    toBeTruthy: () => check(!!actual, negated ? `Expected ${actual} not to be truthy` : `Expected ${actual} to be truthy`),
+
+    toBeFalsy: () => check(!actual, negated ? `Expected ${actual} not to be falsy` : `Expected ${actual} to be falsy`),
+
+    toBeNull: () => check(actual === null, negated ? `Expected ${actual} not to be null` : `Expected ${actual} to be null`),
+
+    toThrow: (errorMatch) => {
+      assert(typeof actual === "function", "Expected a function");
+      let caughtError: unknown;
+      try {
+        (actual as () => void)();
+      } catch (e) {
+        caughtError = e;
+      }
+      check(caughtError !== undefined, negated ? "Expected function not to throw" : "Expected function to throw");
+      if (negated || !errorMatch || !(caughtError instanceof Error)) return;
+      if (typeof errorMatch === "string") {
+        assert(caughtError.message.includes(errorMatch), `Expected error message to include "${errorMatch}" but got "${caughtError.message}"`);
+      } else {
+        assert(
+          caughtError instanceof errorMatch.constructor && caughtError.message === errorMatch.message,
+          `Expected ${errorMatch.constructor.name}: "${errorMatch.message}" but got ${(caughtError as Error).constructor.name}: "${caughtError.message}"`,
+        );
+      }
+    },
+
+    toLogWarn: (expected: string) => {
+      assert(typeof actual === "function", "Expected a function");
+      const original = frooky.log.warn;
+      let captured: string | undefined;
+      frooky.log.warn = (msg: string) => {
+        captured = msg;
+      };
+      try {
+        (actual as () => void)();
+      } finally {
+        frooky.log.warn = original;
+      }
+      check(captured !== undefined, negated ? `Expected frooky.log.warn not to be called` : `Expected frooky.log.warn to be called`);
+      if (negated || captured === undefined) return;
+      assert(captured.includes(expected), `Expected frooky.log.warn to be called with "${expected}" but got "${captured}"`);
+    },
+
+    toLogError: (expected: string) => {
+      assert(typeof actual === "function", "Expected a function");
+      const original = frooky.log.error;
+      let captured: string | undefined;
+      frooky.log.error = (msg: string) => {
+        captured = msg;
+      };
+      try {
+        (actual as () => void)();
+      } finally {
+        frooky.log.error = original;
+      }
+      check(captured !== undefined, negated ? `Expected frooky.log.error not to be called` : `Expected frooky.log.error to be called`);
+      if (negated || captured === undefined) return;
+      assert(captured.includes(expected), `Expected frooky.log.error to be called with "${expected}" but got "${captured}"`);
+    },
+
+    get not() {
+      return createMatcher(actual, !negated);
+    },
+  };
+
+  return matcher;
+};
+
+globalThis.expect = <T>(actual: T): Matcher<T> => createMatcher(actual);
+
+async function runSuite(name: string, fn: () => void | Promise<void>, depth: number): Promise<TestResult> {
+  const children: Array<{ name: string; fn: () => void | Promise<void> }> = [];
+  suiteStack.push(children);
+
+  let passed = true;
+  let error: string | undefined;
+  try {
+    await fn();
+  } catch (e) {
+    passed = false;
+    error = e instanceof Error ? e.message : String(e);
+  } finally {
+    suiteStack.pop();
+  }
+
+  const childResults = await Promise.all(children.map((c) => runSuite(c.name, c.fn, depth + 1)));
+  if (childResults.some((c) => !c.passed)) passed = false;
+
+  return {
+    name,
+    passed,
+    depth,
+    error,
+    children: childResults.length > 0 ? childResults : undefined,
+  };
+}
+
+export async function runTests(sendCallback: (message: TestMessage) => void): Promise<void> {
+  const suitesToRun = [...topLevelTests];
+  topLevelTests.length = 0;
+
+  if (suitesToRun.length === 0) {
+    sendCallback({ type: "test-complete", success: true, results: [] });
+    return;
+  }
+
+  const allResults: TestResult[] = [];
+  for (const suite of suitesToRun) {
+    const result = await runSuite(suite.name, suite.fn, 0);
+    allResults.push(result);
+    sendCallback({ type: "test-result", result });
+  }
+
+  sendCallback({
+    type: "test-complete",
+    success: allResults.every((r) => r.passed),
+    results: allResults,
+  });
+}
+
+export {};

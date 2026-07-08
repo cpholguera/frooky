@@ -1,11 +1,10 @@
-import fs from 'fs';
-import { spawnSync, spawn } from 'child_process';
-import path from 'path';
-import * as yaml from 'js-yaml';
+import { spawn, spawnSync } from 'child_process';
 import chokidar from 'chokidar';
+import fs from 'fs';
+import * as yaml from 'js-yaml';
 import minimist from 'minimist';
+import path, { join } from 'path';
 import { fileURLToPath } from 'url';
-import { join } from 'path'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -43,7 +42,6 @@ const hooksFilePaths = argv._.slice(1);
 const sourceDir = path.join(__dirname, platformOption);
 const distDir = path.join(__dirname, 'dist');
 const buildDir = path.join(__dirname, 'build');
-const combinedHookPath = path.join(buildDir, '_hooks.ts');
 const agentPath = path.join(distDir, `agent-${platformOption}.js`)
 const versionPath = path.join(distDir, `version.json`)
 
@@ -107,41 +105,43 @@ function cleanupBuildDir() {
 }
 
 // TODO: Patch when fixing https://github.com/cpholguera/frooky/issues/29
-// Function to merge hook YAML (or JSON) files and generate _hooks.ts
+// Function to merge multiple hook configuration files into one
 function generateHooksFile() {
-    const mergedHooks = {
-        category: null,
-        hooks: []
-    };
+    const frookyConfigs = []
     hooksFilePaths.forEach(file => {
         try {
             const content = fs.readFileSync(file, 'utf8');
             const ext = path.extname(file).toLowerCase();
 
-            const parsed = (ext === '.yaml' || ext === '.yml')
+            frookyConfigs.push((ext === '.yaml' || ext === '.yml')
                 ? yaml.load(content)
-                : JSON.parse(content);
+                : JSON.parse(content));
 
-            if (!mergedHooks.category && parsed.category) {
-                mergedHooks.category = parsed.category;
-            }
-
-            if (parsed.hooks && Array.isArray(parsed.hooks)) {
-                mergedHooks.hooks = mergedHooks.hooks.concat(parsed.hooks);
-            }
         } catch (error) {
             console.error(`Error reading ${file}:`, error.message);
             process.exit(1);
         }
     });
 
-    const tsContent = `export const target = ${JSON.stringify(mergedHooks, null, 2)};\n`;
+    const targetFile = path.join(buildDir, `index.${targetOption}.ts`);
+    const replacement = `frookyConfigs = ${JSON.stringify(frookyConfigs)} as InputFrookyConfig[];`;
+
+    const blockRegex = /(\/\/%%% REPLACE START\n)[\s\S]*?(\/\/%%% REPLACE STOP)/;
 
     try {
-        fs.writeFileSync(combinedHookPath, tsContent);
-        if (verbose) { console.log(`Hook compiling successful. Location: ${combinedHookPath}`) }
+        let content = fs.readFileSync(targetFile, 'utf8');
+
+        if (!blockRegex.test(content)) {
+            console.error('Replace block markers not found in index.ts');
+            process.exit(1);
+        }
+
+        content = content.replace(blockRegex, `$1${replacement}\n$2`);
+        fs.writeFileSync(targetFile, content, 'utf8');
+
+        if (verbose) { console.log(`Hook compiling successful. Updated: ${targetFile}`); }
     } catch (error) {
-        console.error('Error writing hooks.ts:', error.message);
+        console.error('Error updating index.ts:', error.message);
         process.exit(1);
     }
 }
@@ -184,7 +184,7 @@ function validateInput() {
 
     // validate hooks files
     if (targetOption === 'frida') {
-        if (hooksFilePaths.length == 0) {
+        if (hooksFilePaths.length === 0) {
             console.error(`No hook files provided. Provide one or more hook files.`);
             process.exit(1);
         }
@@ -223,7 +223,7 @@ function setupBuildDir() {
         fs.unlinkSync(unusedIndexPath);
     }
 
-    if (targetOption == 'frida') {
+    if (targetOption === 'frida') {
         generateHooksFile();
     }
 }

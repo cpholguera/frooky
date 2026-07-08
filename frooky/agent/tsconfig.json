@@ -6,23 +6,7 @@
     "strict": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
-    "types": [
-      "node",
-      "frida-gum",
-      "frida-java-bridge",
-      "frida-objc-bridge",
-      "frida-swift-bridge"
-    ],
-    "paths": {
-      "frooky": ["./types/index.d.ts"]
-    }
+    "types": ["node", "frida-gum", "frida-java-bridge", "frida-objc-bridge", "frida-swift-bridge"]
   },
-  "include": [
-    "ios/**/*",
-    "android/**/*",
-    "shared/**/*",
-    "types/**/*",
-    "examples",
-    "tests/**/*"
-  ]
+  "include": ["./**/*"]
 }

@@ -33,5 +33,5 @@ jobs:
       - name: Upload iOS artifact
         uses: actions/upload-artifact@v7
         with:
-          name: target-app-ios
+          name: target-apps-ios
           path: tests/target-apps/ios/dist/

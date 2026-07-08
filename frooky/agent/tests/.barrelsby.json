@@ -1,0 +1,9 @@
+{
+  "directory": ["./tests/android", "./tests/ios", "./android", "./ios", "./shared", "./native"],
+  "include": "\\.test\\.ts$",
+  "exclude": ["index\\.test\\.ts$", "index\\.ts$"],
+  "name": "index.test.ts",
+  "delete": true,
+  "singleQuotes": true,
+  "noHeader": true
+}
