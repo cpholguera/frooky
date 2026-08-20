@@ -11,10 +11,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const argv = minimist(process.argv.slice(2), {
     boolean: ['watch', 'compress', 'verbose', 'keep-build-dir'],
-    string: ['target', 'platform', 'type-check'],
+    string: ['target', 'type-check'],
     alias: {
         t: 'target',
-        p: 'platform',
         w: 'watch',
         c: 'compress',
         v: 'verbose',
@@ -31,14 +30,14 @@ const argv = minimist(process.argv.slice(2), {
 
 // args
 const targetOption = argv.target;
-const platformOption = argv.platform;
+const platformOption = argv._[0];
 const typeCheckOption = argv['type-check'];
 const keepBuildDirOption = argv['keep-build-dir'];
 const watchOption = argv.watch;
 const compressOption = argv.compress;
 const helpOption = argv.help;
 const verbose = argv.verbose;
-const hooksFilePaths = argv._;
+const hooksFilePaths = argv._.slice(1);
 
 // config paths
 const sourceDir = path.join(__dirname, platformOption);
@@ -108,7 +107,7 @@ function cleanupBuildDir() {
 }
 
 // TODO: Patch when fixing https://github.com/cpholguera/frooky/issues/29
-// Function to merge and generate _hooks.ts
+// Function to merge hook YAML (or JSON) files and generate _hooks.ts
 function generateHooksFile() {
     const mergedHooks = {
         category: null,
@@ -150,18 +149,20 @@ function generateHooksFile() {
 
 function showHelp() {
     console.log(`
+    Usage: node build.js <platform> [hook-files...] [options]
+
+    Arguments:
+    <platform>                Platform to target (android, ios)
+    [hook-files...]           Paths to hook YAML (or JSON) files to process (frida target only)
+
     Options:
     -t, --target <name>       Target environment (frooky, frida) [default: frooky]
-    -p, --platform <name>     Platform (android, ios)
     --type-check <name>       Sets TypeScript type checking (full, none) [default: full]
     -w, --watch               Re-Compiles agent.js every time code or hooks change [default: false]
     -c, --compress            Compress agent.js [default: false]
     -v, --verbose             Verbose output [default: false]
     --keep-build-dir          Keeps the build directory after compiling the agent [default: false]
     -h, --help                Show this help message
-
-    Arguments:
-    [hook-files...]           Paths to hook files to process.
     `);
     process.exit(0);
 }
