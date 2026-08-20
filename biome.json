@@ -1,3 +1,12 @@
 {
-  "extends": ["./frooky/agent/biome.json"]
+  "extends": ["./frooky/agent/biome.json"],
+  "json": {
+    "linter": {
+      "enabled": true
+    },
+    "formatter": {
+      "enabled": true,
+      "trailingCommas": "none"
+    }
+  }
 }

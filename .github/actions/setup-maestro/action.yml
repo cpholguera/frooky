@@ -1,0 +1,21 @@
+name: Setup Maestro
+description: Download, install and configure Maestro
+runs:
+  using: composite
+  steps:
+      - name: Cache Maestro
+        uses: actions/cache@v5
+        id: maestro-cache
+        with:
+          path: ~/.maestro
+          key: maestro-${{ runner.os }}
+
+      - name: Install Maestro
+        shell: bash
+        if: steps.maestro-cache.outputs.cache-hit != 'true'
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+
+      - name: Add Maestro to PATH
+        shell: bash
+        run: echo "${HOME}/.maestro/bin" >> $GITHUB_PATH

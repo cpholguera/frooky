@@ -1,6 +1,7 @@
 name: Verify frooky host
 
 on:
+  workflow_call:
   push:
 
 permissions:
@@ -23,7 +24,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.x"
+          python-version: "3.14"
 
       - name: Download host artifact
         uses: actions/download-artifact@v8

@@ -1,0 +1,8 @@
+android {
+    externalNativeBuild {
+        cmake {
+            path = file("cpp/CMakeLists.txt")
+        }
+    }
+}
+

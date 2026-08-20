@@ -12,8 +12,6 @@ jobs:
 
   build-app-android:
     uses: ./.github/workflows/build-app-android.yml
-    with:
-      app_dir: "mastg-demo-0060"
 
   test-host-android:
     name: Test host Android
@@ -32,18 +30,21 @@ jobs:
       - name: Download MAS app Android artifact
         uses: actions/download-artifact@v8
         with:
-          name: target-app-android
-          path: target-app-android
+          name: target-apps-android
+          path: target-apps-android
 
       - name: Setup Host Test Environment
         uses: ./.github/actions/setup-host-test-env
+
+      - name: Setup Maestro
+        uses: ./.github/actions/setup-maestro
 
       - name: Setup Android emulator environment
         uses: ./.github/actions/setup-android-emulator
         with:
           api-level: "34"
 
-      - name: Run tests
+      - name: Install Frida and all apps
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -54,6 +55,8 @@ jobs:
           script: |
             chmod +x .github/scripts/android/prep-device.sh
             chmod +x .github/scripts/android/install-frida-server.sh
+            chmod +x .github/scripts/android/install-target-apps.sh
+            chmod +x .github/scripts/android/launch-target-apps.sh
 
             echo "Starting adb as root"
             .github/scripts/android/prep-device.sh
@@ -61,14 +64,21 @@ jobs:
             echo "Installing frida server"
             .github/scripts/android/install-frida-server.sh
 
-            echo "Installing target app"
-            adb install target-app-android/MASTestApp.apk
+            echo "Installing target apps"
+            .github/scripts/android/install-target-apps.sh
 
-            echo "TBD: run integration tests for Android"
+            echo "Launching all target apps"
+            .github/scripts/android/launch-target-apps.sh
+            
+            echo "Running Android test"
+            pytest tests/integration/android  --report-log=test-results.jsonl
+
+            echo "Summarize test result"
+            jq -rn '[inputs | select(."$report_type" == "TestReport" and .when == "call")] | .[] | "- \(if .outcome == "passed" then "✅" elif .outcome == "failed" then "❌" else "⏭️" end) \(.nodeid) (\(.duration | . * 100 | round / 100)s)"' test-results.jsonl  >> "$GITHUB_STEP_SUMMARY"    
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: test-results-android
-          path: test-results-android.txt
+          name: test-results
+          path: test-results.jsonl

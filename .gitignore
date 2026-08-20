@@ -34,5 +34,4 @@ htmlcov/
 # IDE / OS
 .DS_Store
 .idea/
-.vscode/*
-!.vscode/extensions.json
+

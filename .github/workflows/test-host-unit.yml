@@ -1,0 +1,44 @@
+name: "Test: Host Unit Tests"
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: "./frooky/agent/package-lock.json"
+      - run: chmod +x compileAgent.sh
+      - run: ./compileAgent.sh --dev
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install Python from [dev]
+        run: python -m pip install -e '.[dev]'
+
+      - name: Run host unit tests
+        run: pytest tests/unit --report-log=test-results.jsonl
+
+      - name: Summarize test result
+        if: always()
+        run: |
+            jq -rn '[inputs | select(."$report_type" == "TestReport" and .when == "call")] | .[] | "- \(if .outcome == "passed" then "✅" elif .outcome == "failed" then "❌" else "⏭️" end) \(.nodeid) (\(.duration | . * 100 | round / 100)s)"' test-results.jsonl  >> "$GITHUB_STEP_SUMMARY"  >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: test-results.jsonl
