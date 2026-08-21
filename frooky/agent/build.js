@@ -214,7 +214,19 @@ function setupBuildDir() {
     }
 
     // copy code to build dir
-    fs.cpSync(path.join(__dirname, platformOption), `${buildDir}`, { recursive: true });
+    const src = path.join(__dirname, platformOption);
+    const dest =  `${buildDir}`;
+
+    fs.mkdirSync(dest, { recursive: true });
+    for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+        const srcPath = path.join(src, entry.name);
+        const destPath = path.join(dest, entry.name);
+        if (entry.isDirectory()) {
+            copyDirPlain(srcPath, destPath);
+        } else {
+            fs.writeFileSync(destPath, fs.readFileSync(srcPath));
+        }
+    }
 
     // Remove the index file we're NOT using
     const unusedTarget = targetOption === 'frida' ? 'frooky' : 'frida';
